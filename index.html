@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reward Charts</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rewards">
+<link rel="apple-touch-icon" href="icons/home.png">
+<link rel="icon" href="icons/home.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <nav class="top"><span></span><span id="sync" class="sync">Connecting…</span></nav>
+  <header class="head">
+    <p class="eyebrow">The Ofloy kids</p>
+    <h1>Reward Charts</h1>
+  </header>
+  <div class="homecards">
+    <a class="homecard" href="eli.html" style="--accent:#C2501C">
+      <img src="icons/eli.png" alt="">
+      <div><strong>Eli</strong><small>Running · Chores · School</small></div>
+      <span class="hc-prog" id="p-eli"></span>
+    </a>
+    <a class="homecard" href="trombone.html" style="--accent:#1D6FB8">
+      <img src="icons/trombone.png" alt="">
+      <div><strong>Racquetball &amp; Trombone</strong><small>Move · Racquetball · Chores · Trombone</small></div>
+      <span class="hc-prog" id="p-trombone"></span>
+    </a>
+    <a class="homecard" href="isaiah.html" style="--accent:#1d6b38">
+      <img src="icons/isaiah.png" alt="">
+      <div><strong>Ball Master</strong><small>600 touches · Juggling levels</small></div>
+      <span class="hc-prog" id="p-isaiah"></span>
+    </a>
+  </div>
+  <p class="note">Checkmarks sync to every phone and computer that opens this page. Add each chart to your Home Screen from the Share menu for one-tap access.</p>
+</main>
+<script type="module">
+import { watch, ymd, mondayOf, statusPill } from './store.js';
+import { CHARTS, weekProgress } from './charts.js';
+const wk = ymd(mondayOf(new Date()));
+['eli', 'trombone'].forEach((id) => watch(id, (d) => {
+  const p = weekProgress(CHARTS[id], d.weeks && d.weeks[wk]);
+  document.getElementById('p-' + id).textContent = p.perfect ? 'Perfect week!' : p.done + '/' + p.need + ' this week';
+}, id === 'eli' ? statusPill(document.getElementById('sync')) : null));
+watch('isaiah', (d) => {
+  const t = d.touches || {};
+  let full = 0;
+  for (let w = 0; w < 4; w++) for (let x = 0; x < 7; x++) if (((t[w] || {})[x] || 0) >= 6) full++;
+  const lv = Object.keys(d.juggle || {}).length;
+  document.getElementById('p-isaiah').textContent = full + '/28 days · ' + lv + '/10 levels';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ball Master Challenge</title>
+<meta name="theme-color" content="#14201a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ball Master">
+<link rel="apple-touch-icon" href="icons/isaiah.png">
+<link rel="icon" href="icons/isaiah.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="soccer">
+<main class="wrap">
+  <nav class="top"><a href="./" class="back">&larr; All charts</a><span id="sync" class="sync">Connecting…</span></nav>
+  <header class="head bm">
+    <svg width="54" height="54" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="29" fill="#ffffff" stroke="#14201a" stroke-width="3"></circle>
+      <polygon points="32,20 43,28 39,41 25,41 21,28" fill="#14201a"></polygon>
+      <path d="M32 20 L32 5 M43 28 L58 23 M39 41 L48 54 M25 41 L16 54 M21 28 L6 23" stroke="#14201a" stroke-width="3" fill="none"></path>
+    </svg>
+    <div><h1>BALL MASTER</h1><p class="eyebrow">Training challenge</p></div>
+  </header>
+  <label class="startdate">Challenge start date <input type="date" id="start"></label>
+
+  <section class="sec">
+    <div class="sechead"><span class="num">1</span><div><h2>600 touches every day</h2><p>Tap a day once for every 100 touches. All 6 balls = day complete!</p></div></div>
+    <div id="weeks"></div>
+    <p class="hint">Touch ideas: toe taps, sole rolls, inside-inside, inside-outside, V-pulls, foundations. Any touch with the ball counts.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sechead"><span class="num juggle">2</span><div><h2>Juggling levels</h2><p>Juggles in a row, no hands, ball never hits the ground. Beat a level, tap it, pick your prize!</p></div></div>
+    <div id="levels" class="levels"></div>
+  </section>
+
+  <section class="card reward" id="prizes">
+    <h2>Prize menu</h2>
+    <div id="prizelist" class="prizelist"></div>
+  </section>
+
+  <button id="reset" class="linkbtn danger">Start a new 4-week challenge</button>
+</main>
+<script type="module" src="soccer.js"></script>
+</body>
+</html>
