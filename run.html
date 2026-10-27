@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eli's Training</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Eli's Run">
+<link rel="apple-touch-icon" href="icons/run.png">
+<link rel="icon" href="icons/run.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="runpage" style="--accent:#C2501C">
+<main class="wrap">
+  <nav class="top"><a href="./" class="back">&larr; All charts</a><span id="sync" class="sync">Connecting…</span></nav>
+  <header class="head">
+    <p class="eyebrow" id="eyebrow">Eli · 13-week plan</p>
+    <h1>Training</h1>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-run" aria-selected="true" aria-controls="panel-run">Today's Run</button>
+    <button role="tab" id="tab-def" aria-selected="false" aria-controls="panel-def">Definitions</button>
+  </div>
+
+  <section id="panel-run" role="tabpanel" aria-labelledby="tab-run" class="panel">
+    <div class="daynav">
+      <button id="prevday" class="navbtn" aria-label="Previous day">&lsaquo;</button>
+      <label class="datepick"><span class="sr">Pick a date</span><input type="date" id="date"></label>
+      <button id="nextday" class="navbtn" aria-label="Next day">&rsaquo;</button>
+    </div>
+    <button id="today" class="linkbtn" hidden>Back to today</button>
+
+    <div id="workout" class="workout"></div>
+    <div id="checklist" class="checklist"></div>
+
+    <section id="logcard" class="card logcard">
+      <h2>Run log</h2>
+      <div class="logrow">
+        <div class="field">
+          <span class="flabel">Total time</span>
+          <div class="timein">
+            <input id="tmin" inputmode="numeric" pattern="[0-9]*" placeholder="min" aria-label="Minutes">
+            <span>:</span>
+            <input id="tsec" inputmode="numeric" pattern="[0-9]*" placeholder="sec" aria-label="Seconds">
+          </div>
+        </div>
+        <label class="field"><span class="flabel">Total miles</span><input id="miles" inputmode="decimal" placeholder="0.00"></label>
+        <div class="field pacebox"><span class="flabel">Pace</span><strong id="pace">–:–</strong><small>per mile</small></div>
+      </div>
+      <div class="effort">
+        <span class="flabel">Effort (1 = super easy, 10 = all-out)</span>
+        <div id="effort" class="effortbtns"></div>
+      </div>
+      <label class="field"><span class="flabel">Anything sore? Notes</span><input id="note" placeholder="Tell Dad if it's one spot or makes you limp"></label>
+    </section>
+
+    <section class="card weekcard">
+      <h2 id="weektitle">This week</h2>
+      <div class="weekstats">
+        <div><strong id="wmiles">0.0</strong><small>miles</small></div>
+        <div><strong id="wtime">0:00</strong><small>run time</small></div>
+        <div><strong id="wpace">–:–</strong><small>avg pace</small></div>
+        <div><strong id="wdays">0</strong><small>days done</small></div>
+      </div>
+      <p class="note" id="wgoal"></p>
+    </section>
+  </section>
+
+  <section id="panel-def" role="tabpanel" aria-labelledby="tab-def" class="panel" hidden>
+    <div id="defs"></div>
+  </section>
+</main>
+<script type="module" src="run.js"></script>
+</body>
+</html>

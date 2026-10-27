@@ -26,6 +26,11 @@
       <div><strong>Eli</strong><small>Running · Chores · School</small></div>
       <span class="hc-prog" id="p-eli"></span>
     </a>
+    <a class="homecard" href="run.html" style="--accent:#C2501C">
+      <img src="icons/run.png" alt="">
+      <div><strong>Eli's Training</strong><small>Today's run · Definitions</small></div>
+      <span class="hc-prog" id="p-run"></span>
+    </a>
     <a class="homecard" href="trombone.html" style="--accent:#1D6FB8">
       <img src="icons/trombone.png" alt="">
       <div><strong>Racquetball &amp; Trombone</strong><small>Move · Racquetball · Chores · Trombone</small></div>
@@ -47,6 +52,11 @@ const wk = ymd(mondayOf(new Date()));
   const p = weekProgress(CHARTS[id], d.weeks && d.weeks[wk]);
   document.getElementById('p-' + id).textContent = p.perfect ? 'Perfect week!' : p.done + '/' + p.need + ' this week';
 }, id === 'eli' ? statusPill(document.getElementById('sync')) : null));
+import('./plan.js').then(({ planFor }) => watch('eli-run', (d) => {
+  const p = planFor(new Date());
+  const it = ((d.days || {})[ymd(new Date())] || {}).items || {};
+  document.getElementById('p-run').textContent = p ? 'Today: ' + p.title + (p.items.length && p.items.filter((i) => !i.opt).every((i) => it[i.key]) && p.items.some((i)=>!i.opt) ? ' · done!' : '') : 'Plan finished';
+}));
 watch('isaiah', (d) => {
   const t = d.touches || {};
   let full = 0;
