@@ -18,18 +18,43 @@ const SHOWER = { eli: [0, 1, 2, 3, 4, 5, 6], rhett: [6, 1, 3], isaiah: [0, 2, 5]
 export const AFTER_SNACKS = ['Banana', 'Yogurt', 'Cheese stick', 'Fruit'];
 export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 'Protein shake', 'Peanut butter'];
 
-// Bedtime times by kid and night type. Each row: [key, time, label]
+// Bedtime: steps in order with how many minutes each takes.
+// Normal nights count backward from lights out; Wednesday (and Rhett's Thursday) count forward from getting home.
 const t = (h, m) => h * 60 + m;
-const BED = {
-  young: [['snack', t(19, 5)], ['shower', t(19, 15)], ['teeth', t(19, 30)], ['vitamins', t(19, 40)], ['reading', t(19, 45)], ['lights', t(20, 0)]],
-  eli:   [['snack', t(19, 20)], ['shower', t(19, 30)], ['vitamins', t(19, 45)], ['teeth', t(19, 55)], ['reading', t(20, 0)], ['alarm', t(20, 25)], ['lights', t(20, 30)]],
-  // Wednesday: youth group / Awana, no reading
-  wedIsaiah: [['snack', t(20, 15)], ['shower', t(20, 25)], ['teeth', t(20, 40)], ['vitamins', t(20, 45)], ['lights', t(20, 50)]],
-  wedRhett:  [['snack', t(20, 45)], ['shower', t(20, 55)], ['teeth', t(21, 0)], ['vitamins', t(21, 5)], ['lights', t(21, 10)]],
-  wedEli:    [['snack', t(20, 45)], ['shower', t(20, 55)], ['vitamins', t(21, 10)], ['teeth', t(21, 15)], ['lights', t(21, 20)]],
-  // Thursday: Rhett home from racquetball by 8
-  thuRhett:  [['snack', t(20, 0)], ['shower', t(20, 10)], ['teeth', t(20, 25)], ['vitamins', t(20, 30)], ['reading', t(20, 35)], ['lights', t(20, 45)]]
+const MIN = { snack: 10, shower: 15, pjs: 5, teeth: 5 };
+const ORDER = {
+  young: ['snack', 'shower', 'teeth', 'vitamins', 'reading'],
+  eli: ['snack', 'shower', 'vitamins', 'teeth', 'reading']
 };
+const LIGHTS = { eli: t(20, 30), rhett: t(20, 0), isaiah: t(20, 0) };
+const HOME = { 2: { eli: t(20, 45), rhett: t(20, 45), isaiah: t(20, 15) }, 3: { rhett: t(20, 0) } };
+
+function duration(key, kid, showers, short) {
+  if (key === 'shower') return showers ? MIN.shower : MIN.pjs;
+  if (key === 'vitamins') return kid === 'eli' && !short ? 10 : 5;
+  if (key === 'reading') return kid === 'eli' ? 30 : 15;
+  return MIN[key];
+}
+
+function schedule(kid, dow) {
+  const showers = SHOWER[kid].includes(dow);
+  const home = HOME[dow] && HOME[dow][kid];
+  let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].slice();
+  if (dow === 2) steps = steps.filter((s) => s !== 'reading'); // no reading Wednesdays
+  const rows = [];
+  if (home != null) {
+    let at = home;
+    steps.forEach((k) => { rows.push([k, at]); at += duration(k, kid, showers, dow === 2); });
+    rows.push(['lights', at]);
+  } else {
+    let at = LIGHTS[kid];
+    rows.unshift(['lights', at]);
+    steps.slice().reverse().forEach((k) => { at -= duration(k, kid, showers, false); rows.unshift([k, at]); });
+  }
+  // Show choir alarm: Monday and Thursday nights, 5 min before lights out.
+  if (kid === 'eli' && (dow === 0 || dow === 3)) rows.splice(rows.length - 1, 0, ['alarm', rows[rows.length - 1][1] - 5]);
+  return rows;
+}
 
 export function fmtTime(min) {
   const h = Math.floor(min / 60), m = min % 60;
@@ -50,12 +75,7 @@ function bedLabel(key, kid, dow) {
 }
 
 export function bedtime(kid, dow) {
-  let rows;
-  if (dow === 2) rows = BED[{ eli: 'wedEli', rhett: 'wedRhett', isaiah: 'wedIsaiah' }[kid]];
-  else if (dow === 3 && kid === 'rhett') rows = BED.thuRhett;
-  else rows = kid === 'eli' ? BED.eli : BED.young;
-  // show choir alarm: Monday and Thursday nights only
-  rows = rows.filter(([k]) => k !== 'alarm' || dow === 0 || dow === 3);
+  const rows = schedule(kid, dow);
   const late = dow === 4 || dow === 5 ? 30 : 0; // Fri/Sat
   return rows.map(([key, min]) => ({
     key, time: fmtTime(min + late), label: bedLabel(key, kid, dow),
@@ -74,8 +94,14 @@ export function notes(kid, dow) {
   return n;
 }
 
-// Isaiah's weekly AELP + Awana: due Fri–Sun, carries into the week until done.
-export const WEEKLY = { isaiah: [{ key: 'aelp', label: 'AELP (once this week)' }, { key: 'awana', label: 'Awana (once this week)' }] };
+// Isaiah's weekly AELP + Awana. Each runs on its own week (AELP Thu–Wed, Awana Wed–Tue),
+// shows from the day after he gets it, is meant for Fri–Sun, and stays on as "late" until done.
+export const WEEKLY = {
+  isaiah: [
+    { key: 'aelp', label: 'AELP (once this week)', start: 3, show: [3, 4, 5, 6], late: [0, 1, 2], lateNote: 'Not done yet. Finish it by Wednesday.' },
+    { key: 'awana', label: 'Awana (once this week)', start: 2, show: [3, 4, 5, 6], late: [0, 1], lateNote: 'Not done yet. Finish it before Awana Wednesday.' }
+  ]
+};
 
 export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];

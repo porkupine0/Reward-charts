@@ -13,22 +13,24 @@ let data = {};
 
 const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 const longDate = (d) => d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-// AELP/Awana cycle runs Friday to Thursday.
-const cycleOf = (d) => ymd(addDays(d, -((dowOf(d) + 3) % 7)));
+// Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
+const cycleOf = (d, start) => ymd(addDays(d, -((dowOf(d) - start + 7) % 7)));
+const weeklyDef = (key) => (WEEKLY[kid] || []).find((w) => w.key === key);
 
 function dayChecks() { return ((data.days || {})[ymd(date)] || {})[kid] || {}; }
-function weeklyDone() { return (((data.weekly || {})[kid] || {})[cycleOf(date)]) || {}; }
+function weeklyDoneOn(w) { return ((((data.weekly || {})[kid] || {})[w.key] || {})[cycleOf(date, w.start)]) || null; }
 
 function weeklyItems() {
-  const list = WEEKLY[kid] || [];
-  const done = weeklyDone();
   const dow = dowOf(date);
-  const dueDays = dow >= 4; // Fri, Sat, Sun
-  return list.filter((w) => dueDays || !done[w.key] || done[w.key] === ymd(date)).map((w) => ({
-    key: 'w:' + w.key, weekly: w.key, label: w.label,
-    sub: dueDays ? 'Do it Friday, Saturday or Sunday' : 'Not done yet this week. Finish it before Awana Wednesday.',
-    late: !dueDays && !done[w.key]
-  }));
+  return (WEEKLY[kid] || []).filter((w) => {
+    const done = weeklyDoneOn(w);
+    if (done) return done === ymd(date) || dow >= 4; // stays visible (checked) Fri–Sun
+    return w.show.includes(dow) || w.late.includes(dow);
+  }).map((w) => {
+    const late = w.late.includes(dow) && !weeklyDoneOn(w);
+    return { key: 'w:' + w.key, weekly: w.key, label: w.label, late,
+      sub: late ? w.lateNote : 'Do it Friday, Saturday or Sunday' };
+  });
 }
 
 function expand(items) {
@@ -38,7 +40,7 @@ function expand(items) {
 }
 
 function isOn(it, checks) {
-  if (it.weekly) return !!weeklyDone()[it.weekly];
+  if (it.weekly) return !!weeklyDoneOn(weeklyDef(it.weekly));
   return checks[it.key];
 }
 
@@ -126,9 +128,9 @@ document.addEventListener('click', (e) => {
   const key = btn.dataset.key;
   const base = 'days/' + ymd(date) + '/' + kid + '/';
   if (key.startsWith('w:')) {
-    const w = key.slice(2);
-    const cur = weeklyDone()[w];
-    save(ID, 'weekly/' + kid + '/' + cycleOf(date) + '/' + w, cur ? null : ymd(date));
+    const w = weeklyDef(key.slice(2));
+    const cur = weeklyDoneOn(w);
+    save(ID, 'weekly/' + kid + '/' + w.key + '/' + cycleOf(date, w.start), cur ? null : ymd(date));
     return;
   }
   const cur = dayChecks()[key];
