@@ -107,7 +107,7 @@ export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];
   const items = [
     { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
-    { key: 'snack', label: 'After-school snack', choices: AFTER_SNACKS },
+    { key: 'afterSnack', label: 'After-school snack', choices: AFTER_SNACKS },
     { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' },
     kid === 'isaiah' ? { key: 'due', label: 'Check for homework' } : { key: 'due', label: 'Check assignments due', sub: 'Check your email too' }
   ];
