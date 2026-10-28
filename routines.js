@@ -12,8 +12,8 @@ export const CHORES = {
   isaiah: ['Sunroom', 'Dining/Front Room', 'Kitchen', 'Bathrooms', 'Living Room', 'Laundry']
 };
 
-// Shower nights. Eli every night; Rhett and Isaiah alternate.
-const SHOWER = { eli: [0, 1, 2, 3, 4, 5, 6], rhett: [6, 1, 3], isaiah: [0, 2, 5] };
+// Shower nights (never Wednesday, it's already a late night). Eli every other night; Rhett and Isaiah 3x a week.
+const SHOWER = { eli: [0, 1, 3, 4, 5, 6], rhett: [6, 1, 3], isaiah: [0, 3, 5] };
 
 export const AFTER_SNACKS = ['Banana', 'Yogurt', 'Cheese stick', 'Fruit'];
 export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 'Protein shake', 'Peanut butter'];
@@ -32,7 +32,7 @@ const HOME = { 2: { eli: t(20, 45), rhett: t(20, 45), isaiah: t(20, 15) }, 3: { 
 function duration(key, kid, showers, short) {
   if (key === 'shower') return showers ? MIN.shower : MIN.pjs;
   if (key === 'vitamins') return kid === 'eli' && !short ? 10 : 5;
-  if (key === 'reading') return kid === 'eli' ? 30 : 15;
+  if (key === 'reading') return short ? 10 : kid === 'eli' ? 30 : 15;
   return MIN[key];
 }
 
@@ -40,7 +40,6 @@ function schedule(kid, dow) {
   const showers = SHOWER[kid].includes(dow);
   const home = HOME[dow] && HOME[dow][kid];
   let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].slice();
-  if (dow === 2) steps = steps.filter((s) => s !== 'reading'); // no reading Wednesdays
   const rows = [];
   if (home != null) {
     let at = home;
@@ -76,7 +75,8 @@ function bedLabel(key, kid, dow) {
 
 export function bedtime(kid, dow) {
   const rows = schedule(kid, dow);
-  const late = dow === 4 || dow === 5 ? 30 : 0; // Fri/Sat
+  // Fri/Sat: 30 min later; Rhett gets another 30 on top of Isaiah's
+  const late = dow === 4 || dow === 5 ? (kid === 'rhett' ? 60 : 30) : 0;
   return rows.map(([key, min]) => ({
     key, time: fmtTime(min + late), label: bedLabel(key, kid, dow),
     choices: key === 'snack' ? BED_SNACKS : null,
@@ -90,7 +90,7 @@ export function notes(kid, dow) {
   if (dow === 2) n.push(kid === 'isaiah' ? 'Awana tonight · home about 8:15' : 'Youth group tonight · home about 8:45');
   if (dow === 3 && kid === 'rhett') n.push('Racquetball tonight · home by 8');
   if (kid === 'eli' && (dow === 0 || dow === 3)) n.push('Show choir in the morning · alarm 6:25');
-  if (dow === 4 || dow === 5) n.push('No school tomorrow · bedtime 30 min later');
+  if (dow === 4 || dow === 5) n.push('No school tomorrow · bedtime ' + (kid === 'rhett' ? '1 hour' : '30 min') + ' later');
   return n;
 }
 
@@ -109,9 +109,9 @@ export function afterSchool(kid, dow, runPlan) {
     { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
     { key: 'snack', label: 'After-school snack', choices: AFTER_SNACKS },
     { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' },
-    { key: 'due', label: 'Check assignments due' },
-    { key: 'missing', label: 'Check missing assignments' }
+    kid === 'isaiah' ? { key: 'due', label: 'Check for homework' } : { key: 'due', label: 'Check assignments due', sub: 'Check your email too' }
   ];
+  if (kid !== 'isaiah') items.push({ key: 'missing', label: 'Check missing assignments' });
   if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework' });
   items.push({ weekly: true });
   items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][dow] });
