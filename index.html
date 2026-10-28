@@ -21,6 +21,11 @@
     <h1>Reward Charts</h1>
   </header>
   <div class="homecards">
+    <a class="homecard" href="checklist.html" style="--accent:#1B2A41">
+      <img src="icons/checklist.png" alt="">
+      <div><strong>Daily Checklists</strong><small>After school · Bedtime · All 3 kids</small></div>
+      <span class="hc-prog" id="p-routines"></span>
+    </a>
     <a class="homecard" href="eli.html" style="--accent:#C2501C">
       <img src="icons/eli.png" alt="">
       <div><strong>Eli</strong><small>Running · Chores · School</small></div>
@@ -33,12 +38,12 @@
     </a>
     <a class="homecard" href="trombone.html" style="--accent:#1D6FB8">
       <img src="icons/trombone.png" alt="">
-      <div><strong>Racquetball &amp; Trombone</strong><small>Move · Racquetball · Chores · Trombone</small></div>
+      <div><strong>Rhett</strong><small>Move · Racquetball · Chores · Trombone</small></div>
       <span class="hc-prog" id="p-trombone"></span>
     </a>
     <a class="homecard" href="isaiah.html" style="--accent:#1d6b38">
       <img src="icons/isaiah.png" alt="">
-      <div><strong>Ball Master</strong><small>600 touches · Juggling levels</small></div>
+      <div><strong>Isaiah · Ball Master</strong><small>600 touches · Juggling levels</small></div>
       <span class="hc-prog" id="p-isaiah"></span>
     </a>
   </div>
@@ -56,6 +61,16 @@ import('./plan.js').then(({ planFor }) => watch('eli-run', (d) => {
   const p = planFor(new Date());
   const it = ((d.days || {})[ymd(new Date())] || {}).items || {};
   document.getElementById('p-run').textContent = p ? 'Today: ' + p.title + (p.items.length && p.items.filter((i) => !i.opt).every((i) => it[i.key]) && p.items.some((i)=>!i.opt) ? ' · done!' : '') : 'Plan finished';
+}));
+import('./routines.js').then(({ KIDS, afterSchool, weekend, bedtime }) => watch('routines', (d) => {
+  const t = new Date(), dow = (t.getDay() + 6) % 7, day = ((d.days || {})[ymd(t)]) || {};
+  const parts = Object.entries(KIDS).map(([id, k]) => {
+    const keys = [...(dow <= 4 ? afterSchool(id, dow) : weekend(id, dow)), ...bedtime(id, dow)].filter((i) => i.key && !i.opt).map((i) => i.key);
+    const c = day[id] || {};
+    const n = keys.filter((x) => c[x]).length;
+    return k.name + ' ' + n + '/' + keys.length;
+  });
+  document.getElementById('p-routines').textContent = 'Today: ' + parts.join(' · ');
 }));
 watch('isaiah', (d) => {
   const t = d.touches || {};

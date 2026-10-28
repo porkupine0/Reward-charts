@@ -29,8 +29,8 @@ export const CHARTS = {
   },
   trombone: {
     id: 'trombone',
-    kid: 'Racquetball & Trombone',
-    eyebrow: 'My weekly goals',
+    kid: 'Rhett',
+    eyebrow: "Rhett's weekly goals",
     accent: '#1D6FB8',
     rows: [
       { key: 'move', label: 'Move Your Body', sub: '20 minutes active', cells: [m('20 min'), m('20 min'), m('20 min'), O, m('20 min'), m('20 min'), O] },

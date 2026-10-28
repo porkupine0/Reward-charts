@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Checklists</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Checklists">
+<link rel="apple-touch-icon" href="icons/checklist.png">
+<link rel="icon" href="icons/checklist.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="routines">
+<main class="wrap">
+  <nav class="top"><a href="./" class="back">&larr; All charts</a><span id="sync" class="sync">Connecting…</span></nav>
+  <header class="head">
+    <p class="eyebrow" id="eyebrow">Daily checklist</p>
+    <h1 id="h1">After School + Bedtime</h1>
+  </header>
+
+  <div class="tabs kidtabs" role="tablist" id="kidtabs"></div>
+
+  <div class="daynav">
+    <button id="prevday" class="navbtn" aria-label="Previous day">&lsaquo;</button>
+    <label class="datepick"><span class="sr">Pick a date</span><input type="date" id="date"></label>
+    <button id="nextday" class="navbtn" aria-label="Next day">&rsaquo;</button>
+  </div>
+  <button id="today" class="linkbtn" hidden>Back to today</button>
+
+  <div id="notes" class="rnotes"></div>
+  <section id="day" class="rsec"></section>
+  <section id="bed" class="rsec"></section>
+</main>
+<script type="module" src="checklist.js"></script>
+</body>
+</html>
