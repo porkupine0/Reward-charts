@@ -12,8 +12,8 @@ export const CHORES = {
   isaiah: ['Sunroom', 'Dining/Front Room', 'Kitchen', 'Bathrooms', 'Living Room', 'Laundry']
 };
 
-// Shower nights (never Wednesday, it's already a late night). Eli every other night; Rhett and Isaiah 3x a week.
-const SHOWER = { eli: [0, 1, 3, 4, 5, 6], rhett: [6, 1, 3], isaiah: [0, 3, 5] };
+// Shower nights (never Wednesday, it's already a late night). Eli 5 nights (not Wed or Sun); Rhett and Isaiah 3x a week.
+const SHOWER = { eli: [0, 1, 3, 4, 5], rhett: [6, 1, 3], isaiah: [0, 3, 5] };
 
 export const AFTER_SNACKS = ['Banana', 'Yogurt', 'Cheese stick', 'Fruit'];
 export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 'Protein shake', 'Peanut butter'];
