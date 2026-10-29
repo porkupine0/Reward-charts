@@ -50,6 +50,8 @@ function schedule(kid, dow) {
     rows.unshift(['lights', at]);
     steps.slice().reverse().forEach((k) => { at -= duration(k, kid, showers, false); rows.unshift([k, at]); });
   }
+  // Eli charges his watch every night, right before reading.
+  if (kid === 'eli') { const r = rows.findIndex(([k]) => k === 'reading'); rows.splice(r, 0, ['watch', rows[r][1]]); }
   // Show choir alarm: Monday and Thursday nights, 5 min before lights out.
   if (kid === 'eli' && (dow === 0 || dow === 3)) rows.splice(rows.length - 1, 0, ['alarm', rows[rows.length - 1][1] - 5]);
   return rows;
@@ -69,6 +71,7 @@ function bedLabel(key, kid, dow) {
     vitamins: kid === 'eli' ? 'Get water + take vitamins' : 'Vitamins',
     reading: 'Reading',
     alarm: 'Set alarm for 6:25 am (show choir)',
+    watch: 'Charge your watch',
     lights: 'Lights out'
   }[key];
 }
