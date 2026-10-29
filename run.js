@@ -117,6 +117,8 @@ function syncReward(p, checks) {
   if (!p || p.dow === 6) return;
   const done = dayDone(p, checks);
   save('eli', 'weeks/' + ymd(mondayOf(date)) + '/checks/running/' + p.dow, done);
+  // keep the Running step on his after-school checklist in step too
+  if (p.dow <= 4) save('routines', 'days/' + ymd(date) + '/eli/activity', done || null);
 }
 
 // ---------- events ----------

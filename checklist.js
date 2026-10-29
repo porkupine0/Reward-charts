@@ -114,6 +114,7 @@ function mirror(itemKey, on) {
   const chart = KIDS[kid].chart;
   if (!chart) return;
   if (itemKey === 'chore' && dow <= 5) save(chart, 'weeks/' + wk + '/checks/chores/' + dow, on);
+  if (kid === 'eli' && itemKey === 'activity' && dow <= 4) save('eli', 'weeks/' + wk + '/checks/running/' + dow, on);
   if (kid === 'eli' && itemKey === 'missing' && dow <= 4) save('eli', 'weeks/' + wk + '/checks/school/' + dow, on);
   if (kid === 'rhett' && itemKey === 'duolingo' && dow <= 5) save('trombone', 'weeks/' + wk + '/checks/duolingo/' + dow, on);
   if (kid === 'rhett' && itemKey === 'activity') {
