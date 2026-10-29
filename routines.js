@@ -68,7 +68,7 @@ function bedLabel(key, kid, dow) {
     snack: 'Bedtime snack',
     shower: showers ? 'Shower + pajamas' : 'Pajamas on',
     teeth: 'Brush teeth + mouthwash',
-    vitamins: kid === 'eli' ? 'Get water + take vitamins' : 'Vitamins',
+    vitamins: kid === 'eli' ? 'Get water + take ALL vitamins' : 'Vitamins',
     reading: 'Reading',
     alarm: 'Set alarm for 6:25 am (show choir)',
     watch: 'Charge your watch',
@@ -106,6 +106,9 @@ export const WEEKLY = {
   ]
 };
 
+// Rhett's Duolingo: 10 min, Mon–Sat.
+const DUO = { key: 'duolingo', label: 'Duolingo · 10 min' };
+
 export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];
   const items = [
@@ -116,6 +119,7 @@ export function afterSchool(kid, dow, runPlan) {
   ];
   if (kid !== 'isaiah') items.push({ key: 'missing', label: 'Check missing assignments' });
   if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework' });
+  if (kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
   items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][dow] });
   if (kid === 'eli') {
@@ -135,6 +139,7 @@ export function afterSchool(kid, dow, runPlan) {
 export function weekend(kid, dow) {
   const items = [];
   if (dow === 5) items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][5] });
+  if (dow === 5 && kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
   return items;
 }
