@@ -1,5 +1,5 @@
 import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes } from './routines.js';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult } from './routines.js';
 import { planFor } from './plan.js';
 
 const ID = 'routines';
@@ -102,7 +102,9 @@ function render() {
   $('day').hidden = !items.length;
 
   const bed = bedtime(kid, dow);
-  $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: no reading on Wednesdays.' : '', bed, checks, true);
+  $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
+  $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', timerHtml(checks));
+  tick();
 }
 
 // Mirror into the reward charts.
@@ -146,6 +148,42 @@ $('prevday').onclick = () => go(-1);
 $('nextday').onclick = () => go(1);
 $('today').onclick = () => { const t = new Date(); date = new Date(t.getFullYear(), t.getMonth(), t.getDate()); render(); };
 $('date').addEventListener('change', (e) => { if (e.target.value) { date = parseYmd(e.target.value); render(); } });
+
+// ---------- bedtime timer ----------
+const clock = (secs) => Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+function timerRec() { return dayChecks().bedTimer || {}; }
+function timerHtml(checks) {
+  const r = timerRec();
+  if (!r.start) {
+    return '<div class="btimer"><div><strong>Bedtime timer</strong><small>Tap Start when you begin your bedtime checklist.</small></div>' +
+      '<button class="tbtn start" data-timer="start">Start</button></div>';
+  }
+  if (!r.end) {
+    return '<div class="btimer running"><div><strong>Timer running</strong><small>Started at ' + new Date(r.start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + '</small></div>' +
+      '<span class="tclock" id="tclock">0:00</span><button class="tbtn stop" data-timer="stop">Stop</button></div>';
+  }
+  const res = timerResult(kid, date, r, checks);
+  return '<div class="btimer done' + (res.onTime ? ' ontime' : ' late') + '"><div><strong>' + clock(res.secs) + ' total</strong>' +
+    '<small>Finished ' + new Date(r.end).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · lights out ' + fmtTime(res.lo) + ' · ' +
+    (res.onTime ? 'On time!' : 'Late') + ' · ' + res.done + '/' + res.total + ' steps</small></div>' +
+    '<button class="linkbtn" data-timer="reset">Redo</button></div>';
+}
+function tick() {
+  const el = document.getElementById('tclock');
+  const r = timerRec();
+  if (el && r.start && !r.end) el.textContent = clock(Math.max(0, Math.round((Date.now() - r.start) / 1000)));
+}
+setInterval(tick, 1000);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-timer]');
+  if (!b) return;
+  e.stopPropagation();
+  const base = 'days/' + ymd(date) + '/' + kid + '/bedTimer';
+  const a = b.dataset.timer;
+  if (a === 'start') save(ID, base, { start: Date.now() });
+  if (a === 'stop') save(ID, base + '/end', Date.now());
+  if (a === 'reset' && confirm('Clear tonight\'s bedtime time for ' + KIDS[kid].name + '?')) save(ID, base, null);
+}, true);
 
 render();
 watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));

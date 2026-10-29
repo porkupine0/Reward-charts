@@ -78,7 +78,7 @@ export function bedtime(kid, dow) {
   // Fri/Sat: 30 min later; Rhett gets another 30 on top of Isaiah's
   const late = dow === 4 || dow === 5 ? (kid === 'rhett' ? 60 : 30) : 0;
   return rows.map(([key, min]) => ({
-    key, time: fmtTime(min + late), label: bedLabel(key, kid, dow),
+    key, time: fmtTime(min + late), min: min + late, label: bedLabel(key, kid, dow),
     choices: key === 'snack' ? BED_SNACKS : null,
     hot: key === 'shower' && kid !== 'eli' && SHOWER[kid].includes(dow)
   }));
@@ -134,4 +134,25 @@ export function weekend(kid, dow) {
   if (dow === 5) items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][5] });
   items.push({ weekly: true });
   return items;
+}
+
+// Scheduled lights-out (minutes after midnight) for a kid on a night.
+export function lightsOut(kid, dow) {
+  const b = bedtime(kid, dow);
+  return b[b.length - 1].min;
+}
+
+// Bedtime timer result for one night: { secs, onTime, steps } or null.
+export function timerResult(kid, dateObj, rec, checks) {
+  if (!rec || !rec.start || !rec.end) return null;
+  const dow = (dateObj.getDay() + 6) % 7;
+  const lo = lightsOut(kid, dow);
+  const end = new Date(rec.end);
+  // minutes after midnight of the checklist date (past midnight counts as late)
+  // by the clock, so daylight-saving nights work; each day past the checklist date adds 24h
+  const dayGap = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate(), 12) - new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 12)) / 86400000);
+  const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
+  const steps = bedtime(kid, dow);
+  const done = steps.filter((s) => checks && checks[s.key]).length;
+  return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: endMin <= lo, endMin, lo, done, total: steps.length };
 }

@@ -26,6 +26,11 @@
       <div><strong>Daily Checklists</strong><small>After school · Bedtime · All 3 kids</small></div>
       <span class="hc-prog" id="p-routines"></span>
     </a>
+    <a class="homecard" href="stats.html" style="--accent:#1B2A41">
+      <img src="icons/stats.png" alt="">
+      <div><strong>Bedtime Stats</strong><small>Timer results · On-time nights per week</small></div>
+      <span class="hc-prog" id="p-stats"></span>
+    </a>
     <a class="homecard" href="eli.html" style="--accent:#C2501C">
       <img src="icons/eli.png" alt="">
       <div><strong>Eli</strong><small>Running · Chores · School</small></div>
@@ -71,6 +76,15 @@ import('./routines.js').then(({ KIDS, afterSchool, weekend, bedtime }) => watch(
     return k.name + ' ' + n + '/' + keys.length;
   });
   document.getElementById('p-routines').textContent = 'Today: ' + parts.join(' · ');
+}));
+import('./routines.js').then(({ KIDS, timerResult }) => watch('routines', (d) => {
+  const mon = mondayOf(new Date());
+  const parts = Object.entries(KIDS).map(([id, k]) => {
+    let on = 0;
+    for (let i = 0; i < 7; i++) { const x = new Date(mon); x.setDate(x.getDate() + i); const day = ((d.days || {})[ymd(x)] || {})[id] || {}; const r = timerResult(id, x, day.bedTimer, day); if (r && r.onTime) on++; }
+    return k.name + ' ' + on;
+  });
+  document.getElementById('p-stats').textContent = 'On time this week: ' + parts.join(' · ');
 }));
 watch('isaiah', (d) => {
   const t = d.touches || {};

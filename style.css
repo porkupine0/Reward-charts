@@ -254,3 +254,37 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .chip { min-height: 38px; padding: 6px 12px; border-radius: 99px; border: 2px solid var(--line); background: #fff; font-weight: 600; font-size: 14px; cursor: pointer; }
 .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .cklink { display: inline-block; margin: 0 12px 12px 54px; font-weight: 800; font-size: 14px; color: var(--accent); }
+
+/* bedtime timer */
+.btimer { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--soft); flex-wrap: wrap; }
+.btimer > div { flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; }
+.btimer strong { font-size: 16px; }
+.btimer small { font-size: 13px; color: var(--muted); }
+.btimer.running { background: var(--ink); color: #fff; }
+.btimer.running small { color: #CBD5E0; }
+.btimer.ontime { background: #E3F2E8; }
+.btimer.late { background: #FDEFE6; }
+.tclock { font-family: 'Archivo Black', sans-serif; font-size: 30px; font-variant-numeric: tabular-nums; }
+.tbtn { min-height: 48px; min-width: 96px; border-radius: 12px; border: 0; font-weight: 800; font-size: 17px; cursor: pointer; color: #fff; }
+.tbtn.start { background: var(--accent); }
+.tbtn.stop { background: #C2501C; }
+/* stats */
+.statsum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sumcard { border: 2px solid var(--accent); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.sumcard strong { color: var(--accent); font-size: 15px; }
+.sumcard .big { font-family: 'Archivo Black', sans-serif; font-size: 30px; line-height: 1.1; }
+.sumcard .big small { font-size: 16px; color: var(--muted); }
+.sumcard .lbl { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.sumcard .sm { font-size: 13px; font-weight: 600; }
+.kidstats { border: 2px solid var(--line); margin-bottom: 12px; }
+.kidstats .rhead { margin-top: 0; }
+.kidstats .cklink { margin: 0; }
+.tablewrap { overflow-x: auto; }
+.nighttable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.nighttable th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 4px 6px; border-bottom: 2px solid var(--line); }
+.nighttable td { padding: 7px 5px; vertical-align: middle; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.nighttable tr.none td { color: var(--muted); }
+.nighttable small { color: var(--muted); }
+.pill { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 99px; }
+.pill.ok { background: #E3F2E8; color: #1d6b38; }
+.pill.bad { background: #FDEFE6; color: #9A3A10; }
