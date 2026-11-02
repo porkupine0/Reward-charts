@@ -1,5 +1,5 @@
 import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems } from './routines.js';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning } from './routines.js';
 import { planFor } from './plan.js';
 
 const ID = 'routines';
@@ -94,6 +94,13 @@ function render() {
   const checks = dayChecks();
   $('notes').innerHTML = '<p class="rdate">' + esc(longDate(date)) + '</p>' + notes(kid, dow).map((n) => '<span class="rnote">' + esc(n) + '</span>').join('');
 
+  const morn = morning(kid, dow);
+  $('morning').hidden = !morn.length;
+  if (morn.length) {
+    $('morning').innerHTML = section('Morning', 'Optional. Time yourself if you want!', morn, checks, false);
+    $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', mornTimerHtml());
+  }
+
   const school = dow <= 4;
   const items = expand(school ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow));
   $('day').innerHTML = school
@@ -175,21 +182,41 @@ function timerHtml(checks) {
     (res.onTime ? 'On time!' : 'Late') + ' · ' + res.done + '/' + res.total + ' steps</small></div>' +
     '<button class="linkbtn" data-timer="reset">Redo</button></div>';
 }
+function mornTimerHtml() {
+  const r = dayChecks().mornTimer || {};
+  const hm = (t) => new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  if (!r.start) return '<div class="btimer"><div><strong>Morning timer</strong><small>Want to race the clock? Tap Start.</small></div><button class="tbtn start" data-timer="start" data-which="mornTimer">Start</button></div>';
+  if (!r.end) return '<div class="btimer running"><div><strong>Timer running</strong><small>Started at ' + hm(r.start) + '</small></div><span class="tclock" id="mclock">0:00</span><button class="tbtn stop" data-timer="stop" data-which="mornTimer">Stop</button></div>';
+  // best time this week, to beat
+  let best = null;
+  const mon = mondayOf(date);
+  for (let i = 0; i < 5; i++) {
+    const x = (((data.days || {})[ymd(addDays(mon, i))] || {})[kid] || {}).mornTimer;
+    if (x && x.start && x.end) { const t = Math.round((x.end - x.start) / 1000); if (best == null || t < best) best = t; }
+  }
+  const secs = Math.round((r.end - r.start) / 1000);
+  return '<div class="btimer done ontime"><div><strong>' + clock(secs) + ' total' + (best === secs ? ' · best this week!' : '') + '</strong><small>Done at ' + hm(r.end) +
+    (best != null && best !== secs ? ' · this week\'s best ' + clock(best) : '') + '</small></div><button class="linkbtn" data-timer="reset" data-which="mornTimer">Redo</button></div>';
+}
 function tick() {
   const el = document.getElementById('tclock');
   const r = timerRec();
   if (el && r.start && !r.end) el.textContent = clock(Math.max(0, Math.round((Date.now() - r.start) / 1000)));
+  const m = document.getElementById('mclock');
+  const mr = dayChecks().mornTimer || {};
+  if (m && mr.start && !mr.end) m.textContent = clock(Math.max(0, Math.round((Date.now() - mr.start) / 1000)));
 }
 setInterval(tick, 1000);
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-timer]');
   if (!b) return;
   e.stopPropagation();
-  const base = 'days/' + ymd(date) + '/' + kid + '/bedTimer';
+  const which = b.dataset.which || 'bedTimer';
+  const base = 'days/' + ymd(date) + '/' + kid + '/' + which;
   const a = b.dataset.timer;
   if (a === 'start') save(ID, base, { start: Date.now() });
   if (a === 'stop') save(ID, base + '/end', Date.now());
-  if (a === 'reset' && confirm('Clear tonight\'s bedtime time for ' + KIDS[kid].name + '?')) save(ID, base, null);
+  if (a === 'reset' && confirm('Clear this ' + (which === 'mornTimer' ? 'morning' : 'bedtime') + ' time for ' + KIDS[kid].name + '?')) save(ID, base, null);
 }, true);
 
 render();

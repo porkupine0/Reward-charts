@@ -181,3 +181,18 @@ export function timerResult(kid, dateObj, rec, checks) {
   const done = steps.filter((s) => checks && checks[s.key]).length;
   return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: endMin <= lo, endMin, lo, done, total: steps.length };
 }
+
+// Optional school-morning checklist (Isaiah, Mon–Fri).
+export function morning(kid, dow) {
+  if (kid !== 'isaiah' || dow > 4) return [];
+  return [
+    { key: 'mWake', label: 'Wake up' },
+    { key: 'mDress', label: 'Get dressed' },
+    { key: 'mScarlett', label: 'Let Scarlett out' },
+    { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] },
+    { key: 'mShoes', label: 'Put on shoes' },
+    { key: 'mWeather', label: 'Check the weather on Alexa' },
+    { key: 'mJacket', label: 'Put on jacket + backpack' },
+    { key: 'mHigh5', label: 'High five Mom + check the time' }
+  ];
+}
