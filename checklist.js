@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1793625035';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning } from './routines.js?v=1793625035';
-import { planFor } from './plan.js?v=1793625035';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1793626529';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning } from './routines.js?v=1793626529';
+import { planFor } from './plan.js?v=1793626529';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -95,6 +95,9 @@ function render() {
   $('notes').innerHTML = '<p class="rdate">' + esc(longDate(date)) + '</p>' + notes(kid, dow).map((n) => '<span class="rnote">' + esc(n) + '</span>').join('');
 
   const morn = morning(kid, dow);
+  morn.forEach((i) => {
+    if (i.key === 'mHigh5' && checks.readyAt) i.sub = 'All ready at ' + fmtTime(+checks.readyAt.slice(0, 2) * 60 + +checks.readyAt.slice(3)) + (+checks.readyAt.slice(0, 2) < 12 ? ' am' : ' pm');
+  });
   $('morning').hidden = !morn.length;
   if (morn.length) {
     $('morning').innerHTML = section('Morning', 'Optional. Time yourself if you want!', morn, checks, false);
@@ -158,6 +161,10 @@ document.addEventListener('click', (e) => {
   if (chip) next = cur === btn.dataset.choice ? null : btn.dataset.choice;
   else next = cur ? null : true;
   save(ID, base + key, next);
+  if (key === 'mHigh5') {
+    const n = new Date();
+    save(ID, base + 'readyAt', next ? String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') : null);
+  }
   mirror(key, !!next);
 });
 
