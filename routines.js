@@ -141,6 +141,7 @@ export function weekend(kid, dow) {
   if (dow === 5) items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][5] });
   if (dow === 5 && kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
+  if (dow === 6) items.push({ key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
   return items;
 }
 
