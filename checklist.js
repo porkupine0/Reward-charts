@@ -1,5 +1,5 @@
 import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult } from './routines.js';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems } from './routines.js';
 import { planFor } from './plan.js';
 
 const ID = 'routines';
@@ -113,7 +113,12 @@ function mirror(itemKey, on) {
   const wk = ymd(mondayOf(date));
   const chart = KIDS[kid].chart;
   if (!chart) return;
-  if (itemKey === 'chore' && dow <= 5) save(chart, 'weeks/' + wk + '/checks/chores/' + dow, on);
+  if (itemKey.startsWith('chore')) {
+    // Chores box fills in once every chore for the day is checked
+    const c = Object.assign({}, dayChecks(), { [itemKey]: on || null });
+    const all = choreItems(kid, dow).every((i) => c[i.key]);
+    if (kid === 'eli' || dow <= 5) save(chart, 'weeks/' + wk + '/checks/chores/' + dow, all);
+  }
   if (kid === 'eli' && itemKey === 'activity' && dow <= 4) save('eli', 'weeks/' + wk + '/checks/running/' + dow, on);
   if (kid === 'eli' && itemKey === 'missing' && dow <= 4) save('eli', 'weeks/' + wk + '/checks/school/' + dow, on);
   if (kid === 'rhett' && itemKey === 'duolingo' && dow <= 5) save('trombone', 'weeks/' + wk + '/checks/duolingo/' + dow, on);

@@ -5,12 +5,28 @@ export const KIDS = {
   isaiah: { name: 'Isaiah', accent: '#1d6b38', chart: null }
 };
 
-// Chore rotation, Mon–Sat. Sunroom and bathrooms land every other day; Rhett and Isaiah share laundry Saturday.
+// Chore rotation, Mon–Sun (0 = Mon). Each day is a list; every item gets its own checkbox.
+// No room is done two days in a row; Tuesday jobs are fixed; Rhett & Isaiah do laundry Saturday.
+const FAMILY_KITCHEN = 'Kitchen with the family';
+const LAUNDRY = 'Laundry + clean your room (30 min)';
 export const CHORES = {
-  eli:    ['Dining/Front Room', 'Living Room', 'Sunroom', 'Laundry', 'Kitchen', 'Bathrooms'],
-  rhett:  ['Kitchen', 'Bathrooms', 'Living Room', 'Dining/Front Room', 'Sunroom', 'Laundry'],
-  isaiah: ['Sunroom', 'Dining/Front Room', 'Kitchen', 'Bathrooms', 'Living Room', 'Laundry']
+  eli: [
+    [FAMILY_KITCHEN, LAUNDRY], ['Bathrooms'], ['Sunroom'], ['Living Room'], ['Dining/Front Room'], ['Kitchen'],
+    ['Kitchen (all hands)']
+  ],
+  rhett: [
+    [FAMILY_KITCHEN, 'Sunroom'], ['Living Room'], ['Dining/Front Room'], ['Vacuum/brush Scarlett'], ['Kitchen'], [LAUNDRY],
+    ['Kitchen (all hands)', 'Fold + put away clothes']
+  ],
+  isaiah: [
+    [FAMILY_KITCHEN, 'Dining/Front Room'], ['Front closet + shoe organizing'], ['Kitchen'], ['Stairs, landing + upstairs hallway'], ['Sunroom'], [LAUNDRY],
+    ['Kitchen (all hands)', 'Fold + put away clothes']
+  ]
 };
+
+export function choreItems(kid, dow) {
+  return CHORES[kid][dow].map((label, i) => ({ key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, chore: true }));
+}
 
 // Shower nights (never Wednesday, it's already a late night). Eli 5 nights (not Wed or Sun); Rhett and Isaiah 3x a week.
 const SHOWER = { eli: [0, 1, 3, 4, 5], rhett: [6, 1, 3], isaiah: [0, 3, 5] };
@@ -121,7 +137,7 @@ export function afterSchool(kid, dow, runPlan) {
   if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework' });
   if (kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
-  items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][dow] });
+  items.push(...choreItems(kid, dow));
   if (kid === 'eli') {
     items.push({ key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: dow === 4 ? 'Optional bonus run today' : 'Check it off on your Training page', link: 'run.html', opt: dow === 4 });
   } else if (kid === 'rhett') {
@@ -138,7 +154,7 @@ export function afterSchool(kid, dow, runPlan) {
 // Weekend daytime list (Sat chore; Isaiah's weekly work).
 export function weekend(kid, dow) {
   const items = [];
-  if (dow === 5) items.push({ key: 'chore', label: 'Chore: ' + CHORES[kid][5] });
+  items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
   if (dow === 6) items.push({ key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
