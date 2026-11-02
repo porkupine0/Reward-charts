@@ -99,6 +99,10 @@ function render() {
   if (morn.length) {
     $('morning').innerHTML = section('Morning', 'Optional. Time yourself if you want!', morn, checks, false);
     $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', mornTimerHtml());
+    const woke = checks.wokeAt || '';
+    $('morning').querySelector('.btimer').insertAdjacentHTML('afterend',
+      '<div class="wokeat"><label for="wokeAt">What time did you get out of bed?</label>' +
+      '<div class="wokerow"><input type="time" id="wokeAt" value="' + woke + '"><button class="chip" data-wokenow="1">Now</button></div></div>');
   }
 
   const school = dow <= 4;
@@ -217,6 +221,16 @@ document.addEventListener('click', (e) => {
   if (a === 'start') save(ID, base, { start: Date.now() });
   if (a === 'stop') save(ID, base + '/end', Date.now());
   if (a === 'reset' && confirm('Clear this ' + (which === 'mornTimer' ? 'morning' : 'bedtime') + ' time for ' + KIDS[kid].name + '?')) save(ID, base, null);
+}, true);
+
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'wokeAt') save(ID, 'days/' + ymd(date) + '/' + kid + '/wokeAt', e.target.value || null);
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-wokenow]')) return;
+  e.stopPropagation();
+  const n = new Date();
+  save(ID, 'days/' + ymd(date) + '/' + kid + '/wokeAt', String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'));
 }, true);
 
 render();
