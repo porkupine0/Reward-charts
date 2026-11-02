@@ -11,7 +11,7 @@ const FAMILY_KITCHEN = 'Kitchen with the family';
 const LAUNDRY = 'Laundry + clean your room (30 min)';
 export const CHORES = {
   eli: [
-    [FAMILY_KITCHEN, LAUNDRY], ['Living Room'], ['Sunroom'], ['Vacuum/brush Scarlett'], ['Dining/Front Room'], ['Kitchen'],
+    [FAMILY_KITCHEN, LAUNDRY], ['Living Room'], ['Sunroom'], ['Kitchen'], ['Dining/Front Room'], ['Vacuum/brush Scarlett'],
     ['Kitchen (all hands)']
   ],
   rhett: [
