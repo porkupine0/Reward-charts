@@ -1,5 +1,5 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js';
-import { CHARTS, weekProgress } from './charts.js';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1793625035';
+import { CHARTS, weekProgress } from './charts.js?v=1793625035';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const chart = CHARTS[document.body.dataset.chart];
