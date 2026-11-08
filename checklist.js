@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794150579';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794150579';
-import { planFor } from './plan.js?v=1794150579';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794150661';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794150661';
+import { planFor } from './plan.js?v=1794150661';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -129,11 +129,20 @@ function render() {
     ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false)
     : section('Today', '', items, checks, false);
   $('day').hidden = !items.length;
-  if (prize && morn.length && items.length) $('day').querySelector('.rhead').insertAdjacentHTML('afterend', afternoonTreatHtml(prize, earned, checks.mCandyGiven));
+  // Candy handed out this afternoon: this morning's checklist + last night's bedtime.
+  const candy = MORNING_REWARD[kid];
+  if (candy && items.length) {
+    const yd = addDays(date, -1);
+    const sources = [];
+    if (prize && morn.length) sources.push({ earned, yes: 'Finished your whole morning', no: 'Morning checklist not finished yet' });
+    sources.push({ earned: bedOnTime(yd, ((data.days || {})[ymd(yd)] || {})[kid] || {}), yes: 'In bed on time last night', no: 'Not in bed on time last night' });
+    $('day').querySelector('.rhead').insertAdjacentHTML('afterend', afternoonTreatHtml(sources, checks.mCandyGiven));
+  }
 
   const bed = bedtime(kid, dow);
   $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
   $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', timerHtml(checks));
+  if (candy) $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', bedTreatHtml(candy, bed, checks, dow));
   tick();
 }
 
@@ -150,17 +159,44 @@ function treatHtml(prize, when, done, total) {
     '<div class="track"><div class="fill" style="width:' + Math.round(done / total * 100) + '%"></div></div></div></div>';
 }
 // After school: reminds whoever is home whether the candy was earned, with a button to mark it given.
-function afternoonTreatHtml(prize, earned, given) {
-  if (!earned) {
-    return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No candy yet</strong>' +
-      '<small>Candy comes after the whole morning checklist is checked off.</small></div></div>';
+function afternoonTreatHtml(sources, given) {
+  const n = sources.filter((x) => x.earned).length;
+  const list = '<ul class="treat-list">' + sources.map((x) =>
+    '<li class="' + (x.earned ? 'yes' : 'no') + '">' + (x.earned ? '✓ ' + esc(x.yes) : '○ ' + esc(x.no)) + '</li>').join('') + '</ul>';
+  if (!n) {
+    return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No candy yet</strong>' + list + '</div></div>';
   }
+  const pieces = n === 1 ? '1 piece of candy' : n + ' pieces of candy';
   if (given) {
     return '<div class="treat given"><span class="treat-icon" aria-hidden="true">✅</span><div><strong>Candy enjoyed!</strong>' +
-      '<small>Nice work this morning.</small></div><button class="linkbtn" data-candy="0">Undo</button></div>';
+      '<small>You had ' + pieces + '. Nice work!</small></div><button class="linkbtn" data-candy="0">Undo</button></div>';
   }
-  return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy time!</strong>' +
-    '<small>You earned ' + esc(prize) + ' this morning.</small></div><button class="tbtn start" data-candy="1">Got it!</button></div>';
+  return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy time! ' + (n === 1 ? '1 piece' : n + ' pieces') + '</strong>' + list +
+    '</div><button class="tbtn start" data-candy="1">Got it!</button></div>';
+}
+
+// ---------- bedtime treat ----------
+// On time = the bedtime timer stopped by lights out, or the Lights out box checked by lights out.
+function bedOnTime(dateObj, c) {
+  const r = c.bedTimer && timerResult(kid, dateObj, c.bedTimer, c);
+  if (r && r.onTime) return true;
+  if (c.lights && c.lightsAt) { const x = timerResult(kid, dateObj, { start: c.lightsAt, end: c.lightsAt }, c); return !!(x && x.onTime); }
+  return false;
+}
+function bedTreatHtml(prize, bed, checks, dow) {
+  const lo = bed[bed.length - 1].time;
+  const when = dow === 4 || dow === 5 ? 'tomorrow afternoon' : 'after school tomorrow';
+  const timed = (checks.bedTimer && checks.bedTimer.end) || (checks.lights && checks.lightsAt);
+  if (bedOnTime(date, checks)) {
+    return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy earned!</strong>' +
+      '<small>In bed on time. Enjoy ' + esc(prize) + ' ' + when + '.</small></div></div>';
+  }
+  if (timed) {
+    return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No bedtime candy tonight</strong>' +
+      '<small>Lights out was ' + lo + '. Try again tomorrow night!</small></div></div>';
+  }
+  return '<div class="treat"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>In bed by ' + lo + ' = ' + esc(prize) + '!</strong>' +
+    '<small>Check off Lights out (or stop the timer) by ' + lo + '. You get it ' + when + '.</small></div></div>';
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-candy]');
@@ -218,6 +254,7 @@ document.addEventListener('click', (e) => {
   if (chip) next = cur === btn.dataset.choice ? null : btn.dataset.choice;
   else next = cur ? null : true;
   save(ID, base + key, next);
+  if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);
   if (key === 'mHigh5') {
     const n = new Date();
     save(ID, base + 'readyAt', next ? String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') : null);

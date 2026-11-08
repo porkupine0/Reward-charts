@@ -307,3 +307,6 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .treat.given { border: 2px solid var(--line); background: #E3F2E8; }
 .treat.missed { border: 2px solid var(--line); background: var(--soft); }
 .treat.missed .treat-icon { filter: grayscale(1); opacity: .5; }
+.treat-list { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: 13px; font-weight: 600; }
+.treat-list .yes { color: var(--ink); }
+.treat-list .no { color: var(--muted); font-weight: 400; }
