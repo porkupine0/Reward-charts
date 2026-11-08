@@ -128,7 +128,9 @@ const DUO = { key: 'duolingo', label: 'Duolingo · 10 min' };
 export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];
   const items = [
-    { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
+    kid === 'isaiah'
+      ? { key: 'putaway', label: 'Shoes, backpack + jacket laid out together', sub: 'All in one spot, ready for the morning' }
+      : { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
     { key: 'afterSnack', label: 'After-school snack', choices: AFTER_SNACKS },
     { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' },
     kid === 'isaiah' ? { key: 'due', label: 'Check for homework' } : { key: 'due', label: 'Check assignments due', sub: 'Check your email too' }
@@ -147,9 +149,12 @@ export function afterSchool(kid, dow, runPlan) {
   } else {
     items.push({ key: 'activity', label: 'Soccer: 600 touches', sub: 'Tap your balls on Ball Master', link: 'isaiah.html' });
   }
-  items.push({ key: 'clothes', label: 'Lay out clothes for tomorrow' });
+  items.push(kid === 'isaiah' ? CLOTHES : { key: 'clothes', label: 'Lay out clothes for tomorrow' });
   return items;
 }
+
+// Isaiah lays out each piece of tomorrow's clothes by his bed; the box checks itself when all four are out.
+const CLOTHES = { key: 'clothes', label: 'Lay out clothes by your bed', sub: 'Tap each one as it goes by your bed', parts: ['Shirt', 'Pants', 'Underwear', 'Socks'] };
 
 // Weekend daytime list (Sat chore; Isaiah's weekly work).
 export function weekend(kid, dow) {
@@ -157,7 +162,9 @@ export function weekend(kid, dow) {
   items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
-  if (dow === 6) items.push({ key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
+  if (dow === 6) items.push(kid === 'isaiah'
+    ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes by your bed' })
+    : { key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
   return items;
 }
 

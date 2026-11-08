@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794150377';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794150377';
-import { planFor } from './plan.js?v=1794150377';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794150579';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794150579';
+import { planFor } from './plan.js?v=1794150579';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -39,8 +39,10 @@ function expand(items) {
   return out;
 }
 
+const partKey = (key, part) => key + '_' + part.toLowerCase();
 function isOn(it, checks) {
   if (it.weekly) return !!weeklyDoneOn(weeklyDef(it.weekly));
+  if (it.parts) return it.parts.every((p) => checks[partKey(it.key, p)]);
   return checks[it.key];
 }
 
@@ -56,6 +58,12 @@ function itemHtml(it, checks, extra) {
   if (it.choices) {
     h += '<div class="chips">' + it.choices.map((c) =>
       '<button class="chip' + (v === c ? ' on' : '') + '" data-key="' + it.key + '" data-choice="' + esc(c) + '" aria-pressed="' + (v === c) + '">' + esc(c) + '</button>').join('') + '</div>';
+  }
+  if (it.parts) {
+    h += '<div class="chips parts">' + it.parts.map((p) => {
+      const pOn = !!checks[partKey(it.key, p)];
+      return '<button class="chip part' + (pOn ? ' on' : '') + '" data-key="' + it.key + '" data-part="' + esc(p) + '" data-parts="' + esc(it.parts.join('|')) + '" aria-pressed="' + pOn + '">' + (pOn ? '✓ ' : '') + esc(p) + '</button>';
+    }).join('') + '</div>';
   }
   if (it.link) h += '<a class="cklink" href="' + it.link + '">Open &rarr;</a>';
   return h + '</div>';
@@ -190,6 +198,15 @@ document.addEventListener('click', (e) => {
   if (!btn) return;
   const key = btn.dataset.key;
   const base = 'days/' + ymd(date) + '/' + kid + '/';
+  const partsBtn = btn.dataset.parts ? btn : document.querySelector('.chip.part[data-key="' + key + '"]');
+  if (partsBtn) {
+    const parts = partsBtn.dataset.parts.split('|');
+    const c = dayChecks();
+    if (chip) { const pk = partKey(key, chip.dataset.part); save(ID, base + pk, c[pk] ? null : true); return; }
+    const all = parts.every((p) => c[partKey(key, p)]);
+    parts.forEach((p) => save(ID, base + partKey(key, p), all ? null : true));
+    return;
+  }
   if (key.startsWith('w:')) {
     const w = weeklyDef(key.slice(2));
     const cur = weeklyDoneOn(w);
