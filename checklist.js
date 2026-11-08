@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794149443';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning } from './routines.js?v=1794149443';
-import { planFor } from './plan.js?v=1794149443';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794149545';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning } from './routines.js?v=1794149545';
+import { planFor } from './plan.js?v=1794149545';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
