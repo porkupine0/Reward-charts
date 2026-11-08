@@ -182,20 +182,36 @@ export function timerResult(kid, dateObj, rec, checks) {
   return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: endMin <= lo, endMin, lo, done, total: steps.length };
 }
 
-// Daily treat for finishing the whole school-morning checklist, handed out after school.
+// Daily treat for finishing the whole morning checklist, handed out later that day.
 export const MORNING_REWARD = { isaiah: 'a piece of candy' };
+// When the treat is handed out, by day (Mon = 0). Saturday's morning is optional, so no treat.
+export function rewardWhen(dow) {
+  if (dow <= 4) return 'after school';
+  if (dow === 6) return 'after church';
+  return null;
+}
 
-// Optional school-morning checklist (Isaiah, Mon–Fri).
+// Isaiah's morning checklists: school days (Mon–Fri), an optional Saturday, and Sunday church mornings.
 export function morning(kid, dow) {
-  if (kid !== 'isaiah' || dow > 4) return [];
+  if (kid !== 'isaiah') return [];
+  const breakfast = { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] };
+  if (dow === 5) {
+    return [
+      { key: 'mWake', label: 'Wake up' },
+      { key: 'mDress', label: 'Get dressed' },
+      { key: 'mScarlett', label: 'Let Scarlett out' },
+      breakfast
+    ];
+  }
+  const church = dow === 6;
   return [
     { key: 'mWake', label: 'Wake up' },
-    { key: 'mDress', label: 'Get dressed' },
+    { key: 'mDress', label: church ? 'Get dressed for church' : 'Get dressed' },
     { key: 'mScarlett', label: 'Let Scarlett out' },
-    { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] },
+    breakfast,
     { key: 'mShoes', label: 'Put on shoes' },
     { key: 'mWeather', label: 'Check the weather on Alexa' },
-    { key: 'mJacket', label: 'Put on jacket + backpack' },
+    { key: 'mJacket', label: church ? 'Put on jacket' : 'Put on jacket + backpack' },
     { key: 'mHigh5', label: 'High five Mom', sub: 'Records the time you’re all ready' },
     { key: 'mOnTime', label: 'Out the door on time' },
     { key: 'mCalm', label: 'Out the door with no meltdown', sub: 'Stayed calm even when we were in a hurry' }

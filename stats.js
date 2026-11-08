@@ -1,5 +1,5 @@
-import { watch, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794150265';
-import { KIDS, fmtTime, timerResult } from './routines.js?v=1794150265';
+import { watch, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794150377';
+import { KIDS, fmtTime, timerResult } from './routines.js?v=1794150377';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

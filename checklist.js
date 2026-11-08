@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794150265';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD } from './routines.js?v=1794150265';
-import { planFor } from './plan.js?v=1794150265';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794150377';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794150377';
+import { planFor } from './plan.js?v=1794150377';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -99,17 +99,20 @@ function render() {
     if (i.key === 'mHigh5' && checks.readyAt) i.sub = 'All ready at ' + fmtTime(+checks.readyAt.slice(0, 2) * 60 + +checks.readyAt.slice(3)) + (+checks.readyAt.slice(0, 2) < 12 ? ' am' : ' pm');
   });
   $('morning').hidden = !morn.length;
-  const prize = MORNING_REWARD[kid];
+  const when = rewardWhen(dow);
+  const prize = when && MORNING_REWARD[kid];
   const mornDone = morn.filter((i) => checks[i.key]).length;
   const earned = morn.length > 0 && mornDone === morn.length;
   if (morn.length) {
-    $('morning').innerHTML = section('Morning', prize ? '' : 'Optional. Time yourself if you want!', morn, checks, false);
+    $('morning').innerHTML = section(dow === 6 ? 'Church morning' : 'Morning', prize ? '' : dow === 5 ? 'Optional on Saturdays. No rush!' : 'Optional. Time yourself if you want!', morn, checks, false);
     $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', mornTimerHtml());
-    if (prize) $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', treatHtml(prize, mornDone, morn.length));
+    if (prize) $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', treatHtml(prize, when, mornDone, morn.length));
     const woke = checks.wokeAt || '';
     $('morning').querySelector('.btimer').insertAdjacentHTML('afterend',
       '<div class="wokeat"><label for="wokeAt">What time did you get out of bed?</label>' +
       '<div class="wokerow"><input type="time" id="wokeAt" value="' + woke + '"><button class="chip" data-wokenow="1">Now</button></div></div>');
+    const mnote = $('morning').querySelector('.note');
+    if (mnote) $('morning').querySelector('.rhead').after(mnote);
   }
 
   const school = dow <= 4;
@@ -118,7 +121,7 @@ function render() {
     ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false)
     : section('Today', '', items, checks, false);
   $('day').hidden = !items.length;
-  if (prize && morn.length && school && items.length) $('day').querySelector('.rhead').insertAdjacentHTML('afterend', afternoonTreatHtml(prize, earned, checks.mCandyGiven));
+  if (prize && morn.length && items.length) $('day').querySelector('.rhead').insertAdjacentHTML('afterend', afternoonTreatHtml(prize, earned, checks.mCandyGiven));
 
   const bed = bedtime(kid, dow);
   $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
@@ -128,21 +131,21 @@ function render() {
 
 // ---------- morning treat ----------
 // Morning: shows the goal and progress; turns gold when every box is checked.
-function treatHtml(prize, done, total) {
+function treatHtml(prize, when, done, total) {
   const left = total - done;
   if (!left) {
     return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy earned!</strong>' +
-      '<small>You finished your whole morning. Enjoy ' + esc(prize) + ' after school.</small></div></div>';
+      '<small>You finished your whole morning. Enjoy ' + esc(prize) + ' ' + when + '.</small></div></div>';
   }
   return '<div class="treat"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Check every box to earn ' + esc(prize) + '!</strong>' +
-    '<small>' + left + ' more to go · you get it after school</small>' +
+    '<small>' + left + ' more to go · you get it ' + when + '</small>' +
     '<div class="track"><div class="fill" style="width:' + Math.round(done / total * 100) + '%"></div></div></div></div>';
 }
 // After school: reminds whoever is home whether the candy was earned, with a button to mark it given.
 function afternoonTreatHtml(prize, earned, given) {
   if (!earned) {
-    return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No candy today</strong>' +
-      '<small>The morning checklist wasn’t finished. Try again tomorrow!</small></div></div>';
+    return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No candy yet</strong>' +
+      '<small>Candy comes after the whole morning checklist is checked off.</small></div></div>';
   }
   if (given) {
     return '<div class="treat given"><span class="treat-icon" aria-hidden="true">✅</span><div><strong>Candy enjoyed!</strong>' +
