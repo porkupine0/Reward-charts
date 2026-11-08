@@ -293,3 +293,17 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .wokerow { display: flex; gap: 8px; align-items: center; }
 .wokerow input { flex: 1; min-height: 44px; border: 2px solid var(--ink); border-radius: 10px; padding: 6px 10px; font-size: 18px; font-weight: 800; background: #fff; }
 .wokerow .chip { min-height: 44px; padding: 6px 16px; }
+
+/* Morning treat card */
+.treat { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 2.5px dashed #D4A017; background: #FFF9E8; flex-wrap: wrap; }
+.treat > div { flex: 1 1 160px; display: flex; flex-direction: column; gap: 4px; }
+.treat strong { font-size: 16px; }
+.treat small { font-size: 13px; color: var(--muted); }
+.treat .track { margin-top: 4px; }
+.treat .fill { background: #D4A017; }
+.treat-icon { flex: none; font-size: 30px; line-height: 1; }
+.treat.earned { border-style: solid; background: #FCE9A8; border-color: #D4A017; }
+.treat.earned small { color: var(--ink); }
+.treat.given { border: 2px solid var(--line); background: #E3F2E8; }
+.treat.missed { border: 2px solid var(--line); background: var(--soft); }
+.treat.missed .treat-icon { filter: grayscale(1); opacity: .5; }

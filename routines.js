@@ -182,6 +182,9 @@ export function timerResult(kid, dateObj, rec, checks) {
   return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: endMin <= lo, endMin, lo, done, total: steps.length };
 }
 
+// Daily treat for finishing the whole school-morning checklist, handed out after school.
+export const MORNING_REWARD = { isaiah: 'a piece of candy' };
+
 // Optional school-morning checklist (Isaiah, Mon–Fri).
 export function morning(kid, dow) {
   if (kid !== 'isaiah' || dow > 4) return [];
