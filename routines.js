@@ -193,6 +193,7 @@ export function morning(kid, dow) {
     { key: 'mShoes', label: 'Put on shoes' },
     { key: 'mWeather', label: 'Check the weather on Alexa' },
     { key: 'mJacket', label: 'Put on jacket + backpack' },
-    { key: 'mHigh5', label: 'High five Mom', sub: 'Records the time you’re all ready' }
+    { key: 'mHigh5', label: 'High five Mom', sub: 'Records the time you’re all ready' },
+    { key: 'mCalm', label: 'Out the door with no meltdown', sub: 'Stayed calm even when we were in a hurry' }
   ];
 }
