@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794187983';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794187983';
-import { planFor } from './plan.js?v=1794187983';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794189659';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794189659';
+import { planFor } from './plan.js?v=1794189659';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -254,6 +254,11 @@ document.addEventListener('click', (e) => {
   if (chip) next = cur === btn.dataset.choice ? null : btn.dataset.choice;
   else next = cur ? null : true;
   save(ID, base + key, next);
+  // Checking a bedtime step starts the bedtime timer if nobody has (today only).
+  if (next && ymd(date) === ymd(new Date()) && !(dayChecks().bedTimer || {}).start &&
+      bedtime(kid, dowOf(date)).some((b) => b.key === key)) {
+    save(ID, base + 'bedTimer', { start: Date.now(), auto: true });
+  }
   if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);
   if (key === 'mHigh5') {
     const n = new Date();

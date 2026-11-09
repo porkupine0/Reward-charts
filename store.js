@@ -1,5 +1,5 @@
 // Tiny sync layer: Firebase Realtime Database when configured, this-device storage otherwise.
-import { firebaseConfig } from './config.js?v=1794187983';
+import { firebaseConfig } from './config.js?v=1794189659';
 
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 let dbPromise = null;
