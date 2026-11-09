@@ -37,7 +37,7 @@ export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 
 // Bedtime: steps in order with how many minutes each takes.
 // Normal nights count backward from lights out; Wednesday (and Rhett's Thursday) count forward from getting home.
 const t = (h, m) => h * 60 + m;
-const MIN = { snack: 10, shower: 15, pjs: 5, teeth: 5 };
+const MIN = { snack: 10, shower: 15, teeth: 5 };
 const ORDER = {
   young: ['snack', 'shower', 'teeth', 'vitamins', 'reading'],
   eli: ['snack', 'shower', 'vitamins', 'teeth', 'reading']
@@ -46,7 +46,7 @@ const LIGHTS = { eli: t(20, 30), rhett: t(20, 0), isaiah: t(20, 0) };
 const HOME = { 2: { eli: t(20, 45), rhett: t(20, 45), isaiah: t(20, 15) }, 3: { rhett: t(20, 0) } };
 
 function duration(key, kid, showers, short) {
-  if (key === 'shower') return showers ? MIN.shower : MIN.pjs;
+  if (key === 'shower') return MIN.shower;
   if (key === 'vitamins') return kid === 'eli' && !short ? 10 : 5;
   if (key === 'reading') return short ? 10 : kid === 'eli' ? 30 : 15;
   return MIN[key];
@@ -55,7 +55,7 @@ function duration(key, kid, showers, short) {
 function schedule(kid, dow) {
   const showers = SHOWER[kid].includes(dow);
   const home = HOME[dow] && HOME[dow][kid];
-  let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].slice();
+  let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].filter((k) => k !== 'shower' || showers);
   const rows = [];
   if (home != null) {
     let at = home;
@@ -82,7 +82,7 @@ function bedLabel(key, kid, dow) {
   const showers = SHOWER[kid].includes(dow);
   return {
     snack: 'Bedtime snack',
-    shower: showers ? 'Shower + pajamas' : 'Pajamas on',
+    shower: 'Shower',
     teeth: 'Brush teeth + mouthwash',
     vitamins: kid === 'eli' ? 'Get water + take ALL vitamins' : 'Vitamins',
     reading: 'Reading',
@@ -123,7 +123,7 @@ export const WEEKLY = {
 };
 
 // Rhett's Duolingo: 10 min, Mon–Sat.
-const DUO = { key: 'duolingo', label: 'Duolingo · 10 min' };
+const DUO = { key: 'duolingo', label: 'Duolingo · 10 min', opt: true };
 
 export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];
@@ -132,14 +132,15 @@ export function afterSchool(kid, dow, runPlan) {
       ? { key: 'putaway', label: 'Shoes, backpack + jacket laid out together', sub: 'All in one spot, ready for the morning' }
       : { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
     { key: 'afterSnack', label: 'After-school snack', choices: AFTER_SNACKS },
-    { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' },
-    kid === 'isaiah' ? { key: 'due', label: 'Check for homework' } : { key: 'due', label: 'Check assignments due', sub: 'Check your email too' }
+    kid === 'isaiah' ? CLOTHES : { key: 'clothes', label: 'Lay out clothes for tomorrow' },
+    ...choreItems(kid, dow),
+    { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' }
   ];
+  if (kid !== 'isaiah') items.push({ key: 'due', label: 'Check assignments due', sub: 'Check your email too' });
   if (kid !== 'isaiah') items.push({ key: 'missing', label: 'Check missing assignments' });
   if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework' });
   if (kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
-  items.push(...choreItems(kid, dow));
   if (kid === 'eli') {
     items.push({ key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: dow === 4 ? 'Optional bonus run today' : 'Check it off on your Training page', link: 'run.html', opt: dow === 4 });
   } else if (kid === 'rhett') {
@@ -149,7 +150,6 @@ export function afterSchool(kid, dow, runPlan) {
   } else {
     items.push({ key: 'activity', label: 'Soccer: 600 touches', sub: 'Tap your balls on Ball Master', link: 'isaiah.html' });
   }
-  items.push(kid === 'isaiah' ? CLOTHES : { key: 'clothes', label: 'Lay out clothes for tomorrow' });
   return items;
 }
 
@@ -159,12 +159,12 @@ const CLOTHES = { key: 'clothes', label: 'Lay out clothes by your bed', sub: 'Ta
 // Weekend daytime list (Sat chore; Isaiah's weekly work).
 export function weekend(kid, dow) {
   const items = [];
-  items.push(...choreItems(kid, dow));
-  if (dow === 5 && kid === 'rhett') items.push(DUO);
-  items.push({ weekly: true });
   if (dow === 6) items.push(kid === 'isaiah'
     ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes by your bed' })
     : { key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
+  items.push(...choreItems(kid, dow));
+  if (dow === 5 && kid === 'rhett') items.push(DUO);
+  items.push({ weekly: true });
   return items;
 }
 
@@ -216,11 +216,8 @@ export function morning(kid, dow) {
     { key: 'mDress', label: church ? 'Get dressed for church' : 'Get dressed' },
     { key: 'mScarlett', label: 'Let Scarlett out' },
     breakfast,
-    { key: 'mShoes', label: 'Put on shoes' },
-    { key: 'mWeather', label: 'Check the weather on Alexa' },
-    { key: 'mJacket', label: church ? 'Put on jacket' : 'Put on jacket + backpack' },
-    { key: 'mHigh5', label: 'High five Mom', sub: 'Records the time you’re all ready' },
-    { key: 'mOnTime', label: 'Out the door on time' },
-    { key: 'mCalm', label: 'Out the door with no meltdown', sub: 'Stayed calm even when we were in a hurry' }
+    { key: 'mShoes', label: church ? 'Put on shoes + jacket' : 'Put on shoes, jacket + backpack' },
+    { key: 'mDoor', label: 'Out the door on time with no meltdown', sub: 'Stayed calm even when we were in a hurry' },
+    { key: 'mHigh5', label: 'High five Mom', sub: 'Records the time you’re all ready' }
   ];
 }

@@ -37,7 +37,7 @@ export const CHARTS = {
       { key: 'racquetball', label: 'Racquetball', sub: 'Thursday night + optional Sat', cells: [O, O, O, m('Night'), O, opt('Opt.'), O] },
       { key: 'chores', label: 'Chores', sub: 'Checklist done', cells: [X, X, X, X, X, X, O] },
       { key: 'trombone', label: 'Trombone', sub: 'Practice on the timer', cells: [O, O, O, O, m('20 min'), m('30 min'), m('30 min')] },
-      { key: 'duolingo', label: 'Duolingo', sub: '10 minutes a day', cells: [m('10 min'), m('10 min'), m('10 min'), m('10 min'), m('10 min'), m('10 min'), O] }
+      { key: 'duolingo', label: 'Duolingo', sub: 'Optional · 10 min', cells: [opt('10 min'), opt('10 min'), opt('10 min'), opt('10 min'), opt('10 min'), opt('10 min'), O] }
     ],
     weekly: [
       '30 minutes of extra screen time',

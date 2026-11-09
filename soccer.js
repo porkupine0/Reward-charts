@@ -1,4 +1,4 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794150661';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794187983';
 
 const ID = 'isaiah';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -46,12 +46,12 @@ function render() {
     for (let d = 0; d < 7; d++) {
       const date = addDays(start, w * 7 + d);
       const n = t[d] || 0;
-      h += '<button class="tday' + (n >= 6 ? ' full' : '') + (ymd(date) === today ? ' is-today' : '') + '" data-w="' + w + '" data-d="' + d + '" aria-label="' + shortDate(date) + ': ' + n * 100 + ' touches">' +
-        '<small>' + date.getDate() + '</small><span class="balls">' + [0, 1, 2, 3, 4, 5].map((i) => ball(i < n)).join('') + '</span></button>';
+      h += '<button class="tday' + (n >= 6 ? ' full' : '') + (ymd(date) === today ? ' is-today' : '') + '" data-w="' + w + '" data-d="' + d + '" aria-label="' + shortDate(date) + (n >= 6 ? ': 600 touches done' : ': not done') + '" aria-pressed="' + (n >= 6) + '">' +
+        '<small>' + date.getDate() + '</small>' + ball(n >= 6) + '</button>';
     }
     h += '<span class="wkstar">' + star(weekDone(w)) + '</span></div>';
   }
-  h += '<p class="hint">Tapped one too many? Tap the day until it wraps back to empty.</p>';
+  h += '<p class="hint">Tap a day by mistake? Tap it again to clear it.</p>';
   $('weeks').innerHTML = h;
 
   const jg = data.juggle || {};
@@ -85,7 +85,7 @@ document.addEventListener('click', (e) => {
   if (day) {
     const w = day.dataset.w, d = day.dataset.d;
     const n = ((data.touches && data.touches[w] && data.touches[w][d]) || 0);
-    save(ID, 'touches/' + w + '/' + d, n >= 6 ? null : n + 1);
+    save(ID, 'touches/' + w + '/' + d, n >= 6 ? null : 6);
     return;
   }
   const lv = e.target.closest('.level');
