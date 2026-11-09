@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794189659';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794189659';
-import { planFor } from './plan.js?v=1794189659';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794189807';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794189807';
+import { planFor } from './plan.js?v=1794189807';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -189,14 +189,14 @@ function bedTreatHtml(prize, bed, checks, dow) {
   const timed = (checks.bedTimer && checks.bedTimer.end) || (checks.lights && checks.lightsAt);
   if (bedOnTime(date, checks)) {
     return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy earned!</strong>' +
-      '<small>In bed on time. Enjoy ' + esc(prize) + ' ' + when + '.</small></div></div>';
+      '<small>' + (checks.bedOk ? 'Parent OK’d tonight' : 'In bed on time') + '. Enjoy ' + esc(prize) + ' ' + when + '.</small></div>' + (checks.bedOk ? approveBtn('approved') : '') + '</div>';
   }
   if (timed) {
     return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No bedtime candy tonight</strong>' +
-      '<small>Lights out was ' + lo + '. Try again tomorrow night!</small></div></div>';
+      '<small>Lights out was ' + lo + ' (5-minute grace). Try again tomorrow night!</small></div>' + approveBtn('late') + '</div>';
   }
   return '<div class="treat"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>In bed by ' + lo + ' = ' + esc(prize) + '!</strong>' +
-    '<small>Check off Lights out (or stop the timer) by ' + lo + '. You get it ' + when + '.</small></div></div>';
+    '<small>Check off Lights out (or stop the timer) by ' + lo + ' (5 minutes grace). You get it ' + when + '.</small></div></div>';
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-candy]');
@@ -276,6 +276,12 @@ $('date').addEventListener('change', (e) => { if (e.target.value) { date = parse
 // ---------- bedtime timer ----------
 const clock = (secs) => Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
 function timerRec() { return dayChecks().bedTimer || {}; }
+// Parent override for a late night beyond the 5-minute grace.
+function approveBtn(status) {
+  if (status === 'late') return '<button class="tbtn approve" data-bedok="1">Parent OK</button>';
+  if (status === 'approved') return '<button class="linkbtn" data-bedok="0">Undo OK</button>';
+  return '';
+}
 function timerHtml(checks) {
   const r = timerRec();
   if (!r.start) {
@@ -287,9 +293,10 @@ function timerHtml(checks) {
       '<span class="tclock" id="tclock">0:00</span><button class="tbtn stop" data-timer="stop">Stop</button></div>';
   }
   const res = timerResult(kid, date, r, checks);
+  const word = { ontime: 'On time!', grace: 'On time (' + res.lateBy + ' min grace)', approved: 'Late ' + res.lateBy + ' min · parent OK’d', late: 'Late by ' + res.lateBy + ' min' }[res.status];
   return '<div class="btimer done' + (res.onTime ? ' ontime' : ' late') + '"><div><strong>' + clock(res.secs) + ' total</strong>' +
     '<small>Finished ' + new Date(r.end).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · lights out ' + fmtTime(res.lo) + ' · ' +
-    (res.onTime ? 'On time!' : 'Late') + ' · ' + res.done + '/' + res.total + ' steps</small></div>' +
+    word + ' · ' + res.done + '/' + res.total + ' steps</small></div>' + approveBtn(res.status) +
     '<button class="linkbtn" data-timer="reset">Redo</button></div>';
 }
 function mornTimerHtml() {
@@ -337,6 +344,13 @@ document.addEventListener('click', (e) => {
   e.stopPropagation();
   const n = new Date();
   save(ID, 'days/' + ymd(date) + '/' + kid + '/wokeAt', String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'));
+}, true);
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-bedok]');
+  if (!b) return;
+  e.stopPropagation();
+  save(ID, 'days/' + ymd(date) + '/' + kid + '/bedOk', b.dataset.bedok === '1' ? true : null);
 }, true);
 
 render();

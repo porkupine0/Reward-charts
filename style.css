@@ -312,3 +312,6 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .treat-list .no { color: var(--muted); font-weight: 400; }
 
 .tday .ball { width: 26px; height: 26px; margin-top: 2px; }
+
+.tbtn.approve { background: #1B2A41; min-width: 0; padding: 0 14px; font-size: 15px; }
+.treat .tbtn.approve { align-self: center; }

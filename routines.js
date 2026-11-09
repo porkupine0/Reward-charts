@@ -175,6 +175,9 @@ export function lightsOut(kid, dow) {
 }
 
 // Bedtime timer result for one night: { secs, onTime, steps } or null.
+export const GRACE_MIN = 5;
+export const STATUS_LABEL = { ontime: 'On time', grace: 'Grace', approved: 'Parent OK', late: 'Late' };
+
 export function timerResult(kid, dateObj, rec, checks) {
   if (!rec || !rec.start || !rec.end) return null;
   const dow = (dateObj.getDay() + 6) % 7;
@@ -186,7 +189,10 @@ export function timerResult(kid, dateObj, rec, checks) {
   const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
   const steps = bedtime(kid, dow);
   const done = steps.filter((s) => checks && checks[s.key]).length;
-  return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: endMin <= lo, endMin, lo, done, total: steps.length };
+  // Up to 5 minutes past lights out still counts (grace); beyond that only with a parent's OK.
+  const lateBy = endMin - lo;
+  const status = lateBy <= 0 ? 'ontime' : lateBy <= GRACE_MIN ? 'grace' : checks && checks.bedOk ? 'approved' : 'late';
+  return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: status !== 'late', status, lateBy, endMin, lo, done, total: steps.length };
 }
 
 // Daily treat for finishing the whole morning checklist, handed out later that day.

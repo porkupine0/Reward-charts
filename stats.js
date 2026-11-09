@@ -1,5 +1,5 @@
-import { watch, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794189659';
-import { KIDS, fmtTime, timerResult } from './routines.js?v=1794189659';
+import { watch, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794189807';
+import { KIDS, fmtTime, timerResult, STATUS_LABEL } from './routines.js?v=1794189807';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -51,7 +51,7 @@ function render() {
       const r = n.res;
       return '<tr><td>' + DAYS[n.i] + ' <small>' + n.d.getDate() + '</small></td><td>' + hm(n.rec.start) + '–' + hm(n.rec.end) +
         '<br><small>lights out ' + fmtTime(r.lo) + '</small></td><td><b>' + clock(r.secs) + '</b></td><td>' +
-        '<span class="pill ' + (r.onTime ? 'ok' : 'bad') + '">' + (r.onTime ? 'On time' : 'Late') + '</span>' +
+        '<span class="pill ' + (r.onTime ? 'ok' : 'bad') + '">' + STATUS_LABEL[r.status] + (r.lateBy > 0 ? ' +' + r.lateBy + 'm' : '') + '</span>' +
         (r.done < r.total ? ' <small>' + r.done + '/' + r.total + '</small>' : '') + '</td></tr>';
     }).join('');
     return '<section class="card kidstats" style="--accent:' + k.accent + '"><div class="rhead"><h2>' + esc(k.name) + '</h2>' +
