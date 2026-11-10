@@ -37,7 +37,10 @@ export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 
 // Bedtime: steps in order with how many minutes each takes.
 // Normal nights count backward from lights out; Wednesday (and Rhett's Thursday) count forward from getting home.
 const t = (h, m) => h * 60 + m;
-const MIN = { snack: 10, shower: 15, teeth: 5 };
+const MIN = { snack: 10, teeth: 5 };
+// Shower length: Isaiah 35 min, Eli and Rhett 25. (OLD_SHOWER = the old 15 min, used to keep Thursday's start time.)
+const SHOWER_MIN = { eli: 25, rhett: 25, isaiah: 35 };
+const OLD_SHOWER = 15;
 const ORDER = {
   young: ['snack', 'shower', 'teeth', 'vitamins', 'reading'],
   eli: ['snack', 'shower', 'vitamins', 'teeth', 'reading']
@@ -46,7 +49,7 @@ const LIGHTS = { eli: t(20, 30), rhett: t(20, 0), isaiah: t(20, 0) };
 const HOME = { 2: { eli: t(20, 45), rhett: t(20, 45), isaiah: t(20, 15) }, 3: { rhett: t(20, 0) } };
 
 function duration(key, kid, showers, short) {
-  if (key === 'shower') return MIN.shower;
+  if (key === 'shower') return SHOWER_MIN[kid];
   if (key === 'vitamins') return kid === 'eli' && !short ? 10 : 5;
   if (key === 'reading') return short ? 10 : kid === 'eli' ? 30 : 15;
   return MIN[key];
@@ -56,8 +59,16 @@ function schedule(kid, dow) {
   const showers = SHOWER[kid].includes(dow);
   const home = HOME[dow] && HOME[dow][kid];
   let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].filter((k) => k !== 'shower' || showers);
+  // Isaiah showers first, before his snack.
+  if (kid === 'isaiah' && showers) steps = ['shower'].concat(steps.filter((k) => k !== 'shower'));
   const rows = [];
-  if (home != null) {
+  if (home == null && dow === 3 && showers) {
+    // Thursday: keep the old start time (old 15-min shower, snack first) and push lights out later instead.
+    const old = ORDER[kid === 'eli' ? 'eli' : 'young'];
+    let at = LIGHTS[kid] - old.reduce((sum, k) => sum + (k === 'shower' ? OLD_SHOWER : duration(k, kid, showers, false)), 0);
+    steps.forEach((k) => { rows.push([k, at]); at += duration(k, kid, showers, false); });
+    rows.push(['lights', at]);
+  } else if (home != null) {
     let at = home;
     steps.forEach((k) => { rows.push([k, at]); at += duration(k, kid, showers, dow === 2); });
     rows.push(['lights', at]);
