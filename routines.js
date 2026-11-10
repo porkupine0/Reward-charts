@@ -7,20 +7,20 @@ export const KIDS = {
 
 // Chore rotation, Mon–Sun (0 = Mon). Each day is a list; every item gets its own checkbox.
 // No room is done two days in a row; Tuesday jobs are fixed; Rhett & Isaiah do laundry Saturday.
-const FAMILY_KITCHEN = 'Kitchen with the family';
+const FAMILY_KITCHEN = 'Kitchen + dining room with the family';
 const LAUNDRY = 'Laundry + clean your room (30 min)';
 export const CHORES = {
   eli: [
     [FAMILY_KITCHEN, LAUNDRY], ['Living Room'], ['Sunroom'], ['Kitchen'], ['Dining/Front Room'], ['Vacuum/brush Scarlett'],
-    ['Kitchen (all hands)']
+    ['Kitchen + dining room (all hands)']
   ],
   rhett: [
     [FAMILY_KITCHEN, 'Sunroom'], ['Bathrooms'], ['Dining/Front Room'], ['Living Room'], ['Kitchen'], [LAUNDRY],
-    ['Kitchen (all hands)', 'Fold + put away clothes']
+    ['Kitchen + dining room (all hands)', 'Fold + put away clothes']
   ],
   isaiah: [
-    [FAMILY_KITCHEN, 'Dining/Front Room'], ['Front closet + shoe organizing'], ['Kitchen'], ['Stairs, landing + upstairs hallway'], ['Sunroom'], [LAUNDRY],
-    ['Kitchen (all hands)', 'Fold + put away clothes']
+    [FAMILY_KITCHEN, 'Trash: empty every trash can in the house'], ['Front closet + shoe organizing'], ['Kitchen'], ['Stairs, landing + upstairs hallway'], ['Sunroom'], [LAUNDRY],
+    ['Kitchen + dining room (all hands)', 'Fold + put away clothes']
   ]
 };
 
