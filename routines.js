@@ -226,7 +226,6 @@ export function morning(kid, dow) {
       { key: 'mDress', label: 'Get dressed' },
       { key: 'mScarlett', label: 'Let Scarlett out' },
       breakfast,
-    teeth,
       teeth
     ];
   }
