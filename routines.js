@@ -219,12 +219,15 @@ export function rewardWhen(dow) {
 export function morning(kid, dow) {
   if (kid !== 'isaiah') return [];
   const breakfast = { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] };
+  const teeth = { key: 'mTeeth', label: 'Brush your teeth' };
   if (dow === 5) {
     return [
       { key: 'mWake', label: 'Wake up' },
       { key: 'mDress', label: 'Get dressed' },
       { key: 'mScarlett', label: 'Let Scarlett out' },
-      breakfast
+      breakfast,
+    teeth,
+      teeth
     ];
   }
   const church = dow === 6;
@@ -233,6 +236,7 @@ export function morning(kid, dow) {
     { key: 'mDress', label: church ? 'Get dressed for church' : 'Get dressed' },
     { key: 'mScarlett', label: 'Let Scarlett out' },
     breakfast,
+    teeth,
     { key: 'mShoes', label: church ? 'Put on shoes + jacket' : 'Put on shoes, jacket + backpack' },
     { key: 'mDoor', label: 'Out the door on time with no meltdown', sub: 'Stayed calm even when we were in a hurry' },
     { key: 'mHigh5', label: 'High five Mom', sub: 'Records the time you’re all ready' }
