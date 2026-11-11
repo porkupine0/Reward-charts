@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794426931';
-import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794426931';
-import { saveTrial, fmt as tfmt } from './trials.js?v=1794426931';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794428564';
+import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794428564';
+import { saveTrial, fmt as tfmt } from './trials.js?v=1794428564';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-let date = params.get('date') ? parseYmd(params.get('date')) : new Date();
+let date = dateParam('date');
 date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 let data = {};
 const open = new Set();
@@ -108,15 +108,6 @@ function showPace() {
   $('pace').textContent = pc ? fmt(pc) : '–:–';
 }
 
-// Keep the Running row on Eli's reward chart in step with this page.
-function syncReward(p, checks) {
-  if (!p || p.dow === 6) return;
-  const done = dayDone(p, checks);
-  save('eli', 'weeks/' + ymd(mondayOf(date)) + '/checks/running/' + p.dow, done);
-  // keep the Running step on his after-school checklist in step too
-  if (p.dow <= 4) save('routines', 'days/' + ymd(date) + '/eli/activity', done || null);
-}
-
 // ---------- events ----------
 document.addEventListener('click', (e) => {
   const ck = e.target.closest('.ckbtn');
@@ -126,7 +117,6 @@ document.addEventListener('click', (e) => {
     const checks = Object.assign({}, dd.items || {});
     checks[key] = !checks[key];
     save(ID, 'days/' + ymd(date) + '/items/' + key, checks[key]);
-    syncReward(planFor(date), checks);
     return;
   }
   const ef = e.target.closest('[data-effort]');
@@ -230,8 +220,7 @@ $('trsave').onclick = () => {
   const m = parseInt($('trmin').value, 10), s = parseInt($('trsec').value || '0', 10), secs = m * 60 + s;
   const ok = kind === 'mile' ? secs >= 240 && secs <= 900 : secs >= 840 && secs <= 2700;
   if (!kind || !(s >= 0 && s < 60) || !ok) { $('trialsaved').textContent = 'Check the time: minutes and seconds, like ' + (kind === 'mile' ? '6 and 42.' : '22 and 10.'); return; }
-  const checks = Object.assign({}, dayData(date).items || {}, { run: true });
-  saveTrial({ kind, secs, date: ymd(date), where: $('trwhere').value }, checks);
+  saveTrial({ kind, secs, date: ymd(date), where: $('trwhere').value });
   document.activeElement && document.activeElement.blur();
 };
 watch('eli-trials', (d) => { trials = d.trials || {}; renderTrial(); });

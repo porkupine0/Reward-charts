@@ -1,10 +1,10 @@
-import { watch, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794426931';
-import { KIDS, fmtTime, timerResult, STATUS_LABEL } from './routines.js?v=1794426931';
+import { watch, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794428564';
+import { applyConfig, KIDS, fmtTime, timerResult, STATUS_LABEL } from './routines.js?v=1794428564';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const params = new URLSearchParams(location.search);
-let week = mondayOf(params.get('week') ? parseYmd(params.get('week')) : new Date());
+let week = mondayOf(dateParam('week'));
 let data = {};
 
 const clock = (s) => (s == null ? '–' : Math.floor(s / 60) + ':' + String(Math.round(s) % 60).padStart(2, '0'));
@@ -73,3 +73,4 @@ $('thisweek').onclick = () => { week = mondayOf(new Date()); render(); };
 
 render();
 watch('routines', (d) => { data = d; render(); }, statusPill($('sync')));
+watch('config', (d) => { applyConfig(d); render(); });

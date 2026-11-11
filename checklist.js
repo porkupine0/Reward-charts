@@ -1,54 +1,32 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794426931';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794426931';
-import { askParent } from './parent.js?v=1794426931';
-import { planFor } from './plan.js?v=1794426931';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794428564';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794428564';
+import { askParent } from './parent.js?v=1794428564';
+import * as L from './lists.js?v=1794428564';
+import { dayStreak, cheerIf } from './streaks.js?v=1794428564';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 let kid = KIDS[params.get('kid')] ? params.get('kid') : (() => { try { return localStorage.getItem('rc:lastKid') || 'eli'; } catch (e) { return 'eli'; } })();
 if (!KIDS[kid]) kid = 'eli';
-let date = params.get('date') ? parseYmd(params.get('date')) : new Date();
+let date = dateParam('date');
 date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 let data = {};
 
-const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 const longDate = (d) => d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-// Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
-const cycleOf = (d, start) => ymd(addDays(d, -((dowOf(d) - start + 7) % 7)));
-const weeklyDef = (key) => (WEEKLY[kid] || []).find((w) => w.key === key);
-
-function dayChecks() { return ((data.days || {})[ymd(date)] || {})[kid] || {}; }
-function weeklyDoneOn(w) { return ((((data.weekly || {})[kid] || {})[w.key] || {})[cycleOf(date, w.start)]) || null; }
-
-function weeklyItems() {
-  const dow = dowOf(date);
-  return (WEEKLY[kid] || []).filter((w) => {
-    const done = weeklyDoneOn(w);
-    if (done) return done === ymd(date) || dow >= 4; // stays visible (checked) Fri–Sun
-    return w.show.includes(dow) || w.late.includes(dow);
-  }).map((w) => {
-    const late = w.late.includes(dow) && !weeklyDoneOn(w);
-    return { key: 'w:' + w.key, weekly: w.key, label: w.label, late,
-      sub: late ? w.lateNote : 'Do it Friday, Saturday or Sunday' };
-  });
-}
-
-function expand(items) {
-  const out = [];
-  items.forEach((i) => (i.weekly === true ? out.push(...weeklyItems()) : out.push(i)));
-  return out;
-}
-
-const partKey = (key, part) => key + '_' + part.toLowerCase();
-function isOn(it, checks) {
-  if (it.weekly) return !!weeklyDoneOn(weeklyDef(it.weekly));
-  if (it.parts) return it.parts.every((p) => checks[partKey(it.key, p)]);
-  return checks[it.key];
+// Lists and "is it done?" come from lists.js, shared with the home page.
+const ctx = { routines: {}, run: {}, isaiah: {} };
+const dayChecks = () => L.dayChecks(ctx, kid, date);
+const weeklyDef = (key) => L.weeklyDef(kid, key);
+const weeklyDoneOn = (w) => L.weeklyDoneOn(ctx, kid, w, date);
+const { dowOf, cycleOf, partKey } = L;
+function isOn(it) {
+  if (it.choices) return dayChecks()[it.key];
+  return L.isOn(ctx, kid, date, it);
 }
 
 function itemHtml(it, checks, extra) {
-  const v = isOn(it, checks);
+  const v = isOn(it);
   const on = !!v;
   let h = '<div class="ck' + (on ? ' on' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
   h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '">' +
@@ -72,14 +50,14 @@ function itemHtml(it, checks, extra) {
 
 function section(title, sub, items, checks, timed) {
   if (!items.length) return '';
-  const done = items.filter((i) => isOn(i, checks) || i.opt).length;
+  const done = items.filter((i) => isOn(i) || i.opt).length;
   const req = items.filter((i) => !i.opt);
-  const doneReq = req.filter((i) => isOn(i, checks)).length;
+  const doneReq = req.filter((i) => isOn(i)).length;
   const isToday = ymd(date) === ymd(new Date());
   let nextMarked = false;
   const body = items.map((it) => {
     let extra = timed ? { time: it.time } : {};
-    if (timed && isToday && !nextMarked && !isOn(it, checks)) { extra.next = true; nextMarked = true; }
+    if (timed && isToday && !nextMarked && !isOn(it)) { extra.next = true; nextMarked = true; }
     return itemHtml(it, checks, extra);
   }).join('');
   const all = req.length && doneReq === req.length;
@@ -101,10 +79,12 @@ function render() {
   history.replaceState(null, '', '?kid=' + kid + (key === ymd(new Date()) ? '' : '&date=' + key));
 
   const checks = dayChecks();
-  $('notes').innerHTML = '<p class="rdate">' + esc(longDate(date)) + '</p>' + notes(kid, dow).map((n) => '<span class="rnote">' + esc(n) + '</span>').join('');
+  const streak = dayStreak(ctx, kid, new Date());
+  $('notes').innerHTML = '<p class="rdate">' + esc(longDate(date)) + '</p>' + (streak >= 2 ? '<span class="rnote streak">' + streak + '-day streak</span>' : '') + notes(kid, dow).map((n) => '<span class="rnote">' + esc(n) + '</span>').join('');
 
   // Teeth was added Nov 11, 2026; leave it off earlier mornings so past candy isn't undone.
-  const morn = morning(kid, dow).filter((i) => i.key !== 'mTeeth' || ymd(date) >= '2026-11-11');
+  const lst = L.lists(ctx, kid, date);
+  const morn = lst.morning;
   morn.forEach((i) => {
     if (i.key === 'mHigh5' && checks.readyAt) i.sub = 'All ready at ' + fmtTime(+checks.readyAt.slice(0, 2) * 60 + +checks.readyAt.slice(3)) + (+checks.readyAt.slice(0, 2) < 12 ? ' am' : ' pm');
   });
@@ -126,7 +106,7 @@ function render() {
   }
 
   const school = dow <= 4;
-  const items = expand(school ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow));
+  const items = lst.day;
   $('day').innerHTML = school
     ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false)
     : section('Today', '', items, checks, false);
@@ -141,10 +121,16 @@ function render() {
     $('day').querySelector('.rhead').insertAdjacentHTML('afterend', afternoonTreatHtml(sources, checks.mCandyGiven));
   }
 
-  const bed = bedtime(kid, dow);
+  const bed = lst.bed;
   $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
   $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', timerHtml(checks));
   if (candy) $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', bedTreatHtml(candy, bed, checks, dow));
+  // Celebrate finishing a whole list (only right after a tap on this phone)
+  const k0 = kid + ymd(date);
+  const dp = L.progress(ctx, kid, date, lst.day), bp = L.progress(ctx, kid, date, lst.bed), mp = L.progress(ctx, kid, date, lst.morning);
+  if (lst.morning.length) cheerIf(k0 + 'm', !mp.left.length, 'Morning done! Nice work, ' + KIDS[kid].name + '.');
+  if (dp.req.length) cheerIf(k0 + 'd', !dp.left.length, (dow <= 4 ? 'After school' : 'Today’s list') + ' done!');
+  cheerIf(k0 + 'b', !bp.left.length, 'Bedtime done. Good night, ' + KIDS[kid].name + '!');
   tick();
 }
 
@@ -207,27 +193,6 @@ document.addEventListener('click', (e) => {
   save(ID, 'days/' + ymd(date) + '/' + kid + '/mCandyGiven', b.dataset.candy === '1' ? true : null);
 }, true);
 
-// Mirror into the reward charts.
-function mirror(itemKey, on) {
-  const dow = dowOf(date);
-  const wk = ymd(mondayOf(date));
-  const chart = KIDS[kid].chart;
-  if (!chart) return;
-  if (itemKey.startsWith('chore')) {
-    // Chores box fills in once every chore for the day is checked
-    const c = Object.assign({}, dayChecks(), { [itemKey]: on || null });
-    const all = choreItems(kid, dow).every((i) => c[i.key]);
-    if (kid === 'eli' || dow <= 5) save(chart, 'weeks/' + wk + '/checks/chores/' + dow, all);
-  }
-  if (kid === 'eli' && itemKey === 'activity' && dow <= 4) save('eli', 'weeks/' + wk + '/checks/running/' + dow, on);
-  if (kid === 'eli' && itemKey === 'missing' && dow <= 4) save('eli', 'weeks/' + wk + '/checks/school/' + dow, on);
-  if (kid === 'rhett' && itemKey === 'duolingo' && dow <= 5) save('trombone', 'weeks/' + wk + '/checks/duolingo/' + dow, on);
-  if (kid === 'rhett' && itemKey === 'activity') {
-    if (dow === 3) save('trombone', 'weeks/' + wk + '/checks/racquetball/3', on);
-    else if ([0, 1, 2, 4, 5].includes(dow)) save('trombone', 'weeks/' + wk + '/checks/move/' + dow, on);
-  }
-}
-
 document.addEventListener('click', (e) => {
   const tab = e.target.closest('[data-kid]');
   if (tab) { kid = tab.dataset.kid; try { localStorage.setItem('rc:lastKid', kid); } catch (err) {} render(); return; }
@@ -245,6 +210,10 @@ document.addEventListener('click', (e) => {
     parts.forEach((p) => save(ID, base + partKey(key, p), all ? null : true));
     return;
   }
+  // Eli's Running is done on Training; Isaiah's 600 touches is shared with Ball Master.
+  const item = L.lists(ctx, kid, date).day.find((i) => i.key === key);
+  if (item && item.derived === 'run') { location.href = 'run.html' + (ymd(date) === ymd(new Date()) ? '' : '?date=' + ymd(date)); return; }
+  if (item && item.derived === 'touches') { save('isaiah', 'touchDays/' + ymd(date), isOn(item) ? null : true); return; }
   if (key.startsWith('w:')) {
     const w = weeklyDef(key.slice(2));
     const cur = weeklyDoneOn(w);
@@ -266,7 +235,6 @@ document.addEventListener('click', (e) => {
     const n = new Date();
     save(ID, base + 'readyAt', next ? String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') : null);
   }
-  mirror(key, !!next);
 });
 
 function go(n) { date = addDays(date, n); render(); }
@@ -352,9 +320,12 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-bedok]');
   if (!b) return;
   e.stopPropagation();
-  if (!askParent()) return;
-  save(ID, 'days/' + ymd(date) + '/' + kid + '/bedOk', b.dataset.bedok === '1' ? true : null);
+  const path = 'days/' + ymd(date) + '/' + kid + '/bedOk', v = b.dataset.bedok === '1' ? true : null;
+  askParent().then((ok) => { if (ok) save(ID, path, v); });
 }, true);
 
 render();
-watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));
+watch(ID, (d) => { data = d; ctx.routines = d; render(); }, statusPill($('sync')));
+watch('config', (d) => { applyConfig(d); render(); });
+watch('eli-run', (d) => { ctx.run = d; render(); });
+watch('isaiah', (d) => { ctx.isaiah = d; render(); });

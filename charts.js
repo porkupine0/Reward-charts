@@ -1,3 +1,4 @@
+import { SETTINGS } from './settings.js?v=1794428564';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -15,16 +16,8 @@ export const CHARTS = {
       { key: 'chores', label: 'Chores', sub: 'All chores completed', cells: [X, X, X, X, X, X, X] },
       { key: 'school', label: 'School', sub: 'No missing assignments', cells: [X, X, X, X, X, O, O] }
     ],
-    weekly: [
-      '30 minutes of extra screen time',
-      'Pick something from the Hy-Vee checkout line',
-      'Skip one chore next week (parent’s pick of which)'
-    ],
-    monthly: [
-      'Arcade at B&B Theatres or the Operating Room',
-      'Lunch out with Dad',
-      '1 hour of extra video game time'
-    ],
+    get weekly() { return SETTINGS.rewards[this.id].weekly; },
+    get monthly() { return SETTINGS.rewards[this.id].monthly; },
     note: '<b>Bonus run</b> on Friday is optional and doesn’t count against the reward. <b>No missing assignments</b> = checked on the school portal that day.'
   },
   trombone: {
@@ -39,16 +32,8 @@ export const CHARTS = {
       { key: 'trombone', label: 'Trombone', sub: 'Practice on the timer', cells: [O, O, O, O, m('20 min'), m('30 min'), m('30 min')] },
       { key: 'duolingo', label: 'Duolingo', sub: 'Optional · 10 min', cells: [opt('10 min'), opt('10 min'), opt('10 min'), opt('10 min'), opt('10 min'), opt('10 min'), O] }
     ],
-    weekly: [
-      '30 minutes of extra screen time',
-      'Pick something from the Hy-Vee checkout line',
-      'Skip one chore next week (parent’s pick of which)'
-    ],
-    monthly: [
-      'New racquetball gear (balls, goggles or a grip)',
-      'Lunch out with Dad',
-      '1 hour of extra video game time'
-    ],
+    get weekly() { return SETTINGS.rewards[this.id].weekly; },
+    get monthly() { return SETTINGS.rewards[this.id].monthly; },
     note: '<b>Move your body</b> = 20 minutes of anything active: bike ride, shooting hoops, jump rope, a walk, a workout video. <b>Saturday racquetball</b> is optional and doesn’t count against the reward.'
   }
 };

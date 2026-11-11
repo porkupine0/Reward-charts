@@ -1,14 +1,19 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794426931';
-import { askParent } from './parent.js?v=1794426931';
-import { CHARTS, weekProgress } from './charts.js?v=1794426931';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794428564';
+import { askParent } from './parent.js?v=1794428564';
+import { CHARTS, weekProgress } from './charts.js?v=1794428564';
+import { applySettings } from './settings.js?v=1794428564';
+import { weekStreak, cheerIf } from './streaks.js?v=1794428564';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794428564';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const chart = CHARTS[document.body.dataset.chart];
 document.documentElement.style.setProperty('--accent', chart.accent);
 
 const params = new URLSearchParams(location.search);
-let week = mondayOf(params.get('week') ? parseYmd(params.get('week')) : new Date());
+let week = mondayOf(dateParam('week'));
 let data = {};
+const ctx = { routines: {}, run: {} };
+const eff = (monday) => effectiveWeek(chart, monday, (data.weeks || {})[ymd(monday)], ctx);
 
 const $ = (id) => document.getElementById(id);
 $('eyebrow').textContent = chart.eyebrow;
@@ -27,7 +32,6 @@ function monthWeeks(monday) {
 function render() {
   const wk = ymd(week);
   const wd = (data.weeks && data.weeks[wk]) || {};
-  const checks = wd.checks || {};
   const today = ymd(new Date());
 
   $('weeklabel').textContent = 'Week of ' + shortDate(week);
@@ -43,9 +47,10 @@ function render() {
     h += '<div class="g-label"><strong>' + esc(r.label) + '</strong><small>' + esc(r.sub) + '</small></div>';
     r.cells.forEach((c, i) => {
       if (c === '-') { h += '<div class="cell off" aria-hidden="true">Off</div>'; return; }
-      const on = !!(checks[r.key] && checks[r.key][i]);
+      const on = cellOn(chart.id, r.key, i, week, wd, ctx);
+      const auto = derivedCell(chart.id, r.key, i, week, ctx) !== undefined;
       const text = c === 'x' ? '' : c.t;
-      const cls = 'cell' + (c.opt ? ' opt' : '') + (on ? ' on' : '');
+      const cls = 'cell' + (c.opt ? ' opt' : '') + (on ? ' on' : '') + (auto ? ' auto' : '');
       const lbl = r.label + ', ' + DAYS[i] + (text ? ', ' + text : '') + (c.opt ? ', optional' : '');
       h += '<button class="' + cls + '" data-row="' + r.key + '" data-day="' + i + '" aria-pressed="' + on + '" aria-label="' + esc(lbl) + '">' +
         '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>' +
@@ -55,8 +60,10 @@ function render() {
   $('grid').innerHTML = h;
 
   // progress + weekly reward
-  const p = weekProgress(chart, wd);
-  $('progress').textContent = p.done + ' of ' + p.need;
+  const p = weekProgress(chart, eff(week));
+  const ws = weekStreak(chart, data, ctx, new Date());
+  $('progress').textContent = p.done + ' of ' + p.need + (ws >= 2 ? ' · ' + ws + ' perfect weeks in a row' : '');
+  cheerIf('week' + wk, p.perfect, 'Perfect week! Pick your reward.');
   $('bar').style.width = (p.need ? (100 * p.done / p.need) : 0) + '%';
   $('weeklycard').classList.toggle('unlocked', p.perfect);
   $('weeklystatus').textContent = p.perfect ? 'Reward earned! Pick one:' : 'Check every white box to unlock';
@@ -73,7 +80,7 @@ function render() {
   let allPerfect = true;
   $('monthname').textContent = week.toLocaleDateString('en-US', { month: 'long' }) + ' prize';
   $('circles').innerHTML = weeks.map((w, i) => {
-    const pp = weekProgress(chart, data.weeks && data.weeks[ymd(w)]);
+    const pp = weekProgress(chart, eff(w));
     if (!pp.perfect) allPerfect = false;
     return '<span class="circle' + (pp.perfect ? ' full' : '') + (ymd(w) === wk ? ' current' : '') + '" title="Week of ' + shortDate(w) + '">' + (i + 1) + '</span>';
   }).join('');
@@ -90,8 +97,13 @@ document.addEventListener('click', (e) => {
   const cell = e.target.closest('button.cell');
   const wk = ymd(week);
   if (cell) {
-    const on = cell.getAttribute('aria-pressed') !== 'true';
-    save(chart.id, 'weeks/' + wk + '/checks/' + cell.dataset.row + '/' + cell.dataset.day, on);
+    // Boxes the checklist fills: a tap here is a hand override (stored as true or 'off');
+    // tapping back to what the checklist says clears the override.
+    const row = cell.dataset.row, i = Number(cell.dataset.day);
+    const want = cell.getAttribute('aria-pressed') !== 'true';
+    const auto = derivedCell(chart.id, row, i, week, ctx);
+    const v = auto !== undefined && want === !!auto ? null : want ? true : (auto ? 'off' : null);
+    save(chart.id, 'weeks/' + wk + '/checks/' + row + '/' + i, v);
     return;
   }
   const rw = e.target.closest('[data-reward]');
@@ -109,8 +121,16 @@ document.addEventListener('click', (e) => {
     save(chart.id, 'months/' + mk + '/prize', cur === i ? null : i);
   }
 });
-$('given').addEventListener('change', (e) => { if (!askParent()) { e.target.checked = !e.target.checked; return; } save(chart.id, 'weeks/' + ymd(week) + '/given', e.target.checked); });
-$('mgiven').addEventListener('change', (e) => { if (!askParent()) { e.target.checked = !e.target.checked; return; } save(chart.id, 'months/' + ymd(week).slice(0, 7) + '/given', e.target.checked); });
+// Parent boxes: undo the tap, then set it once the PIN check passes.
+function parentBox(id, pathFn) {
+  $(id).addEventListener('change', (e) => {
+    const want = e.target.checked, path = pathFn();
+    e.target.checked = !want;
+    askParent().then((ok) => { if (ok) save(chart.id, path, want); });
+  });
+}
+parentBox('given', () => 'weeks/' + ymd(week) + '/given');
+parentBox('mgiven', () => 'months/' + ymd(week).slice(0, 7) + '/given');
 function go(n) {
   week = addDays(week, 7 * n);
   history.replaceState(null, '', '?week=' + ymd(week));
@@ -122,3 +142,6 @@ $('thisweek').onclick = () => { week = mondayOf(new Date()); history.replaceStat
 
 render();
 watch(chart.id, (d) => { data = d; render(); }, statusPill($('sync')));
+watch('routines', (d) => { ctx.routines = d; render(); });
+watch('config', (d) => { applySettings(d); render(); });
+if (chart.id === 'eli') watch('eli-run', (d) => { ctx.run = d; render(); });

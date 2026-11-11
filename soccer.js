@@ -1,22 +1,11 @@
-import { askParent } from './parent.js?v=1794426931';
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794426931';
+import { askParent } from './parent.js?v=1794428564';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, isLive } from './store.js?v=1794428564';
+import { touchedOn } from './lists.js?v=1794428564';
 
 const ID = 'isaiah';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-export const LEVELS = [
-  ['5', ['Pick dessert tonight', 'Candy bar at checkout', 'Pick the cereal this week']],
-  ['8', ['Pick the family movie', 'Stay up 15 min late', 'Extra 20 min game time']],
-  ['10', ['Pick dinner one night', 'Donut run with Dad', 'Family game night, you pick the game']],
-  ['12', ['Slushie trip', 'Skip one chore', 'Pick Saturday breakfast, Dad cooks']],
-  ['15', ['Ice cream trip', '$5 to spend', 'Extra 30 min game time']],
-  ['20', ['$10 to spend', 'Pick the restaurant', 'Breakfast date with Dad']],
-  ['25', ['Milkshake date with Dad', 'Bowling or mini-golf', 'No chores for a weekend']],
-  ['30', ['$15 to spend', 'Movie night: snacks + stay up late', 'Rec center swim with Dad']],
-  ['40', ['New soccer warmup or jersey', '$25 to spend', 'Afternoon with Dad, you plan it']],
-  ['50', ['FAMILY FUN DAY — you plan the whole day']]
-];
-const WEEKLY = ['Pick Friday night dinner', '$5 to spend', 'Stay up 30 min late Saturday', 'Skip one chore of your choice', '30 min extra weekend game time (if not lost)'];
-const CHAMPION = ['Lunch out with Dad, your pick', 'New soccer warmup or jersey', '$20 to spend', 'Family game night, your rules + late bedtime'];
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794428564';
+export { LEVELS };
 
 const $ = (id) => document.getElementById(id);
 let data = {};
@@ -24,10 +13,25 @@ let data = {};
 const ball = (on) => '<svg class="ball' + (on ? ' on' : '') + '" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><polygon points="9,5.5 12.3,8 11.1,11.8 6.9,11.8 5.7,8"/></svg>';
 const star = (on) => '<svg class="star' + (on ? ' on' : '') + '" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2.5 14.9,8.6 21.5,9.4 16.6,13.9 17.9,20.5 12,17.2 6.1,20.5 7.4,13.9 2.5,9.4 9.1,8.6"/></svg>';
 
+// Touch days are stored by real date (touchDays/2026-11-11), shared with Isaiah's checklist.
+const startDate = () => (data.start && parseYmd(data.start)) || mondayOf(new Date());
+const dayOn = (w, d) => touchedOn(data, ymd(addDays(startDate(), w * 7 + d)));
 function weekDone(w) {
-  const t = (data.touches && data.touches[w]) || {};
-  for (let d = 0; d < 7; d++) if ((t[d] || 0) < 6) return false;
+  for (let d = 0; d < 7; d++) if (!dayOn(w, d)) return false;
   return true;
+}
+// One-time move of older week/day ticks to real dates, and freeze the start date.
+let migrated = false;
+function migrate() {
+  if (migrated || !isLive(ID)) return;
+  migrated = true;
+  const start = startDate();
+  if (!data.start) save(ID, 'start', ymd(start));
+  if (!data.touches) return;
+  for (let w = 0; w < 4; w++) for (let d = 0; d < 7; d++) {
+    if ((((data.touches[w] || {})[d]) || 0) >= 6) save(ID, 'touchDays/' + ymd(addDays(start, w * 7 + d)), true);
+  }
+  save(ID, 'touches', null);
 }
 
 // "Cashed in" checkbox, shown once a prize is picked.
@@ -48,18 +52,21 @@ function selectOnly(path, options, value, label) {
 }
 
 function render() {
-  const start = data.start ? parseYmd(data.start) : mondayOf(new Date());
+  migrate();
+  const start = startDate();
   $('start').value = ymd(start);
+  const last = addDays(start, 27), full = [0, 1, 2, 3].reduce((n, w) => n + [0, 1, 2, 3, 4, 5, 6].filter((d) => dayOn(w, d)).length, 0);
+  $('ended').hidden = ymd(new Date()) <= ymd(last);
+  $('ended').innerHTML = '<strong>This challenge ended ' + shortDate(last) + '.</strong> ' + full + ' of 28 days done. <button class="linkbtn" data-newchallenge="1">Start a new 4-week challenge</button>';
   const today = ymd(new Date());
 
   let h = '<div class="bm-row bm-headrow"><span></span>' + DAYS.map((d, i) => '<span>' + DAYS[(start.getDay() + 6 + i) % 7].toUpperCase() + '</span>').join('') + '<span class="pz">Prize</span></div>';
   for (let w = 0; w < 4; w++) {
-    const t = (data.touches && data.touches[w]) || {};
     h += '<div class="bm-row"><span class="wk">WK ' + (w + 1) + '</span>';
     for (let d = 0; d < 7; d++) {
       const date = addDays(start, w * 7 + d);
-      const n = t[d] || 0;
-      h += '<button class="tday' + (n >= 6 ? ' full' : '') + (ymd(date) === today ? ' is-today' : '') + '" data-w="' + w + '" data-d="' + d + '" aria-label="' + shortDate(date) + (n >= 6 ? ': 600 touches done' : ': not done') + '" aria-pressed="' + (n >= 6) + '">' +
+      const n = dayOn(w, d) ? 6 : 0;
+      h += '<button class="tday' + (n >= 6 ? ' full' : '') + (ymd(date) === today ? ' is-today' : '') + '" data-date="' + ymd(date) + '" aria-label="' + shortDate(date) + (n >= 6 ? ': 600 touches done' : ': not done') + '" aria-pressed="' + (n >= 6) + '">' +
         '<small>' + date.getDate() + '</small>' + ball(n >= 6) + '</button>';
     }
     h += '<span class="wkstar">' + star(weekDone(w)) + '</span></div>';
@@ -96,10 +103,11 @@ function render() {
 document.addEventListener('click', (e) => {
   const day = e.target.closest('.tday');
   if (day) {
-    const w = day.dataset.w, d = day.dataset.d;
-    const n = ((data.touches && data.touches[w] && data.touches[w][d]) || 0);
-    save(ID, 'touches/' + w + '/' + d, n >= 6 ? null : 6);
+    const k = day.dataset.date;
+    save(ID, 'touchDays/' + k, touchedOn(data, k) ? null : true);
     return;
+  }
+  if (e.target.closest('[data-newchallenge]')) { $('reset').click(); return;
   }
   const lv = e.target.closest('.level');
   if (lv) {
@@ -118,17 +126,16 @@ document.addEventListener('change', (e) => {
 });
 $('start').addEventListener('change', (e) => { if (e.target.value) save(ID, 'start', e.target.value); });
 $('reset').onclick = () => {
-  if (!confirm('Start a new 4-week challenge? This clears the touch tracker and weekly prizes. Juggling levels stay.')) return;
-  save(ID, 'touches', null); save(ID, 'weekPrize', null); save(ID, 'champion', null);
+  if (!confirm('Start a new 4-week challenge from this Monday? Weekly prizes reset. Juggling levels and past days stay.')) return;
+  save(ID, 'weekPrize', null); save(ID, 'champion', null); save(ID, 'cashed', null);
   save(ID, 'start', ymd(mondayOf(new Date())));
 };
 
 document.addEventListener('click', (e) => {
   const c = e.target.closest('[data-cash]');
   if (!c) return;
-  if (!askParent()) return;
   const k = c.dataset.cash;
-  save(ID, 'cashed/' + k, (data.cashed || {})[k] ? null : ymd(new Date()));
+  askParent().then((ok) => { if (ok) save(ID, 'cashed/' + k, (data.cashed || {})[k] ? null : ymd(new Date())); });
 });
 
 render();

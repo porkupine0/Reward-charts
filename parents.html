@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__V='1794428564';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parents · Reward Charts</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Parents">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/parents.png">
+<link rel="icon" href="icons/parents.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1794428564">
+</head>
+<body class="parents">
+<main class="wrap">
+  <nav class="top"><a href="./" class="back">&larr; All charts</a><span id="sync" class="sync">Connecting…</span></nav>
+  <header class="head">
+    <p class="eyebrow">The Ofloy kids</p>
+    <h1>Parents</h1>
+  </header>
+
+  <section class="card pcard">
+    <div class="rhead"><h2>To pay or give</h2><span class="rcount" id="owedcount"></span></div>
+    <p class="note">Everything the kids have earned and not received yet. Tick it when it’s handed over.</p>
+    <div id="owed" class="plist"></div>
+  </section>
+
+  <section class="card pcard">
+    <div class="rhead"><h2>Late nights</h2></div>
+    <p class="note">Past the 5-minute grace in the last 7 nights. A Parent OK counts the night as on time.</p>
+    <div id="late" class="plist"></div>
+  </section>
+
+  <section class="card pcard">
+    <div class="rhead"><h2 id="weekhead">This week</h2></div>
+    <div id="summary" class="psummary"></div>
+  </section>
+
+  <section class="card pcard">
+    <div class="rhead"><h2>Phone reminders</h2></div>
+    <p class="note">Adds repeating events to this phone’s Calendar app with an alert 15 minutes before. Tap one, then Add All.</p>
+    <div id="ics" class="pbtns"></div>
+  </section>
+
+  <section class="card pcard">
+    <div class="rhead"><h2>Settings &amp; data</h2></div>
+    <div class="pbtns">
+      <a class="pillbtn" href="settings.html">Edit chores, bedtimes &amp; prizes</a>
+      <button class="pillbtn" id="backup" type="button">Download a backup</button>
+      <button class="pillbtn" id="prune" type="button">Clear old daily logs</button>
+      <button class="pillbtn" id="pin" type="button">Change parent PIN</button>
+      <button class="pillbtn" id="lock" type="button">Lock this phone</button>
+    </div>
+    <p class="note" id="datamsg"></p>
+  </section>
+</main>
+<script type="module" src="parents.js?v=1794428564"></script>
+</body>
+</html>

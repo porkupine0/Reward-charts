@@ -1,3 +1,4 @@
+import { SETTINGS, applySettings, toMin } from './settings.js?v=1794428564';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -7,29 +8,16 @@ export const KIDS = {
 
 // Chore rotation, Mon–Sun (0 = Mon). Each day is a list; every item gets its own checkbox.
 // No room is done two days in a row; Tuesday jobs are fixed; Rhett & Isaiah do laundry Saturday.
-const FAMILY_KITCHEN = 'Kitchen + dining room with the family';
-const LAUNDRY = 'Laundry + clean your room (30 min)';
-export const CHORES = {
-  eli: [
-    [FAMILY_KITCHEN, LAUNDRY], ['Living Room'], ['Sunroom'], ['Kitchen'], ['Dining/Front Room'], ['Vacuum/brush Scarlett'],
-    ['Kitchen + dining room (all hands)']
-  ],
-  rhett: [
-    [FAMILY_KITCHEN, 'Sunroom'], ['Bathrooms'], ['Dining/Front Room'], ['Living Room'], ['Kitchen'], [LAUNDRY],
-    ['Kitchen + dining room (all hands)', 'Fold + put away clothes']
-  ],
-  isaiah: [
-    [FAMILY_KITCHEN, 'Trash: empty every trash can in the house'], ['Front closet + shoe organizing'], ['Kitchen'], ['Stairs, landing + upstairs hallway'], ['Sunroom'], [LAUNDRY],
-    ['Kitchen + dining room (all hands)', 'Fold + put away clothes']
-  ]
-};
+// Chores, shower nights and lights out come from settings.js (editable on the Settings page).
+export const CHORES = new Proxy({}, { get: (_, kid) => SETTINGS.chores[kid] });
+export { applySettings as applyConfig };
 
 export function choreItems(kid, dow) {
-  return CHORES[kid][dow].map((label, i) => ({ key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, chore: true }));
+  return (CHORES[kid][dow] || []).map((label, i) => ({ key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, chore: true }));
 }
 
 // Shower nights (never Wednesday, it's already a late night). Eli 5 nights (not Wed or Sun); Rhett and Isaiah 3x a week.
-const SHOWER = { eli: [0, 1, 3, 4, 5], rhett: [6, 1, 3], isaiah: [0, 3, 5] };
+const SHOWER = new Proxy({}, { get: (_, kid) => SETTINGS.showers[kid] || [] });
 
 export const AFTER_SNACKS = ['Banana', 'Yogurt', 'Cheese stick', 'Fruit'];
 export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 'Protein shake', 'Peanut butter'];
@@ -45,7 +33,7 @@ const ORDER = {
   young: ['snack', 'shower', 'teeth', 'vitamins', 'reading'],
   eli: ['snack', 'shower', 'vitamins', 'teeth', 'reading']
 };
-const LIGHTS = { eli: t(20, 30), rhett: t(20, 0), isaiah: t(20, 0) };
+const LIGHTS = new Proxy({}, { get: (_, kid) => toMin(SETTINGS.lights[kid]) });
 const HOME = { 2: { eli: t(20, 45), rhett: t(20, 45), isaiah: t(20, 15) }, 3: { rhett: t(20, 0) } };
 
 function duration(key, kid, showers, short) {
@@ -153,13 +141,13 @@ export function afterSchool(kid, dow, runPlan) {
   if (kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
   if (kid === 'eli') {
-    items.push({ key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: dow === 4 ? 'Optional bonus run today' : 'Check it off on your Training page', link: 'run.html', opt: dow === 4 });
+    items.push({ key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: (dow === 4 ? 'Optional bonus run today. ' : '') + 'Checks itself off when today’s Training is done. Tap to open it.', link: 'run.html', opt: dow === 4 });
   } else if (kid === 'rhett') {
     items.push(dow === 3
       ? { key: 'activity', label: 'Racquetball tonight' }
       : { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video', link: 'trombone.html' });
   } else {
-    items.push({ key: 'activity', label: 'Soccer: 600 touches', sub: 'Tap your balls on Ball Master', link: 'isaiah.html' });
+    items.push({ key: 'activity', label: 'Soccer: 600 touches', sub: 'Same box as Ball Master: tap either one', link: 'isaiah.html' });
   }
   return items;
 }

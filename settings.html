@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__V='1794428564';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Settings · Reward Charts</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/parents.png">
+<link rel="icon" href="icons/parents.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1794428564">
+</head>
+<body class="settings">
+<main class="wrap">
+  <nav class="top"><a href="parents.html" class="back">&larr; Parents</a><span id="sync" class="sync">Connecting…</span></nav>
+  <header class="head">
+    <p class="eyebrow">Parents</p>
+    <h1>Settings</h1>
+  </header>
+  <p class="note">Changes show on every phone as soon as you save. One item per line. Saving asks for the parent PIN.</p>
+
+  <div class="tabs kidtabs" role="tablist" id="kidtabs"></div>
+  <section class="card scard" id="kidpanel" aria-live="polite"></section>
+
+  <section class="card scard">
+    <h2>Weekly &amp; monthly rewards</h2>
+    <div class="sgrid">
+      <label class="field"><span class="flabel">Eli · perfect week</span><textarea id="r-eli-weekly" rows="4"></textarea></label>
+      <label class="field"><span class="flabel">Eli · perfect month</span><textarea id="r-eli-monthly" rows="4"></textarea></label>
+      <label class="field"><span class="flabel">Rhett · perfect week</span><textarea id="r-trombone-weekly" rows="4"></textarea></label>
+      <label class="field"><span class="flabel">Rhett · perfect month</span><textarea id="r-trombone-monthly" rows="4"></textarea></label>
+    </div>
+  </section>
+
+  <section class="card scard">
+    <h2>Eli’s time-trial prize levels</h2>
+    <div class="sgrid" id="levels"></div>
+  </section>
+
+  <div class="sbar">
+    <button class="tt-save" id="save" type="button">Save changes</button>
+    <button class="linkbtn danger" id="reset" type="button">Back to the original settings</button>
+    <p class="note" id="msg" role="status"></p>
+  </div>
+</main>
+<script type="module" src="settings-page.js?v=1794428564"></script>
+</body>
+</html>

@@ -1,18 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1794426931';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1794428564';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Eli's Training · Time Trials</title>
 <meta name="theme-color" content="#1B2A41">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Trials">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/trials.png">
 <link rel="icon" href="icons/trials.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1794426931">
+<link rel="stylesheet" href="style.css?v=1794428564">
 </head>
 <body class="trials" style="--accent:#C2501C; --juggle:#C2501C">
 <main class="wrap">
@@ -21,11 +22,11 @@
     <p class="eyebrow">Eli · Mile and 5K</p>
     <h1>Training</h1>
   </header>
-  <div class="tabs tabs3" role="tablist">
-    <a role="tab" class="tablink" href="run.html" aria-selected="false">Today's Run</a>
-    <a role="tab" class="tablink" href="trials.html" aria-selected="true" aria-current="page">Time Trials</a>
-    <a role="tab" class="tablink" href="run.html#definitions" aria-selected="false">Definitions</a>
-  </div>
+  <nav class="tabs tabs3" aria-label="Training sections">
+    <a class="tablink" href="run.html">Today's Run</a>
+    <a class="tablink" href="trials.html" aria-current="page">Time Trials</a>
+    <a class="tablink" href="run.html#definitions">Definitions</a>
+  </nav>
 
   <section class="tt-next" id="next"></section>
 
@@ -74,6 +75,6 @@
     <div id="sched" class="tt-list"></div>
   </section>
 </main>
-<script type="module" src="trials.js?v=1794426931"></script>
+<script type="module" src="trials.js?v=1794428564"></script>
 </body>
 </html>

@@ -1,17 +1,16 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794426931';
-import { askParent } from './parent.js?v=1794426931';
-import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794426931';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794428564';
+import { askParent } from './parent.js?v=1794428564';
+import { celebrate } from './streaks.js?v=1794428564';
+import { PLAN_START, trialOn } from './plan.js?v=1794428564';
 
 const ID = 'eli-trials';
 
-// Prize tiers, smallest to biggest.
-const T1 = ['Pick something from the Hy-Vee checkout line', 'New running socks', '15 min extra video game time'];
-const T2 = ['Breakfast out with Dad', 'Starbucks run', 'Smoothie or shake after a run', 'Skip one chore (parent’s pick)', 'Family movie night: you pick the movie and dessert', '1 hour extra video game time'];
-const T3 = ['Special lunch out with Dad', 'Friday night pizza: you pick where and what', 'Chore-free day', 'Ice cream for the family', '1.5 hours extra video game time'];
-const T4 = ['Arcade at B&B Theatres or the Operating Room', 'Sit-down family dinner at a nice restaurant'];
-const T5 = ['Plan 2 family activities for a Saturday', 'Arcade at B&B Theatres or the Operating Room + a Starbucks run', 'Sit-down family dinner at a nice restaurant + lunch out with Dad'];
-const TIERS = [[T1, 'Small'], [T2, 'Medium'], [T3, 'Big'], [T4, 'Huge'], [T5, 'Grand']];
-const tierName = (opts) => TIERS.find(([t]) => t === opts)[1];
+// Prize levels, smallest to biggest. The lists can be changed on the Settings page.
+import { SETTINGS, applySettings } from './settings.js?v=1794428564';
+export const LEVELS = ['Small', 'Medium', 'Big', 'Huge', 'Grand'];
+const T1 = 'Small', T2 = 'Medium', T3 = 'Big', T4 = 'Huge', T5 = 'Grand';
+const tierName = (lvl) => lvl;
+const tierOpts = (lvl) => SETTINGS.prizeLevels[lvl] || [];
 
 // [seconds to break, prize tier, label]
 export const MILE = [[440, T1], [430, T1], [420, T1], [405, T2], [390, T2], [380, T3], [370, T3], [360, T4, 'Big one'], [350, T4], [340, T5], [330, T5, 'Stretch goal']];
@@ -24,17 +23,11 @@ const TRIAL_PRIZE = '15 min extra video game time';
 export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 2], 5: ['5k', 3, 'Turkey Trot'], 6: ['mile', 3], 7: ['5k', 2], 8: ['mile', 2], 9: ['5k', 2], 10: ['mile', 2], 11: ['5k', 2], 12: ['mile', 2], 13: ['5k', 3, 'Final test'] };
 
 // Save a trial. On a planned test day of the same distance it uses one id per day (re-saving
-// replaces it) and checks off the Training run, his Running box and his after-school Running step.
-export function saveTrial(t, runChecks) {
-  const d = parseYmd(t.date);
-  const planned = trialOn(d) === t.kind;
+// replaces it) and checks off that day's time trial on Training (his reward chart follows Training).
+export function saveTrial(t) {
+  const planned = trialOn(parseYmd(t.date)) === t.kind;
   save(ID, 'trials/' + (planned ? 'p' + t.date : Date.now().toString(36)), t);
-  if (!planned) return;
-  const checks = Object.assign({}, runChecks || {}, { run: true });
-  save('eli-run', 'days/' + t.date + '/items/run', true);
-  const p = planFor(d), done = dayDone(p, checks);
-  save('eli', 'weeks/' + ymd(mondayOf(d)) + '/checks/running/' + p.dow, done);
-  if (p.dow <= 4) save('routines', 'days/' + t.date + '/eli/activity', done || null);
+  if (planned) save('eli-run', 'days/' + t.date + '/items/run', true);
 }
 
 export const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
@@ -59,8 +52,36 @@ export function nextMilestone(kind, sc) {
   return (kind === 'mile' ? MILE : FIVE).find(([s]) => !sc.hit[kind][s]);
 }
 
+// Planned trials with their dates and any logged time.
+export function planned(sc) {
+  const start = parseYmd(PLAN_START);
+  return Object.entries(SCHED).map(([n, [k, day, note]]) => {
+    const ws = addDays(start, (n - 1) * 7), date = addDays(ws, day);
+    const t = sc.trials.find((x) => x.kind === k && x.date >= ymd(ws) && x.date <= ymd(addDays(ws, 6)));
+    return { n: +n, k, note, date, ws, t };
+  });
+}
+
+// Prizes earned and not handed over yet: game time per trial and per new best (fixed),
+// and milestone prizes (picked or still to pick).
+export function owed(d) {
+  const sc = score(d || {}), paid = (d || {}).paid || {}, pick = (d || {}).pick || {};
+  const out = [];
+  sc.trials.forEach((t) => {
+    if (!paid['t_' + t.id]) out.push({ key: 't_' + t.id, date: t.date, what: TRIAL_PRIZE + ' (' + name(t.kind) + ' ' + fmt(t.secs) + ')' });
+    if (sc.prs[t.id] && !paid['pr_' + t.id]) out.push({ key: 'pr_' + t.id, date: t.date, what: TRIAL_PRIZE + ' (new ' + name(t.kind) + ' best)' });
+  });
+  [['mile', MILE], ['5k', FIVE]].forEach(([k, list]) => list.forEach(([s, lvl]) => {
+    const got = sc.hit[k][s], key = k + '_' + s;
+    if (!got || paid[key]) return;
+    const v = pick[key];
+    out.push({ key, date: got, needsPick: v == null, what: v == null ? 'Pick a ' + lvl + ' prize for breaking ' + fmt(s) + ' (' + name(k) + ')' : tierOpts(lvl)[v] + ' (' + name(k) + ' under ' + fmt(s) + ')' });
+  }));
+  return out;
+}
+
 if (typeof document !== 'undefined' && $('form')) {
-  let data = {}, kind = trialOn(new Date()) || 'mile';
+  let data = {}, kind = trialOn(new Date()) || 'mile', formTouched = false;
 
   const paidBtn = (key) => {
     const when = (data.paid || {})[key];
@@ -80,6 +101,7 @@ if (typeof document !== 'undefined' && $('form')) {
     const next = nextMilestone(k, sc);
     return list.map(([s, opts, tag], i) => {
       const got = sc.hit[k][s], isNext = next && next[0] === s;
+      opts = tierName(opts);
       const gap = isNext && sc.best[k] ? (sc.best[k] - s + 1) + ' sec to go' : '';
       return '<div class="rung' + (got ? ' got' : isNext ? ' next' : '') + '"><span class="rt">' + fmt(s) + '</span>' +
         '<span class="rl">' + (got ? 'Broke it ' + shortDate(parseYmd(got)) : isNext ? 'Next up' + (gap ? ' · ' + gap : '') : 'Locked') + '<b class="tier">' + tierName(opts) + '</b>' + (tag ? '<b>' + tag + '</b>' : '') + '</span>' +
@@ -87,25 +109,36 @@ if (typeof document !== 'undefined' && $('form')) {
     }).join('');
   }
 
+  let hitCount = null, savedAt = 0;
   function render() {
     const sc = score(data);
+    const hits = Object.keys(sc.hit.mile).length + Object.keys(sc.hit['5k']).length;
+    if (hitCount !== null && hits > hitCount && Date.now() - savedAt < 5000) celebrate('New milestone! Pick your prize below.');
+    hitCount = hits;
     const today = ymd(new Date()), wk = mondayOf(new Date());
     const pw = Math.round((wk - parseYmd(PLAN_START)) / 6048e5) + 1;
 
-    // Next trial + bests
-    const upcoming = Object.entries(SCHED).map(([n, [k, day, note]]) => ({ n: +n, k, note, date: addDays(addDays(parseYmd(PLAN_START), (n - 1) * 7), day) }))
-      .find((x) => ymd(x.date) >= today || x.n === pw);
+    // Last trial, any trial still needing a time, and the next one
+    const pl = planned(sc);
+    const last = [...pl].reverse().find((x) => x.t && ymd(x.date) <= today);
+    const missing = [...pl].reverse().find((x) => !x.t && ymd(x.date) <= today && ymd(x.date) >= ymd(addDays(new Date(), -7)));
+    const upcoming = pl.find((x) => !x.t && ymd(x.date) > today);
+    const when = (x) => (ymd(x.date) === today ? 'Today' : DAYS[(x.date.getDay() + 6) % 7] + ' ' + shortDate(x.date));
     const bests = ['mile', '5k'].map((k) => {
       const nx = nextMilestone(k, sc);
       return '<div><small>' + (k === 'mile' ? 'Mile' : '5K') + ' best</small><strong' + (sc.best[k] ? '>' + fmt(sc.best[k]) : ' class="none">No time yet') + '</strong><small>' + (nx ? 'Next: under ' + fmt(nx[0]) : 'All done!') + '</small></div>';
     }).join('');
     $('next').innerHTML = '<div class="tt-bests">' + bests + '</div>' +
-      (upcoming ? '<p class="tt-up"><b>' + (ymd(upcoming.date) === today ? 'Today' : DAYS[(upcoming.date.getDay() + 6) % 7] + ' ' + shortDate(upcoming.date)) + ':</b> ' + name(upcoming.k) + ' time trial' + (upcoming.note ? ' · ' + upcoming.note : '') + ' (Week ' + upcoming.n + ')</p>' : '');
+      (missing ? '<p class="tt-up"><b>' + when(missing) + ':</b> ' + name(missing.k) + ' time trial' + (missing.note ? ' · ' + missing.note : '') + ' · <b>needs a time</b></p>' : '') +
+      (last && !missing ? '<p class="tt-up"><b>Last:</b> ' + name(last.k) + ' ' + fmt(last.t.secs) + ' ✓ (' + when(last) + ')</p>' : '') +
+      (upcoming ? '<p class="tt-up"><b>Next · ' + when(upcoming) + ':</b> ' + name(upcoming.k) + ' time trial' + (upcoming.note ? ' · ' + upcoming.note : '') + ' (Week ' + upcoming.n + ')</p>' : '');
+    // The form starts on the trial that still needs a time
+    if (missing && !formTouched) { kind = missing.k; $('tdate').value = ymd(missing.date); }
 
     $('ladMile').innerHTML = ladder('mile', MILE, sc);
     $('lad5k').innerHTML = ladder('5k', FIVE, sc);
 
-    // Prize menu: earned milestones get a picker + Paid box; locked ones list their choices
+    // Prize menu: only what's been earned. Locked milestones show their level on the ladders above.
     let p = '<h3>Every time trial <small>Finish one</small></h3>';
     const newest = [...sc.trials].reverse();
     p += newest.length ? newest.map((t) => {
@@ -115,20 +148,18 @@ if (typeof document !== 'undefined' && $('form')) {
     }).join('') : '<p class="muted">Finish a trial: ' + TRIAL_PRIZE + '. Beat your best: another 15 minutes.</p>';
     [['mile', MILE, 'Mile'], ['5k', FIVE, '5K']].forEach(([k, list, label]) => {
       p += '<h3>' + label + ' milestones <small>Pick one per milestone</small></h3>';
-      list.forEach(([s, opts]) => {
-        const got = sc.hit[k][s], key = k + '_' + s;
-        p += '<div class="prow' + (got ? '' : ' locked') + '"><span class="ttag">' + fmt(s) + '</span>' +
-          (got ? picker(key, opts, label + ' ' + fmt(s) + ' prize') : '<span class="muted">' + tierName(opts) + ' prize · locked</span>') + '</div>';
+      const earned = list.filter(([s]) => sc.hit[k][s]);
+      if (!earned.length) p += '<p class="muted">Break your first ' + (k === 'mile' ? 'mile' : '5K') + ' milestone to pick a prize.</p>';
+      earned.forEach(([s, lvl]) => {
+        p += '<div class="prow"><span class="ttag">' + fmt(s) + '</span>' + picker(k + '_' + s, tierOpts(lvl), label + ' ' + fmt(s) + ' prize') + '</div>';
       });
     });
-    p += '<h3>Prize levels <small>What you can pick</small></h3>' + TIERS.map(([opts, n]) => '<div class="prow"><span class="ttag">' + n + '</span><span class="muted">' + opts.map(esc).join(' · ') + '</span></div>').join('');
+    p += '<h3>Prize levels <small>What you can pick</small></h3>' + LEVELS.map((n) => '<div class="prow"><span class="ttag">' + n + '</span><span class="muted">' + tierOpts(n).map(esc).join(' · ') + '</span></div>').join('');
     $('prizelist').innerHTML = p;
 
     // Schedule with results
-    $('sched').innerHTML = Object.entries(SCHED).map(([n, [k, day, note]]) => {
-      const ws = addDays(parseYmd(PLAN_START), (n - 1) * 7), date = addDays(ws, day);
-      const t = sc.trials.find((x) => x.kind === k && x.date >= ymd(ws) && x.date <= ymd(addDays(ws, 6)));
-      const isNow = +n === pw;
+    $('sched').innerHTML = pl.map(({ n, k, note, date, t }) => {
+      const day = (date.getDay() + 6) % 7, isNow = n === pw;
       const tag = t ? '<span class="tt-res">' + fmt(t.secs) + '</span>' : isNow ? '<span class="tt-now">This week</span>' : ymd(date) < today ? '<span class="tt-miss">No time</span>' : '';
       return '<div class="tt-row' + (isNow ? ' now' : '') + '"><span class="wk">WK ' + n + '</span><span class="grow"><b>' + name(k) + '</b>' + (note ? ' · ' + note : '') + '<small>' + DAYS[day] + ' ' + shortDate(date) + '</small></span>' + tag + '</div>';
     }).join('') +
@@ -141,9 +172,9 @@ if (typeof document !== 'undefined' && $('form')) {
 
   document.addEventListener('click', (e) => {
     const kb = e.target.closest('.tt-kind button');
-    if (kb) { kind = kb.dataset.kind; render(); return; }
+    if (kb) { kind = kb.dataset.kind; formTouched = true; render(); return; }
     const pb = e.target.closest('[data-paid]');
-    if (pb) { if (!askParent()) return; const k = pb.dataset.paid; save(ID, 'paid/' + k, (data.paid || {})[k] ? null : ymd(new Date())); return; }
+    if (pb) { const k = pb.dataset.paid; askParent().then((ok) => { if (ok) save(ID, 'paid/' + k, (data.paid || {})[k] ? null : ymd(new Date())); }); return; }
     const db = e.target.closest('[data-del]');
     if (db && confirm('Delete this time?')) save(ID, 'trials/' + db.dataset.del, null);
   });
@@ -155,20 +186,20 @@ if (typeof document !== 'undefined' && $('form')) {
     }
   });
   $('tdate').value = ymd(new Date());
-  $('tdate').addEventListener('change', () => { const k = $('tdate').value && trialOn(parseYmd($('tdate').value)); if (k) { kind = k; render(); } });
+  $('tdate').addEventListener('change', () => { formTouched = true; const k = $('tdate').value && trialOn(parseYmd($('tdate').value)); if (k) { kind = k; render(); } });
   $('form').addEventListener('submit', (e) => {
     e.preventDefault();
     const m = parseInt($('tmin').value, 10), s = parseInt($('tsec').value || '0', 10), secs = m * 60 + s;
     const ok = kind === 'mile' ? secs >= 240 && secs <= 900 : secs >= 840 && secs <= 2700;
     if (!(m >= 0) || !(s >= 0 && s < 60) || !ok) { $('msg').textContent = 'Check the time: minutes and seconds, like 6 and 42' + (kind === '5k' ? ' (or 22 and 10 for a 5K).' : '.'); return; }
-    saveTrial({ kind, secs, date: $('tdate').value || ymd(new Date()), where: $('twhere').value }, runDay(($('tdate').value || ymd(new Date()))));
+    savedAt = Date.now();
+    saveTrial({ kind, secs, date: $('tdate').value || ymd(new Date()), where: $('twhere').value });
     $('tmin').value = ''; $('tsec').value = '';
     $('msg').textContent = name(kind) + ' in ' + fmt(secs) + ' saved. Check the prize menu!';
+    formTouched = false;
   });
 
-  let runData = {};
-  const runDay = (k) => (((runData.days || {})[k] || {}).items) || {};
-  watch('eli-run', (d) => { runData = d; });
   render();
   watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));
+  watch('config', (d) => { applySettings(d); render(); });
 }
