@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__V='1794424576';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eli's Time Trials</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Time Trials">
+<link rel="apple-touch-icon" href="icons/trials.png">
+<link rel="icon" href="icons/trials.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1794424576">
+</head>
+<body class="trials" style="--accent:#C2501C; --juggle:#C2501C">
+<main class="wrap">
+  <nav class="top"><a href="./" class="back">&larr; All charts</a><span class="navlinks"><a href="run.html" class="pillbtn">Training</a><span id="sync" class="sync">Connecting…</span></span></nav>
+  <header class="head">
+    <p class="eyebrow">Eli · Mile and 5K</p>
+    <h1>Time Trials</h1>
+  </header>
+
+  <section class="tt-next" id="next"></section>
+
+  <section class="sec">
+    <div class="sechead"><span class="num">1</span><div><h2>Log a time trial</h2><p>All out, after a 15-minute warm-up and 4 strides. Every trial earns a prize.</p></div></div>
+    <form class="card logcard" id="form">
+      <div class="tt-kind" role="radiogroup" aria-label="Distance">
+        <button type="button" data-kind="mile" aria-pressed="true">1 mile</button>
+        <button type="button" data-kind="5k" aria-pressed="false">5K</button>
+      </div>
+      <div class="logrow">
+        <div class="field">
+          <span class="flabel">Time</span>
+          <div class="timein">
+            <input id="tmin" inputmode="numeric" pattern="[0-9]*" placeholder="min" aria-label="Minutes">
+            <span>:</span>
+            <input id="tsec" inputmode="numeric" pattern="[0-9]*" placeholder="sec" aria-label="Seconds">
+          </div>
+        </div>
+        <label class="field"><span class="flabel">Date</span><input id="tdate" type="date"></label>
+        <label class="field"><span class="flabel">Where</span>
+          <select id="twhere" class="tt-select"><option value="track">Track</option><option value="treadmill">Treadmill</option><option value="race">Race</option></select></label>
+      </div>
+      <button class="tt-save" type="submit">Save time</button>
+      <p class="note" id="msg"></p>
+    </form>
+  </section>
+
+  <section class="sec">
+    <div class="sechead"><span class="num">2</span><div><h2>Mile milestones</h2><p>Break a time, unlock a prize. Each one pays once.</p></div></div>
+    <div id="ladMile" class="ladder"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sechead"><span class="num">3</span><div><h2>5K milestones</h2><p>The 21:30 season goal, then all the way to 19:00.</p></div></div>
+    <div id="lad5k" class="ladder"></div>
+  </section>
+
+  <section class="card reward" id="prizes">
+    <h2>Prize menu</h2>
+    <div id="prizelist" class="prizelist"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sechead"><span class="num">4</span><div><h2>Schedule and results</h2><p>One trial a week, mile and 5K taking turns. It replaces Wednesday's intervals; Weeks 5, 6 and 13 test on Thursday.</p></div></div>
+    <div id="sched" class="tt-list"></div>
+  </section>
+</main>
+<script type="module" src="trials.js?v=1794424576"></script>
+</body>
+</html>
