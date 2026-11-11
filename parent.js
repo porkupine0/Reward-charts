@@ -1,6 +1,6 @@
 // Parent-only boxes ("Reward given", "Paid", "Parent OK"). The first parent to use one sets a PIN;
 // each parent's phone remembers it after one correct entry, so kids' phones stay locked.
-import { watch, save } from './store.js?v=1794425755';
+import { watch, save } from './store.js?v=1794426322';
 
 let pin = null;
 watch('settings', (d) => { pin = d.pin || null; });

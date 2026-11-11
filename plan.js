@@ -178,7 +178,7 @@ export const TERMS = [
   ['Strides', 'About 30 seconds of quick, relaxed running at 10.0–10.5 mph once the belt reaches speed, then 60 seconds walking or easy jogging. Fast but not a sprint. Use the speed buttons, not the rails.'],
   ['Progression long run', 'A long easy run where the last 10–15 minutes speed up to steady pace (7.4 mph).'],
   ['Warm-up / cool-down', 'Every quality day starts with 10 minutes easy (6.5 mph) and ends with 10 minutes easy. “10 easy” in a workout means exactly that.'],
-  ['Time trial', 'An all-out test, once a week from Week 4: 1 mile and 5K take turns. Warm up 15 min easy + 4 strides, cool down 10 min. Use the indoor track when you can, otherwise the treadmill at 1%. A mile × 3.33 = your 5K fitness. Log every result on the Time Trials chart.'],
+  ['Time trial', 'An all-out test, once a week from Week 4: 1 mile and 5K take turns. Warm up 15 min easy + 4 strides, cool down 10 min. Use the indoor track when you can, otherwise the treadmill at 1%. A mile × 3.4 = your 5K fitness (you slow down over the longer race). Log every result on the Time Trials chart.'],
   ['Down week', 'A lighter week (Weeks 6, 9, 13) so your body absorbs the training. Skip plyometrics in down weeks.'],
   ['Plyometrics (plyos)', 'Quick jumping exercises with soft, quiet landings. They make you more efficient and faster at top speed. Stop a set when jumps get sloppy.'],
   ['Pace', 'Minutes per mile: total time ÷ total miles. The Run tab works it out for you.'],
