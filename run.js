@@ -1,5 +1,5 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794424576';
-import { planFor, ZONES, TERMS, ROUTINES } from './plan.js?v=1794424576';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794424874';
+import { planFor, ZONES, TERMS, ROUTINES } from './plan.js?v=1794424874';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
@@ -45,7 +45,8 @@ function render() {
       '<div class="wo-card' + (p.optional ? ' is-opt' : '') + (p.dow === 6 ? ' is-rest' : '') + '">' +
       '<p class="wo-meta">' + esc(longDate(date)) + ' · Week ' + p.week + ' · ' + esc(p.focus) + '</p>' +
       '<h2 class="wo-title">' + esc(p.title) + (p.tag ? '<span class="wo-tag">' + esc(p.tag) + '</span>' : '') + '</h2>' +
-      '<p class="wo-detail">' + esc(p.detail) + '</p></div>';
+      '<p class="wo-detail">' + esc(p.detail) + '</p>' +
+      (/time trial/i.test(p.title) ? '<a class="cklink" href="trials.html">Log your time on Time Trials &rarr;</a>' : '') + '</div>';
 
     $('checklist').innerHTML = p.items.map((it) => {
       const on = !!checks[it.key];
@@ -204,7 +205,7 @@ if (location.hash === '#definitions') tab('def');
 
 // ---------- definitions ----------
 $('defs').innerHTML =
-  '<section class="card defcard"><h2>Pace zones</h2><p class="note">Treadmill at 1% incline, which matches outdoor effort. Re-set speeds after the Week 6 time trial.</p>' +
+  '<section class="card defcard"><h2>Pace zones</h2><p class="note">Treadmill at 1% incline, which matches outdoor effort. Re-set speeds after every time trial.</p>' +
   '<div class="zones">' + ZONES.map((z) => '<div class="zone"><strong>' + esc(z[0]) + '</strong><span>' + esc(z[1]) + '</span><b>' + esc(z[2]) + ' /mi</b><b>' + esc(z[3]) + ' mph</b></div>').join('') + '</div></section>' +
   '<section class="card defcard"><h2>Workout words</h2><dl class="terms">' +
   TERMS.map((t) => '<dt>' + esc(t[0]) + '</dt><dd>' + esc(t[1]) + '</dd>').join('') + '</dl></section>' +

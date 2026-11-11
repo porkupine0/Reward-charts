@@ -1,5 +1,5 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794424576';
-import { PLAN_START } from './plan.js?v=1794424576';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794424874';
+import { PLAN_START } from './plan.js?v=1794424874';
 
 const ID = 'eli-trials';
 

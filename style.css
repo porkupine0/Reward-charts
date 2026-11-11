@@ -224,7 +224,8 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .howto p { margin: 0; font-size: 14px; line-height: 1.45; color: #2D3748; }
 .howto p:first-child { display: flex; justify-content: space-between; gap: 10px; color: var(--ink); }
 .howto b { flex: none; color: var(--accent); font-size: 13px; }
-.navlinks { display: flex; gap: 14px; align-items: center; }
+.navlinks { display: flex; gap: 8px; align-items: center; }
+.back { white-space: nowrap; }
 .pillbtn { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 12px; border-radius: 99px; background: var(--accent); color: #fff; text-decoration: none; font-weight: 800; font-size: 13px; }
 @media (max-width: 420px) {
   .logrow { grid-template-columns: 1fr 1fr; }
