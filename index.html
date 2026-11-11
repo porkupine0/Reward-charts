@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1794425211';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1794425491';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Reward Charts</title>
@@ -12,7 +12,7 @@
 <link rel="icon" href="icons/home.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1794425211">
+<link rel="stylesheet" href="style.css?v=1794425491">
 </head>
 <body>
 <main class="wrap">
@@ -21,12 +21,11 @@
     <p class="eyebrow">The Ofloy kids</p>
     <h1>Reward Charts</h1>
   </header>
+  <section class="today" aria-labelledby="todayh">
+    <div class="today-head"><h2 id="todayh">Today</h2><span id="todaydate" class="today-date"></span></div>
+    <div id="todaylist" class="todaylist"></div>
+  </section>
   <div class="homecards">
-    <a class="homecard" href="checklist.html" style="--accent:#1B2A41">
-      <img src="icons/checklist.png" alt="">
-      <div><strong>Daily Checklists</strong><small>After school · Bedtime · All 3 kids</small></div>
-      <span class="hc-prog" id="p-routines"></span>
-    </a>
     <a class="homecard" href="stats.html" style="--accent:#1B2A41">
       <img src="icons/stats.png" alt="">
       <div><strong>Bedtime Stats</strong><small>Timer results · On-time nights per week</small></div>
@@ -39,13 +38,8 @@
     </a>
     <a class="homecard" href="run.html" style="--accent:#C2501C">
       <img src="icons/run.png" alt="">
-      <div><strong>Eli's Training</strong><small>Today's run · Definitions</small></div>
-      <span class="hc-prog" id="p-run"></span>
-    </a>
-    <a class="homecard" href="trials.html" style="--accent:#C2501C">
-      <img src="icons/trials.png" alt="">
-      <div><strong>Eli's Time Trials</strong><small>Mile · 5K · Milestone prizes</small></div>
-      <span class="hc-prog" id="p-trials"></span>
+      <div><strong>Eli's Training</strong><small>Today's run · Time trials · Definitions</small></div>
+      <span class="hc-prog"><span id="p-run"></span><span id="p-trials"></span></span>
     </a>
     <a class="homecard" href="trombone.html" style="--accent:#1D6FB8">
       <img src="icons/trombone.png" alt="">
@@ -58,32 +52,45 @@
       <span class="hc-prog" id="p-isaiah"></span>
     </a>
   </div>
+  <p class="note" id="parentline"></p>
   <p class="note">Checkmarks sync to every phone and computer that opens this page. Add each chart to your Home Screen from the Share menu for one-tap access.</p>
 </main>
 <script type="module">
-import { watch, ymd, mondayOf, statusPill } from './store.js?v=1794425211';
-import { CHARTS, weekProgress } from './charts.js?v=1794425211';
+import { watch, ymd, mondayOf, statusPill, esc } from './store.js?v=1794425491';
+import { CHARTS, weekProgress } from './charts.js?v=1794425491';
 const wk = ymd(mondayOf(new Date()));
 ['eli', 'trombone'].forEach((id) => watch(id, (d) => {
   const p = weekProgress(CHARTS[id], d.weeks && d.weeks[wk]);
   document.getElementById('p-' + id).textContent = p.perfect ? 'Perfect week!' : p.done + '/' + p.need + ' this week';
 }, id === 'eli' ? statusPill(document.getElementById('sync')) : null));
-import('./plan.js?v=1794425211').then(({ planFor }) => watch('eli-run', (d) => {
+import('./plan.js?v=1794425491').then(({ planFor }) => watch('eli-run', (d) => {
   const p = planFor(new Date());
   const it = ((d.days || {})[ymd(new Date())] || {}).items || {};
   document.getElementById('p-run').textContent = p ? 'Today: ' + p.title + (p.items.length && p.items.filter((i) => !i.opt).every((i) => it[i.key]) && p.items.some((i)=>!i.opt) ? ' · done!' : '') : 'Plan finished';
 }));
-import('./routines.js?v=1794425211').then(({ KIDS, afterSchool, weekend, bedtime }) => watch('routines', (d) => {
+Promise.all([import('./routines.js?v=1794425491'), import('./plan.js?v=1794425491')]).then(([R, P]) => watch('routines', (d) => {
   const t = new Date(), dow = (t.getDay() + 6) % 7, day = ((d.days || {})[ymd(t)]) || {};
-  const parts = Object.entries(KIDS).map(([id, k]) => {
-    const list = [...(dow <= 4 ? afterSchool(id, dow) : weekend(id, dow)), ...bedtime(id, dow)].filter((i) => i.key && !i.opt);
+  document.getElementById('todaydate').textContent = t.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  const short = (l) => l.replace(/^Chore: /, '').replace(/ \(.*\)$/, '');
+  document.getElementById('todaylist').innerHTML = Object.entries(R.KIDS).map(([id, k]) => {
     const c = day[id] || {};
-    const isOn = (i) => (i.parts ? i.parts.every((p) => c[i.key + '_' + p.toLowerCase()]) : c[i.key]);
-    return k.name + ' ' + list.filter(isOn).length + '/' + list.length;
-  });
-  document.getElementById('p-routines').textContent = 'Today: ' + parts.join(' · ');
+    const on = (i) => (i.parts ? i.parts.every((p) => c[i.key + '_' + p.toLowerCase()]) : c[i.key]);
+    const need = (list) => list.filter((i) => i.key && !i.opt);
+    const morn = need(R.morning(id, dow)), mornLeft = morn.filter((i) => !on(i));
+    const dayItems = need(dow <= 4 ? R.afterSchool(id, dow, id === 'eli' ? P.planFor(t) : null) : R.weekend(id, dow));
+    const left = dayItems.filter((i) => !on(i));
+    const bed = need(R.bedtime(id, dow)), bedLeft = bed.filter((i) => !on(i));
+    const lo = bed.length ? bed[bed.length - 1].time : '';
+    let main;
+    if (t.getHours() < 12 && mornLeft.length) main = 'Morning: ' + mornLeft.length + ' left';
+    else if (left.length) main = '<b>' + left.length + ' left</b> ' + left.slice(0, 2).map((i) => esc(short(i.label))).join(' · ') + (left.length > 2 ? ' · +' + (left.length - 2) + ' more' : '');
+    else main = dayItems.length ? '<b>' + (dow <= 4 ? 'After school' : 'Today') + ' done ✓</b>' : 'Nothing on the list';
+    const bedTxt = !bedLeft.length ? 'Bedtime done ✓' : 'Lights out ' + lo;
+    return '<a class="todayrow" href="checklist.html?kid=' + id + '" style="--accent:' + k.accent + '"><strong>' + esc(k.name) + '</strong>' +
+      '<span class="tr-main">' + main + '</span><span class="tr-bed">' + bedTxt + '</span><span class="tr-go" aria-hidden="true">&rsaquo;</span></a>';
+  }).join('');
 }));
-import('./routines.js?v=1794425211').then(({ KIDS, timerResult }) => watch('routines', (d) => {
+import('./routines.js?v=1794425491').then(({ KIDS, timerResult }) => watch('routines', (d) => {
   const mon = mondayOf(new Date());
   const parts = Object.entries(KIDS).map(([id, k]) => {
     let on = 0;
@@ -92,13 +99,11 @@ import('./routines.js?v=1794425211').then(({ KIDS, timerResult }) => watch('rout
   });
   document.getElementById('p-stats').textContent = 'On time this week: ' + parts.join(' · ');
 }));
-import('./trials.js?v=1794425211').then(({ score, nextMilestone, fmt }) => watch('eli-trials', (d) => {
+import('./trials.js?v=1794425491').then(({ score }) => watch('eli-trials', (d) => {
   const sc = score(d);
-  const part = (k, label) => sc.best[k] ? label + ' ' + fmt(sc.best[k]) : null;
   const paid = d.paid || {};
   const unpaid = Object.keys(d.pick || {}).filter((k) => !paid[k]).length + sc.trials.filter((t) => !paid['t_' + t.id]).length + Object.keys(sc.prs).filter((id) => !paid['pr_' + id]).length;
-  const bits = [part('mile', 'Mile'), part('5k', '5K')].filter(Boolean);
-  document.getElementById('p-trials').textContent = (bits.length ? 'Best: ' + bits.join(' · ') : 'First trial Wed Nov 18') + (unpaid ? ' · ' + unpaid + ' prize' + (unpaid > 1 ? 's' : '') + ' to pay' : '');
+  document.getElementById('p-trials').textContent = unpaid ? ' · ' + unpaid + ' prize' + (unpaid > 1 ? 's' : '') + ' to pay' : '';
 }));
 watch('isaiah', (d) => {
   const t = d.touches || {};
@@ -106,6 +111,11 @@ watch('isaiah', (d) => {
   for (let w = 0; w < 4; w++) for (let x = 0; x < 7; x++) if (((t[w] || {})[x] || 0) >= 6) full++;
   const lv = Object.keys(d.juggle || {}).length;
   document.getElementById('p-isaiah').textContent = full + '/28 days · ' + lv + '/10 levels';
+});
+import('./parent.js?v=1794425491').then(({ isParent, setParent }) => {
+  const el = document.getElementById('parentline');
+  const show = () => { el.innerHTML = isParent() ? '<b>Parent phone.</b> Reward given, Paid and Parent OK boxes are unlocked here. <button class="linkbtn" id="lockbtn">Lock this phone</button>' : 'Reward given, Paid and Parent OK boxes ask for the parent PIN on this phone.'; const b = document.getElementById('lockbtn'); if (b) b.onclick = () => { setParent(false); show(); }; };
+  show();
 });
 </script>
 </body>

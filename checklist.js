@@ -1,6 +1,7 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794425211';
-import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794425211';
-import { planFor } from './plan.js?v=1794425211';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794425491';
+import { KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794425491';
+import { askParent } from './parent.js?v=1794425491';
+import { planFor } from './plan.js?v=1794425491';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -351,6 +352,7 @@ document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-bedok]');
   if (!b) return;
   e.stopPropagation();
+  if (!askParent()) return;
   save(ID, 'days/' + ymd(date) + '/' + kid + '/bedOk', b.dataset.bedok === '1' ? true : null);
 }, true);
 

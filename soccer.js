@@ -1,4 +1,5 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794425211';
+import { askParent } from './parent.js?v=1794425491';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794425491';
 
 const ID = 'isaiah';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -125,6 +126,7 @@ $('reset').onclick = () => {
 document.addEventListener('click', (e) => {
   const c = e.target.closest('[data-cash]');
   if (!c) return;
+  if (!askParent()) return;
   const k = c.dataset.cash;
   save(ID, 'cashed/' + k, (data.cashed || {})[k] ? null : ymd(new Date()));
 });

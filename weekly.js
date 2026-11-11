@@ -1,5 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794425211';
-import { CHARTS, weekProgress } from './charts.js?v=1794425211';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794425491';
+import { askParent } from './parent.js?v=1794425491';
+import { CHARTS, weekProgress } from './charts.js?v=1794425491';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const chart = CHARTS[document.body.dataset.chart];
@@ -108,8 +109,8 @@ document.addEventListener('click', (e) => {
     save(chart.id, 'months/' + mk + '/prize', cur === i ? null : i);
   }
 });
-$('given').addEventListener('change', (e) => save(chart.id, 'weeks/' + ymd(week) + '/given', e.target.checked));
-$('mgiven').addEventListener('change', (e) => save(chart.id, 'months/' + ymd(week).slice(0, 7) + '/given', e.target.checked));
+$('given').addEventListener('change', (e) => { if (!askParent()) { e.target.checked = !e.target.checked; return; } save(chart.id, 'weeks/' + ymd(week) + '/given', e.target.checked); });
+$('mgiven').addEventListener('change', (e) => { if (!askParent()) { e.target.checked = !e.target.checked; return; } save(chart.id, 'months/' + ymd(week).slice(0, 7) + '/given', e.target.checked); });
 function go(n) {
   week = addDays(week, 7 * n);
   history.replaceState(null, '', '?week=' + ymd(week));

@@ -41,11 +41,11 @@ export const CHARTS = {
     ],
     weekly: [
       '30 minutes of extra screen time',
-      '$5 toward something from the Hy-Vee checkout line',
+      'Pick something from the Hy-Vee checkout line',
       'Skip one chore next week (parent’s pick of which)'
     ],
     monthly: [
-      'New racquetball gear up to $20 (balls, goggles, grip)',
+      'New racquetball gear (balls, goggles or a grip)',
       'Lunch out with Dad',
       '1 hour of extra video game time'
     ],

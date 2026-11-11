@@ -1,5 +1,6 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794425211';
-import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794425211';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794425491';
+import { askParent } from './parent.js?v=1794425491';
+import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794425491';
 
 const ID = 'eli-trials';
 
@@ -140,7 +141,7 @@ if (typeof document !== 'undefined' && $('form')) {
     const kb = e.target.closest('.tt-kind button');
     if (kb) { kind = kb.dataset.kind; render(); return; }
     const pb = e.target.closest('[data-paid]');
-    if (pb) { const k = pb.dataset.paid; save(ID, 'paid/' + k, (data.paid || {})[k] ? null : ymd(new Date())); return; }
+    if (pb) { if (!askParent()) return; const k = pb.dataset.paid; save(ID, 'paid/' + k, (data.paid || {})[k] ? null : ymd(new Date())); return; }
     const db = e.target.closest('[data-del]');
     if (db && confirm('Delete this time?')) save(ID, 'trials/' + db.dataset.del, null);
   });
