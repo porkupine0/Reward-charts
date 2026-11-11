@@ -1,5 +1,5 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794317919';
-import { planFor, ZONES, TERMS, ROUTINES } from './plan.js?v=1794317919';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794409442';
+import { planFor, ZONES, TERMS, ROUTINES } from './plan.js?v=1794409442';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);

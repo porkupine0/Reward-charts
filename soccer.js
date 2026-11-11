@@ -1,4 +1,4 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794317919';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794409442';
 
 const ID = 'isaiah';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -29,7 +29,19 @@ function weekDone(w) {
   return true;
 }
 
+// "Cashed in" checkbox, shown once a prize is picked.
+function cashBtn(path) {
+  const key = path.replace(/\//g, '_');
+  const when = (data.cashed || {})[key];
+  return '<button class="cash' + (when ? ' on' : '') + '" data-cash="' + key + '" aria-pressed="' + !!when + '">' +
+    '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
+    (when ? 'Cashed in ' + shortDate(parseYmd(when)) : 'Cashed in?') + '</button>';
+}
 function select(path, options, value, label) {
+  const picked = value !== undefined && value !== null && value !== '';
+  return '<div class="pickcol">' + selectOnly(path, options, value, label) + (picked ? cashBtn(path) : '') + '</div>';
+}
+function selectOnly(path, options, value, label) {
   return '<select data-path="' + path + '" aria-label="' + esc(label) + '"><option value="">Pick a prize…</option>' +
     options.map((o, i) => '<option value="' + i + '"' + (value === i ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>';
 }
@@ -109,6 +121,13 @@ $('reset').onclick = () => {
   save(ID, 'touches', null); save(ID, 'weekPrize', null); save(ID, 'champion', null);
   save(ID, 'start', ymd(mondayOf(new Date())));
 };
+
+document.addEventListener('click', (e) => {
+  const c = e.target.closest('[data-cash]');
+  if (!c) return;
+  const k = c.dataset.cash;
+  save(ID, 'cashed/' + k, (data.cashed || {})[k] ? null : ymd(new Date()));
+});
 
 render();
 watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));
