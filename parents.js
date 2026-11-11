@@ -1,12 +1,12 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794428564';
-import { CHARTS, weekProgress } from './charts.js?v=1794428564';
-import { KIDS, timerResult, bedtime, applyConfig } from './routines.js?v=1794428564';
-import * as L from './lists.js?v=1794428564';
-import { owed, score, planned, fmt } from './trials.js?v=1794428564';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794428564';
-import { askParent, setParent, changePin } from './parent.js?v=1794428564';
-import { dayFull } from './streaks.js?v=1794428564';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794440709';
+import { CHARTS, weekProgress } from './charts.js?v=1794440709';
+import { KIDS, timerResult, bedtime, applyConfig } from './routines.js?v=1794440709';
+import * as L from './lists.js?v=1794440709';
+import { owed, score, planned, fmt } from './trials.js?v=1794440709';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794440709';
+import { askParent, setParent, changePin } from './parent.js?v=1794440709';
+import { dayFull } from './streaks.js?v=1794440709';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'eli-trials', 'config'];

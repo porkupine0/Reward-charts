@@ -9,7 +9,7 @@ const load = (f) => import('../' + f + '?v=' + V);
 const { ymd, parseYmd, mondayOf, addDays } = await load('store.js');
 const { bedtime, timerResult, choreItems, lightsOut, afterSchool } = await load('routines.js');
 const { planFor, trialOn, dayDone } = await load('plan.js');
-const { score, nextMilestone, owed, planned, MILE, FIVE } = await load('trials.js');
+const { score, nextMilestone, owed, planned, MILE, FIVE, mphFor } = await load('trials.js');
 const { CHARTS, weekProgress } = await load('charts.js');
 const L = await load('lists.js');
 const { applySettings, SETTINGS, DEFAULTS } = await load('settings.js');
@@ -76,8 +76,11 @@ test('trials: milestones, bests, paired ladders, owed prizes', () => {
   assert.equal(sc.prs.b, 21);
   assert.equal(nextMilestone('mile', sc)[0], 390);
   const o = owed(data).map((x) => x.key);
-  assert.ok(!o.includes('t_a'), 'paid trial prize not owed');
-  assert.ok(o.includes('t_b') && o.includes('pr_b') && o.includes('mile_440') && o.includes('mile_405'));
+  assert.ok(!o.some((k) => /^(t|pr)_/.test(k)), 'running a trial or a new best is not rewarded');
+  assert.ok(o.includes('mile_440') && o.includes('mile_405') && o.length === 4);
+  assert.equal(mphFor('mile', 420), 8.6);    // 7:00 mile -> 8.6 mph beats it (6:58.6)
+  assert.equal(mphFor('5k', 1395), 8.1);     // 23:15 5K
+  MILE.forEach(([s]) => assert.ok(3600 / mphFor('mile', s) < s, 'speed beats ' + s));
   // a deleted trial no longer owes anything
   assert.equal(owed({ pick: { mile_440: 0 } }).length, 0);
   const pl = planned(sc);

@@ -512,3 +512,7 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .trend .ax { fill: var(--muted); font-size: 12px; font-family: 'Archivo', sans-serif; }
 .trend polyline.smile { stroke: #C2501C; stroke-width: 3; } .trend circle.smile { fill: #C2501C; }
 .trend polyline.s5k { stroke: #1D6FB8; stroke-width: 3; } .trend circle.s5k { fill: #1D6FB8; }
+
+.rp b { display: block; color: var(--ink); font-size: 13px; text-align: right; }
+.rung.got .rp b { color: var(--accent); }
+.trialgoal { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--tint); font-size: 14px; line-height: 1.4; }

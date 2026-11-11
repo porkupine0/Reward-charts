@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794428564';
-import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794428564';
-import { saveTrial, fmt as tfmt } from './trials.js?v=1794428564';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794440709';
+import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794440709';
+import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1794440709';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
@@ -207,6 +207,12 @@ function renderTrial() {
   if (!kind) return;
   const t = trials['p' + ymd(date)];
   $('trialhead').textContent = (kind === 'mile' ? '1-mile' : '5K') + ' time trial result';
+  // Goal: the next milestone, not counting today's own time, and the treadmill speed that beats it
+  const before = {}; Object.entries(trials).forEach(([id, x]) => { if (id !== 'p' + ymd(date)) before[id] = x; });
+  const sc = score({ trials: before }), nx = nextMilestone(kind, sc);
+  $('trialgoal').innerHTML = nx
+    ? 'Goal: under <b>' + tfmt(nx[0]) + '</b> (' + nx[1] + ' prize). On the treadmill at 1%, run <b>' + mphFor(kind, nx[0]).toFixed(1) + ' mph or faster</b>.' + (sc.best[kind] ? ' Best so far ' + tfmt(sc.best[kind]) + '.' : '')
+    : 'Every ' + (kind === 'mile' ? 'mile' : '5K') + ' milestone is done. Go for a new best!';
   $('trialsaved').innerHTML = t ? 'Saved: <b>' + tfmt(t.secs) + '</b>. <a href="trials.html">See your milestones and prizes &rarr;</a>' : 'Just the trial itself, not the warm-up. Saving checks off your time trial.';
   const f = document.activeElement && document.activeElement.id;
   if (f !== 'trmin' && f !== 'trsec') {

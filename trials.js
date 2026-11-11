@@ -1,12 +1,12 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794428564';
-import { askParent } from './parent.js?v=1794428564';
-import { celebrate } from './streaks.js?v=1794428564';
-import { PLAN_START, trialOn } from './plan.js?v=1794428564';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794440709';
+import { askParent } from './parent.js?v=1794440709';
+import { celebrate } from './streaks.js?v=1794440709';
+import { PLAN_START, trialOn } from './plan.js?v=1794440709';
 
 const ID = 'eli-trials';
 
 // Prize levels, smallest to biggest. The lists can be changed on the Settings page.
-import { SETTINGS, applySettings } from './settings.js?v=1794428564';
+import { SETTINGS, applySettings } from './settings.js?v=1794440709';
 export const LEVELS = ['Small', 'Medium', 'Big', 'Huge', 'Grand'];
 const T1 = 'Small', T2 = 'Medium', T3 = 'Big', T4 = 'Huge', T5 = 'Grand';
 const tierName = (lvl) => lvl;
@@ -17,7 +17,9 @@ export const MILE = [[440, T1], [430, T1], [420, T1], [405, T2], [390, T2], [380
 // Each 5K rung matches the mile rung beside it: the Daniels VDOT 5K equivalent of that mile
 // (about mile × 3.4, which allows for slowing over the longer race), made 2% faster, to the nearest 5 sec.
 export const FIVE = [[1460, T1], [1425, T1], [1395, T1], [1350, T2], [1300, T2], [1270, T3, 'Season goal'], [1235, T3], [1205, T4], [1175, T4], [1140, T5], [1110, T5, 'Stretch goal']];
-const TRIAL_PRIZE = '15 min extra video game time';
+// Treadmill speed (mph, 1% incline) that beats a time: the next 0.1 mph above the exact pace
+// (a 6:00 mile is exactly 10.0 mph, which only ties it, so the goal is 10.1).
+export const mphFor = (kind, secs) => (Math.floor(((kind === 'mile' ? 1 : 3.10686) * 3600 / secs) * 10 + 1e-9) + 1) / 10;
 
 // Plan week → [distance, day index (0 = Mon), note]
 export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 2], 5: ['5k', 3, 'Turkey Trot'], 6: ['mile', 3], 7: ['5k', 2], 8: ['mile', 2], 9: ['5k', 2], 10: ['mile', 2], 11: ['5k', 2], 12: ['mile', 2], 13: ['5k', 3, 'Final test'] };
@@ -62,15 +64,11 @@ export function planned(sc) {
   });
 }
 
-// Prizes earned and not handed over yet: game time per trial and per new best (fixed),
-// and milestone prizes (picked or still to pick).
+// Milestone prizes earned and not handed over yet (picked or still to pick).
+// Running a trial or setting a best is not rewarded by itself; only breaking a milestone is.
 export function owed(d) {
   const sc = score(d || {}), paid = (d || {}).paid || {}, pick = (d || {}).pick || {};
   const out = [];
-  sc.trials.forEach((t) => {
-    if (!paid['t_' + t.id]) out.push({ key: 't_' + t.id, date: t.date, what: TRIAL_PRIZE + ' (' + name(t.kind) + ' ' + fmt(t.secs) + ')' });
-    if (sc.prs[t.id] && !paid['pr_' + t.id]) out.push({ key: 'pr_' + t.id, date: t.date, what: TRIAL_PRIZE + ' (new ' + name(t.kind) + ' best)' });
-  });
   [['mile', MILE], ['5k', FIVE]].forEach(([k, list]) => list.forEach(([s, lvl]) => {
     const got = sc.hit[k][s], key = k + '_' + s;
     if (!got || paid[key]) return;
@@ -105,7 +103,7 @@ if (typeof document !== 'undefined' && $('form')) {
       const gap = isNext && sc.best[k] ? (sc.best[k] - s + 1) + ' sec to go' : '';
       return '<div class="rung' + (got ? ' got' : isNext ? ' next' : '') + '"><span class="rt">' + fmt(s) + '</span>' +
         '<span class="rl">' + (got ? 'Broke it ' + shortDate(parseYmd(got)) : isNext ? 'Next up' + (gap ? ' · ' + gap : '') : 'Locked') + '<b class="tier">' + tierName(opts) + '</b>' + (tag ? '<b>' + tag + '</b>' : '') + '</span>' +
-        '<span class="rp">' + (k === 'mile' ? 'Matches ' + fmt(FIVE[i][0]) + ' 5K' : fmt(s / 3.10686) + '/mi') + '</span></div>';
+        '<span class="rp"><b>' + mphFor(k, s).toFixed(1) + ' mph</b>' + (k === 'mile' ? 'Matches ' + fmt(FIVE[i][0]) + ' 5K' : fmt(s / 3.10686) + '/mi') + '</span></div>';
     }).join('');
   }
 
@@ -126,7 +124,7 @@ if (typeof document !== 'undefined' && $('form')) {
     const when = (x) => (ymd(x.date) === today ? 'Today' : DAYS[(x.date.getDay() + 6) % 7] + ' ' + shortDate(x.date));
     const bests = ['mile', '5k'].map((k) => {
       const nx = nextMilestone(k, sc);
-      return '<div><small>' + (k === 'mile' ? 'Mile' : '5K') + ' best</small><strong' + (sc.best[k] ? '>' + fmt(sc.best[k]) : ' class="none">No time yet') + '</strong><small>' + (nx ? 'Next: under ' + fmt(nx[0]) : 'All done!') + '</small></div>';
+      return '<div><small>' + (k === 'mile' ? 'Mile' : '5K') + ' best</small><strong' + (sc.best[k] ? '>' + fmt(sc.best[k]) : ' class="none">No time yet') + '</strong><small>' + (nx ? 'Next: under ' + fmt(nx[0]) + ' · ' + mphFor(k, nx[0]).toFixed(1) + ' mph' : 'All done!') + '</small></div>';
     }).join('');
     $('next').innerHTML = '<div class="tt-bests">' + bests + '</div>' +
       (missing ? '<p class="tt-up"><b>' + when(missing) + ':</b> ' + name(missing.k) + ' time trial' + (missing.note ? ' · ' + missing.note : '') + ' · <b>needs a time</b></p>' : '') +
@@ -139,13 +137,7 @@ if (typeof document !== 'undefined' && $('form')) {
     $('lad5k').innerHTML = ladder('5k', FIVE, sc);
 
     // Prize menu: only what's been earned. Locked milestones show their level on the ladders above.
-    let p = '<h3>Every time trial <small>Finish one</small></h3>';
-    const newest = [...sc.trials].reverse();
-    p += newest.length ? newest.map((t) => {
-      let row = '<div class="prow"><span class="ttag">' + shortDate(parseYmd(t.date)) + '</span><div class="pickcol"><span class="fixed">' + TRIAL_PRIZE + ' · ' + name(t.kind) + ' ' + fmt(t.secs) + '</span>' + paidBtn('t_' + t.id) + '</div></div>';
-      if (sc.prs[t.id]) row += '<div class="prow"><span class="ttag pr">Best</span><div class="pickcol"><span class="fixed">' + TRIAL_PRIZE + ' · new best by ' + sc.prs[t.id] + ' sec</span>' + paidBtn('pr_' + t.id) + '</div></div>';
-      return row;
-    }).join('') : '<p class="muted">Finish a trial: ' + TRIAL_PRIZE + '. Beat your best: another 15 minutes.</p>';
+    let p = '';
     [['mile', MILE, 'Mile'], ['5k', FIVE, '5K']].forEach(([k, list, label]) => {
       p += '<h3>' + label + ' milestones <small>Pick one per milestone</small></h3>';
       const earned = list.filter(([s]) => sc.hit[k][s]);

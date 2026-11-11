@@ -1,12 +1,12 @@
 // Home page: "Today" for each kid, plus a one-line status on every card.
-import { watch, ymd, mondayOf, addDays, statusPill, esc } from './store.js?v=1794428564';
-import { CHARTS, weekProgress } from './charts.js?v=1794428564';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1794428564';
-import { planFor } from './plan.js?v=1794428564';
-import * as L from './lists.js?v=1794428564';
-import { owed } from './trials.js?v=1794428564';
-import { isParent, setParent } from './parent.js?v=1794428564';
-import { dayStreak } from './streaks.js?v=1794428564';
+import { watch, ymd, mondayOf, addDays, statusPill, esc } from './store.js?v=1794440709';
+import { CHARTS, weekProgress } from './charts.js?v=1794440709';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1794440709';
+import { planFor } from './plan.js?v=1794440709';
+import * as L from './lists.js?v=1794440709';
+import { owed } from './trials.js?v=1794440709';
+import { isParent, setParent } from './parent.js?v=1794440709';
+import { dayStreak } from './streaks.js?v=1794440709';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {} };

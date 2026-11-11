@@ -1,9 +1,9 @@
 // History: each kid's month at a glance, and Eli's time-trial trend.
-import { watch, ymd, addDays, mondayOf, esc, statusPill } from './store.js?v=1794428564';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1794428564';
-import * as L from './lists.js?v=1794428564';
-import { dayFull } from './streaks.js?v=1794428564';
-import { score, fmt } from './trials.js?v=1794428564';
+import { watch, ymd, addDays, mondayOf, esc, statusPill } from './store.js?v=1794440709';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1794440709';
+import * as L from './lists.js?v=1794440709';
+import { dayFull } from './streaks.js?v=1794440709';
+import { score, fmt } from './trials.js?v=1794440709';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {} };
