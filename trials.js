@@ -1,27 +1,27 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794426322';
-import { askParent } from './parent.js?v=1794426322';
-import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794426322';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794426931';
+import { askParent } from './parent.js?v=1794426931';
+import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794426931';
 
 const ID = 'eli-trials';
 
 // Prize tiers, smallest to biggest.
-const T1 = ['Pick something from the Hy-Vee checkout line', 'New running socks', 'Stay up 30 min later on a Friday or Saturday', '30 min extra video game time'];
-const T2 = ['Breakfast out with Dad', 'Starbucks run', 'Smoothie or shake after a run', 'Skip one chore (parent’s pick)', 'Family movie night: you pick the movie and snacks', '1 hour extra video game time'];
-const T3 = ['Special lunch out with Dad', 'Friday night pizza: you pick where and what', 'Chore-free day'];
+const T1 = ['Pick something from the Hy-Vee checkout line', 'New running socks', '15 min extra video game time'];
+const T2 = ['Breakfast out with Dad', 'Starbucks run', 'Smoothie or shake after a run', 'Skip one chore (parent’s pick)', 'Family movie night: you pick the movie and dessert', '1 hour extra video game time'];
+const T3 = ['Special lunch out with Dad', 'Friday night pizza: you pick where and what', 'Chore-free day', 'Ice cream for the family', '1.5 hours extra video game time'];
 const T4 = ['Arcade at B&B Theatres or the Operating Room', 'Sit-down family dinner at a nice restaurant'];
 const T5 = ['Plan 2 family activities for a Saturday', 'Arcade at B&B Theatres or the Operating Room + a Starbucks run', 'Sit-down family dinner at a nice restaurant + lunch out with Dad'];
 const TIERS = [[T1, 'Small'], [T2, 'Medium'], [T3, 'Big'], [T4, 'Huge'], [T5, 'Grand']];
 const tierName = (opts) => TIERS.find(([t]) => t === opts)[1];
 
 // [seconds to break, prize tier, label]
-export const MILE = [[420, T1], [405, T2], [390, T2], [380, T3], [370, T3], [360, T4, 'Big one'], [350, T4], [340, T5], [330, T5, 'Stretch goal']];
+export const MILE = [[440, T1], [430, T1], [420, T1], [405, T2], [390, T2], [380, T3], [370, T3], [360, T4, 'Big one'], [350, T4], [340, T5], [330, T5, 'Stretch goal']];
 // Each 5K rung matches the mile rung beside it: the Daniels VDOT 5K equivalent of that mile
 // (about mile × 3.4, which allows for slowing over the longer race), made 2% faster, to the nearest 5 sec.
-export const FIVE = [[1395, T1], [1350, T2], [1300, T2], [1270, T3, 'Season goal'], [1235, T3], [1205, T4], [1175, T4], [1140, T5], [1110, T5, 'Stretch goal']];
+export const FIVE = [[1460, T1], [1425, T1], [1395, T1], [1350, T2], [1300, T2], [1270, T3, 'Season goal'], [1235, T3], [1205, T4], [1175, T4], [1140, T5], [1110, T5, 'Stretch goal']];
 const TRIAL_PRIZE = '15 min extra video game time';
 
 // Plan week → [distance, day index (0 = Mon), note]
-export const SCHED = { 4: ['mile', 2], 5: ['5k', 3, 'Turkey Trot'], 6: ['mile', 3], 7: ['5k', 2], 8: ['mile', 2], 9: ['5k', 2], 10: ['mile', 2], 11: ['5k', 2], 12: ['mile', 2], 13: ['5k', 3, 'Final test'] };
+export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 2], 5: ['5k', 3, 'Turkey Trot'], 6: ['mile', 3], 7: ['5k', 2], 8: ['mile', 2], 9: ['5k', 2], 10: ['mile', 2], 11: ['5k', 2], 12: ['mile', 2], 13: ['5k', 3, 'Final test'] };
 
 // Save a trial. On a planned test day of the same distance it uses one id per day (re-saving
 // replaces it) and checks off the Training run, his Running box and his after-school Running step.
@@ -82,7 +82,7 @@ if (typeof document !== 'undefined' && $('form')) {
       const got = sc.hit[k][s], isNext = next && next[0] === s;
       const gap = isNext && sc.best[k] ? (sc.best[k] - s + 1) + ' sec to go' : '';
       return '<div class="rung' + (got ? ' got' : isNext ? ' next' : '') + '"><span class="rt">' + fmt(s) + '</span>' +
-        '<span class="rl">' + (got ? 'Broke it ' + shortDate(parseYmd(got)) : isNext ? 'Next up' + (gap ? ' · ' + gap : '') : 'Locked') + (tag ? '<b>' + tag + '</b>' : '<b class="tier">' + tierName(opts) + '</b>') + '</span>' +
+        '<span class="rl">' + (got ? 'Broke it ' + shortDate(parseYmd(got)) : isNext ? 'Next up' + (gap ? ' · ' + gap : '') : 'Locked') + '<b class="tier">' + tierName(opts) + '</b>' + (tag ? '<b>' + tag + '</b>' : '') + '</span>' +
         '<span class="rp">' + (k === 'mile' ? 'Matches ' + fmt(FIVE[i][0]) + ' 5K' : fmt(s / 3.10686) + '/mi') + '</span></div>';
     }).join('');
   }
@@ -97,7 +97,7 @@ if (typeof document !== 'undefined' && $('form')) {
       .find((x) => ymd(x.date) >= today || x.n === pw);
     const bests = ['mile', '5k'].map((k) => {
       const nx = nextMilestone(k, sc);
-      return '<div><small>' + (k === 'mile' ? 'Mile' : '5K') + ' best</small><strong>' + (sc.best[k] ? fmt(sc.best[k]) : '–:––') + '</strong><small>' + (nx ? 'Next: under ' + fmt(nx[0]) : 'All done!') + '</small></div>';
+      return '<div><small>' + (k === 'mile' ? 'Mile' : '5K') + ' best</small><strong' + (sc.best[k] ? '>' + fmt(sc.best[k]) : ' class="none">No time yet') + '</strong><small>' + (nx ? 'Next: under ' + fmt(nx[0]) : 'All done!') + '</small></div>';
     }).join('');
     $('next').innerHTML = '<div class="tt-bests">' + bests + '</div>' +
       (upcoming ? '<p class="tt-up"><b>' + (ymd(upcoming.date) === today ? 'Today' : DAYS[(upcoming.date.getDay() + 6) % 7] + ' ' + shortDate(upcoming.date)) + ':</b> ' + name(upcoming.k) + ' time trial' + (upcoming.note ? ' · ' + upcoming.note : '') + ' (Week ' + upcoming.n + ')</p>' : '');
