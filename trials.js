@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794425491';
-import { askParent } from './parent.js?v=1794425491';
-import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794425491';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794425755';
+import { askParent } from './parent.js?v=1794425755';
+import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794425755';
 
 const ID = 'eli-trials';
 
@@ -15,7 +15,7 @@ const tierName = (opts) => TIERS.find(([t]) => t === opts)[1];
 
 // [seconds to break, prize tier, label]
 export const MILE = [[420, T1], [405, T2], [390, T2], [380, T3], [370, T3], [360, T4, 'Big one'], [350, T4], [340, T5], [330, T5, 'Stretch goal']];
-export const FIVE = [[1380, T1], [1350, T2], [1320, T3], [1290, T4, 'Season goal'], [1260, T4], [1245, T4], [1230, T5], [1215, T5], [1200, T5], [1185, T5], [1170, T5], [1155, T5], [1140, T5, 'Stretch goal']];
+export const FIVE = [[1440, T1], [1410, T1], [1380, T2], [1350, T2], [1320, T3], [1290, T3], [1260, T4, 'Season goal'], [1230, T4], [1200, T4], [1185, T5], [1170, T5, 'Stretch goal']];
 const TRIAL_PRIZE = '15 min extra video game time';
 
 // Plan week → [distance, day index (0 = Mon), note]
