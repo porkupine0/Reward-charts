@@ -375,3 +375,7 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
   .rung { grid-template-columns: 58px 1fr auto; padding: 8px 10px; }
   .rt { font-size: 17px; }
 }
+
+.trialbox { border-color: var(--accent); }
+.trialbox .tt-save { min-height: 46px; }
+.trialbox .note a { color: var(--accent); font-weight: 800; }

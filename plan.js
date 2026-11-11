@@ -125,6 +125,20 @@ function items(text, dow) {
 
 function parse(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
 
+// Required items done? Optional-only days count once the run is checked.
+export function dayDone(p, checks) {
+  const req = p.items.filter((i) => !i.opt);
+  if (req.length) return req.every((i) => checks[i.key]);
+  return !!(checks.run || checks.cross);
+}
+
+// 'mile' or '5k' when the plan has a time trial on this date, else null.
+export function trialOn(date) {
+  const p = planFor(date);
+  if (!p || !/time trial/i.test(p.title)) return null;
+  return /mile/i.test(p.title) ? 'mile' : '5k';
+}
+
 // Returns the plan for a date, or null if it's outside the 13 weeks.
 export function planFor(date) {
   const start = parse(PLAN_START);

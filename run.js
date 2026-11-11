@@ -1,5 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794424874';
-import { planFor, ZONES, TERMS, ROUTINES } from './plan.js?v=1794424874';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794425211';
+import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794425211';
+import { saveTrial, fmt as tfmt } from './trials.js?v=1794425211';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
@@ -46,7 +47,7 @@ function render() {
       '<p class="wo-meta">' + esc(longDate(date)) + ' · Week ' + p.week + ' · ' + esc(p.focus) + '</p>' +
       '<h2 class="wo-title">' + esc(p.title) + (p.tag ? '<span class="wo-tag">' + esc(p.tag) + '</span>' : '') + '</h2>' +
       '<p class="wo-detail">' + esc(p.detail) + '</p>' +
-      (/time trial/i.test(p.title) ? '<a class="cklink" href="trials.html">Log your time on Time Trials &rarr;</a>' : '') + '</div>';
+'</div>';
 
     $('checklist').innerHTML = p.items.map((it) => {
       const on = !!checks[it.key];
@@ -78,6 +79,7 @@ function render() {
   $('effort').innerHTML = Array.from({ length: 10 }, (_, i) => i + 1).map((n) =>
     '<button class="eff' + (dd.effort === n ? ' on' : '') + '" data-effort="' + n + '" aria-pressed="' + (dd.effort === n) + '">' + n + '</button>').join('');
   $('logcard').hidden = !!(p && p.dow === 6);
+  renderTrial();
 
   // week totals
   const mon = mondayOf(date);
@@ -104,13 +106,6 @@ function showPace() {
   const { time, miles } = readLog();
   const pc = paceOf(time, miles);
   $('pace').textContent = pc ? fmt(pc) : '–:–';
-}
-
-// Required items done? Optional-only days count once the run is checked.
-function dayDone(p, checks) {
-  const req = p.items.filter((i) => !i.opt);
-  if (req.length) return req.every((i) => checks[i.key]);
-  return !!(checks.run || checks.cross);
 }
 
 // Keep the Running row on Eli's reward chart in step with this page.
@@ -213,6 +208,33 @@ $('defs').innerHTML =
     '<section class="card defcard"><h2>' + esc(r.title) + '</h2><p class="when">' + esc(r.when) + '</p><p class="note">' + esc(r.note) + '</p>' +
     '<div class="howto">' + r.list.map((x) => '<div><p><strong>' + esc(x[0]) + '</strong> <b>' + esc(x[1]) + '</b></p><p>' + esc(x[2]) + '</p></div>').join('') + '</div></section>').join('') +
   '<p class="note">Not sure about one? Look up the name on YouTube and watch a 30-second demo before trying it.</p>';
+
+// ---------- time trial result (test days) ----------
+let trials = {};
+function renderTrial() {
+  const kind = trialOn(date);
+  $('trialbox').hidden = !kind;
+  if (!kind) return;
+  const t = trials['p' + ymd(date)];
+  $('trialhead').textContent = (kind === 'mile' ? '1-mile' : '5K') + ' time trial result';
+  $('trialsaved').innerHTML = t ? 'Saved: <b>' + tfmt(t.secs) + '</b>. <a href="trials.html">See your milestones and prizes &rarr;</a>' : 'Just the trial itself, not the warm-up. Saving checks off your time trial.';
+  const f = document.activeElement && document.activeElement.id;
+  if (f !== 'trmin' && f !== 'trsec') {
+    $('trmin').value = t ? Math.floor(t.secs / 60) : '';
+    $('trsec').value = t ? String(t.secs % 60).padStart(2, '0') : '';
+  }
+  if (t && t.where) $('trwhere').value = t.where;
+}
+$('trsave').onclick = () => {
+  const kind = trialOn(date);
+  const m = parseInt($('trmin').value, 10), s = parseInt($('trsec').value || '0', 10), secs = m * 60 + s;
+  const ok = kind === 'mile' ? secs >= 240 && secs <= 900 : secs >= 840 && secs <= 2700;
+  if (!kind || !(s >= 0 && s < 60) || !ok) { $('trialsaved').textContent = 'Check the time: minutes and seconds, like ' + (kind === 'mile' ? '6 and 42.' : '22 and 10.'); return; }
+  const checks = Object.assign({}, dayData(date).items || {}, { run: true });
+  saveTrial({ kind, secs, date: ymd(date), where: $('trwhere').value }, checks);
+  document.activeElement && document.activeElement.blur();
+};
+watch('eli-trials', (d) => { trials = d.trials || {}; renderTrial(); });
 
 render();
 watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));

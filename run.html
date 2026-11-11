@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1794424874';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1794425211';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Eli's Training</title>
@@ -12,7 +12,7 @@
 <link rel="icon" href="icons/run.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1794424874">
+<link rel="stylesheet" href="style.css?v=1794425211">
 </head>
 <body class="runpage" style="--accent:#C2501C">
 <main class="wrap">
@@ -36,6 +36,23 @@
     <button id="today" class="linkbtn" hidden>Back to today</button>
 
     <div id="workout" class="workout"></div>
+    <section id="trialbox" class="card logcard trialbox" hidden>
+      <h2 id="trialhead">Time trial result</h2>
+      <div class="logrow">
+        <div class="field">
+          <span class="flabel">Trial time</span>
+          <div class="timein">
+            <input id="trmin" inputmode="numeric" pattern="[0-9]*" placeholder="min" aria-label="Trial minutes">
+            <span>:</span>
+            <input id="trsec" inputmode="numeric" pattern="[0-9]*" placeholder="sec" aria-label="Trial seconds">
+          </div>
+        </div>
+        <label class="field"><span class="flabel">Where</span>
+          <select id="trwhere" class="tt-select"><option value="track">Track</option><option value="treadmill">Treadmill</option><option value="race">Race</option></select></label>
+        <button id="trsave" class="tt-save" type="button">Save</button>
+      </div>
+      <p class="note" id="trialsaved"></p>
+    </section>
     <div id="checklist" class="checklist"></div>
 
     <section id="logcard" class="card logcard">
@@ -75,6 +92,6 @@
     <div id="defs"></div>
   </section>
 </main>
-<script type="module" src="run.js?v=1794424874"></script>
+<script type="module" src="run.js?v=1794425211"></script>
 </body>
 </html>

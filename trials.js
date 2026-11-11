@@ -1,5 +1,5 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794424874';
-import { PLAN_START } from './plan.js?v=1794424874';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794425211';
+import { PLAN_START, planFor, dayDone, trialOn } from './plan.js?v=1794425211';
 
 const ID = 'eli-trials';
 
@@ -19,6 +19,20 @@ const TRIAL_PRIZE = '15 min extra video game time';
 
 // Plan week → [distance, day index (0 = Mon), note]
 export const SCHED = { 4: ['mile', 2], 5: ['5k', 3, 'Turkey Trot'], 6: ['mile', 3], 7: ['5k', 2], 8: ['mile', 2], 9: ['5k', 2], 10: ['mile', 2], 11: ['5k', 2], 12: ['mile', 2], 13: ['5k', 3, 'Final test'] };
+
+// Save a trial. On a planned test day of the same distance it uses one id per day (re-saving
+// replaces it) and checks off the Training run, his Running box and his after-school Running step.
+export function saveTrial(t, runChecks) {
+  const d = parseYmd(t.date);
+  const planned = trialOn(d) === t.kind;
+  save(ID, 'trials/' + (planned ? 'p' + t.date : Date.now().toString(36)), t);
+  if (!planned) return;
+  const checks = Object.assign({}, runChecks || {}, { run: true });
+  save('eli-run', 'days/' + t.date + '/items/run', true);
+  const p = planFor(d), done = dayDone(p, checks);
+  save('eli', 'weeks/' + ymd(mondayOf(d)) + '/checks/running/' + p.dow, done);
+  if (p.dow <= 4) save('routines', 'days/' + t.date + '/eli/activity', done || null);
+}
 
 export const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
 const name = (k) => (k === 'mile' ? '1 mile' : '5K');
@@ -43,7 +57,7 @@ export function nextMilestone(kind, sc) {
 }
 
 if (typeof document !== 'undefined' && $('form')) {
-  let data = {}, kind = 'mile';
+  let data = {}, kind = trialOn(new Date()) || 'mile';
 
   const paidBtn = (key) => {
     const when = (data.paid || {})[key];
@@ -138,17 +152,20 @@ if (typeof document !== 'undefined' && $('form')) {
     }
   });
   $('tdate').value = ymd(new Date());
+  $('tdate').addEventListener('change', () => { const k = $('tdate').value && trialOn(parseYmd($('tdate').value)); if (k) { kind = k; render(); } });
   $('form').addEventListener('submit', (e) => {
     e.preventDefault();
     const m = parseInt($('tmin').value, 10), s = parseInt($('tsec').value || '0', 10), secs = m * 60 + s;
     const ok = kind === 'mile' ? secs >= 240 && secs <= 900 : secs >= 840 && secs <= 2700;
     if (!(m >= 0) || !(s >= 0 && s < 60) || !ok) { $('msg').textContent = 'Check the time: minutes and seconds, like 6 and 42' + (kind === '5k' ? ' (or 22 and 10 for a 5K).' : '.'); return; }
-    const id = Date.now().toString(36);
-    save(ID, 'trials/' + id, { kind, secs, date: $('tdate').value || ymd(new Date()), where: $('twhere').value });
+    saveTrial({ kind, secs, date: $('tdate').value || ymd(new Date()), where: $('twhere').value }, runDay(($('tdate').value || ymd(new Date()))));
     $('tmin').value = ''; $('tsec').value = '';
     $('msg').textContent = name(kind) + ' in ' + fmt(secs) + ' saved. Check the prize menu!';
   });
 
+  let runData = {};
+  const runDay = (k) => (((runData.days || {})[k] || {}).items) || {};
+  watch('eli-run', (d) => { runData = d; });
   render();
   watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));
 }
