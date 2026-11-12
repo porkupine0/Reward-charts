@@ -52,24 +52,37 @@ test('bedtime timer: on time, grace, late, parent OK, past midnight, DST night',
   assert.equal(res.status, 'ontime'); // Sat lights out 9:00
 });
 
-test('plan: time trials alternate weekly from Week 3', () => {
-  assert.equal(trialOn(d('2026-11-11')), '5k');
-  assert.equal(trialOn(d('2026-11-18')), 'mile');
-  assert.equal(trialOn(d('2026-11-26')), '5k');   // Turkey Trot (Thursday)
-  assert.equal(trialOn(d('2026-12-03')), 'mile');
+test('plan: trials open Thursday workouts (re-set Nov 12)', () => {
+  assert.equal(trialOn(d('2026-11-11')), '5k');   // first test (Week 3)
+  assert.equal(trialOn(d('2026-11-18')), null);
+  assert.equal(trialOn(d('2026-11-19')), 'mile'); // Week 4 diagnostic
+  assert.equal(trialOn(d('2026-11-26')), '5k');   // Turkey Trot
+  assert.equal(trialOn(d('2026-12-03')), null);   // down week
+  assert.equal(trialOn(d('2026-12-10')), 'mile');
+  assert.equal(trialOn(d('2026-12-31')), '5k');
+  assert.equal(trialOn(d('2027-01-14')), 'mile');
   assert.equal(trialOn(d('2027-01-21')), '5k');   // final test
-  assert.equal(trialOn(d('2026-11-12')), null);
   assert.equal(planFor(d('2027-02-01')), null);
   const p = planFor(d('2026-11-11'));
   assert.equal(dayDone(p, {}), false);
   assert.equal(dayDone(p, Object.fromEntries(p.items.filter((i) => !i.opt).map((i) => [i.key, true]))), true);
+  // every new-plan run day has an inside and an outside version; paces are the 24:30 zones
+  for (let i = 0; i < 70; i++) {
+    const q = planFor(addDays(d('2026-11-16'), i));
+    if (q.dow > 4 || q.title === 'Off') continue;
+    assert.ok(q.indoor && q.outdoor, ymd(addDays(d('2026-11-16'), i)) + ' needs inside and outside');
+    assert.ok(!/10\.0|6\.5 mph|7\.8–7\.9|8\.7/.test(q.indoor), 'old pace left in ' + q.indoor);
+  }
+  // Strength B on Thursday always offers Home Strength
+  const thu = planFor(d('2026-12-17')).items.find((i) => i.key === 'strB');
+  assert.equal(thu.routine2, 'home');
 });
 
 test('trials: milestones, bests, paired ladders, owed prizes', () => {
   assert.equal(MILE.length, FIVE.length);
   for (let i = 1; i < MILE.length; i++) { assert.ok(MILE[i][0] < MILE[i - 1][0]); assert.ok(FIVE[i][0] < FIVE[i - 1][0]); }
   MILE.forEach(([s, lvl], i) => assert.equal(FIVE[i][1], lvl, 'same prize level at rung ' + i));
-  const data = { trials: { a: { kind: 'mile', secs: 425, date: '2026-11-18' }, b: { kind: 'mile', secs: 404, date: '2026-12-03' } }, pick: { mile_440: 0 }, paid: { t_a: '2026-11-19' } };
+  const data = { trials: { a: { kind: 'mile', secs: 425, date: '2026-11-18' }, b: { kind: 'mile', secs: 404, date: '2026-12-10' } }, pick: { mile_440: 0 }, paid: { t_a: '2026-11-19' } };
   const sc = score(data);
   assert.equal(sc.best.mile, 404);
   assert.deepEqual(Object.keys(sc.hit.mile).map(Number).sort((a, b) => b - a), [440, 430, 420, 405]);
@@ -85,7 +98,7 @@ test('trials: milestones, bests, paired ladders, owed prizes', () => {
   assert.equal(owed({ pick: { mile_440: 0 } }).length, 0);
   const pl = planned(sc);
   assert.equal(pl[0].n, 3);
-  assert.equal(pl.find((x) => x.n === 6).t.id, 'b');
+  assert.equal(pl.find((x) => x.n === 7).t.id, 'b');
 });
 
 test('lists: same items and counts the checklist uses', () => {

@@ -1,12 +1,12 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794442095';
-import { askParent } from './parent.js?v=1794442095';
-import { celebrate } from './streaks.js?v=1794442095';
-import { PLAN_START, trialOn } from './plan.js?v=1794442095';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794452868';
+import { askParent } from './parent.js?v=1794452868';
+import { celebrate } from './streaks.js?v=1794452868';
+import { PLAN_START, trialOn } from './plan.js?v=1794452868';
 
 const ID = 'eli-trials';
 
 // Prize levels, smallest to biggest. The lists can be changed on the Settings page.
-import { SETTINGS, applySettings } from './settings.js?v=1794442095';
+import { SETTINGS, applySettings } from './settings.js?v=1794452868';
 export const LEVELS = ['Small', 'Medium', 'Big', 'Huge', 'Grand'];
 const T1 = 'Small', T2 = 'Medium', T3 = 'Big', T4 = 'Huge', T5 = 'Grand';
 const tierName = (lvl) => lvl;
@@ -22,7 +22,8 @@ export const FIVE = [[1460, T1], [1425, T1], [1395, T1], [1350, T2], [1300, T2],
 export const mphFor = (kind, secs) => (Math.floor(((kind === 'mile' ? 1 : 3.10686) * 3600 / secs) * 10 + 1e-9) + 1) / 10;
 
 // Plan week → [distance, day index (0 = Mon), note]
-export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 2], 5: ['5k', 3, 'Turkey Trot'], 6: ['mile', 3], 7: ['5k', 2], 8: ['mile', 2], 9: ['5k', 2], 10: ['mile', 2], 11: ['5k', 2], 12: ['mile', 2], 13: ['5k', 3, 'Final test'] };
+// Re-set Nov 12 after the coach review: each trial opens a Thursday workout at the gym track.
+export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 3, 'Diagnostic'], 5: ['5k', 3, 'Turkey Trot'], 7: ['mile', 3], 10: ['5k', 3], 12: ['mile', 3], 13: ['5k', 3, 'Final test'] };
 
 // Save a trial. On a planned test day of the same distance it uses one id per day (re-saving
 // replaces it) and checks off that day's time trial on Training (his reward chart follows Training).

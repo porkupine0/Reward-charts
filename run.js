@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794442095';
-import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794442095';
-import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1794442095';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794452868';
+import { planFor, ZONES, LAPS, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794452868';
+import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1794452868';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
@@ -47,6 +47,8 @@ function render() {
       '<p class="wo-meta">' + esc(longDate(date)) + ' · Week ' + p.week + ' · ' + esc(p.focus) + '</p>' +
       '<h2 class="wo-title">' + esc(p.title) + (p.tag ? '<span class="wo-tag">' + esc(p.tag) + '</span>' : '') + '</h2>' +
       '<p class="wo-detail">' + esc(p.detail) + '</p>' +
+      (p.indoor ? '<div class="wo-ways"><p><b>Inside</b>' + esc(p.indoor) + '</p><p><b>Outside</b>' + esc(p.outdoor) + '</p></div>' : '') +
+      (p.note ? '<p class="wo-note">' + esc(p.note) + '</p>' : '') +
 '</div>';
 
     $('checklist').innerHTML = p.items.map((it) => {
@@ -57,11 +59,13 @@ function render() {
         '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
         '<span class="cktext"><strong>' + esc(it.label) + (it.opt ? ' <em>optional</em>' : '') + '</strong>' +
         (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
-      if (r) {
-        h += '<details data-key="' + it.key + '"' + (open.has(it.key) ? ' open' : '') + '><summary>Show the exercises</summary><ul>' +
-          r.list.map((x) => '<li><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></li>').join('') +
-          '</ul><p class="note">' + esc(r.note) + '</p></details>';
-      }
+      [[r, ''], [it.routine2 && ROUTINES[it.routine2], '2']].forEach(([rt, n]) => {
+        if (!rt) return;
+        const k = it.key + n;
+        h += '<details data-key="' + k + '"' + (open.has(k) ? ' open' : '') + '><summary>' + (n ? 'Or: ' + esc(rt.title) + ' (no gym)' : 'Show the exercises') + '</summary><ul>' +
+          rt.list.map((x) => '<li><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></li>').join('') +
+          '</ul><p class="note">' + esc(rt.note) + '</p></details>';
+      });
       return h + '</div>';
     }).join('') || '<p class="note">Rest day. Nothing to check off. Fill in nothing and enjoy it.</p>';
   }
@@ -211,8 +215,9 @@ function renderHistory() {
 
 // ---------- definitions ----------
 $('defs').innerHTML =
-  '<section class="card defcard"><h2>Pace zones</h2><p class="note">Treadmill at 1% incline, which matches outdoor effort. Re-set speeds after every time trial.</p>' +
+  '<section class="card defcard"><h2>Pace zones</h2><p class="note">Set Nov 12 from a 24:30 5K. Treadmill at 1% incline, which matches outdoor effort. If a speed feels harder than described, trust the feeling and slow down 0.1–0.2 mph: the treadmill may read a little off. Re-set only after a 5K on the track that is 20+ seconds faster.</p>' +
   '<div class="zones">' + ZONES.map((z) => '<div class="zone"><strong>' + esc(z[0]) + '</strong><span>' + esc(z[1]) + '</span><b>' + esc(z[2]) + ' /mi</b><b>' + esc(z[3]) + ' mph</b></div>').join('') + '</div></section>' +
+  '<section class="card defcard"><h2>Indoor track lap times</h2><p class="note">Check the track’s posted length first (a 200 m track is 25 laps per 5K; a 1/10-mile track is 10 laps per mile). Switch direction every 10–15 minutes if allowed.</p><div class="zones">' + LAPS.map((z) => '<div class="zone"><strong>' + esc(z[0]) + '</strong><span>' + esc(z[1]) + '</span></div>').join('') + '</div></section>' +
   '<section class="card defcard"><h2>Workout words</h2><dl class="terms">' +
   TERMS.map((t) => '<dt>' + esc(t[0]) + '</dt><dd>' + esc(t[1]) + '</dd>').join('') + '</dl></section>' +
   Object.values(ROUTINES).map((r) =>
@@ -232,7 +237,7 @@ function renderTrial() {
   const before = {}; Object.entries(trials).forEach(([id, x]) => { if (id !== 'p' + ymd(date)) before[id] = x; });
   const sc = score({ trials: before }), nx = nextMilestone(kind, sc);
   $('trialgoal').innerHTML = nx
-    ? 'Goal: under <b>' + tfmt(nx[0]) + '</b> (' + nx[1] + ' prize). On the treadmill at 1%, run <b>' + mphFor(kind, nx[0]).toFixed(1) + ' mph or faster</b>.' + (sc.best[kind] ? ' Best so far ' + tfmt(sc.best[kind]) + '.' : '')
+    ? 'Goal: under <b>' + tfmt(nx[0]) + '</b> (' + nx[1] + ' prize). On the treadmill at 1%, run <b>' + mphFor(kind, nx[0]).toFixed(1) + ' mph or faster</b>; on the track, ' + tfmt(nx[0] / (kind === 'mile' ? 4.0234 : 12.5) - 0.5) + ' or faster per 400.' + (sc.best[kind] ? ' Best so far ' + tfmt(sc.best[kind]) + '.' : '')
     : 'Every ' + (kind === 'mile' ? 'mile' : '5K') + ' milestone is done. Go for a new best!';
   $('trialsaved').innerHTML = t ? 'Saved: <b>' + tfmt(t.secs) + '</b>. <a href="trials.html">See your milestones and prizes &rarr;</a>' : 'Just the trial itself, not the warm-up. Saving checks off your time trial.';
   const f = document.activeElement && document.activeElement.id;

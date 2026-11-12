@@ -568,3 +568,10 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .histtable td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
 .histtable td small { display: block; color: var(--muted); white-space: normal; max-width: 180px; }
 .prtag { display: inline-block; font-size: 10.5px; font-weight: 800; color: #fff; background: var(--accent); border-radius: 99px; padding: 1px 6px; margin-left: 2px; vertical-align: 1px; }
+
+.wo-ways { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.wo-ways p { margin: 0; font-size: 14px; line-height: 1.45; color: #E6ECF4; }
+.wo-ways b { display: inline-block; min-width: 62px; margin-right: 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #F6B48F; }
+.wo-card.is-opt .wo-ways p { color: var(--ink); }
+.wo-card.is-opt .wo-ways b { color: var(--accent); }
+.wo-note { margin: 4px 0 0; font-size: 13px; font-weight: 700; color: #F6B48F; }
