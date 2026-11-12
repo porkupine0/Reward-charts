@@ -3,7 +3,7 @@
 // - Every tap is saved on the phone first and stays queued until Firebase confirms it,
 //   so nothing is lost if the app is closed while offline.
 // - If Firebase can't be reached, it keeps retrying and a banner says changes aren't synced yet.
-import { firebaseConfig } from './config.js?v=1794440709';
+import { firebaseConfig } from './config.js?v=1794441590';
 
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const LS = (() => { try { const k = 'rc:t'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return localStorage; } catch (e) { return null; } })();

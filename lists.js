@@ -1,8 +1,8 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794440709';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794440709';
-import { planFor, dayDone } from './plan.js?v=1794440709';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794441590';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794441590';
+import { planFor, dayDone } from './plan.js?v=1794441590';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -114,3 +114,33 @@ export function effectiveWeek(chart, monday, weekData, ctx) {
   return Object.assign({}, weekData, { checks });
 }
 export { mondayOf };
+
+// ---- "Right now": what's left for a kid at this time of day ----
+// Morning (Isaiah's list, until 8:30 on school days / 10:00 weekends) → at school (until 3:00)
+// → after school or the weekend list → bedtime (15 min before the first step, through lights out + grace)
+// → after lights out. Anything left from earlier in the day is mentioned too.
+export function nowStatus(ctx, kid, now) {
+  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dow = dowOf(date), school = dow <= 4, min = now.getHours() * 60 + now.getMinutes();
+  const ls = lists(ctx, kid, date);
+  const m = progress(ctx, kid, date, ls.morning), d = progress(ctx, kid, date, ls.day), b = progress(ctx, kid, date, ls.bed);
+  const bedStart = ls.bed[0].min - 15, lo = ls.bed[ls.bed.length - 1];
+  const dayName = school ? 'After school' : 'Today';
+  const left = (p) => p.left.map((i) => ({ label: i.label.replace(/^Chore: /, ''), time: i.time || '', key: i.key }));
+  if (min < 5 * 60) return { phase: 'night', title: 'Sleeping', left: [], done: true, sub: '' };
+  if (ls.morning.length && m.left.length && min < (school ? 8 * 60 + 30 : 10 * 60)) {
+    return { phase: 'morning', title: 'Morning', left: left(m), done: false, sub: school ? 'Out the door by 8:30' : '' };
+  }
+  if (school && min < 15 * 60) {
+    return { phase: 'school', title: min < 8 * 60 + 30 ? 'Before school' : 'At school', left: [], done: true, sub: d.req.length ? 'After school: ' + d.req.length + ' things to do' : '' };
+  }
+  if (min < bedStart) {
+    return { phase: 'day', title: dayName, left: left(d), done: !d.left.length, sub: 'Bedtime starts ' + ls.bed[0].time };
+  }
+  if (min <= lo.min + 5) {
+    const extra = d.left.length ? d.left.length + ' still left from ' + (school ? 'after school' : 'today') : '';
+    return { phase: 'bed', title: 'Bedtime', left: left(b), done: !b.left.length, sub: 'Lights out ' + lo.time + (extra ? ' · ' + extra : '') };
+  }
+  if (!b.left.length) return { phase: 'night', title: 'In bed', left: [], done: true, sub: 'Good night!' };
+  return { phase: 'late', title: 'After lights out', left: left(b), done: false, sub: 'Lights out was ' + lo.time };
+}

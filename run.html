@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1794440709';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1794441590';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Eli's Training</title>
@@ -13,20 +13,21 @@
 <link rel="icon" href="icons/run.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1794440709">
+<link rel="stylesheet" href="style.css?v=1794441590">
 </head>
 <body class="runpage" style="--accent:#C2501C">
 <main class="wrap">
-  <nav class="top"><a href="./" class="back">&larr; All charts</a><span id="sync" class="sync">Connecting…</span></nav>
+  <nav class="top"><a href="kid.html?kid=eli" class="back">&larr; Eli</a><span id="sync" class="sync">Connecting…</span></nav>
   <header class="head">
     <p class="eyebrow" id="eyebrow">Eli · 13-week plan</p>
     <h1>Training</h1>
   </header>
 
-  <div class="tabs tabs3" role="tablist">
-    <button role="tab" id="tab-run" aria-selected="true" aria-controls="panel-run">Today's Run</button>
-    <a class="tablink" href="trials.html">Time Trials</a>
-    <button role="tab" id="tab-def" aria-selected="false" aria-controls="panel-def">Definitions</button>
+  <div class="tabs tabs4" role="tablist">
+    <button role="tab" id="tab-run" aria-selected="true" aria-controls="panel-run">Today</button>
+    <a class="tablink" href="trials.html">Trials</a>
+    <button role="tab" id="tab-hist" aria-selected="false" aria-controls="panel-hist">History</button>
+    <button role="tab" id="tab-def" aria-selected="false" aria-controls="panel-def">Terms</button>
   </div>
 
   <section id="panel-run" role="tabpanel" aria-labelledby="tab-run" class="panel">
@@ -91,10 +92,23 @@
     </section>
   </section>
 
+  <section id="panel-hist" role="tabpanel" aria-labelledby="tab-hist" class="panel" hidden>
+    <section class="card defcard">
+      <h2>Time trials</h2>
+      <p class="note">Every trial, newest first. Speed is the treadmill speed that pace works out to.</p>
+      <div class="tablewrap"><table class="histtable" id="trialtable"></table></div>
+    </section>
+    <section class="card defcard">
+      <h2>Run log</h2>
+      <p class="note" id="runsum"></p>
+      <div class="tablewrap"><table class="histtable" id="runtable"></table></div>
+    </section>
+  </section>
+
   <section id="panel-def" role="tabpanel" aria-labelledby="tab-def" class="panel" hidden>
     <div id="defs"></div>
   </section>
 </main>
-<script type="module" src="run.js?v=1794440709"></script>
+<script type="module" src="run.js?v=1794441590"></script>
 </body>
 </html>

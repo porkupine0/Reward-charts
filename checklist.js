@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794440709';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794440709';
-import { askParent } from './parent.js?v=1794440709';
-import * as L from './lists.js?v=1794440709';
-import { dayStreak, cheerIf } from './streaks.js?v=1794440709';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794441590';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794441590';
+import { askParent } from './parent.js?v=1794441590';
+import * as L from './lists.js?v=1794441590';
+import { dayStreak, cheerIf } from './streaks.js?v=1794441590';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -72,6 +72,7 @@ function render() {
   const key = ymd(date);
   document.body.style.setProperty('--accent', k.accent);
   $('eyebrow').textContent = k.name + "'s checklist";
+  $('back').href = 'kid.html?kid=' + kid; $('back').innerHTML = '&larr; ' + esc(k.name);
   $('kidtabs').innerHTML = Object.entries(KIDS).map(([id, x]) =>
     '<button role="tab" data-kid="' + id + '" aria-selected="' + (id === kid) + '" style="--accent:' + x.accent + '">' + esc(x.name) + '</button>').join('');
   $('date').value = key;

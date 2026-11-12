@@ -2,7 +2,7 @@
 // falling back to the last copy. Firebase code and fonts: saved copy first (they never change).
 const CACHE = 'rc-v1';
 const SHELL = ['./', 'index.html', 'checklist.html', 'stats.html', 'eli.html', 'run.html', 'trials.html', 'trombone.html',
-  'isaiah.html', 'parents.html', 'settings.html', 'history.html', 'style.css'];
+  'isaiah.html', 'kid.html', 'parents.html', 'settings.html', 'history.html', 'style.css'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));

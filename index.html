@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1794440709';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1794441590';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Reward Charts</title>
@@ -13,7 +13,7 @@
 <link rel="icon" href="icons/home.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1794440709">
+<link rel="stylesheet" href="style.css?v=1794441590">
 </head>
 <body>
 <main class="wrap">
@@ -22,48 +22,16 @@
     <p class="eyebrow">The Ofloy kids</p>
     <h1>Reward Charts</h1>
   </header>
-  <section class="today" aria-labelledby="todayh">
-    <div class="today-head"><h2 id="todayh">Today</h2><span id="todaydate" class="today-date"></span></div>
-    <div id="todaylist" class="todaylist"></div>
-  </section>
-  <div class="homecards">
-    <a class="homecard" href="stats.html" style="--accent:#1B2A41">
-      <img src="icons/stats.png" alt="">
-      <div><strong>Bedtime Stats</strong><small>Timer results · On-time nights per week</small></div>
-      <span class="hc-prog" id="p-stats"></span>
-    </a>
-    <a class="homecard" href="eli.html" style="--accent:#C2501C">
-      <img src="icons/eli.png" alt="">
-      <div><strong>Eli</strong><small>Running · Chores · School</small></div>
-      <span class="hc-prog" id="p-eli"></span>
-    </a>
-    <a class="homecard" href="run.html" style="--accent:#C2501C">
-      <img src="icons/run.png" alt="">
-      <div><strong>Eli's Training</strong><small>Today's run · Time trials · Definitions</small></div>
-      <span class="hc-prog"><span id="p-run"></span><span id="p-trials"></span></span>
-    </a>
-    <a class="homecard" href="trombone.html" style="--accent:#1D6FB8">
-      <img src="icons/trombone.png" alt="">
-      <div><strong>Rhett</strong><small>Move · Racquetball · Chores · Trombone · Duolingo</small></div>
-      <span class="hc-prog" id="p-trombone"></span>
-    </a>
-    <a class="homecard" href="isaiah.html" style="--accent:#1d6b38">
-      <img src="icons/isaiah.png" alt="">
-      <div><strong>Isaiah · Ball Master</strong><small>600 touches · Juggling levels</small></div>
-      <span class="hc-prog" id="p-isaiah"></span>
-    </a>
-    <a class="homecard" href="history.html" style="--accent:#1B2A41">
-      <img src="icons/history.png" alt="">
-      <div><strong>History</strong><small>Month at a glance · Trial times</small></div>
-    </a>
-    <a class="homecard" href="parents.html" style="--accent:#1B2A41">
-      <img src="icons/parents.png" alt="">
-      <div><strong>Parents</strong><small>To pay or give · Late nights · Settings · Backup</small></div>
-    </a>
+  <p class="pickme">Who’s checking in?</p>
+  <div class="people" id="people">
+    <a class="person" href="kid.html?kid=eli" style="--accent:#C2501C"><img src="icons/eli.png" alt=""><div><strong>Eli</strong><small id="n-eli"></small></div></a>
+    <a class="person" href="kid.html?kid=rhett" style="--accent:#1D6FB8"><img src="icons/trombone.png" alt=""><div><strong>Rhett</strong><small id="n-rhett"></small></div></a>
+    <a class="person" href="kid.html?kid=isaiah" style="--accent:#1d6b38"><img src="icons/isaiah.png" alt=""><div><strong>Isaiah</strong><small id="n-isaiah"></small></div></a>
+    <a class="person parents" href="parents.html" style="--accent:#1B2A41"><img src="icons/parents.png" alt=""><div><strong>Parents</strong><small id="n-parents"></small></div></a>
   </div>
   <p class="note" id="parentline"></p>
   <p class="note">Checkmarks sync to every phone and computer that opens this page. Add each chart to your Home Screen from the Share menu for one-tap access.</p>
 </main>
-<script type="module" src="home.js?v=1794440709"></script>
+<script type="module" src="home.js?v=1794441590"></script>
 </body>
 </html>

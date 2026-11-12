@@ -516,3 +516,54 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .rp b { display: block; color: var(--ink); font-size: 13px; text-align: right; }
 .rung.got .rp b { color: var(--accent); }
 .trialgoal { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--tint); font-size: 14px; line-height: 1.4; }
+
+/* ---------- Home: who's checking in ---------- */
+.pickme { margin: 0; font-size: 15px; font-weight: 700; color: var(--muted); }
+.people { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 640px) { .people { grid-template-columns: 1fr 1fr; } }
+.person { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; background: var(--surface); border: 2px solid var(--line); border-left: 10px solid var(--accent); text-decoration: none; color: var(--ink); min-height: 96px; }
+.person img { width: 60px; height: 60px; border-radius: 14px; flex: none; }
+.person div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.person strong { font-family: 'Archivo Black', 'Archivo', sans-serif; font-weight: 400; font-size: 26px; line-height: 1.05; color: var(--accent); }
+.person small { font-size: 14px; color: var(--muted); font-weight: 600; line-height: 1.35; }
+.person.parents strong { color: var(--ink); }
+@media (prefers-color-scheme: dark) { .person.parents { border-left-color: #5B7092; } }
+
+/* ---------- Kid page ---------- */
+.kidtabs .tablink[aria-current="page"] { background: var(--accent); color: #fff; box-shadow: none; }
+.kidtabs { grid-template-columns: repeat(3, 1fr); }
+.nowcard { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: var(--ink); border: 3px solid var(--accent); background: var(--surface); }
+.now-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.now-phase { font-family: 'Archivo Black', 'Archivo', sans-serif; font-size: 20px; color: var(--accent); }
+.now-count { font-size: 13px; font-weight: 800; color: var(--muted); }
+.now-count.done { color: #1d6b38; }
+.now-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.now-list li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; font-weight: 600; padding-left: 14px; position: relative; }
+.now-list li::before { content: ""; position: absolute; left: 0; top: .55em; width: 7px; height: 7px; border-radius: 50%; border: 2px solid var(--accent); }
+.now-list li.now-more::before { display: none; }
+.now-more { color: var(--muted); font-weight: 600; }
+.now-time { flex: none; font-size: 12px; font-weight: 800; color: var(--muted); min-width: 36px; font-variant-numeric: tabular-nums; }
+.now-sub { margin: 0; font-size: 13px; color: var(--muted); }
+.now-go { font-weight: 800; color: var(--accent); font-size: 14px; }
+.hubgrid { display: flex; flex-direction: column; gap: 12px; }
+.hubgrid .homecard { border-left-color: var(--accent); }
+
+/* ---------- Parents: right now ---------- */
+.pnow { display: flex; flex-direction: column; gap: 10px; }
+.nowall { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 760px) { .nowall { grid-template-columns: repeat(3, 1fr); } }
+.nowkid { border: 2px solid var(--line); border-top: 6px solid var(--accent); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); }
+.nowkid-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.nowname { font-family: 'Archivo Black', sans-serif; font-size: 20px; color: var(--accent); text-decoration: none; }
+.nowlinks { display: flex; gap: 6px; flex-wrap: wrap; }
+.nowlinks a { font-size: 12.5px; font-weight: 800; text-decoration: none; color: var(--accent); border: 2px solid var(--accent); border-radius: 99px; padding: 4px 10px; min-height: 32px; display: inline-flex; align-items: center; }
+.nowkid .now-phase { font-size: 16px; color: var(--ink); }
+
+/* ---------- Training: 4 tabs + history tables ---------- */
+.tabs4 { grid-template-columns: repeat(4, 1fr); }
+.tabs4 button, .tabs4 .tablink { font-size: 14px; padding: 0 2px; }
+.histtable { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.histtable th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 6px 8px 6px 0; border-bottom: 2px solid var(--line); white-space: nowrap; }
+.histtable td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+.histtable td small { display: block; color: var(--muted); white-space: normal; max-width: 180px; }
+.prtag { display: inline-block; font-size: 10.5px; font-weight: 800; color: #fff; background: var(--accent); border-radius: 99px; padding: 1px 6px; margin-left: 2px; vertical-align: 1px; }

@@ -1,4 +1,4 @@
-import { SETTINGS } from './settings.js?v=1794440709';
+import { SETTINGS } from './settings.js?v=1794441590';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';

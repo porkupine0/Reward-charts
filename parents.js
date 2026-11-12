@@ -1,12 +1,14 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794440709';
-import { CHARTS, weekProgress } from './charts.js?v=1794440709';
-import { KIDS, timerResult, bedtime, applyConfig } from './routines.js?v=1794440709';
-import * as L from './lists.js?v=1794440709';
-import { owed, score, planned, fmt } from './trials.js?v=1794440709';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794440709';
-import { askParent, setParent, changePin } from './parent.js?v=1794440709';
-import { dayFull } from './streaks.js?v=1794440709';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794441590';
+import { CHARTS, weekProgress } from './charts.js?v=1794441590';
+import { KIDS, timerResult, bedtime, applyConfig } from './routines.js?v=1794441590';
+import * as L from './lists.js?v=1794441590';
+import { owed, score, planned, fmt } from './trials.js?v=1794441590';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794441590';
+import { askParent, setParent, changePin } from './parent.js?v=1794441590';
+import { dayFull } from './streaks.js?v=1794441590';
+import { owedItems } from './owed.js?v=1794441590';
+import { nowHtml } from './nowview.js?v=1794441590';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'eli-trials', 'config'];
@@ -17,49 +19,18 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const tick = (chart, path, label) => '<button class="cash" data-chart="' + chart + '" data-path="' + esc(path) + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' + esc(label) + '</button>';
 const row = (who, accent, what, when, action) => '<div class="prow2" style="--accent:' + accent + '"><span class="pwho">' + esc(who) + '</span><span class="pwhat">' + what + (when ? '<small>' + esc(when) + '</small>' : '') + '</span>' + (action || '') + '</div>';
 
-function owedList() {
-  const out = [];
-  const today = new Date(), thisMon = mondayOf(today);
-  // Eli's and Rhett's perfect weeks and months (last 10 weeks)
-  ['eli', 'trombone'].forEach((id) => {
-    const ch = CHARTS[id], data = D[id], kid = id === 'eli' ? KIDS.eli : KIDS.rhett;
-    const perfect = (mon) => weekProgress(ch, L.effectiveWeek(ch, mon, (data.weeks || {})[ymd(mon)], ctx)).perfect;
-    for (let w = 0; w < 10; w++) {
-      const mon = addDays(thisMon, -7 * w), wd = (data.weeks || {})[ymd(mon)] || {};
-      if (!perfect(mon) || wd.given) continue;
-      const pick = wd.reward != null ? ch.weekly[wd.reward] : null;
-      out.push(row(kid.name, kid.accent, pick ? esc(pick) : '<em>Perfect week, needs a pick</em>', 'Week of ' + shortDate(mon), tick(id, 'weeks/' + ymd(mon) + '/given', 'Given')));
-    }
-    for (let m = 0; m < 3; m++) {
-      const first = new Date(today.getFullYear(), today.getMonth() - m, 1), key = ymd(first).slice(0, 7);
-      const mons = []; let d = mondayOf(first); if (d < first) d = addDays(d, 7);
-      while (d.getMonth() === first.getMonth()) { mons.push(d); d = addDays(d, 7); }
-      const md = (data.months || {})[key] || {};
-      if (!mons.every(perfect) || md.given) continue;
-      const pick = md.prize != null ? ch.monthly[md.prize] : null;
-      out.push(row(kid.name, kid.accent, (pick ? esc(pick) : '<em>Perfect month, needs a pick</em>'), first.toLocaleDateString('en-US', { month: 'long' }) + ' prize', tick(id, 'months/' + key + '/given', 'Given')));
-    }
-  });
-  // Eli's time-trial prizes
-  owed(D['eli-trials']).forEach((o) => out.push(row('Eli', KIDS.eli.accent, o.needsPick ? '<em>' + esc(o.what) + '</em>' : esc(o.what), 'Earned ' + shortDate(parseYmd(o.date)), tick('eli-trials', 'paid/' + o.key, 'Paid'))));
-  // Isaiah's Ball Master prizes
-  const iz = D.isaiah, cashed = iz.cashed || {}, start = (iz.start && parseYmd(iz.start)) || thisMon;
-  for (let w = 0; w < 4; w++) {
-    const full = [0, 1, 2, 3, 4, 5, 6].every((d) => L.touchedOn(iz, ymd(addDays(start, w * 7 + d))));
-    const v = (iz.weekPrize || {})[w];
-    if (full && !cashed['weekPrize_' + w]) out.push(row('Isaiah', KIDS.isaiah.accent, v != null ? esc(WEEKLY[v]) : '<em>Full week, needs a pick</em>', 'Ball Master week ' + (w + 1), tick('isaiah', 'cashed/weekPrize_' + w, 'Cashed in')));
-  }
-  if (iz.champion != null && !cashed.champion) out.push(row('Isaiah', KIDS.isaiah.accent, esc(CHAMPION[iz.champion]), 'Ball Master champion', tick('isaiah', 'cashed/champion', 'Cashed in')));
-  LEVELS.forEach(([n, opts]) => {
-    const got = (iz.juggle || {})[n];
-    if (!got || cashed['juggle_' + n + '_prize']) return;
-    out.push(row('Isaiah', KIDS.isaiah.accent, got.prize != null ? esc(opts[got.prize]) : '<em>Juggling level ' + n + ', needs a pick</em>', 'Juggled ' + n + ' in a row', got.prize != null ? tick('isaiah', 'cashed/juggle_' + n + '_prize', 'Cashed in') : ''));
-  });
-  return out;
-}
+const owedList = () => owedItems(D, ctx, row, tick);
+
+const PAGES = { eli: [['Checklist', 'checklist.html?kid=eli'], ['Chart', 'eli.html'], ['Training', 'run.html']],
+  rhett: [['Checklist', 'checklist.html?kid=rhett'], ['Chart', 'trombone.html']],
+  isaiah: [['Checklist', 'checklist.html?kid=isaiah'], ['Ball Master', 'isaiah.html']] };
 
 function render() {
   const today = new Date(), mon = mondayOf(today);
+  // Right now: where each kid is, given the time of day
+  $('nowhead').textContent = 'Right now · ' + today.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  $('nowall').innerHTML = Object.entries(KIDS).map(([id, k]) => '<div class="nowkid" style="--accent:' + k.accent + '"><div class="nowkid-top"><a class="nowname" href="kid.html?kid=' + id + '">' + esc(k.name) + '</a>' +
+    '<span class="nowlinks">' + PAGES[id].map(([t, h]) => '<a href="' + h + '">' + t + '</a>').join('') + '</span></div>' + nowHtml(L.nowStatus(ctx, id, today), 5) + '</div>').join('');
   const o = owedList();
   $('owedcount').textContent = o.length ? o.length + ' to go' : 'All caught up';
   $('owed').innerHTML = o.join('') || '<p class="muted">Nothing owed right now.</p>';
@@ -159,4 +130,5 @@ $('ics').innerHTML = Object.entries(KIDS).map(([id, k]) => '<button class="pillb
   '<button class="pillbtn" style="--accent:#C2501C" data-ics="trials">Eli’s time trials</button>';
 
 render();
+setInterval(render, 60000);
 IDS.forEach((id, i) => watch(id, (d) => { D[id] = d; if (id === 'config') applyConfig(d); render(); }, i === 0 ? statusPill($('sync')) : null));

@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794440709';
-import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794440709';
-import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1794440709';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794441590';
+import { planFor, ZONES, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1794441590';
+import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1794441590';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
@@ -176,17 +176,38 @@ $('today').onclick = () => { const t = new Date(); date = new Date(t.getFullYear
 $('date').addEventListener('change', (e) => { if (e.target.value) { date = parseYmd(e.target.value); open.clear(); render(); } });
 
 // ---------- tabs ----------
+const TABS = { run: '', hist: '#history', def: '#definitions' };
 function tab(which) {
-  const run = which === 'run';
-  $('tab-run').setAttribute('aria-selected', run);
-  $('tab-def').setAttribute('aria-selected', !run);
-  $('panel-run').hidden = !run;
-  $('panel-def').hidden = run;
-  if (location.hash !== (run ? '' : '#definitions')) history.replaceState(null, '', location.search + (run ? '' : '#definitions'));
+  Object.keys(TABS).forEach((t) => { $('tab-' + t).setAttribute('aria-selected', t === which); $('panel-' + t).hidden = t !== which; });
+  if (location.hash !== TABS[which]) history.replaceState(null, '', location.search + TABS[which]);
+  if (which === 'hist') renderHistory();
 }
-$('tab-run').onclick = () => tab('run');
-$('tab-def').onclick = () => tab('def');
-if (location.hash === '#definitions') tab('def');
+Object.keys(TABS).forEach((t) => { $('tab-' + t).onclick = () => tab(t); });
+
+// ---------- history tab ----------
+const WHERE = { track: 'Track', treadmill: 'Treadmill', race: 'Race' };
+function renderHistory() {
+  if ($('panel-hist').hidden) return;
+  const sc = score({ trials });
+  const rows = [...sc.trials].reverse();
+  $('trialtable').innerHTML = '<thead><tr><th>Date</th><th>Trial</th><th>Time</th><th>Pace /mi</th><th>Speed</th><th>Where</th></tr></thead><tbody>' +
+    (rows.length ? rows.map((t) => {
+      const dist = t.kind === 'mile' ? 1 : 3.10686, pace = t.secs / dist;
+      return '<tr><td>' + esc(parseYmd(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) + '</td><td>' + (t.kind === 'mile' ? '1 mile' : '5K') + '</td>' +
+        '<td><b>' + tfmt(t.secs) + '</b>' + (sc.prs[t.id] ? ' <span class="prtag">Best</span>' : '') + '</td><td>' + tfmt(pace) + '</td><td>' + (3600 / pace).toFixed(1) + ' mph</td><td>' + esc(WHERE[t.where] || '') + '</td></tr>';
+    }).join('') : '<tr><td colspan="6" class="muted">No trials yet.</td></tr>') + '</tbody>';
+
+  const days = Object.entries(data.days || {}).filter(([, x]) => x.time || x.miles || x.effort).sort((a, b) => b[0].localeCompare(a[0]));
+  let miles = 0, secs = 0; days.forEach(([, x]) => { miles += x.miles || 0; if (x.time && x.miles) secs += x.time; });
+  $('runsum').textContent = days.length ? days.length + ' runs logged · ' + miles.toFixed(1) + ' miles' + (secs ? ' · average pace ' + fmt(secs / days.reduce((m, [, x]) => m + (x.time && x.miles ? x.miles : 0), 0)) + ' /mi' : '') : 'Runs you log on the Today tab show up here.';
+  $('runtable').innerHTML = '<thead><tr><th>Date</th><th>Workout</th><th>Miles</th><th>Time</th><th>Pace</th><th>Effort</th></tr></thead><tbody>' +
+    days.slice(0, 120).map(([k, x]) => {
+      const p = planFor(parseYmd(k));
+      return '<tr><td>' + esc(parseYmd(k).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) + '</td><td>' + esc(p ? p.title : 'Run') + (x.note ? '<small>' + esc(x.note) + '</small>' : '') + '</td>' +
+        '<td>' + (x.miles ? x.miles.toFixed(2) : '–') + '</td><td>' + (x.time ? fmt(x.time) : '–') + '</td><td>' + (x.time && x.miles ? fmt(x.time / x.miles) : '–') + '</td><td>' + (x.effort || '–') + '</td></tr>';
+    }).join('') + (days.length ? '' : '<tr><td colspan="6" class="muted">No runs logged yet.</td></tr>') + '</tbody>';
+}
+
 
 // ---------- definitions ----------
 $('defs').innerHTML =
@@ -229,7 +250,10 @@ $('trsave').onclick = () => {
   saveTrial({ kind, secs, date: ymd(date), where: $('trwhere').value });
   document.activeElement && document.activeElement.blur();
 };
-watch('eli-trials', (d) => { trials = d.trials || {}; renderTrial(); });
+watch('eli-trials', (d) => { trials = d.trials || {}; renderTrial(); renderHistory(); });
 
 render();
-watch(ID, (d) => { data = d; render(); }, statusPill($('sync')));
+watch(ID, (d) => { data = d; render(); renderHistory(); }, statusPill($('sync')));
+// Open the tab named in the address (after everything above is set up)
+if (location.hash === '#definitions') tab('def');
+if (location.hash === '#history') tab('hist');

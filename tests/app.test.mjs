@@ -136,3 +136,22 @@ test('settings: parents can change chores, showers, lights and prizes', () => {
   assert.equal(lightsOut('eli', 0), 20 * 60 + 30);
   assert.ok(afterSchool('eli', 0, null).some((i) => i.key === 'chore'));
 });
+
+test('right now: what shows depends on the time of day', () => {
+  const ctx = { routines: {}, run: {}, isaiah: {} };
+  const at = (h, m) => new Date(2026, 10, 11, h, m); // a Wednesday
+  assert.equal(L.nowStatus(ctx, 'isaiah', at(7, 0)).phase, 'morning');
+  assert.equal(L.nowStatus(ctx, 'eli', at(7, 0)).title, 'Before school');
+  assert.equal(L.nowStatus(ctx, 'eli', at(11, 0)).title, 'At school');
+  const after = L.nowStatus(ctx, 'eli', at(16, 0));
+  assert.equal(after.phase, 'day');
+  assert.ok(after.left.length > 3);
+  const bed = L.nowStatus(ctx, 'isaiah', at(20, 30));
+  assert.equal(bed.phase, 'bed');
+  assert.match(bed.sub, /still left from after school/);
+  assert.equal(L.nowStatus(ctx, 'eli', at(23, 0)).phase, 'late');
+  const allBed = Object.fromEntries(L.lists(ctx, 'eli', at(0, 0)).bed.map((i) => [i.key, true]));
+  assert.equal(L.nowStatus({ routines: { days: { '2026-11-11': { eli: allBed } } }, run: {}, isaiah: {} }, 'eli', at(23, 0)).title, 'In bed');
+  // Saturday: no school, the day list shows from the morning
+  assert.equal(L.nowStatus(ctx, 'rhett', new Date(2026, 10, 14, 11, 0)).title, 'Today');
+});
