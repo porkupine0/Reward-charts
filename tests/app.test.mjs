@@ -30,6 +30,12 @@ test('bedtime: lights out by kid and night', () => {
   assert.equal(lightsOut('rhett', 4), 21 * 60);         // Friday: Rhett gets an extra hour
   assert.equal(lightsOut('isaiah', 4), 20 * 60 + 30);   // Friday: 30 min later
   assert.equal(lightsOut('isaiah', 3), 20 * 60);        // Thursday: done by 8:00 (shower moves earlier)
+  // Eli: 30-minute showers, same lights out every night
+  [[0, 20 * 60 + 30], [1, 20 * 60 + 30], [3, 20 * 60 + 40], [4, 21 * 60], [5, 21 * 60]].forEach(([dow, lo]) => {
+    const b = bedtime('eli', dow), sh = b.findIndex((x) => x.key === 'shower');
+    assert.equal(b[b.length - 1].min, lo, 'Eli lights out unchanged on day ' + dow);
+    assert.equal(b[sh + 1].min - b[sh].min, 30, 'Eli shower is 30 min on day ' + dow);
+  });
   const wed = bedtime('eli', 2);
   assert.ok(wed[0].min >= 20 * 60 + 45, 'Wednesday counts forward from getting home');
   for (const kid of ['eli', 'rhett', 'isaiah']) for (let dow = 0; dow < 7; dow++) {

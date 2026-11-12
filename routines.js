@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin } from './settings.js?v=1794511205';
+import { SETTINGS, applySettings, toMin } from './settings.js?v=1794511357';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -26,9 +26,11 @@ export const BED_SNACKS = ['Fruit', 'Cheese stick', 'Yogurt', 'Cottage cheese', 
 // Normal nights count backward from lights out; Wednesday (and Rhett's Thursday) count forward from getting home.
 const t = (h, m) => h * 60 + m;
 const MIN = { snack: 10, teeth: 5 };
-// Shower length: Isaiah 35 min, Eli and Rhett 25. (OLD_SHOWER = the old 15 min, used to keep Thursday's start time.)
-const SHOWER_MIN = { eli: 25, rhett: 25, isaiah: 35 };
+// Shower length: Isaiah 35 min, Eli 30, Rhett 25. (OLD_SHOWER = the old 15 min that set Thursday's start time;
+// THU_SHOWER = the shower length when Thursday's lights out was set, so a longer shower starts earlier instead.)
+const SHOWER_MIN = { eli: 30, rhett: 25, isaiah: 35 };
 const OLD_SHOWER = 15;
+const THU_SHOWER = { eli: 25, rhett: 25 };
 const ORDER = {
   young: ['snack', 'shower', 'teeth', 'vitamins', 'reading'],
   eli: ['snack', 'shower', 'vitamins', 'teeth', 'reading']
@@ -53,10 +55,13 @@ function schedule(kid, dow) {
   if (home == null && dow === 3 && showers && kid !== 'isaiah') {
     // Thursday: keep the old start time (old 15-min shower, snack first) and push lights out later instead.
     // (Not Isaiah: he's done by 8:00 on Thursdays like other nights, so his shower starts earlier.)
+    // Lights out stays where it was (Eli 8:40); anything longer than that shower starts earlier.
     const old = ORDER[kid === 'eli' ? 'eli' : 'young'];
-    let at = LIGHTS[kid] - old.reduce((sum, k) => sum + (k === 'shower' ? OLD_SHOWER : duration(k, kid, showers, false)), 0);
-    steps.forEach((k) => { rows.push([k, at]); at += duration(k, kid, showers, false); });
-    rows.push(['lights', at]);
+    const start = LIGHTS[kid] - old.reduce((sum, k) => sum + (k === 'shower' ? OLD_SHOWER : duration(k, kid, showers, false)), 0);
+    const lo = start + steps.reduce((sum, k) => sum + (k === 'shower' ? THU_SHOWER[kid] || SHOWER_MIN[kid] : duration(k, kid, showers, false)), 0);
+    let at = lo;
+    rows.push(['lights', lo]);
+    steps.slice().reverse().forEach((k) => { at -= duration(k, kid, showers, false); rows.unshift([k, at]); });
   } else if (home != null) {
     let at = home;
     steps.forEach((k) => { rows.push([k, at]); at += duration(k, kid, showers, dow === 2); });

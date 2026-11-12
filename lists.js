@@ -1,8 +1,8 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794511205';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794511205';
-import { planFor, dayDone } from './plan.js?v=1794511205';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794511357';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794511357';
+import { planFor, dayDone } from './plan.js?v=1794511357';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
