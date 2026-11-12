@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794460559';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794460559';
-import { askParent } from './parent.js?v=1794460559';
-import * as L from './lists.js?v=1794460559';
-import { dayStreak, cheerIf } from './streaks.js?v=1794460559';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794490501';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794490501';
+import { askParent } from './parent.js?v=1794490501';
+import * as L from './lists.js?v=1794490501';
+import { dayStreak, cheerIf } from './streaks.js?v=1794490501';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -232,6 +232,17 @@ document.addEventListener('click', (e) => {
     save(ID, base + 'bedTimer', { start: Date.now(), auto: true });
   }
   if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);
+  // Last box in Morning or Bedtime checked while that timer is running: stop and log it.
+  if (next) {
+    const after = Object.assign({}, dayChecks(), { [key]: next });
+    const lst = L.lists(ctx, kid, date);
+    [['morning', 'mornTimer'], ['bed', 'bedTimer']].forEach(([sec, timer]) => {
+      const list = lst[sec] || [];
+      if (!list.some((i) => i.key === key)) return;
+      const t = after[timer] || {};
+      if (t.start && !t.end && list.filter((i) => !i.opt).every((i) => after[i.key])) save(ID, base + timer + '/end', Date.now());
+    });
+  }
   if (key === 'mHigh5') {
     const n = new Date();
     save(ID, base + 'readyAt', next ? String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') : null);
