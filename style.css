@@ -22,7 +22,8 @@
     --panel: #22324B; --tint: #3A2618; --tint-good: #183324; --tint-warn: #3A3014; --tint-bad: #3D2318; --treat: #2F2A16; --treat-on: #4A3F12;
     color-scheme: dark;
   }
-  .soccer { --ink: #E6EFE9; --muted: #A8B8AD; }
+  /* body.soccer outranks the light .soccer colors set further down */
+  body.soccer { --ink: #E6EFE9; --muted: #A8B8AD; --accent: #4FB878; --juggle: #F08A55; }
   .sync[data-state="live"], .tt-res, .pill.ok { background: #183324 !important; color: #8FD3A8 !important; }
   .sync[data-state="offline"], .pill.bad { color: #F4A67E !important; }
   .treat, .treat.earned { color: var(--ink); }
@@ -160,7 +161,7 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .prizelist h3 small { font-family: 'Archivo', sans-serif; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
 .prow { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
 .prow > span:first-child { flex: none; }
-.prow select { flex: 1; min-width: 0; min-height: 44px; border: 2px solid var(--accent); border-radius: 10px; padding: 6px 10px; background: var(--surface); }
+.prow select { flex: 1; min-width: 0; min-height: 44px; border: 2px solid var(--accent); border-radius: 10px; padding: 6px 10px; background: var(--surface); color: var(--ink); font-weight: 700; }
 .prow.locked { }
 .lvbadge { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--juggle); display: inline-flex; align-items: center; justify-content: center; font-family: 'Archivo Black', sans-serif; font-size: 13px; }
 .muted { color: var(--muted); font-size: 13px; font-weight: 400; margin: 0; line-height: 1.4; }
@@ -347,7 +348,7 @@ h2 { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-t
 .cash.on { color: var(--accent); }
 .cash.on .box { background: var(--accent); border-color: var(--accent); }
 .cash.on .box svg { visibility: visible; }
-.prow:has(.cash.on) select { opacity: .6; }
+.prow:has(.cash.on) select { opacity: .8; }
 
 /* Eli's time trials */
 .trials .head { border-bottom-color: var(--ink); }

@@ -1,5 +1,5 @@
 // How "right now" looks, shared by the home page, each kid's page and the Parents page.
-import { esc } from './store.js?v=1794441590';
+import { esc } from './store.js?v=1794442095';
 
 export function nowHtml(st, max = 4) {
   const head = '<div class="now-head"><span class="now-phase">' + esc(st.title) + '</span>' +
