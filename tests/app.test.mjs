@@ -29,6 +29,7 @@ test('bedtime: lights out by kid and night', () => {
   assert.equal(lightsOut('eli', 0), 20 * 60 + 30);      // Monday 8:30
   assert.equal(lightsOut('rhett', 4), 21 * 60);         // Friday: Rhett gets an extra hour
   assert.equal(lightsOut('isaiah', 4), 20 * 60 + 30);   // Friday: 30 min later
+  assert.equal(lightsOut('isaiah', 3), 20 * 60);        // Thursday: done by 8:00 (shower moves earlier)
   const wed = bedtime('eli', 2);
   assert.ok(wed[0].min >= 20 * 60 + 45, 'Wednesday counts forward from getting home');
   for (const kid of ['eli', 'rhett', 'isaiah']) for (let dow = 0; dow < 7; dow++) {

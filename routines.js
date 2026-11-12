@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin } from './settings.js?v=1794490501';
+import { SETTINGS, applySettings, toMin } from './settings.js?v=1794511205';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -50,8 +50,9 @@ function schedule(kid, dow) {
   // Isaiah showers first, before his snack.
   if (kid === 'isaiah' && showers) steps = ['shower'].concat(steps.filter((k) => k !== 'shower'));
   const rows = [];
-  if (home == null && dow === 3 && showers) {
+  if (home == null && dow === 3 && showers && kid !== 'isaiah') {
     // Thursday: keep the old start time (old 15-min shower, snack first) and push lights out later instead.
+    // (Not Isaiah: he's done by 8:00 on Thursdays like other nights, so his shower starts earlier.)
     const old = ORDER[kid === 'eli' ? 'eli' : 'young'];
     let at = LIGHTS[kid] - old.reduce((sum, k) => sum + (k === 'shower' ? OLD_SHOWER : duration(k, kid, showers, false)), 0);
     steps.forEach((k) => { rows.push([k, at]); at += duration(k, kid, showers, false); });
