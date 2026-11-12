@@ -112,8 +112,9 @@ const W = [
     'Tempo: 10 easy, 3 × 6 min at 7.8 mph with 2 min easy, 10 easy + Core A',
     '30 min easy + 6 strides + Plyometrics (2 sets) + Strength A + Core B',
     '5K time trial: 15 min easy + 4 strides, an all-out 5K, 10 min easy + Core A',
-    'Gym: 40 min easy run (shorter after the trial) + Strength B + Core B',
-    'Optional: 25 min easy + Core A']
+    // Thu–Fri of Week 3 use the new format (re-set Nov 12): inside/outside and the Home Strength option
+    longRun(40, { tag: 'Gym', note: 'Shorter after Wednesday’s 5K', strB: true, core: 'B' }),
+    bonus(25)]
 ];
 NEW_WEEKS.forEach(([label, focus, miles, days]) => W.push([label, focus, miles, ...days]));
 
