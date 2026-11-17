@@ -1,13 +1,13 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794950037';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1794950037';
-import { CHARTS, weekProgress } from './charts.js?v=1794950037';
-import { planFor } from './plan.js?v=1794950037';
-import * as L from './lists.js?v=1794950037';
-import { score, fmt, nextMilestone } from './trials.js?v=1794950037';
-import { dayStreak } from './streaks.js?v=1794950037';
-import { nowHtml } from './nowview.js?v=1794950037';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794956282';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1794956282';
+import { CHARTS, weekProgress } from './charts.js?v=1794956282';
+import { planFor } from './plan.js?v=1794956282';
+import * as L from './lists.js?v=1794956282';
+import { score, fmt, nextMilestone } from './trials.js?v=1794956282';
+import { dayStreak } from './streaks.js?v=1794956282';
+import { nowHtml } from './nowview.js?v=1794956282';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {} };
@@ -40,7 +40,8 @@ function render() {
   const yd = addDays(now, -1), c = L.dayChecks(ctx, kid, yd), r = timerResult(kid, yd, c.bedTimer, c);
   if (kid === 'eli') {
     const p = weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, mon, (charts.eli.weeks || {})[ymd(mon)], ctx));
-    links.push(card('eli.html', 'eli', 'Reward chart', 'Running · Chores · School', p.perfect ? 'Perfect week!' : p.done + '/' + p.need + ' this week'));
+    const g = L.gameWeek(ctx, 'eli', mon);
+    links.push(card('eli.html', 'eli', 'Reward chart', 'Weekend game time · Run or swim · Chores · School', 'Game time: ' + g.minutes + ' of ' + g.max + ' min' + (L.GAME.days.includes(L.dowOf(now)) && !L.gameDay(ctx, 'eli', now).earned ? ' · today not yet' : '')));
     const pl = planFor(now), sc = score(trials), nx = nextMilestone('mile', sc), n5 = nextMilestone('5k', sc);
     links.push(card('run.html', 'run', 'Training', 'Today’s run · Time trials · History', pl ? 'Today: ' + pl.title + (L.eliRunDone(ctx.run, now) ? ' · done!' : '') : 'Plan finished'));
     links.push(card('trials.html', 'trials', 'Time trials', 'Milestones · Prizes', (nx ? 'Next mile: under ' + fmt(nx[0]) : 'Mile done') + ' · ' + (n5 ? '5K: under ' + fmt(n5[0]) : '5K done')));
@@ -54,7 +55,8 @@ function render() {
     let full = 0; for (let i = 0; i < 28; i++) if (L.touchedOn(iz, ymd(addDays(start, i)))) full++;
     links.push(card('isaiah.html', 'isaiah', 'Ball Master', '600 touches · Juggling levels', full + '/28 days · ' + Object.keys(iz.juggle || {}).length + '/10 levels'));
   }
-  links.push(card('history.html?kid=' + kid, 'history', 'My month', 'Every day at a glance', ''));
+  const rw = L.readingWeek(ctx, kid, mon, now);
+  links.push(card('history.html?kid=' + kid, 'history', 'My month', 'Every day at a glance · reading', 'Reading this week: ' + rw.read + ' of ' + rw.nights + ' nights' + (rw.excused ? ' (' + rw.excused + ' excused)' : '')));
   links.push(card('stats.html', 'stats', 'Bedtime', 'Timer results · On-time nights', r ? 'Last night: ' + (r.onTime ? 'on time' : 'late by ' + r.lateBy + ' min') : ''));
   $('links').innerHTML = links.join('');
 }

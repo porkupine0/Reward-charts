@@ -1,14 +1,14 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794950037';
-import { CHARTS, weekProgress } from './charts.js?v=1794950037';
-import { KIDS, timerResult, bedtime, applyConfig } from './routines.js?v=1794950037';
-import * as L from './lists.js?v=1794950037';
-import { owed, score, planned, fmt } from './trials.js?v=1794950037';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794950037';
-import { askParent, setParent, changePin } from './parent.js?v=1794950037';
-import { dayFull } from './streaks.js?v=1794950037';
-import { owedItems } from './owed.js?v=1794950037';
-import { nowHtml } from './nowview.js?v=1794950037';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794956282';
+import { CHARTS, weekProgress } from './charts.js?v=1794956282';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794956282';
+import * as L from './lists.js?v=1794956282';
+import { owed, score, planned, fmt } from './trials.js?v=1794956282';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794956282';
+import { askParent, setParent, changePin } from './parent.js?v=1794956282';
+import { dayFull } from './streaks.js?v=1794956282';
+import { owedItems } from './owed.js?v=1794956282';
+import { nowHtml } from './nowview.js?v=1794956282';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'eli-trials', 'config'];
@@ -46,6 +46,29 @@ function render() {
   }
   $('late').innerHTML = late.join('') || '<p class="muted">No late nights in the last week.</p>';
 
+  // Not able to complete: waiting for approval (last 7 days)
+  const ex = [];
+  for (let i = 0; i <= 7; i++) {
+    const d = addDays(today, -i);
+    Object.entries(KIDS).forEach(([id, k]) => {
+      const c = L.dayChecks(ctx, id, d), ls = L.lists(ctx, id, d);
+      [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => {
+        if (c[it.key] !== SKIP) return;
+        ex.push(row(k.name, k.accent, esc(it.label.replace(/^Chore: /, '')), DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d),
+          '<span class="exbtns"><button class="tbtn approve" data-ex="' + ymd(d) + '|' + id + '|' + it.key + '|ok">Approve</button><button class="linkbtn" data-ex="' + ymd(d) + '|' + id + '|' + it.key + '|no">Not OK</button></span>'));
+      });
+    });
+  }
+  $('excuses').innerHTML = ex.join('') || '<p class="muted">Nothing waiting.</p>';
+
+  // Reading: this week and the 3 before, per kid
+  const weeks = [0, 1, 2, 3].map((w) => addDays(mon, -7 * w));
+  $('reading').innerHTML = '<thead><tr><th></th>' + weeks.map((w, i) => '<th>' + (i ? 'Wk of ' + shortDate(w) : 'This week') + '</th>').join('') + '</tr></thead><tbody>' +
+    Object.entries(KIDS).map(([id, k]) => '<tr><td><b style="color:' + k.accent + '">' + esc(k.name) + '</b></td>' + weeks.map((w, i) => {
+      const r = L.readingWeek(ctx, id, w, i ? null : today);
+      return '<td><b>' + r.read + '</b>/' + r.nights + (r.excused ? ' <small>+' + r.excused + ' excused</small>' : '') + '</td>';
+    }).join('') + '</tr>').join('') + '</tbody>';
+
   // This week
   $('weekhead').textContent = 'This week · ' + shortDate(mon) + '–' + shortDate(addDays(mon, 6));
   const days = Math.min(7, Math.round((today - mon) / 864e5) + 1);
@@ -61,7 +84,9 @@ function render() {
     if (k.chart) {
       const p = weekProgress(CHARTS[k.chart], L.effectiveWeek(CHARTS[k.chart], mon, (D[k.chart].weeks || {})[ymd(mon)], ctx));
       bits.push('chart <b>' + p.done + '/' + p.need + '</b>');
+      if (id === 'eli') { const g = L.gameWeek(ctx, 'eli', mon); bits.push('game time <b>' + g.minutes + ' of ' + g.max + ' min</b>'); }
     }
+    { const r = L.readingWeek(ctx, id, mon, today); bits.push('read <b>' + r.read + '/' + r.nights + '</b> nights'); }
     if (id === 'eli') { const sc = score(D['eli-trials']); bits.push('best mile <b>' + (sc.best.mile ? fmt(sc.best.mile) : '–') + '</b>, 5K <b>' + (sc.best['5k'] ? fmt(sc.best['5k']) : '–') + '</b>'); }
     if (id === 'isaiah') { let t = 0; for (let i = 0; i < days; i++) if (L.touchedOn(D.isaiah, ymd(addDays(mon, i)))) t++; bits.push('600 touches <b>' + t + '/' + days + '</b>'); }
     return '<div class="psum" style="--accent:' + k.accent + '"><strong>' + esc(k.name) + '</strong><span>' + bits.join(' · ') + '</span></div>';
@@ -72,6 +97,8 @@ function render() {
 document.addEventListener('click', async (e) => {
   const t = e.target.closest('[data-path]');
   if (t) { if (await askParent()) save(t.dataset.chart, t.dataset.path, t.dataset.chart === 'eli' || t.dataset.chart === 'trombone' ? true : ymd(new Date())); return; }
+  const xb = e.target.closest('[data-ex]');
+  if (xb) { const [d, kid, key, a] = xb.dataset.ex.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/' + key, a === 'ok' ? EXCUSED : null); return; }
   const b = e.target.closest('[data-bedok]');
   if (b) { const [d, kid] = b.dataset.bedok.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/bedOk', true); return; }
   const ic = e.target.closest('[data-ics]');

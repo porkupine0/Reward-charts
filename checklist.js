@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794950037';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794950037';
-import { askParent } from './parent.js?v=1794950037';
-import * as L from './lists.js?v=1794950037';
-import { dayStreak, cheerIf } from './streaks.js?v=1794950037';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794956282';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794956282';
+import { askParent } from './parent.js?v=1794956282';
+import * as L from './lists.js?v=1794956282';
+import { dayStreak, cheerIf } from './streaks.js?v=1794956282';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -29,7 +29,11 @@ function itemHtml(it, checks, extra) {
   const v = isOn(it);
   const on = !!v;
   const locked = !!(extra && extra.locked);
-  let h = '<div class="ck' + (on ? ' on' : '') + (locked ? ' locked' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
+  // "Not able to complete": regular items only (not ones filled from other pages, weekly or multi-part ones)
+  const raw = checks[it.key];
+  const canExcuse = EXCUSABLE.includes(it.key) && !it.derived && !locked;
+  const excused = raw === EXCUSED, pending = raw === SKIP;
+  let h = '<div class="ck' + (on ? ' on' : '') + (excused ? ' excused' : '') + (pending ? ' pending' : '') + (locked ? ' locked' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
   h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
     (extra && extra.time ? '<span class="rtime">' + esc(extra.time) + '</span>' : '') +
     '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
@@ -46,6 +50,11 @@ function itemHtml(it, checks, extra) {
     }).join('') + '</div>';
   }
   if (it.link) h += '<a class="cklink" href="' + it.link + '">Open &rarr;</a>';
+  if (canExcuse) {
+    if (pending) h += '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-excuse="approve" data-key="' + it.key + '">Approve</button><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
+    else if (excused) h += '<div class="excuse"><span>Excused tonight · counts, but not done</span><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
+    else if (!on) h += '<button class="linkbtn excuse-ask" data-excuse="mark" data-key="' + it.key + '">Not able to do it?</button>';
+  }
   return h + '</div>';
 }
 
@@ -94,7 +103,7 @@ function render() {
   $('morning').hidden = !morn.length;
   const when = rewardWhen(dow);
   const prize = when && MORNING_REWARD[kid];
-  const mornDone = morn.filter((i) => checks[i.key]).length;
+  const mornDone = morn.filter((i) => isOn(i)).length;
   const earned = morn.length > 0 && mornDone === morn.length;
   if (morn.length) {
     $('morning').innerHTML = section(dow === 6 ? 'Church morning' : 'Morning', prize ? '' : dow === 5 ? 'Optional on Saturdays. No rush!' : 'Optional. Time yourself if you want!', morn, checks, false);
@@ -128,6 +137,16 @@ function render() {
   $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
   $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', timerHtml(checks));
   if (candy) $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', bedTreatHtml(candy, bed, checks, dow));
+  // Eli: end-of-day checks by Mom or Dad, and today's game time
+  if (kid === 'eli') {
+    const yn = (k) => '<div class="dchk"><div><strong>' + esc(k.label) + '</strong><small>' + esc(k.sub) + '</small></div>' +
+      '<span class="dchk-btns"><button class="chip' + (checks[k.key] === true ? ' on' : '') + '" data-daycheck="' + k.key + '|yes" aria-pressed="' + (checks[k.key] === true) + '">Yes</button>' +
+      '<button class="chip' + (checks[k.key] === 'no' ? ' on no' : '') + '" data-daycheck="' + k.key + '|no" aria-pressed="' + (checks[k.key] === 'no') + '">Not today</button></span></div>';
+    const g = L.gameDay(ctx, kid, date), school = L.GAME.days.includes(dow);
+    $('bed').insertAdjacentHTML('beforeend', '<div class="rhead dchk-head"><h2>End of day</h2><span class="rcount">Mom or Dad</span></div>' +
+      L.DAY_CHECKS.map(yn).join('') +
+      (school ? '<p class="gt-today">' + (g.earned ? '<b>+30 min of weekend game time earned today ✓</b>' : '<b>For today’s 30 min of game time:</b> ' + esc(g.left.join(' · '))) + '</p>' : ''));
+  }
   // Celebrate finishing a whole list (only right after a tap on this phone)
   const k0 = kid + ymd(date);
   const dp = L.progress(ctx, kid, date, lst.day), bp = L.progress(ctx, kid, date, lst.bed), mp = L.progress(ctx, kid, date, lst.morning);
@@ -244,7 +263,7 @@ document.addEventListener('click', (e) => {
       const list = lst[sec] || [];
       if (!list.some((i) => i.key === key)) return;
       const t = after[timer] || {};
-      if (t.start && !t.end && list.filter((i) => !i.opt).every((i) => after[i.key])) save(ID, base + timer + '/end', Date.now());
+      if (t.start && !t.end && list.filter((i) => !i.opt).every((i) => isDone(after[i.key]))) save(ID, base + timer + '/end', Date.now());
     });
   }
   if (key === 'mHigh5') {
@@ -338,6 +357,27 @@ document.addEventListener('click', (e) => {
   e.stopPropagation();
   const path = 'days/' + ymd(date) + '/' + kid + '/bedOk', v = b.dataset.bedok === '1' ? true : null;
   askParent().then((ok) => { if (ok) save(ID, path, v); });
+}, true);
+
+// End-of-day checks (Eli): parents only
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-daycheck]');
+  if (!b) return;
+  e.stopPropagation();
+  const [k, a] = b.dataset.daycheck.split('|'), path = 'days/' + ymd(date) + '/' + kid + '/' + k;
+  const cur = dayChecks()[k], v = a === 'yes' ? (cur === true ? null : true) : (cur === 'no' ? null : 'no');
+  askParent().then((ok) => { if (ok) save(ID, path, v); });
+}, true);
+
+// Not able to complete: the kid marks it, a parent approves (PIN) or the kid undoes it.
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-excuse]');
+  if (!b) return;
+  e.stopPropagation();
+  const path = 'days/' + ymd(date) + '/' + kid + '/' + b.dataset.key, a = b.dataset.excuse;
+  if (a === 'mark') save(ID, path, SKIP);
+  if (a === 'undo') save(ID, path, null);
+  if (a === 'approve') askParent().then((ok) => { if (ok) save(ID, path, EXCUSED); });
 }, true);
 
 render();

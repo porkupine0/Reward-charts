@@ -1,10 +1,12 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794950037';
-import { askParent } from './parent.js?v=1794950037';
-import { CHARTS, weekProgress, rowsFor } from './charts.js?v=1794950037';
-import { applySettings } from './settings.js?v=1794950037';
-import { weekStreak, cheerIf } from './streaks.js?v=1794950037';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794950037';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794956282';
+import { askParent } from './parent.js?v=1794956282';
+import { CHARTS, weekProgress, rowsFor } from './charts.js?v=1794956282';
+import { applySettings } from './settings.js?v=1794956282';
+import { weekStreak, cheerIf } from './streaks.js?v=1794956282';
+import { gameWeek } from './lists.js?v=1794956282';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794956282';
 
+const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const chart = CHARTS[document.body.dataset.chart];
 document.documentElement.style.setProperty('--accent', chart.accent);
@@ -65,6 +67,20 @@ function render() {
   $('progress').textContent = p.done + ' of ' + p.need + (ws >= 2 ? ' · ' + ws + ' perfect weeks in a row' : '');
   cheerIf('week' + wk, p.perfect, 'Perfect week! Pick your reward.');
   $('bar').style.width = (p.need ? (100 * p.done / p.need) : 0) + '%';
+  if (chart.gameTime) {
+    // Eli: weekend game time, 30 min for each full school day
+    const g = gameWeek(ctx, 'eli', week);
+    $('weeklycard').classList.toggle('unlocked', g.minutes > 0);
+    $('weeklytitle').textContent = 'Weekend game time';
+    $('weeklystatus').innerHTML = '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
+    $('weekly').innerHTML = '<div class="gt-days">' + g.days.map((d) => '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+30 min' : ymd(d.date) > ymd(new Date()) ? 'to come' : 'not yet') + '</span>' +
+      (!d.earned && ymd(d.date) <= ymd(new Date()) ? '<small>' + esc(d.left.slice(0, 3).join(' · ') + (d.left.length > 3 ? ' · +' + (d.left.length - 3) + ' more' : '')) + '</small>' : '') + '</div>').join('') + '</div>' +
+      (() => { const t = g.days.find((d) => ymd(d.date) === ymd(new Date())); return t && !t.earned ? '<p class="gt-today"><b>Today, still to do:</b> ' + esc(t.left.join(' · ')) + '</p>' : t ? '<p class="gt-today"><b>Today: +30 min earned ✓</b></p>' : ''; })() +
+      '<p class="note">Each school day with the whole checklist done and both evening checks = 30 minutes, to use Saturday and Sunday.</p>';
+    $('given').checked = !!wd.given;
+    $('given').disabled = g.minutes === 0;
+    $('givenlabel').textContent = 'Game time given (parent)';
+  } else {
   $('weeklycard').classList.toggle('unlocked', p.perfect);
   $('weeklystatus').textContent = p.perfect ? 'Reward earned! Pick one:' : 'Check every white box to unlock';
   $('weekly').innerHTML = chart.weekly.map((w, i) =>
@@ -72,6 +88,7 @@ function render() {
     '<span class="dot"></span>' + esc(w) + '</button>').join('');
   $('given').checked = !!wd.given;
   $('given').disabled = !p.perfect;
+  }
 
   // monthly
   const weeks = monthWeeks(week);
@@ -96,6 +113,13 @@ function render() {
 document.addEventListener('click', (e) => {
   const cell = e.target.closest('button.cell');
   const wk = ymd(week);
+  if (cell && rowsFor(chart, week).find((r) => r.key === cell.dataset.row && r.parent)) {
+    // Evening checks (Eli): Mom or Dad marks them; stored with the day's checklist
+    const date = addDays(week, Number(cell.dataset.day)), path = 'days/' + ymd(date) + '/' + (chart.id === 'eli' ? 'eli' : 'rhett') + '/' + cell.dataset.row;
+    const want = cell.getAttribute('aria-pressed') !== 'true';
+    askParent().then((ok) => { if (ok) save('routines', path, want ? true : 'no'); });
+    return;
+  }
   if (cell) {
     // Boxes the checklist fills: a tap here is a hand override (stored as true or 'off');
     // tapping back to what the checklist says clears the override.

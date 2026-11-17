@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin } from './settings.js?v=1794950037';
+import { SETTINGS, applySettings, toMin } from './settings.js?v=1794956282';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -8,6 +8,13 @@ export const KIDS = {
 
 // Chore rotation, Mon–Sun (0 = Mon). Each day is a list; every item gets its own checkbox.
 // No room is done two days in a row; Tuesday jobs are fixed; Rhett & Isaiah do laundry Saturday.
+// "Not able to complete": a kid marks an item SKIP; a parent approves it as EXCUSED.
+// Excused counts for credit (lists, streaks, rewards) but is recorded as not done (reading tracker).
+export const SKIP = '~skip', EXCUSED = '~excused';
+export const isDone = (v) => !!v && v !== SKIP;
+// Items a kid can mark "not able to do it": schoolwork, reading and practice, not chores or bedtime basics.
+export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize'];
+
 // Chores, shower nights and lights out come from settings.js (editable on the Settings page).
 export const CHORES = new Proxy({}, { get: (_, kid) => SETTINGS.chores[kid] });
 export { applySettings as applyConfig };
@@ -202,7 +209,7 @@ export function timerResult(kid, dateObj, rec, checks) {
   const dayGap = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate(), 12) - new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 12)) / 86400000);
   const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
   const steps = bedtime(kid, dow);
-  const done = steps.filter((s) => checks && checks[s.key]).length;
+  const done = steps.filter((s) => checks && isDone(checks[s.key])).length;
   // Up to 5 minutes past lights out still counts (grace); beyond that only with a parent's OK.
   const lateBy = endMin - lo;
   const status = lateBy <= 0 ? 'ontime' : lateBy <= GRACE_MIN ? 'grace' : checks && checks.bedOk ? 'approved' : 'late';
@@ -225,7 +232,6 @@ export function morning(kid, dow) {
   const teeth = { key: 'mTeeth', label: 'Brush your teeth' };
   if (dow === 5) {
     return [
-      { key: 'mWake', label: 'Wake up' },
       { key: 'mDress', label: 'Get dressed' },
       { key: 'mScarlett', label: 'Let Scarlett out' },
       breakfast,
@@ -234,7 +240,6 @@ export function morning(kid, dow) {
   }
   const church = dow === 6;
   return [
-    { key: 'mWake', label: 'Wake up' },
     { key: 'mDress', label: church ? 'Get dressed for church' : 'Get dressed' },
     { key: 'mScarlett', label: 'Let Scarlett out' },
     breakfast,

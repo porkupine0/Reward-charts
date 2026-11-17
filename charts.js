@@ -1,4 +1,4 @@
-import { SETTINGS } from './settings.js?v=1794950037';
+import { SETTINGS } from './settings.js?v=1794956282';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -21,11 +21,15 @@ export const CHARTS = {
     altRows: [
       { key: 'running', label: 'Run or swim', sub: 'Swim Mon, Thu, Fri · Run Tue, Wed, Sat', cells: [m('Swim'), m('Run'), m('Run'), m('Swim'), m('Swim'), m('Run'), O] },
       { key: 'chores', label: 'Chores', sub: 'All chores completed', cells: [X, X, X, X, X, X, X] },
-      { key: 'school', label: 'School', sub: 'No missing assignments', cells: [X, X, X, X, X, O, O] }
+      { key: 'school', label: 'School', sub: 'No missing assignments', cells: [X, X, X, X, X, O, O] },
+      { key: 'kind', label: 'Kind to brothers', sub: 'No hurting, in actions or words', parent: true, cells: [X, X, X, X, X, X, X] },
+      { key: 'listen', label: 'Listened', sub: 'To Mom and Dad, no arguing', parent: true, cells: [X, X, X, X, X, X, X] }
     ],
+    // Weekend game time: 30 min for each full school day (see lists.js GAME), up to 2.5 hours
+    gameTime: true,
     get weekly() { return SETTINGS.rewards[this.id].weekly; },
     get monthly() { return SETTINGS.rewards[this.id].monthly; },
-    note: '<b>Run or swim</b>: swim practice Monday, Thursday and Friday, runs Tuesday, Wednesday and Saturday. Each box fills when that day’s Training page is done. <b>No missing assignments</b> = checked on the school portal that day.'
+    note: '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and both evening checks = 30 minutes, up to 2.5 hours for the weekend. <b>Run or swim</b>: swim Monday, Thursday and Friday, run Tuesday, Wednesday and Saturday; each box fills when that day’s Training page is done. <b>Kind to brothers</b> and <b>Listened</b> are marked by Mom or Dad at the end of the day.'
   },
   trombone: {
     id: 'trombone',

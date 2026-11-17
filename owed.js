@@ -1,11 +1,11 @@
 // Everything the kids have earned and not received yet (Parents page and the home Parents button).
 // row(who, accent, whatHtml, when, actionHtml) and tick(chart, path, label) decide how each item looks.
-import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1794950037';
-import { CHARTS, weekProgress } from './charts.js?v=1794950037';
-import { KIDS } from './routines.js?v=1794950037';
-import * as L from './lists.js?v=1794950037';
-import { owed } from './trials.js?v=1794950037';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794950037';
+import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1794956282';
+import { CHARTS, weekProgress } from './charts.js?v=1794956282';
+import { KIDS } from './routines.js?v=1794956282';
+import * as L from './lists.js?v=1794956282';
+import { owed } from './trials.js?v=1794956282';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794956282';
 
 export function owedItems(D, ctx, row, tick) {
   const out = [];
@@ -16,6 +16,13 @@ export function owedItems(D, ctx, row, tick) {
     const perfect = (mon) => weekProgress(ch, L.effectiveWeek(ch, mon, (data.weeks || {})[ymd(mon)], ctx)).perfect;
     for (let w = 0; w < 10; w++) {
       const mon = addDays(thisMon, -7 * w), wd = (data.weeks || {})[ymd(mon)] || {};
+      // Eli from Nov 16, 2026: weekend game time earned on school days, shown from Saturday
+      if (ch.gameTime && ymd(mon) >= '2026-11-16') {
+        const g = L.gameWeek(ctx, 'eli', mon);
+        if (!g.minutes || wd.given || (w === 0 && (today.getDay() + 6) % 7 < 5)) continue;
+        out.push(row(kid.name, kid.accent, 'Weekend game time: ' + g.minutes + ' min', 'Week of ' + shortDate(mon) + ' · ' + g.days.filter((d) => d.earned).length + ' of 5 school days', tick(id, 'weeks/' + ymd(mon) + '/given', 'Given')));
+        continue;
+      }
       if (!perfect(mon) || wd.given) continue;
       const pick = wd.reward != null ? ch.weekly[wd.reward] : null;
       out.push(row(kid.name, kid.accent, pick ? esc(pick) : '<em>Perfect week, needs a pick</em>', 'Week of ' + shortDate(mon), tick(id, 'weeks/' + ymd(mon) + '/given', 'Given')));

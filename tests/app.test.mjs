@@ -89,7 +89,7 @@ test('plan: swim Mon/Thu/Fri, run Tue/Wed/Sat, trials on Saturdays (re-set Nov 1
 test('reward chart: Run or swim row from Nov 16, old row before', () => {
   const ctx = { routines: {}, run: { days: { '2026-11-16': { items: { swim: true } } } } };
   assert.equal(L.effectiveWeek(CHARTS.eli, d('2026-11-16'), {}, ctx).checks.running[0], true); // Monday swim fills the box
-  assert.equal(weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, d('2026-11-16'), {}, ctx)).need, 18);
+  assert.equal(weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, d('2026-11-16'), {}, ctx)).need, 32); // + 2 evening-check rows × 7
   assert.equal(weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, d('2026-11-09'), {}, ctx)).need, 17);
 });
 
@@ -229,4 +229,39 @@ test("Rhett: trombone box on his chart fills from the checklist (Fri-Sun)", () =
   const mon = d('2026-11-16'), ctx = { routines: { days: { '2026-11-21': { rhett: { trombone: true } } } }, run: {}, isaiah: {} };
   assert.equal(!!L.derivedCell('trombone', 'trombone', 5, mon, ctx), true);
   assert.equal(!!L.derivedCell('trombone', 'trombone', 4, mon, ctx), false);
+});
+
+
+test('not able to complete: pending does not count, excused counts, reading tracks it', () => {
+  const R = { '2026-11-16': { eli: { reading: true } }, '2026-11-17': { eli: { reading: '~excused', homework: '~skip' } } };
+  const ctx = { routines: { days: R }, run: {}, isaiah: {} };
+  const tue = d('2026-11-17');
+  const bed = L.lists(ctx, 'eli', tue).bed.find((i) => i.key === 'reading');
+  const hw = L.lists(ctx, 'eli', tue).day.find((i) => i.key === 'homework');
+  assert.equal(L.isOn(ctx, 'eli', tue, bed), true);   // excused counts for credit
+  assert.equal(L.isOn(ctx, 'eli', tue, hw), false);   // waiting for a parent: not yet
+  assert.deepEqual(L.readingWeek(ctx, 'eli', d('2026-11-16'), tue), { read: 1, excused: 1, nights: 2 });
+});
+
+test('Eli game time: 30 min per full school day with both evening checks', () => {
+  const day = d('2026-11-17'), ctx = { routines: { days: {} }, run: { days: {} }, isaiah: {} };
+  const ls = L.lists(ctx, 'eli', day);
+  const all = {};
+  [...ls.day, ...ls.bed].forEach((i) => { if (!i.opt && !i.derived && !i.weekly) all[i.key] = true; });
+  ctx.routines.days['2026-11-17'] = { eli: Object.assign({}, all) };
+  const plan = planFor(day);
+  ctx.run.days['2026-11-17'] = { items: Object.fromEntries(plan.items.filter((i) => !i.opt).map((i) => [i.key, true])) };
+  assert.equal(L.gameDay(ctx, 'eli', day).earned, false);           // checks not set yet
+  ctx.routines.days['2026-11-17'].eli.kind = true;
+  ctx.routines.days['2026-11-17'].eli.listen = 'no';
+  assert.equal(L.gameDay(ctx, 'eli', day).earned, false);           // listened: not today
+  ctx.routines.days['2026-11-17'].eli.listen = true;
+  assert.equal(L.gameDay(ctx, 'eli', day).earned, true);
+  const g = L.gameWeek(ctx, 'eli', d('2026-11-16'));
+  assert.equal(g.minutes, 30);
+  assert.equal(g.max, 150);
+});
+
+test('Isaiah: no Wake up on his morning list', () => {
+  for (let i = 0; i < 7; i++) assert.ok(!L.lists({ routines: {}, run: {}, isaiah: {} }, 'isaiah', addDays(d('2026-11-16'), i)).morning.some((x) => x.key === 'mWake'));
 });

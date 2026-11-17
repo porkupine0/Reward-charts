@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794950037';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794950037';
-import { rowsFor } from './charts.js?v=1794950037';
-import { planFor, dayDone } from './plan.js?v=1794950037';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794956282';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794956282';
+import { rowsFor } from './charts.js?v=1794956282';
+import { planFor, dayDone } from './plan.js?v=1794956282';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -77,7 +77,7 @@ export function isOn(ctx, kid, date, it) {
   if (it.derived === 'run') return eliRunDone(ctx.run, date);
   if (it.derived === 'touches') return touchedOn(ctx.isaiah, ymd(date));
   if (it.parts) return it.parts.every((p) => checks[partKey(it.key, p)]);
-  return !!checks[it.key];
+  return isDone(checks[it.key]);
 }
 
 // Required (not optional) items and how many are done.
@@ -93,11 +93,12 @@ export function progress(ctx, kid, date, list) {
 export function derivedCell(chartId, rowKey, i, monday, ctx) {
   const date = addDays(monday, i), k = ymd(date);
   const c = (kid) => dayChecks(ctx, kid, date);
-  const allChores = (kid) => choreItems(kid, i).every((x) => c(kid)[x.key]);
+  const allChores = (kid) => choreItems(kid, i).every((x) => isDone(c(kid)[x.key]));
   if (chartId === 'eli') {
     if (rowKey === 'running' && i <= 5) return eliRunDone(ctx.run, date);
     if (rowKey === 'chores') return allChores('eli');
-    if (rowKey === 'school' && i <= 4) return !!c('eli').missing;
+    if (rowKey === 'school' && i <= 4) return isDone(c('eli').missing);
+    if (rowKey === 'kind' || rowKey === 'listen') return c('eli')[rowKey] === true;
   }
   if (chartId === 'trombone') {
     if (rowKey === 'trombone' && i >= 4) return !!c('rhett').trombone; // Fri, Sat, Sun: ticked on his checklist
@@ -153,4 +154,42 @@ export function nowStatus(ctx, kid, now) {
   }
   if (!b.left.length) return { phase: 'night', title: 'In bed', left: [], done: true, sub: 'Good night!' };
   return { phase: 'late', title: 'After lights out', left: left(b), done: false, sub: 'Lights out was ' + lo.time };
+}
+
+// ---- Reading tracker: nights read, excused nights, and nights with reading on the list ----
+export function readingWeek(ctx, kid, monday, upTo) {
+  let read = 0, excused = 0, nights = 0;
+  const last = upTo || addDays(monday, 6);
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(monday, i);
+    if (ymd(d) > ymd(last)) break;
+    if (!bedtime(kid, dowOf(d)).some((s) => s.key === 'reading')) continue;
+    nights++;
+    const v = dayChecks(ctx, kid, d).reading;
+    if (v === EXCUSED) excused++;
+    else if (isDone(v)) read++;
+  }
+  return { read, excused, nights };
+}
+
+// ---- Eli's weekend game time ----
+// End-of-day checks, set by a parent: true = yes, 'no' = not today.
+export const DAY_CHECKS = [
+  { key: 'kind', label: 'Kind to his brothers', sub: 'No hurting them, physically or with words' },
+  { key: 'listen', label: 'Listened to Mom and Dad', sub: 'Without arguing' }
+];
+export const GAME = { perDay: 30, days: [0, 1, 2, 3, 4] }; // 30 min for each full school day = up to 2.5 hours
+// A school day earns its 30 minutes when the whole checklist (after school + bedtime, excused items count)
+// is done and both end-of-day checks are yes.
+export function gameDay(ctx, kid, date) {
+  const ls = lists(ctx, kid, date);
+  const left = [...progress(ctx, kid, date, ls.day).left, ...progress(ctx, kid, date, ls.bed).left].map((i) => i.label.replace(/^Chore: /, ''));
+  const c = dayChecks(ctx, kid, date);
+  DAY_CHECKS.forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
+  return { earned: !left.length, left };
+}
+export function gameWeek(ctx, kid, monday) {
+  const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });
+  const minutes = days.filter((d) => d.earned).length * GAME.perDay;
+  return { days, minutes, max: GAME.days.length * GAME.perDay };
 }
