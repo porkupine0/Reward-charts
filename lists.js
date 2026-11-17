@@ -2,6 +2,7 @@
 // The checklist page, the home "Today" list and the parent page all use these.
 import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794511357';
 import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794511357';
+import { rowsFor } from './charts.js?v=1794511357';
 import { planFor, dayDone } from './plan.js?v=1794511357';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
@@ -107,11 +108,11 @@ export function cellOn(chartId, rowKey, i, monday, weekData, ctx) {
 // Same shape weekProgress expects: { checks: { row: { day: true } } }
 export function effectiveWeek(chart, monday, weekData, ctx) {
   const checks = {};
-  chart.rows.forEach((r) => r.cells.forEach((cell, i) => {
+  rowsFor(chart, monday).forEach((r) => r.cells.forEach((cell, i) => {
     if (cell === '-') return;
     if (cellOn(chart.id, r.key, i, monday, weekData, ctx)) (checks[r.key] = checks[r.key] || {})[i] = true;
   }));
-  return Object.assign({}, weekData, { checks });
+  return Object.assign({}, weekData, { checks, monday });
 }
 export { mondayOf };
 

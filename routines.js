@@ -147,7 +147,9 @@ export function afterSchool(kid, dow, runPlan) {
   if (kid === 'rhett') items.push(DUO);
   items.push({ weekly: true });
   if (kid === 'eli') {
-    items.push({ key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: (dow === 4 ? 'Optional bonus run today. ' : '') + 'Checks itself off when today’s Training is done. Tap to open it.', link: 'run.html', opt: dow === 4 });
+    items.push(runPlan && runPlan.swim
+      ? { key: 'activity', label: 'Swim practice', sub: 'Checks itself off when you tick it on your Training page. Tap to open it.', link: 'run.html', opt: !!runPlan.optional }
+      : { key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: (runPlan ? (runPlan.optional ? 'Optional today. ' : '') : dow === 4 ? 'Optional bonus run today. ' : '') + 'Checks itself off when today’s Training is done. Tap to open it.', link: 'run.html', opt: runPlan ? !!runPlan.optional : dow === 4 });
   } else if (kid === 'rhett') {
     items.push(dow === 3
       ? { key: 'activity', label: 'Racquetball tonight' }

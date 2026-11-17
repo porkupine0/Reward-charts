@@ -1,6 +1,6 @@
 import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794511357';
 import { askParent } from './parent.js?v=1794511357';
-import { CHARTS, weekProgress } from './charts.js?v=1794511357';
+import { CHARTS, weekProgress, rowsFor } from './charts.js?v=1794511357';
 import { applySettings } from './settings.js?v=1794511357';
 import { weekStreak, cheerIf } from './streaks.js?v=1794511357';
 import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794511357';
@@ -43,7 +43,7 @@ function render() {
     const date = addDays(week, i);
     h += '<div class="g-day' + (ymd(date) === today ? ' is-today' : '') + '"><span>' + d + '</span><small>' + date.getDate() + '</small></div>';
   });
-  chart.rows.forEach((r) => {
+  rowsFor(chart, week).forEach((r) => {
     h += '<div class="g-label"><strong>' + esc(r.label) + '</strong><small>' + esc(r.sub) + '</small></div>';
     r.cells.forEach((c, i) => {
       if (c === '-') { h += '<div class="cell off" aria-hidden="true">Off</div>'; return; }

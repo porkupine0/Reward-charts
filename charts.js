@@ -16,9 +16,16 @@ export const CHARTS = {
       { key: 'chores', label: 'Chores', sub: 'All chores completed', cells: [X, X, X, X, X, X, X] },
       { key: 'school', label: 'School', sub: 'No missing assignments', cells: [X, X, X, X, X, O, O] }
     ],
+    // From the week of Nov 16, 2026: swim practice Mon/Thu/Fri and runs Tue/Wed/Sat share one row.
+    altFrom: '2026-11-16',
+    altRows: [
+      { key: 'running', label: 'Run or swim', sub: 'Swim Mon, Thu, Fri · Run Tue, Wed, Sat', cells: [m('Swim'), m('Run'), m('Run'), m('Swim'), m('Swim'), m('Run'), O] },
+      { key: 'chores', label: 'Chores', sub: 'All chores completed', cells: [X, X, X, X, X, X, X] },
+      { key: 'school', label: 'School', sub: 'No missing assignments', cells: [X, X, X, X, X, O, O] }
+    ],
     get weekly() { return SETTINGS.rewards[this.id].weekly; },
     get monthly() { return SETTINGS.rewards[this.id].monthly; },
-    note: '<b>Bonus run</b> on Friday is optional and doesn’t count against the reward. <b>No missing assignments</b> = checked on the school portal that day.'
+    note: '<b>Run or swim</b>: swim practice Monday, Thursday and Friday, runs Tuesday, Wednesday and Saturday. Each box fills when that day’s Training page is done. <b>No missing assignments</b> = checked on the school portal that day.'
   },
   trombone: {
     id: 'trombone',
@@ -39,10 +46,18 @@ export const CHARTS = {
 };
 
 // Shared scoring so the home page and chart pages agree.
+// The rows a chart uses for the week starting on this Monday (a chart can change from a date on).
+export function rowsFor(chart, monday) {
+  if (!chart.altFrom || !monday) return chart.rows;
+  const p = (n) => String(n).padStart(2, '0');
+  const k = monday.getFullYear() + '-' + p(monday.getMonth() + 1) + '-' + p(monday.getDate());
+  return k >= chart.altFrom ? chart.altRows : chart.rows;
+}
+
 export function weekProgress(chart, weekData) {
   const checks = (weekData && weekData.checks) || {};
   let done = 0, need = 0;
-  chart.rows.forEach((r) => r.cells.forEach((c, i) => {
+  rowsFor(chart, weekData && weekData.monday).forEach((r) => r.cells.forEach((c, i) => {
     if (c === '-' || (c && c.opt)) return;
     need++;
     if (checks[r.key] && checks[r.key][i]) done++;

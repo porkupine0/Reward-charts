@@ -159,7 +159,8 @@ function items(text, dow) {
 function objItems(t) {
   if (t.off) return [];
   const opt = !!t.opt, out = [];
-  out.push({ key: 'run', label: t.trial ? 'Time trial' : 'Run', sub: t.s, opt, log: true });
+  if (t.swim) out.push({ key: 'swim', label: 'Swim practice', sub: t.s || 'With the team', opt });
+  else out.push({ key: 'run', label: t.trial ? 'Time trial' : 'Run', sub: t.s, opt, log: true });
   if (t.strides) out.push({ key: 'strides', label: t.strides + ' strides at 9.0–9.5 mph', sub: '15–20 sec once the belt is up to speed, 60 sec walk. Outside: only on dry pavement.', opt });
   if (t.plyo) out.push({ key: 'plyo', label: 'Plyometrics · ' + t.plyo + ' sets', sub: 'After your warm-up, before the run, while fresh', routine: 'plyo' });
   if (t.strA) out.push({ key: 'strA', label: 'Strength A · at home' + (t.strA === true ? '' : ' (' + t.strA + ')'), routine: 'strA' });
@@ -198,7 +199,7 @@ export function planFor(date) {
     const t = text;
     return {
       week: wi + 1, weekLabel: w[0], focus: w[1], miles: w[2], dow,
-      title: t.title, optional: !!t.opt, detail: t.s, indoor: t.off ? '' : t.in, outdoor: t.off ? '' : t.out, note: t.note || '',
+      title: t.title, optional: !!t.opt, detail: t.s, swim: !!t.swim, indoor: t.off ? '' : t.in, outdoor: t.off ? '' : t.out, note: t.note || '',
       tag: t.tag || (t.opt ? 'Optional' : ''), items: objItems(t), strengthNote: ''
     };
   }

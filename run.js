@@ -82,7 +82,7 @@ function render() {
   showPace();
   $('effort').innerHTML = Array.from({ length: 10 }, (_, i) => i + 1).map((n) =>
     '<button class="eff' + (dd.effort === n ? ' on' : '') + '" data-effort="' + n + '" aria-pressed="' + (dd.effort === n) + '">' + n + '</button>').join('');
-  $('logcard').hidden = !!(p && p.dow === 6);
+  $('logcard').hidden = !!(p && (p.dow === 6 || p.swim)); // no run log on rest or swim days
   renderTrial();
 
   // week totals
