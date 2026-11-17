@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794947441';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794947441';
-import { rowsFor } from './charts.js?v=1794947441';
-import { planFor, dayDone } from './plan.js?v=1794947441';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794950037';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794950037';
+import { rowsFor } from './charts.js?v=1794950037';
+import { planFor, dayDone } from './plan.js?v=1794950037';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -64,6 +64,13 @@ export function lists(ctx, kid, date) {
   return { morning: morn, day, bed: bedtime(kid, dow) };
 }
 
+// A computer task (typing, Duolingo, checking assignments, homework) can't be ticked until every chore in the day's list is done.
+// One that is already ticked can still be un-ticked.
+export function lockedBy(ctx, kid, date, it, list) {
+  if (!it.computer || isOn(ctx, kid, date, it)) return false;
+  return (list || []).filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c));
+}
+
 export function isOn(ctx, kid, date, it) {
   const checks = dayChecks(ctx, kid, date);
   if (it.weekly) return !!weeklyDoneOn(ctx, kid, weeklyDef(kid, it.weekly), date);
@@ -93,6 +100,7 @@ export function derivedCell(chartId, rowKey, i, monday, ctx) {
     if (rowKey === 'school' && i <= 4) return !!c('eli').missing;
   }
   if (chartId === 'trombone') {
+    if (rowKey === 'trombone' && i >= 4) return !!c('rhett').trombone; // Fri, Sat, Sun: ticked on his checklist
     if (rowKey === 'chores' && i <= 5) return allChores('rhett');
     if (rowKey === 'duolingo' && i <= 5) return !!c('rhett').duolingo;
     if (rowKey === 'move' && [0, 1, 2, 4, 5].includes(i)) return !!c('rhett').activity;

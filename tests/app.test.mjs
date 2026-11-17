@@ -183,3 +183,50 @@ test('right now: what shows depends on the time of day', () => {
   // Saturday: no school, the day list shows from the morning
   assert.equal(L.nowStatus(ctx, 'rhett', new Date(2026, 10, 14, 11, 0)).title, 'Today');
 });
+
+test("Rhett: trombone Fri/Sat/Sun, typing every day, chores before any computer task", () => {
+  const ctx = { routines: { days: {} }, run: {}, isaiah: {} };
+  const week = ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20', '2026-11-21', '2026-11-22']; // Mon..Sun
+  week.forEach((day, dow) => {
+    const list = L.lists(ctx, 'rhett', d(day)).day;
+    const keys = list.map((i) => i.key);
+    assert.equal(keys.includes('typing'), true, 'typing on day ' + dow);
+    assert.equal(keys.includes('trombone'), dow >= 4, 'trombone only Fri/Sat/Sun (day ' + dow + ')');
+    const typing = list.find((i) => i.key === 'typing');
+    assert.equal(typing.opt, undefined, 'typing is required');
+    assert.match(typing.label, /10 min/);
+    if (dow >= 4) assert.match(list.find((i) => i.key === 'trombone').label, dow === 4 ? /20 min/ : /30 min/);
+    // every chore comes before every computer task
+    const lastChore = Math.max(...list.map((i, n) => (i.chore ? n : -1)));
+    const firstComputer = list.findIndex((i) => i.computer);
+    assert.ok(lastChore >= 0 && firstComputer > lastChore, 'chores come first on day ' + dow);
+  });
+  ['eli', 'isaiah'].forEach((kid) => week.forEach((day) => {
+    const keys = L.lists(ctx, kid, d(day)).day.map((i) => i.key);
+    assert.equal(keys.includes('typing') || keys.includes('trombone'), false, kid + ' is unchanged');
+  }));
+});
+
+test("Rhett: computer tasks stay locked until every chore is ticked", () => {
+  const fri = '2026-11-20';
+  const make = (checks) => ({ routines: { days: { [fri]: { rhett: checks } } }, run: {}, isaiah: {} });
+  const list = (ctx) => L.lists(ctx, 'rhett', d(fri)).day;
+  const computer = (ctx) => list(ctx).filter((i) => i.computer);
+  assert.ok(computer(make({})).length >= 5, 'typing, Duolingo, assignments, missing, homework');
+  computer(make({})).forEach((i) => assert.equal(L.lockedBy(make({}), 'rhett', d(fri), i, list(make({}))), true, i.key + ' is locked'));
+  // trombone is not a computer task
+  assert.equal(L.lockedBy(make({}), 'rhett', d(fri), list(make({})).find((i) => i.key === 'trombone'), list(make({}))), false);
+  const chores = choreItems('rhett', 4), all = Object.fromEntries(chores.map((c) => [c.key, true]));
+  const some = { [chores[0].key]: true };
+  if (chores.length > 1) computer(make(some)).forEach((i) => assert.equal(L.lockedBy(make(some), 'rhett', d(fri), i, list(make(some))), true, 'one chore is not enough'));
+  computer(make(all)).forEach((i) => assert.equal(L.lockedBy(make(all), 'rhett', d(fri), i, list(make(all))), false, i.key + ' opens after chores'));
+  // one already ticked can still be un-ticked even if a chore is un-ticked later
+  const ticked = make({ typing: true });
+  assert.equal(L.lockedBy(ticked, 'rhett', d(fri), list(ticked).find((i) => i.key === 'typing'), list(ticked)), false);
+});
+
+test("Rhett: trombone box on his chart fills from the checklist (Fri-Sun)", () => {
+  const mon = d('2026-11-16'), ctx = { routines: { days: { '2026-11-21': { rhett: { trombone: true } } } }, run: {}, isaiah: {} };
+  assert.equal(!!L.derivedCell('trombone', 'trombone', 5, mon, ctx), true);
+  assert.equal(!!L.derivedCell('trombone', 'trombone', 4, mon, ctx), false);
+});

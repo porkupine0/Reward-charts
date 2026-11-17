@@ -575,3 +575,8 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .wo-card.is-opt .wo-ways p { color: var(--ink); }
 .wo-card.is-opt .wo-ways b { color: var(--accent); }
 .wo-note { margin: 4px 0 0; font-size: 13px; font-weight: 700; color: #F6B48F; }
+
+/* A computer task waiting for chores */
+.ck.locked { opacity: .55; border-style: dashed; }
+.ck.locked .ckbtn { cursor: not-allowed; }
+.ck.locked .cktext small { color: var(--accent); font-weight: 800; }

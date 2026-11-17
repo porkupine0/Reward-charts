@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794947441';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794947441';
-import { askParent } from './parent.js?v=1794947441';
-import * as L from './lists.js?v=1794947441';
-import { dayStreak, cheerIf } from './streaks.js?v=1794947441';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794950037';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen } from './routines.js?v=1794950037';
+import { askParent } from './parent.js?v=1794950037';
+import * as L from './lists.js?v=1794950037';
+import { dayStreak, cheerIf } from './streaks.js?v=1794950037';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -28,12 +28,13 @@ function isOn(it) {
 function itemHtml(it, checks, extra) {
   const v = isOn(it);
   const on = !!v;
-  let h = '<div class="ck' + (on ? ' on' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
-  h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '">' +
+  const locked = !!(extra && extra.locked);
+  let h = '<div class="ck' + (on ? ' on' : '') + (locked ? ' locked' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
+  h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
     (extra && extra.time ? '<span class="rtime">' + esc(extra.time) + '</span>' : '') +
     '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
     '<span class="cktext"><strong>' + esc(it.label) + (it.opt ? ' <em>optional</em>' : '') + (it.hot ? ' <em class="hot">shower night</em>' : '') + '</strong>' +
-    (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
+    (locked ? '<small>Do your chores first</small>' : it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
   if (it.choices) {
     h += '<div class="chips">' + it.choices.map((c) =>
       '<button class="chip' + (v === c ? ' on' : '') + '" data-key="' + it.key + '" data-choice="' + esc(c) + '" aria-pressed="' + (v === c) + '">' + esc(c) + '</button>').join('') + '</div>';
@@ -57,6 +58,7 @@ function section(title, sub, items, checks, timed) {
   let nextMarked = false;
   const body = items.map((it) => {
     let extra = timed ? { time: it.time } : {};
+    if (L.lockedBy(ctx, kid, date, it, items)) extra.locked = true;
     if (timed && isToday && !nextMarked && !isOn(it)) { extra.next = true; nextMarked = true; }
     return itemHtml(it, checks, extra);
   }).join('');
@@ -201,6 +203,8 @@ document.addEventListener('click', (e) => {
   const btn = chip || e.target.closest('.ckbtn');
   if (!btn) return;
   const key = btn.dataset.key;
+  // computer tasks wait for chores (the button looks locked; ignore the tap)
+  if (btn.closest('.ck.locked')) return;
   const base = 'days/' + ymd(date) + '/' + kid + '/';
   const partsBtn = btn.dataset.parts ? btn : document.querySelector('.chip.part[data-key="' + key + '"]');
   if (partsBtn) {

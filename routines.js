@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin } from './settings.js?v=1794947441';
+import { SETTINGS, applySettings, toMin } from './settings.js?v=1794950037';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -128,7 +128,12 @@ export const WEEKLY = {
 };
 
 // Rhett's Duolingo: 10 min, Mon–Sat.
-const DUO = { key: 'duolingo', label: 'Duolingo · 10 min', opt: true };
+// `computer` items (typing, Duolingo, checking assignments and email, homework) wait until his chores are done.
+const DUO = { key: 'duolingo', label: 'Duolingo · 10 min', opt: true, computer: true };
+// Rhett's typing practice, 10 min every day (a computer task, so it waits for chores too).
+const TYPING = { key: 'typing', label: 'Typing practice · 10 min', computer: true };
+// Rhett's trombone practice, Fri/Sat/Sun: 20 min Friday, 30 min Saturday and Sunday (the minutes on his reward chart).
+const trombone = (dow) => ({ key: 'trombone', label: 'Practice trombone · ' + (dow === 4 ? 20 : 30) + ' min', sub: 'Use the timer on your chart page. Tap to open it.', link: 'trombone.html' });
 
 export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];
@@ -141,10 +146,11 @@ export function afterSchool(kid, dow, runPlan) {
     ...choreItems(kid, dow),
     { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' }
   ];
-  if (kid !== 'isaiah') items.push({ key: 'due', label: 'Check assignments due', sub: 'Check your email too' });
-  if (kid !== 'isaiah') items.push({ key: 'missing', label: 'Check missing assignments' });
-  if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework' });
-  if (kid === 'rhett') items.push(DUO);
+  if (kid !== 'isaiah') items.push({ key: 'due', label: 'Check assignments due', sub: 'Check your email too', computer: kid === 'rhett' });
+  if (kid !== 'isaiah') items.push({ key: 'missing', label: 'Check missing assignments', computer: kid === 'rhett' });
+  if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework', computer: kid === 'rhett' });
+  if (kid === 'rhett') items.push(DUO, TYPING);
+  if (kid === 'rhett' && dow === 4) items.push(trombone(dow));
   items.push({ weekly: true });
   if (kid === 'eli') {
     items.push(runPlan && runPlan.swim
@@ -171,6 +177,7 @@ export function weekend(kid, dow) {
     : { key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
   items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO);
+  if (kid === 'rhett') items.push(TYPING, trombone(dow)); // Saturday and Sunday
   items.push({ weekly: true });
   return items;
 }
