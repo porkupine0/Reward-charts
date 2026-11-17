@@ -1,12 +1,12 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794511357';
-import { askParent } from './parent.js?v=1794511357';
-import { celebrate } from './streaks.js?v=1794511357';
-import { PLAN_START, trialOn } from './plan.js?v=1794511357';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1794947441';
+import { askParent } from './parent.js?v=1794947441';
+import { celebrate } from './streaks.js?v=1794947441';
+import { PLAN_START, trialOn } from './plan.js?v=1794947441';
 
 const ID = 'eli-trials';
 
 // Prize levels, smallest to biggest. The lists can be changed on the Settings page.
-import { SETTINGS, applySettings } from './settings.js?v=1794511357';
+import { SETTINGS, applySettings } from './settings.js?v=1794947441';
 export const LEVELS = ['Small', 'Medium', 'Big', 'Huge', 'Grand'];
 const T1 = 'Small', T2 = 'Medium', T3 = 'Big', T4 = 'Huge', T5 = 'Grand';
 const tierName = (lvl) => lvl;
@@ -22,8 +22,8 @@ export const FIVE = [[1460, T1], [1425, T1], [1395, T1], [1350, T2], [1300, T2],
 export const mphFor = (kind, secs) => (Math.floor(((kind === 'mile' ? 1 : 3.10686) * 3600 / secs) * 10 + 1e-9) + 1) / 10;
 
 // Plan week → [distance, day index (0 = Mon), note]
-// Re-set Nov 12 after the coach review: each trial opens a Thursday workout at the gym track.
-export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 3, 'Diagnostic'], 5: ['5k', 3, 'Turkey Trot'], 7: ['mile', 3], 10: ['5k', 3], 12: ['mile', 3], 13: ['5k', 3, 'Final test'] };
+// Re-set Nov 17 (swim Mon/Thu/Fri): each trial opens the Saturday workout, every other week.
+export const SCHED = { 3: ['5k', 2, 'First test'], 4: ['mile', 5, 'Diagnostic'], 5: ['5k', 3, 'Turkey Trot (or Saturday)'], 7: ['mile', 5], 10: ['5k', 5], 12: ['mile', 5], 13: ['5k', 5, 'Final test'] };
 
 // Save a trial. On a planned test day of the same distance it uses one id per day (re-saving
 // replaces it) and checks off that day's time trial on Training (his reward chart follows Training).

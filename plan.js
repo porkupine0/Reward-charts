@@ -31,67 +31,101 @@ const rFart = (extra = {}) => Object.assign({ title: 'Fast reps', s: "12' easy, 
 const iWork = (spec, extra = {}) => Object.assign({ title: 'Intervals', s: "15' easy + 4 strides, " + spec.s + ", 10' easy", in: spec.in, out: spec.out }, extra);
 const bonus = (m) => Object.assign({ title: 'Bonus run', opt: true, core: 'A', s: m + "' easy" }, EZ(m));
 
+// Re-set Nov 17, 2026: swim practice Mon/Thu/Fri, running Tue/Wed/Sat (coach review).
+// Each week lists all 7 days, Mon–Sun.
+const swim = (extra = {}) => Object.assign({ title: 'Swim practice', swim: true, s: 'Swim practice with the team' }, extra);
+const swimLift = (extra = {}) => swim(Object.assign({ s: 'Swim practice, then Strength B (lifts only, no jumps) or Home Strength', strB: 'lifts only, no jumps' }, extra));
+const swimEasy = (extra = {}) => swim(Object.assign({ s: 'Swim practice: ask to keep it easy (trial tomorrow)' }, extra));
+const rest = () => ({ title: 'Rest', off: true, s: 'Rest day' });
+const satMile = (block) => mileTrial(block, { tag: 'Track or treadmill', strB: false, core: 'B' });
+const sat5k = (extra = {}) => fiveTrial(Object.assign({ tag: 'Track or treadmill', strB: false, core: 'B' }, extra));
+
 const NEW_WEEKS = [
-  ['Nov 16–22', 'Build + mile time trial', 17, [
-    thr("3×6'", "1'", { core: 'A' }),
-    longRun(45, { plyo: 2, strA: true, core: 'B' }),
-    easy(25, { strides: 4, core: 'A' }),
-    mileTrial("2×5' (2' jog)", { tag: 'Gym', note: 'Diagnostic' }),
-    bonus(25)]],
-  ['Nov 23–29', 'Build + 5K time trial (Thanksgiving)', 18, [
-    thr("4×5'", "1'", { core: 'A' }),
-    longRun(50, { plyo: 2, strA: true, core: 'B' }),
-    easy(25, { strides: 4, core: 'A' }),
-    fiveTrial({ tag: 'Thanksgiving', strB: false, in: 'Backup: treadmill 5K from 7.6 mph, up 0.1 each km from 3 km (log it as treadmill). Gym closed and no race? Run 30–40 minutes easy and move the 5K to Week 10.', out: 'Turkey Trot: 15–20 min easy warm-up, race it, 10 min easy cool-down. Layers, gloves and a hat.' }),
-    Object.assign(bonus(20), { home: 'in place of Strength B this week' })]],
-  ['Nov 30–Dec 6', 'Down week', 14, [
-    easy(30, { strides: 6, core: 'A' }),
-    easy(30, { strA: '2 sets', core: 'B' }),
-    longRun(40, { core: 'A' }),
-    rFart({ tag: 'Gym', strB: '2 sets of lifts, no jumps', core: 'B' }),
-    bonus(20)]],
-  ['Dec 7–13', 'Build + mile time trial', 19, [
-    thr("3×7'", "90 sec", { core: 'A' }),
-    longRun(55, { plyo: 2, strA: true, core: 'B' }),
-    easy(30, { strides: 4, core: 'A' }),
-    mileTrial("2×6' (2' jog)", { tag: 'Gym' }),
-    bonus(25)]],
-  ['Dec 14–20', 'Build', 19, [
-    thr("2×10'", "2'", { core: 'A' }),
-    easy(35, { strides: 6, plyo: 2, strA: true, core: 'B' }),
-    longSteady(60, { core: 'A' }),
-    iWork({ s: '6×400 at interval pace', in: 'Gym track: 6×400 in 1:52–1:54, 200 m jog (about 90 sec). Treadmill: 6×2 min at 7.9–8.0 mph with 90 sec at 5.5.', out: '6×2 min hard (effort 8 of 10) with 90 sec jog on a flat, clear route' }, { tag: 'Gym', strB: true, core: 'B' }),
-    bonus(25)]],
-  ['Dec 21–27', 'Down week (Christmas)', 14, [
-    easy(30, { strides: 6, core: 'A' }),
-    easy(30, { strA: '2 sets', core: 'B' }),
-    rFart({ s: "15' easy, 6×30 sec fast and relaxed, 10' easy", core: 'A' }),
-    Object.assign(longRun(40, { core: 'B' }), { title: 'Easy run', tag: 'Christmas Eve' }),
-    { title: 'Off', tag: 'Christmas', off: true, s: 'Merry Christmas!' }]],
-  ['Dec 28–Jan 3', 'Build + 5K time trial', 20, [
-    thr("3×8'", "90 sec", { core: 'A' }),
-    longRun(60, { plyo: 2, strA: true, core: 'B' }),
-    easy(30, { strides: 4, core: 'A' }),
-    fiveTrial({ tag: 'Gym', note: 'New Year’s Eve: if the gym is closed, swap with Wednesday or run it on the treadmill' }),
-    Object.assign(bonus(25), { tag: 'New Year’s Day', home: 'if you skipped Strength B Thursday' })]],
-  ['Jan 4–10', 'Peak build', 20.5, [
-    thr("20' continuous", '', { core: 'A' }),
-    easy(40, { strides: 6, plyo: 3, strA: true, core: 'B' }),
-    longSteady(65, { core: 'A' }),
-    iWork({ s: '4×800 at interval pace', in: 'Gym track: 4×800 in 3:44–3:49, 400 m jog (about 3 min). Treadmill: 4×3:45 at 7.9–8.0 mph with 3 min at 5.5.', out: '4×4 min hard (effort 8 of 10) with 3 min jog' }, { tag: 'Gym', strB: true, core: 'B' }),
-    bonus(25)]],
-  ['Jan 11–17', 'Peak + mile time trial', 21, [
-    thr("2×12'", "2'", { core: 'A' }),
-    longRun(65, { plyo: 2, strA: true, core: 'B' }),
-    easy(30, { strides: 4, core: 'A' }),
-    mileTrial("3×5' (90 sec jog)", { tag: 'Gym' }),
-    bonus(25)]],
-  ['Jan 18–24', 'Down week + final 5K time trial', 15, [
-    easy(30, { strides: 6, core: 'A' }),
-    easy(25, { strides: 4, strA: '2 sets, light', core: 'B' }),
-    { title: 'Sharpener', s: "20' easy with 4×30 sec at interval pace", in: "Treadmill: 20' easy with 4×30 sec at 7.9–8.0 mph, 90 sec easy between. Gym track: 4×200 in 56–57 sec.", out: '20 min easy with 4×30 sec quick (by effort)', core: 'A' },
-    fiveTrial({ tag: 'Gym', note: 'Final test: take a split at 2 miles and compare it with his 14:08', strB: false }),
-    Object.assign(bonus(20), { title: 'Off, or easy run' })]]
+  ['Nov 16–22', 'Build + mile time trial', 14, [
+    swim({ s: 'Swim practice (done)' }),
+    thr("3×6'", "1'", { strA: true, note: 'If today is already over, skip it rather than squeezing it into Wednesday.' }),
+    longRun(45, { plyo: 2, core: 'A', s: "45' easy (plyos after the first 10 minutes)" }),
+    swimLift(),
+    swimEasy(),
+    satMile("2×5' (2' jog)"),
+    rest()]],
+  ['Nov 23–29', 'Build + 5K time trial (Thanksgiving)', 15, [
+    swim(),
+    thr("2×8'", "2'", { strA: true }),
+    easy(30, { strides: 4, core: 'A', note: 'Skipping the Turkey Trot? Make this a 50-minute long easy run with plyos (2 sets) instead.' }),
+    fiveTrial({ tag: 'Thanksgiving', opt: true, strB: false, core: false,
+      s: "Turkey Trot (optional): 15–20' easy warm-up, race it, 5' walk, a few relaxed strides, 10' easy",
+      in: 'Not racing? No run today; the 5K moves to Saturday.',
+      out: 'Turkey Trot: layers, gloves and a hat.' }),
+    swim({ s: 'Swim practice, if there is one. Home Strength (lifts only) if Thursday’s was skipped.', home: 'if Thursday’s strength was skipped', opt: true }),
+    Object.assign(easy(40, { core: 'B' }), { title: 'Easy run or 5K time trial', trial: '5k',
+      s: "Ran the Turkey Trot: 40' easy. Skipped it: the 5K time trial session here instead.",
+      note: 'Only one 5K this week: Thursday’s race or today.' }),
+    rest()]],
+  ['Nov 30–Dec 6', 'Down week', 11, [
+    swim(),
+    easy(30, { strides: 6, strA: '2 sets' }),
+    longRun(40, { title: 'Easy run', core: 'A' }),
+    swim({ s: 'Swim practice, then Home Strength (2 light rounds)', strB: '2 light rounds, no jumps' }),
+    swim(),
+    rFart({ tag: 'Track or treadmill', core: 'B' }),
+    rest()]],
+  ['Dec 7–13', 'Build + mile time trial', 15.5, [
+    swim(),
+    thr("3×7'", '90 sec', { strA: true }),
+    longRun(55, { plyo: 2, core: 'A' }),
+    swimLift(),
+    swimEasy(),
+    satMile("2×6' (2' jog)"),
+    rest()]],
+  ['Dec 14–20', 'Build', 15, [
+    swim(),
+    thr("2×10'", "2'", { strA: true }),
+    longSteady(60, { plyo: 2, core: 'A' }),
+    swimLift(),
+    swim(),
+    iWork({ s: '6×400 at interval pace', in: 'Gym track: 6×400 in 1:52–1:54, 200 m jog. Treadmill: 6×2 min at 7.8–8.0 mph with 90 sec at 5.5.', out: '6×2 min hard (effort 8 of 10) with 90 sec jog on a flat, clear route' }, { tag: 'Track or treadmill', core: 'B' }),
+    rest()]],
+  ['Dec 21–27', 'Down week (Christmas)', 11, [
+    swim(),
+    easy(30, { strides: 6, strA: '2 sets' }),
+    longRun(40, { title: 'Easy run', core: 'A' }),
+    swim({ tag: 'Christmas Eve', opt: true, s: 'Swim if there’s practice. If not, an optional 30-minute easy run, inside or out. No strength.' }),
+    { title: 'Off', tag: 'Christmas', off: true, s: 'Merry Christmas!' },
+    rFart({ s: "15' easy, 6×30 sec fast and relaxed, 10' easy", core: 'B' }),
+    rest()]],
+  ['Dec 28–Jan 3', 'Build + 5K time trial', 16.5, [
+    swim(),
+    thr("3×8'", '90 sec', { strA: true }),
+    longRun(60, { plyo: 2, core: 'A' }),
+    swimLift({ tag: 'New Year’s Eve' }),
+    swim({ tag: 'New Year’s Day', opt: true, s: 'Swim if there’s practice; otherwise off. No run the day before the trial.' }),
+    sat5k({ note: 'Check the gym’s holiday hours; the treadmill works too.' }),
+    rest()]],
+  ['Jan 4–10', 'Peak build', 16, [
+    swim(),
+    Object.assign(thr("20' continuous", '', { strA: true }), { s: "10' easy, 20' threshold, 15' easy" }),
+    longSteady(60, { plyo: 3, core: 'A' }),
+    swimLift(),
+    swim(),
+    iWork({ s: '4×800 at interval pace', in: 'Gym track: 4×800 in 3:44–3:49, 400 m jog (about 3 min). Treadmill: 4×3:45 at 7.8–8.0 mph with 3 min at 5.5.', out: '4×4 min hard (effort 8 of 10) with 3 min jog' }, { tag: 'Track or treadmill', core: 'B' }),
+    rest()]],
+  ['Jan 11–17', 'Peak + mile time trial', 16.5, [
+    swim(),
+    thr("2×12'", "2'", { strA: true }),
+    longRun(60, { plyo: 2, core: 'A' }),
+    swimLift(),
+    swimEasy(),
+    satMile("3×5' (90 sec jog)"),
+    rest()]],
+  ['Jan 18–24', 'Down week + final 5K time trial', 12, [
+    swim(),
+    easy(30, { strides: 6, strA: '2 sets, light' }),
+    { title: 'Sharpener', s: "25' easy with 4×30 sec at interval pace, 90 sec easy between", in: "Treadmill: 25' easy with 4×30 sec at 7.8–8.0 mph. Gym track: 4×200 in 56–57 sec.", out: '25 min easy with 4×30 sec quick (by effort)', core: 'A' },
+    swim({ s: 'Swim practice. No strength this week.' }),
+    swimEasy(),
+    sat5k({ note: 'Final test: track preferred; take a split at 2 miles to compare with his 14:08.', core: false }),
+    rest()]]
 ];
 
 // Each week: [label, focus, miles, Mon, Tue, Wed, Thu, Fri, (Sat), (Sun)]
@@ -194,13 +228,14 @@ export function planFor(date) {
   if (diff < 0 || diff >= W.length * 7) return null;
   const wi = Math.floor(diff / 7), dow = diff % 7;
   const w = W[wi];
-  const text = dow < 5 ? w[3 + dow] : dow === 5 ? SAT : SUN;
-  if (dow < 5 && typeof text === 'object') {
+  // Weeks that list all 7 days (from Week 4) have their own Saturday and Sunday.
+  const text = dow < 5 ? w[3 + dow] : (w[3 + dow] !== undefined ? w[3 + dow] : dow === 5 ? SAT : SUN);
+  if (typeof text === 'object') {
     const t = text;
     return {
       week: wi + 1, weekLabel: w[0], focus: w[1], miles: w[2], dow,
       title: t.title, optional: !!t.opt, detail: t.s, swim: !!t.swim, indoor: t.off ? '' : t.in, outdoor: t.off ? '' : t.out, note: t.note || '',
-      tag: t.tag || (t.opt ? 'Optional' : ''), items: objItems(t), strengthNote: ''
+      tag: t.tag || (t.opt ? 'Optional' : t.swim ? 'Swim' : ''), items: objItems(t), strengthNote: ''
     };
   }
   const strengthNote = (wi === 0 || wi === 1) ? 'Strength A: 2 sets in Weeks 1–2.' : '';

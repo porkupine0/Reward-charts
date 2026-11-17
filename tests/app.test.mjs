@@ -59,30 +59,38 @@ test('bedtime timer: on time, grace, late, parent OK, past midnight, DST night',
   assert.equal(res.status, 'ontime'); // Sat lights out 9:00
 });
 
-test('plan: trials open Thursday workouts (re-set Nov 12)', () => {
+test('plan: swim Mon/Thu/Fri, run Tue/Wed/Sat, trials on Saturdays (re-set Nov 17)', () => {
   assert.equal(trialOn(d('2026-11-11')), '5k');   // first test (Week 3)
-  assert.equal(trialOn(d('2026-11-18')), null);
-  assert.equal(trialOn(d('2026-11-19')), 'mile'); // Week 4 diagnostic
-  assert.equal(trialOn(d('2026-11-26')), '5k');   // Turkey Trot
-  assert.equal(trialOn(d('2026-12-03')), null);   // down week
-  assert.equal(trialOn(d('2026-12-10')), 'mile');
-  assert.equal(trialOn(d('2026-12-31')), '5k');
-  assert.equal(trialOn(d('2027-01-14')), 'mile');
-  assert.equal(trialOn(d('2027-01-21')), '5k');   // final test
+  assert.equal(trialOn(d('2026-11-19')), null);   // Thursday is a swim day now
+  assert.equal(trialOn(d('2026-11-21')), 'mile'); // Week 4 diagnostic, Saturday
+  assert.equal(trialOn(d('2026-11-26')), '5k');   // Turkey Trot (optional)
+  assert.equal(trialOn(d('2026-12-12')), 'mile');
+  assert.equal(trialOn(d('2027-01-02')), '5k');
+  assert.equal(trialOn(d('2027-01-16')), 'mile');
+  assert.equal(trialOn(d('2027-01-23')), '5k');   // final test
   assert.equal(planFor(d('2027-02-01')), null);
   const p = planFor(d('2026-11-11'));
   assert.equal(dayDone(p, {}), false);
   assert.equal(dayDone(p, Object.fromEntries(p.items.filter((i) => !i.opt).map((i) => [i.key, true]))), true);
-  // every new-plan run day has an inside and an outside version; paces are the 24:30 zones
-  for (let i = 0; i < 70; i++) {
-    const q = planFor(addDays(d('2026-11-16'), i));
-    if (q.dow > 4 || q.title === 'Off') continue;
-    assert.ok(q.indoor && q.outdoor, ymd(addDays(d('2026-11-16'), i)) + ' needs inside and outside');
+  for (let i = 0; i < 69; i++) {
+    const day = addDays(d('2026-11-17'), i), q = planFor(day), dow = (day.getDay() + 6) % 7;
+    if (q.title === 'Rest' || q.title === 'Off') continue;
+    if ([0, 3, 4].includes(dow) && /Turkey Trot/.test(q.detail)) continue; // Thanksgiving race, the one exception
+    if ([0, 3, 4].includes(dow)) { assert.ok(q.swim, ymd(day) + ' should be swim'); continue; }
+    assert.ok([1, 2, 5].includes(dow), ymd(day) + ' runs only Tue/Wed/Sat');
+    assert.ok(q.indoor && q.outdoor, ymd(day) + ' needs inside and outside');
     assert.ok(!/10\.0|6\.5 mph|7\.8–7\.9|8\.7/.test(q.indoor), 'old pace left in ' + q.indoor);
   }
-  // Strength B on Thursday always offers Home Strength
+  // Thursday swim + Strength B, with Home Strength as the alternative
   const thu = planFor(d('2026-12-17')).items.find((i) => i.key === 'strB');
   assert.equal(thu.routine2, 'home');
+});
+
+test('reward chart: Run or swim row from Nov 16, old row before', () => {
+  const ctx = { routines: {}, run: { days: { '2026-11-16': { items: { swim: true } } } } };
+  assert.equal(L.effectiveWeek(CHARTS.eli, d('2026-11-16'), {}, ctx).checks.running[0], true); // Monday swim fills the box
+  assert.equal(weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, d('2026-11-16'), {}, ctx)).need, 18);
+  assert.equal(weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, d('2026-11-09'), {}, ctx)).need, 17);
 });
 
 test('trials: milestones, bests, paired ladders, owed prizes', () => {

@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794511357';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794511357';
-import { rowsFor } from './charts.js?v=1794511357';
-import { planFor, dayDone } from './plan.js?v=1794511357';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794947441';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems } from './routines.js?v=1794947441';
+import { rowsFor } from './charts.js?v=1794947441';
+import { planFor, dayDone } from './plan.js?v=1794947441';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -31,6 +31,7 @@ export function touchedOn(isaiah, dateStr) {
 // Eli's running for a day is done when Training's required items are done.
 export function eliRunDone(run, date) {
   const p = planFor(date);
+  if (p && p.title === 'Off') return true; // a planned day off (e.g. Christmas) counts
   if (!p || !p.items.length) return false;
   return dayDone(p, (((run || {}).days || {})[ymd(date)] || {}).items || {});
 }
