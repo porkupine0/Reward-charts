@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794956282';
-import { CHARTS, weekProgress } from './charts.js?v=1794956282';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794956282';
-import * as L from './lists.js?v=1794956282';
-import { owed, score, planned, fmt } from './trials.js?v=1794956282';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794956282';
-import { askParent, setParent, changePin } from './parent.js?v=1794956282';
-import { dayFull } from './streaks.js?v=1794956282';
-import { owedItems } from './owed.js?v=1794956282';
-import { nowHtml } from './nowview.js?v=1794956282';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794966441';
+import { CHARTS, weekProgress } from './charts.js?v=1794966441';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794966441';
+import * as L from './lists.js?v=1794966441';
+import { owed, score, planned, fmt } from './trials.js?v=1794966441';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794966441';
+import { askParent, setParent, changePin } from './parent.js?v=1794966441';
+import { dayFull } from './streaks.js?v=1794966441';
+import { owedItems } from './owed.js?v=1794966441';
+import { nowHtml } from './nowview.js?v=1794966441';
 
 const $ = (id) => document.getElementById(id);
-const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'eli-trials', 'config'];
+const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
 const D = Object.fromEntries(IDS.map((id) => [id, {}]));
 const ctx = { get routines() { return D.routines; }, get run() { return D['eli-run']; }, get isaiah() { return D.isaiah; } };
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -23,7 +23,7 @@ const owedList = () => owedItems(D, ctx, row, tick);
 
 const PAGES = { eli: [['Checklist', 'checklist.html?kid=eli'], ['Chart', 'eli.html'], ['Training', 'run.html']],
   rhett: [['Checklist', 'checklist.html?kid=rhett'], ['Chart', 'trombone.html']],
-  isaiah: [['Checklist', 'checklist.html?kid=isaiah'], ['Ball Master', 'isaiah.html']] };
+  isaiah: [['Checklist', 'checklist.html?kid=isaiah'], ['Chart', 'zay.html'], ['Ball Master', 'isaiah.html']] };
 
 function render() {
   const today = new Date(), mon = mondayOf(today);
@@ -84,7 +84,7 @@ function render() {
     if (k.chart) {
       const p = weekProgress(CHARTS[k.chart], L.effectiveWeek(CHARTS[k.chart], mon, (D[k.chart].weeks || {})[ymd(mon)], ctx));
       bits.push('chart <b>' + p.done + '/' + p.need + '</b>');
-      if (id === 'eli') { const g = L.gameWeek(ctx, 'eli', mon); bits.push('game time <b>' + g.minutes + ' of ' + g.max + ' min</b>'); }
+      if (CHARTS[k.chart].gameTime) { const g = L.gameWeek(ctx, id, mon); bits.push('game time <b>' + g.minutes + ' of ' + g.max + ' min</b>' + (g.used ? ' (' + g.used + ' used)' : '')); }
     }
     { const r = L.readingWeek(ctx, id, mon, today); bits.push('read <b>' + r.read + '/' + r.nights + '</b> nights'); }
     if (id === 'eli') { const sc = score(D['eli-trials']); bits.push('best mile <b>' + (sc.best.mile ? fmt(sc.best.mile) : '–') + '</b>, 5K <b>' + (sc.best['5k'] ? fmt(sc.best['5k']) : '–') + '</b>'); }

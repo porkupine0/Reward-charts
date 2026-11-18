@@ -209,16 +209,17 @@ test("Rhett: trombone Fri/Sat/Sun, typing every day, chores before any computer 
 
 test("Rhett: computer tasks stay locked until every chore is ticked", () => {
   const fri = '2026-11-20';
-  const make = (checks) => ({ routines: { days: { [fri]: { rhett: checks } } }, run: {}, isaiah: {} });
+  // Wed and Thu chores are done, so only today's chores matter here
+  const make = (checks) => ({ routines: { days: { [fri]: { rhett: checks }, '2026-11-18': { rhett: { chore: true } }, '2026-11-19': { rhett: { chore: true } } } }, run: {}, isaiah: {} });
   const list = (ctx) => L.lists(ctx, 'rhett', d(fri)).day;
   const computer = (ctx) => list(ctx).filter((i) => i.computer);
   assert.ok(computer(make({})).length >= 5, 'typing, Duolingo, assignments, missing, homework');
-  computer(make({})).forEach((i) => assert.equal(L.lockedBy(make({}), 'rhett', d(fri), i, list(make({}))), true, i.key + ' is locked'));
+  computer(make({})).forEach((i) => assert.equal(L.lockedBy(make({}), 'rhett', d(fri), i, list(make({}))), 'chores', i.key + ' is locked'));
   // trombone is not a computer task
   assert.equal(L.lockedBy(make({}), 'rhett', d(fri), list(make({})).find((i) => i.key === 'trombone'), list(make({}))), false);
   const chores = choreItems('rhett', 4), all = Object.fromEntries(chores.map((c) => [c.key, true]));
   const some = { [chores[0].key]: true };
-  if (chores.length > 1) computer(make(some)).forEach((i) => assert.equal(L.lockedBy(make(some), 'rhett', d(fri), i, list(make(some))), true, 'one chore is not enough'));
+  if (chores.length > 1) computer(make(some)).forEach((i) => assert.equal(L.lockedBy(make(some), 'rhett', d(fri), i, list(make(some))), 'chores', 'one chore is not enough'));
   computer(make(all)).forEach((i) => assert.equal(L.lockedBy(make(all), 'rhett', d(fri), i, list(make(all))), false, i.key + ' opens after chores'));
   // one already ticked can still be un-ticked even if a chore is un-ticked later
   const ticked = make({ typing: true });
@@ -264,4 +265,65 @@ test('Eli game time: 30 min per full school day with both evening checks', () =>
 
 test('Isaiah: no Wake up on his morning list', () => {
   for (let i = 0; i < 7; i++) assert.ok(!L.lists({ routines: {}, run: {}, isaiah: {} }, 'isaiah', addDays(d('2026-11-16'), i)).morning.some((x) => x.key === 'mWake'));
+});
+
+test("charts: from Nov 16 every box on every chart comes from the checklist", () => {
+  const { rowsFor } = { rowsFor: (c, m) => (c.altFrom && ymd(m) >= c.altFrom ? c.altRows : c.rows) };
+  const mon = d('2026-11-16'), ctx = { routines: {}, run: {}, isaiah: {} };
+  Object.values(CHARTS).forEach((ch) => rowsFor(ch, mon).forEach((r) => r.cells.forEach((c, i) => {
+    if (c === '-') return;
+    assert.notEqual(L.derivedCell(ch.id, r.key, i, mon, ctx), undefined, ch.id + ' ' + r.key + ' day ' + i + ' is tied to the checklist');
+  })));
+  // a stored hand tick no longer counts from that week on, but still does before it
+  const wd = { checks: { chores: { 0: true } } };
+  assert.equal(L.cellOn('trombone', 'chores', 0, mon, wd, ctx), false);
+  assert.equal(L.cellOn('trombone', 'chores', 0, d('2026-11-09'), wd, ctx), true);
+});
+
+test("Rhett & Isaiah: three evening checks, game time, and their chart boxes", () => {
+  const mon = d('2026-11-16'), wed = '2026-11-18';
+  assert.deepEqual(L.CHECKS.rhett.map((k) => k.key), ['noYell', 'firstTime', 'noLies']);
+  assert.deepEqual(L.CHECKS.isaiah.map((k) => k.key), ['noYell', 'firstTime', 'noLies']);
+  const ctx = { routines: { days: { [wed]: { rhett: { noYell: true, firstTime: true, noLies: 'no' } } } }, run: {}, isaiah: {} };
+  const g = L.gameDay(ctx, 'rhett', d(wed));
+  assert.equal(g.earned, false);
+  assert.ok(g.left.some((x) => /No lies today: not today/.test(x)));
+  assert.equal(!!L.derivedCell('trombone', 'noYell', 2, mon, ctx), true);
+  assert.equal(!!L.derivedCell('trombone', 'noLies', 2, mon, ctx), false);
+  assert.equal(L.gameWeek(ctx, 'isaiah', mon).max, 150);
+  // Rhett's Saturday move is on his checklist now
+  assert.ok(L.lists(ctx, 'rhett', d('2026-11-21')).day.some((i) => i.key === 'activity'));
+});
+
+test("game time used is logged in pieces: earned, used, left", () => {
+  const mon = d('2026-11-16'), ctx = { routines: { game: { eli: { '2026-11-16': { 1000: 30, 2000: 15, 3000: null } } } }, run: {}, isaiah: {} };
+  const g = L.gameWeek(ctx, 'eli', mon);
+  assert.equal(g.used, 45);
+  assert.equal(g.uses.length, 2);
+  assert.equal(g.left, 0); // nothing earned in this test, so nothing left
+});
+
+test("not able to: Eli's run/swim and Isaiah's soccer can be excused by a parent", () => {
+  const tue = '2026-11-17', mon = d('2026-11-16');
+  const ctx = (v) => ({ routines: { days: { [tue]: { eli: { activity: v }, isaiah: { activity: v } } } }, run: {}, isaiah: {} });
+  const act = (c, kid) => L.lists(c, kid, d(tue)).day.find((i) => i.key === 'activity');
+  assert.equal(L.isOn(ctx('~skip'), 'eli', d(tue), act(ctx('~skip'), 'eli')), false, 'asking is not enough');
+  assert.equal(L.isOn(ctx('~excused'), 'eli', d(tue), act(ctx('~excused'), 'eli')), true);
+  assert.equal(L.isOn(ctx('~excused'), 'isaiah', d(tue), act(ctx('~excused'), 'isaiah')), true);
+  assert.equal(!!L.derivedCell('eli', 'running', 1, mon, ctx('~excused')), true);
+  assert.equal(!!L.derivedCell('zay', 'soccer', 1, mon, ctx('~excused')), true);
+});
+
+test("a chore missed earlier this week locks the after-school list until it's done", () => {
+  const thu = '2026-11-19';
+  const make = (wedChore) => ({ routines: { days: { '2026-11-18': { isaiah: { chore: wedChore } } } }, run: {}, isaiah: {} });
+  const owed = L.choresOwed(make(null), 'isaiah', d(thu));
+  assert.equal(owed.length, 1);
+  assert.equal(ymd(owed[0].date), '2026-11-18');
+  const day = L.lists(make(null), 'isaiah', d(thu)).day, bed = L.lists(make(null), 'isaiah', d(thu)).bed;
+  assert.equal(L.lockedBy(make(null), 'isaiah', d(thu), day[0], day), 'owed');
+  assert.equal(L.lockedBy(make(null), 'isaiah', d(thu), bed[0], bed), false, 'bedtime is not locked');
+  assert.equal(L.choresOwed(make(true), 'isaiah', d(thu)).length, 0);
+  // Monday and Tuesday (before Nov 18) don't count
+  assert.equal(L.choresOwed({ routines: {}, run: {}, isaiah: {} }, 'isaiah', d('2026-11-18')).length, 0);
 });

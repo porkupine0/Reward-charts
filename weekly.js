@@ -1,10 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794956282';
-import { askParent } from './parent.js?v=1794956282';
-import { CHARTS, weekProgress, rowsFor } from './charts.js?v=1794956282';
-import { applySettings } from './settings.js?v=1794956282';
-import { weekStreak, cheerIf } from './streaks.js?v=1794956282';
-import { gameWeek } from './lists.js?v=1794956282';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794956282';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794966441';
+import { askParent } from './parent.js?v=1794966441';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1794966441';
+import { applySettings } from './settings.js?v=1794966441';
+import { weekStreak, cheerIf } from './streaks.js?v=1794966441';
+import { gameWeek } from './lists.js?v=1794966441';
+import * as L from './lists.js?v=1794966441';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794966441';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -14,12 +15,20 @@ document.documentElement.style.setProperty('--accent', chart.accent);
 const params = new URLSearchParams(location.search);
 let week = mondayOf(dateParam('week'));
 let data = {};
-const ctx = { routines: {}, run: {} };
+const ctx = { routines: {}, run: {}, isaiah: {} };
+const kidId = chart.kidId;
+const tied = () => ymd(week) >= TIED_FROM;
 const eff = (monday) => effectiveWeek(chart, monday, (data.weeks || {})[ymd(monday)], ctx);
 
 const $ = (id) => document.getElementById(id);
 $('eyebrow').textContent = chart.eyebrow;
 $('note').innerHTML = chart.note;
+// Game-time card (all three boys), above the perfect-week reward
+if (chart.gameTime) {
+  $('weeklycard').insertAdjacentHTML('beforebegin', '<section id="gamecard" class="card reward"><h2>Weekend game time</h2><p id="gtstatus" class="status"></p><div id="gtbody"></div></section>');
+  if (chart.gameOnly) $('weeklycard').style.display = 'none';
+}
+if (!chart.monthly.length) $('monthcard').style.display = 'none';
 
 function monthWeeks(monday) {
   // Every week whose Monday falls in the same month as this one.
@@ -29,6 +38,23 @@ function monthWeeks(monday) {
   const out = [];
   while (d.getMonth() === monday.getMonth()) { out.push(new Date(d)); d = addDays(d, 7); }
   return out;
+}
+
+function renderGame() {
+  // Earned on school days (30 min each), used in pieces on the weekend
+  const g = gameWeek(ctx, kidId, week), now = new Date(), today = ymd(now);
+  const n = (L.CHECKS[kidId] || []).length;
+  $('gamecard').classList.toggle('unlocked', g.minutes > 0);
+  $('gtstatus').innerHTML = '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
+  const t = g.days.find((d) => ymd(d.date) === today);
+  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+30 min' : ymd(d.date) > today ? 'to come' : 'not yet') + '</span>' +
+      (!d.earned && ymd(d.date) <= today ? '<small>' + esc(d.left.slice(0, 3).join(' · ') + (d.left.length > 3 ? ' · +' + (d.left.length - 3) + ' more' : '')) + '</small>' : '') + '</div>').join('') + '</div>' +
+    (t && !t.earned ? '<p class="gt-today"><b>Today, still to do:</b> ' + esc(t.left.join(' · ')) + '</p>' : t ? '<p class="gt-today"><b>Today: +30 min earned ✓</b></p>' : '') +
+    '<div class="gt-sum"><span>Earned <b>' + fmtMin(g.minutes) + '</b></span><span>Used <b>' + fmtMin(g.used) + '</b></span><span>Left <b>' + fmtMin(g.left) + '</b></span></div>' +
+    (g.left > 0 ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
+      '<button class="chip" data-gtuse="other">Other…</button></div>' : '') +
+    (g.uses.length ? '<ul class="gt-log">' + g.uses.map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + fmtMin(u.minutes) + '</b></span><button class="linkbtn" data-gtundo="' + u.at + '">Undo</button></li>').join('') + '</ul>' : '') +
+    '<p class="note">Each school day with the whole checklist done and ' + (n === 3 ? 'all three' : 'both') + ' evening checks = 30 minutes, to use Saturday and Sunday. Log each time you play so you know what’s left.</p>';
 }
 
 function render() {
@@ -52,7 +78,7 @@ function render() {
       const on = cellOn(chart.id, r.key, i, week, wd, ctx);
       const auto = derivedCell(chart.id, r.key, i, week, ctx) !== undefined;
       const text = c === 'x' ? '' : c.t;
-      const cls = 'cell' + (c.opt ? ' opt' : '') + (on ? ' on' : '') + (auto ? ' auto' : '');
+      const cls = 'cell' + (c.opt ? ' opt' : '') + (on ? ' on' : '') + (auto ? ' auto' : '') + (tied() ? ' tied' : '');
       const lbl = r.label + ', ' + DAYS[i] + (text ? ', ' + text : '') + (c.opt ? ', optional' : '');
       h += '<button class="' + cls + '" data-row="' + r.key + '" data-day="' + i + '" aria-pressed="' + on + '" aria-label="' + esc(lbl) + '">' +
         '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>' +
@@ -65,22 +91,10 @@ function render() {
   const p = weekProgress(chart, eff(week));
   const ws = weekStreak(chart, data, ctx, new Date());
   $('progress').textContent = p.done + ' of ' + p.need + (ws >= 2 ? ' · ' + ws + ' perfect weeks in a row' : '');
-  cheerIf('week' + wk, p.perfect, 'Perfect week! Pick your reward.');
+  cheerIf('week' + wk, p.perfect, chart.weekly.length ? 'Perfect week! Pick your reward.' : 'Perfect week!');
   $('bar').style.width = (p.need ? (100 * p.done / p.need) : 0) + '%';
-  if (chart.gameTime) {
-    // Eli: weekend game time, 30 min for each full school day
-    const g = gameWeek(ctx, 'eli', week);
-    $('weeklycard').classList.toggle('unlocked', g.minutes > 0);
-    $('weeklytitle').textContent = 'Weekend game time';
-    $('weeklystatus').innerHTML = '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
-    $('weekly').innerHTML = '<div class="gt-days">' + g.days.map((d) => '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+30 min' : ymd(d.date) > ymd(new Date()) ? 'to come' : 'not yet') + '</span>' +
-      (!d.earned && ymd(d.date) <= ymd(new Date()) ? '<small>' + esc(d.left.slice(0, 3).join(' · ') + (d.left.length > 3 ? ' · +' + (d.left.length - 3) + ' more' : '')) + '</small>' : '') + '</div>').join('') + '</div>' +
-      (() => { const t = g.days.find((d) => ymd(d.date) === ymd(new Date())); return t && !t.earned ? '<p class="gt-today"><b>Today, still to do:</b> ' + esc(t.left.join(' · ')) + '</p>' : t ? '<p class="gt-today"><b>Today: +30 min earned ✓</b></p>' : ''; })() +
-      '<p class="note">Each school day with the whole checklist done and both evening checks = 30 minutes, to use Saturday and Sunday.</p>';
-    $('given').checked = !!wd.given;
-    $('given').disabled = g.minutes === 0;
-    $('givenlabel').textContent = 'Game time given (parent)';
-  } else {
+  if (chart.gameTime) renderGame();
+  {
   $('weeklycard').classList.toggle('unlocked', p.perfect);
   $('weeklystatus').textContent = p.perfect ? 'Reward earned! Pick one:' : 'Check every white box to unlock';
   $('weekly').innerHTML = chart.weekly.map((w, i) =>
@@ -90,6 +104,7 @@ function render() {
   $('given').disabled = !p.perfect;
   }
 
+  if (!chart.monthly.length) return;
   // monthly
   const weeks = monthWeeks(week);
   const mk = wk.slice(0, 7);
@@ -115,11 +130,30 @@ document.addEventListener('click', (e) => {
   const wk = ymd(week);
   if (cell && rowsFor(chart, week).find((r) => r.key === cell.dataset.row && r.parent)) {
     // Evening checks (Eli): Mom or Dad marks them; stored with the day's checklist
-    const date = addDays(week, Number(cell.dataset.day)), path = 'days/' + ymd(date) + '/' + (chart.id === 'eli' ? 'eli' : 'rhett') + '/' + cell.dataset.row;
+    const date = addDays(week, Number(cell.dataset.day)), path = 'days/' + ymd(date) + '/' + kidId + '/' + cell.dataset.row;
     const want = cell.getAttribute('aria-pressed') !== 'true';
     askParent().then((ok) => { if (ok) save('routines', path, want ? true : 'no'); });
     return;
   }
+  if (cell && tied()) {
+    // Every box comes from the checklist: open the day it belongs to
+    const date = ymd(addDays(week, Number(cell.dataset.day))), isToday = date === ymd(new Date()), row = cell.dataset.row;
+    if (chart.id === 'eli' && row === 'running') location.href = 'run.html' + (isToday ? '' : '?date=' + date);
+    else if (chart.id === 'zay' && row === 'soccer') location.href = 'isaiah.html';
+    else location.href = 'checklist.html?kid=' + kidId + (isToday ? '' : '&date=' + date);
+    return;
+  }
+  const gu = e.target.closest('[data-gtuse]');
+  if (gu) {
+    const g = gameWeek(ctx, kidId, week);
+    let m = gu.dataset.gtuse === 'other' ? Number(prompt('How many minutes did you play? (' + g.left + ' left)', '')) : Number(gu.dataset.gtuse);
+    if (!m || m < 0) return;
+    m = Math.min(Math.round(m), g.left);
+    if (m > 0) save('routines', 'game/' + kidId + '/' + wk + '/' + Date.now(), m);
+    return;
+  }
+  const gx = e.target.closest('[data-gtundo]');
+  if (gx) { save('routines', 'game/' + kidId + '/' + wk + '/' + gx.dataset.gtundo, null); return; }
   if (cell) {
     // Boxes the checklist fills: a tap here is a hand override (stored as true or 'off');
     // tapping back to what the checklist says clears the override.
@@ -169,3 +203,4 @@ watch(chart.id, (d) => { data = d; render(); }, statusPill($('sync')));
 watch('routines', (d) => { ctx.routines = d; render(); });
 watch('config', (d) => { applySettings(d); render(); });
 if (chart.id === 'eli') watch('eli-run', (d) => { ctx.run = d; render(); });
+if (chart.id === 'zay') watch('isaiah', (d) => { ctx.isaiah = d; render(); });

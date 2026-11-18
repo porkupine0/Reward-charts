@@ -1,9 +1,9 @@
-import { SETTINGS, applySettings, toMin } from './settings.js?v=1794956282';
+import { SETTINGS, applySettings, toMin } from './settings.js?v=1794966441';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
   rhett: { name: 'Rhett', accent: '#1D6FB8', chart: 'trombone' },
-  isaiah: { name: 'Isaiah', accent: '#1d6b38', chart: null }
+  isaiah: { name: 'Isaiah', accent: '#1d6b38', chart: 'zay' }
 };
 
 // Chore rotation, Mon–Sun (0 = Mon). Each day is a list; every item gets its own checkbox.
@@ -13,7 +13,7 @@ export const KIDS = {
 export const SKIP = '~skip', EXCUSED = '~excused';
 export const isDone = (v) => !!v && v !== SKIP;
 // Items a kid can mark "not able to do it": schoolwork, reading and practice, not chores or bedtime basics.
-export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize'];
+export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize', 'activity']; // activity = Eli's run/swim, Isaiah's soccer, Rhett's move/racquetball
 
 // Chores, shower nights and lights out come from settings.js (editable on the Settings page).
 export const CHORES = new Proxy({}, { get: (_, kid) => SETTINGS.chores[kid] });
@@ -183,7 +183,7 @@ export function weekend(kid, dow) {
     ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes by your bed' })
     : { key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
   items.push(...choreItems(kid, dow));
-  if (dow === 5 && kid === 'rhett') items.push(DUO);
+  if (dow === 5 && kid === 'rhett') items.push(DUO, { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video' });
   if (kid === 'rhett') items.push(TYPING, trombone(dow)); // Saturday and Sunday
   items.push({ weekly: true });
   return items;

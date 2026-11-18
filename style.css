@@ -610,3 +610,18 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .dchk small { color: var(--muted); font-size: 12.5px; }
 .dchk-btns { display: flex; gap: 6px; }
 .chip.on.no { background: #9A3A10; border-color: #9A3A10; color: #fff; }
+
+/* A chore missed earlier this week: finish it first */
+.owed { border: 2px solid var(--accent); background: var(--tint); border-radius: 12px; padding: 12px 12px 6px; margin: 8px 0 10px; }
+.owed > strong { display: block; }
+.owed > small { display: block; color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+.owed .ckbtn { padding: 10px 0; min-height: 48px; }
+.owed .cktext small { color: var(--muted); }
+
+/* Game time used, logged in pieces */
+.gt-sum { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 10px 0 6px; font-size: 14px; }
+.gt-sum b { font-family: 'Archivo Black', sans-serif; font-size: 18px; color: var(--accent); }
+.gt-use { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+.gt-log { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+.gt-log li { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px dashed var(--line); padding-bottom: 4px; }
+.cell.auto.tied::after { display: none; }

@@ -1,17 +1,17 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794956282';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1794956282';
-import { CHARTS, weekProgress } from './charts.js?v=1794956282';
-import { planFor } from './plan.js?v=1794956282';
-import * as L from './lists.js?v=1794956282';
-import { score, fmt, nextMilestone } from './trials.js?v=1794956282';
-import { dayStreak } from './streaks.js?v=1794956282';
-import { nowHtml } from './nowview.js?v=1794956282';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1794966441';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1794966441';
+import { CHARTS, weekProgress } from './charts.js?v=1794966441';
+import { planFor } from './plan.js?v=1794966441';
+import * as L from './lists.js?v=1794966441';
+import { score, fmt, nextMilestone } from './trials.js?v=1794966441';
+import { dayStreak } from './streaks.js?v=1794966441';
+import { nowHtml } from './nowview.js?v=1794966441';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {} };
-const charts = { eli: {}, trombone: {} };
+const charts = { eli: {}, trombone: {}, zay: {} };
 let trials = {};
 const remembered = () => { try { return localStorage.getItem('rc:lastKid'); } catch (e) { return null; } };
 let kid = new URLSearchParams(location.search).get('kid') || remembered() || 'eli';
@@ -48,9 +48,12 @@ function render() {
   }
   if (kid === 'rhett') {
     const p = weekProgress(CHARTS.trombone, L.effectiveWeek(CHARTS.trombone, mon, (charts.trombone.weeks || {})[ymd(mon)], ctx));
-    links.push(card('trombone.html', 'trombone', 'Reward chart', 'Move · Racquetball · Chores · Trombone · Duolingo', p.perfect ? 'Perfect week!' : p.done + '/' + p.need + ' this week'));
+    const g = L.gameWeek(ctx, 'rhett', mon);
+    links.push(card('trombone.html', 'trombone', 'Reward chart', 'Weekend game time · Move · Chores · Typing · Trombone', (p.perfect ? 'Perfect week!' : p.done + '/' + p.need + ' this week') + ' · game time ' + g.minutes + ' min'));
   }
   if (kid === 'isaiah') {
+    const g = L.gameWeek(ctx, 'isaiah', mon);
+    links.push(card('zay.html', 'isaiah', 'Reward chart', 'Weekend game time · Soccer · Chores · Evening checks', 'Game time: ' + g.minutes + ' of ' + g.max + ' min' + (L.GAME.days.includes(L.dowOf(now)) && !L.gameDay(ctx, 'isaiah', now).earned ? ' · today not yet' : '')));
     const iz = ctx.isaiah, start = (iz.start && new Date(iz.start + 'T00:00')) || mon;
     let full = 0; for (let i = 0; i < 28; i++) if (L.touchedOn(iz, ymd(addDays(start, i)))) full++;
     links.push(card('isaiah.html', 'isaiah', 'Ball Master', '600 touches · Juggling levels', full + '/28 days · ' + Object.keys(iz.juggle || {}).length + '/10 levels'));
@@ -68,5 +71,6 @@ watch('eli-run', (d) => { ctx.run = d; render(); });
 watch('isaiah', (d) => { ctx.isaiah = d; render(); });
 watch('eli', (d) => { charts.eli = d; render(); });
 watch('trombone', (d) => { charts.trombone = d; render(); });
+watch('zay', (d) => { charts.zay = d; render(); });
 watch('eli-trials', (d) => { trials = d; render(); });
 watch('config', (d) => { applyConfig(d); render(); });

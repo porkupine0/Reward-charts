@@ -1,14 +1,14 @@
 // Home: one button per person, each with a one-line "right now".
-import { watch, statusPill } from './store.js?v=1794956282';
-import { KIDS, applyConfig, timerResult } from './routines.js?v=1794956282';
-import * as L from './lists.js?v=1794956282';
-import { nowLine } from './nowview.js?v=1794956282';
-import { owedItems } from './owed.js?v=1794956282';
-import { isParent, setParent } from './parent.js?v=1794956282';
-import { addDays } from './store.js?v=1794956282';
+import { watch, statusPill } from './store.js?v=1794966441';
+import { KIDS, applyConfig, timerResult } from './routines.js?v=1794966441';
+import * as L from './lists.js?v=1794966441';
+import { nowLine } from './nowview.js?v=1794966441';
+import { owedItems } from './owed.js?v=1794966441';
+import { isParent, setParent } from './parent.js?v=1794966441';
+import { addDays } from './store.js?v=1794966441';
 
 const $ = (id) => document.getElementById(id);
-const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'eli-trials', 'config'];
+const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
 const D = Object.fromEntries(IDS.map((id) => [id, {}]));
 const ctx = { get routines() { return D.routines; }, get run() { return D['eli-run']; }, get isaiah() { return D.isaiah; } };
 

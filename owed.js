@@ -1,29 +1,30 @@
 // Everything the kids have earned and not received yet (Parents page and the home Parents button).
 // row(who, accent, whatHtml, when, actionHtml) and tick(chart, path, label) decide how each item looks.
-import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1794956282';
-import { CHARTS, weekProgress } from './charts.js?v=1794956282';
-import { KIDS } from './routines.js?v=1794956282';
-import * as L from './lists.js?v=1794956282';
-import { owed } from './trials.js?v=1794956282';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794956282';
+import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1794966441';
+import { CHARTS, weekProgress } from './charts.js?v=1794966441';
+import { KIDS } from './routines.js?v=1794966441';
+import * as L from './lists.js?v=1794966441';
+import { owed } from './trials.js?v=1794966441';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794966441';
 
 export function owedItems(D, ctx, row, tick) {
   const out = [];
   const today = new Date(), thisMon = mondayOf(today);
-  // Eli's and Rhett's perfect weeks and months (last 10 weeks)
-  ['eli', 'trombone'].forEach((id) => {
-    const ch = CHARTS[id], data = D[id], kid = id === 'eli' ? KIDS.eli : KIDS.rhett;
+  // Weekend game time left this weekend (logged as it's used; shown Saturday and Sunday)
+  if ((today.getDay() + 6) % 7 >= 5) Object.entries(KIDS).forEach(([kidId, k]) => {
+    const ch = CHARTS[k.chart];
+    if (!ch || !ch.gameTime) return;
+    const g = L.gameWeek(ctx, kidId, thisMon);
+    if (g.left > 0) out.push(row(k.name, k.accent, 'Game time left: ' + g.left + ' min', g.minutes + ' earned · ' + g.used + ' used · log it on his chart', ''));
+  });
+  // Perfect weeks and months (last 10 weeks); Eli's and Isaiah's weeks are game time instead
+  ['eli', 'trombone', 'zay'].forEach((id) => {
+    const ch = CHARTS[id], data = D[id] || {}, kid = KIDS[ch.kidId];
     const perfect = (mon) => weekProgress(ch, L.effectiveWeek(ch, mon, (data.weeks || {})[ymd(mon)], ctx)).perfect;
     for (let w = 0; w < 10; w++) {
       const mon = addDays(thisMon, -7 * w), wd = (data.weeks || {})[ymd(mon)] || {};
-      // Eli from Nov 16, 2026: weekend game time earned on school days, shown from Saturday
-      if (ch.gameTime && ymd(mon) >= '2026-11-16') {
-        const g = L.gameWeek(ctx, 'eli', mon);
-        if (!g.minutes || wd.given || (w === 0 && (today.getDay() + 6) % 7 < 5)) continue;
-        out.push(row(kid.name, kid.accent, 'Weekend game time: ' + g.minutes + ' min', 'Week of ' + shortDate(mon) + ' · ' + g.days.filter((d) => d.earned).length + ' of 5 school days', tick(id, 'weeks/' + ymd(mon) + '/given', 'Given')));
-        continue;
-      }
-      if (!perfect(mon) || wd.given) continue;
+      if (ch.gameOnly && ymd(mon) >= '2026-11-16') continue; // game time instead (above)
+      if (!ch.weekly.length || !perfect(mon) || wd.given) continue;
       const pick = wd.reward != null ? ch.weekly[wd.reward] : null;
       out.push(row(kid.name, kid.accent, pick ? esc(pick) : '<em>Perfect week, needs a pick</em>', 'Week of ' + shortDate(mon), tick(id, 'weeks/' + ymd(mon) + '/given', 'Given')));
     }
@@ -32,7 +33,7 @@ export function owedItems(D, ctx, row, tick) {
       const mons = []; let d = mondayOf(first); if (d < first) d = addDays(d, 7);
       while (d.getMonth() === first.getMonth()) { mons.push(d); d = addDays(d, 7); }
       const md = (data.months || {})[key] || {};
-      if (!mons.every(perfect) || md.given) continue;
+      if (!ch.monthly.length || !mons.every(perfect) || md.given) continue;
       const pick = md.prize != null ? ch.monthly[md.prize] : null;
       out.push(row(kid.name, kid.accent, (pick ? esc(pick) : '<em>Perfect month, needs a pick</em>'), first.toLocaleDateString('en-US', { month: 'long' }) + ' prize', tick(id, 'months/' + key + '/given', 'Given')));
     }

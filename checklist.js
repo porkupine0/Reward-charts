@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794956282';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794956282';
-import { askParent } from './parent.js?v=1794956282';
-import * as L from './lists.js?v=1794956282';
-import { dayStreak, cheerIf } from './streaks.js?v=1794956282';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794966441';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794966441';
+import { askParent } from './parent.js?v=1794966441';
+import * as L from './lists.js?v=1794966441';
+import { dayStreak, cheerIf } from './streaks.js?v=1794966441';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -29,16 +29,17 @@ function itemHtml(it, checks, extra) {
   const v = isOn(it);
   const on = !!v;
   const locked = !!(extra && extra.locked);
+  const lockMsg = extra && extra.locked === 'owed' ? 'Finish the chore you missed first (top of this list)' : 'Do your chores first';
   // "Not able to complete": regular items only (not ones filled from other pages, weekly or multi-part ones)
   const raw = checks[it.key];
-  const canExcuse = EXCUSABLE.includes(it.key) && !it.derived && !locked;
+  const canExcuse = EXCUSABLE.includes(it.key) && (!it.derived || it.key === 'activity') && !locked;
   const excused = raw === EXCUSED, pending = raw === SKIP;
   let h = '<div class="ck' + (on ? ' on' : '') + (excused ? ' excused' : '') + (pending ? ' pending' : '') + (locked ? ' locked' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
   h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
     (extra && extra.time ? '<span class="rtime">' + esc(extra.time) + '</span>' : '') +
     '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
     '<span class="cktext"><strong>' + esc(it.label) + (it.opt ? ' <em>optional</em>' : '') + (it.hot ? ' <em class="hot">shower night</em>' : '') + '</strong>' +
-    (locked ? '<small>Do your chores first</small>' : it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
+    (locked ? '<small>' + esc(lockMsg) + '</small>' : it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
   if (it.choices) {
     h += '<div class="chips">' + it.choices.map((c) =>
       '<button class="chip' + (v === c ? ' on' : '') + '" data-key="' + it.key + '" data-choice="' + esc(c) + '" aria-pressed="' + (v === c) + '">' + esc(c) + '</button>').join('') + '</div>';
@@ -67,7 +68,8 @@ function section(title, sub, items, checks, timed) {
   let nextMarked = false;
   const body = items.map((it) => {
     let extra = timed ? { time: it.time } : {};
-    if (L.lockedBy(ctx, kid, date, it, items)) extra.locked = true;
+    const lk = L.lockedBy(ctx, kid, date, it, items);
+    if (lk) extra.locked = lk;
     if (timed && isToday && !nextMarked && !isOn(it)) { extra.next = true; nextMarked = true; }
     return itemHtml(it, checks, extra);
   }).join('');
@@ -123,6 +125,13 @@ function render() {
     ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false)
     : section('Today', '', items, checks, false);
   $('day').hidden = !items.length;
+  const owed = L.choresOwed(ctx, kid, date);
+  if (owed.length && items.length) {
+    $('day').querySelector('.rhead').insertAdjacentHTML('afterend', '<div class="owed"><strong>Finish first: a chore from earlier this week</strong>' +
+      '<small>The rest of this list unlocks once it’s done.</small>' +
+      owed.map((o) => '<button class="ckbtn owedbtn" data-owed="' + ymd(o.date) + '|' + o.item.key + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
+        '<span class="cktext"><strong>' + esc(o.item.label) + '</strong><small>From ' + esc(o.date.toLocaleDateString('en-US', { weekday: 'long' })) + '</small></span></button>').join('') + '</div>');
+  }
   // Candy handed out this afternoon: this morning's checklist + last night's bedtime.
   const candy = MORNING_REWARD[kid];
   if (candy && items.length) {
@@ -137,14 +146,15 @@ function render() {
   $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
   $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', timerHtml(checks));
   if (candy) $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', bedTreatHtml(candy, bed, checks, dow));
-  // Eli: end-of-day checks by Mom or Dad, and today's game time
-  if (kid === 'eli') {
-    const yn = (k) => '<div class="dchk"><div><strong>' + esc(k.label) + '</strong><small>' + esc(k.sub) + '</small></div>' +
+  // End-of-day checks by Mom or Dad, and today's game time
+  const dchecks = L.CHECKS[kid] || [];
+  if (dchecks.length) {
+    const yn = (k) => '<div class="dchk"><div><strong>' + esc(k.label) + '</strong>' + (k.sub ? '<small>' + esc(k.sub) + '</small>' : '') + '</div>' +
       '<span class="dchk-btns"><button class="chip' + (checks[k.key] === true ? ' on' : '') + '" data-daycheck="' + k.key + '|yes" aria-pressed="' + (checks[k.key] === true) + '">Yes</button>' +
       '<button class="chip' + (checks[k.key] === 'no' ? ' on no' : '') + '" data-daycheck="' + k.key + '|no" aria-pressed="' + (checks[k.key] === 'no') + '">Not today</button></span></div>';
     const g = L.gameDay(ctx, kid, date), school = L.GAME.days.includes(dow);
     $('bed').insertAdjacentHTML('beforeend', '<div class="rhead dchk-head"><h2>End of day</h2><span class="rcount">Mom or Dad</span></div>' +
-      L.DAY_CHECKS.map(yn).join('') +
+      dchecks.map(yn).join('') +
       (school ? '<p class="gt-today">' + (g.earned ? '<b>+30 min of weekend game time earned today ✓</b>' : '<b>For today’s 30 min of game time:</b> ' + esc(g.left.join(' · '))) + '</p>' : ''));
   }
   // Celebrate finishing a whole list (only right after a tap on this phone)
@@ -359,7 +369,16 @@ document.addEventListener('click', (e) => {
   askParent().then((ok) => { if (ok) save(ID, path, v); });
 }, true);
 
-// End-of-day checks (Eli): parents only
+// A chore missed earlier this week: done now, saved on the day it was for.
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-owed]');
+  if (!b) return;
+  e.stopPropagation();
+  const [d, k] = b.dataset.owed.split('|');
+  save(ID, 'days/' + d + '/' + kid + '/' + k, true);
+}, true);
+
+// End-of-day checks: parents only
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-daycheck]');
   if (!b) return;

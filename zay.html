@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>window.__V='1794966441';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Isaiah's Reward Chart</title>
+<meta name="theme-color" content="#1B2A41">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Isaiah's Chart">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/isaiah.png">
+<link rel="icon" href="icons/isaiah.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1794966441">
+</head>
+<body data-chart="zay">
+<main class="wrap">
+  <nav class="top"><a href="kid.html?kid=isaiah" class="back">&larr; Isaiah</a><span class="navlinks"><a href="checklist.html?kid=isaiah" class="pillbtn">Checklist</a><a href="isaiah.html" class="pillbtn">Ball Master</a><span id="sync" class="sync">Connecting…</span></span></nav>
+  <header class="head">
+    <p id="eyebrow" class="eyebrow"></p>
+    <h1>Earn the Reward</h1>
+  </header>
+  <div class="weeknav">
+    <button id="prev" class="navbtn" aria-label="Previous week">&lsaquo;</button>
+    <div><strong id="weeklabel"></strong><button id="thisweek" class="linkbtn" hidden>Back to this week</button></div>
+    <button id="next" class="navbtn" aria-label="Next week">&rsaquo;</button>
+  </div>
+  <div class="progress"><div class="track"><div id="bar" class="fill"></div></div><span id="progress"></span></div>
+  <div id="grid" class="grid"></div>
+  <section id="weeklycard" class="card reward">
+    <h2 id="weeklytitle">Perfect week reward</h2>
+    <p id="weeklystatus" class="status"></p>
+    <div id="weekly" class="picks"></div>
+    <label class="given"><input type="checkbox" id="given"> <span id="givenlabel">Reward given (parent)</span></label>
+  </section>
+  <section id="monthcard" class="card month">
+    <div class="month-left"><h2 id="monthname">Monthly prize</h2><div id="circles" class="circles"></div></div>
+    <div class="month-right"><p id="monthlystatus" class="status"></p><div id="monthly" class="picks"></div><label class="given"><input type="checkbox" id="mgiven"> Prize given (parent)</label></div>
+  </section>
+  <p id="note" class="note"></p>
+  <p class="note">Every box fills in by itself from the checklist (and Training or Ball Master). Tap a box to open that day. Weeks before Nov 16: a parent can tap a box to change it.</p>
+</main>
+<script type="module" src="weekly.js?v=1794966441"></script>
+</body>
+</html>

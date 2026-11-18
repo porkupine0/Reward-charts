@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794956282';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794956282';
-import { rowsFor } from './charts.js?v=1794956282';
-import { planFor, dayDone } from './plan.js?v=1794956282';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794966441';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794966441';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794966441';
+import { planFor, dayDone } from './plan.js?v=1794966441';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -67,13 +67,28 @@ export function lists(ctx, kid, date) {
 // A computer task (typing, Duolingo, checking assignments, homework) can't be ticked until every chore in the day's list is done.
 // One that is already ticked can still be un-ticked.
 export function lockedBy(ctx, kid, date, it, list) {
-  if (!it.computer || isOn(ctx, kid, date, it)) return false;
-  return (list || []).filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c));
+  if (isOn(ctx, kid, date, it)) return false;
+  if (lists(ctx, kid, date).day.some((i) => i.key === it.key) && choresOwed(ctx, kid, date).length) return 'owed'; // an earlier day's chore comes first
+  if (!it.computer) return false;
+  return (list || []).filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c)) ? 'chores' : false;
+}
+
+// Chores left undone on an earlier day this week (from Nov 18, 2026). Until they're done,
+// the after-school (or weekend) list is locked. [{ date, item }]
+export const OWED_FROM = '2026-11-18';
+export function choresOwed(ctx, kid, date) {
+  const out = [], mon = mondayOf(date);
+  for (let d = mon; ymd(d) < ymd(date); d = addDays(d, 1)) {
+    if (ymd(d) < OWED_FROM) continue;
+    lists(ctx, kid, d).day.filter((i) => i.chore && !isOn(ctx, kid, d, i)).forEach((item) => out.push({ date: new Date(d), item }));
+  }
+  return out;
 }
 
 export function isOn(ctx, kid, date, it) {
   const checks = dayChecks(ctx, kid, date);
   if (it.weekly) return !!weeklyDoneOn(ctx, kid, weeklyDef(kid, it.weekly), date);
+  if (it.derived && checks[it.key] === EXCUSED) return true; // a parent excused the run, swim or soccer
   if (it.derived === 'run') return eliRunDone(ctx.run, date);
   if (it.derived === 'touches') return touchedOn(ctx.isaiah, ymd(date));
   if (it.parts) return it.parts.every((p) => checks[partKey(it.key, p)]);
@@ -91,28 +106,41 @@ export function progress(ctx, kid, date, list) {
 // A box the checklist can fill is "derived". A parent can still tick or un-tick it by hand:
 // that's stored on the chart as true (on) or 'off', and wins over the derived value.
 export function derivedCell(chartId, rowKey, i, monday, ctx) {
-  const date = addDays(monday, i), k = ymd(date);
+  const date = addDays(monday, i);
   const c = (kid) => dayChecks(ctx, kid, date);
   const allChores = (kid) => choreItems(kid, i).every((x) => isDone(c(kid)[x.key]));
+  const yes = (kid) => c(kid)[rowKey] === true; // evening checks by Mom or Dad
+  const tied = ymd(monday) >= TIED_FROM;
   if (chartId === 'eli') {
-    if (rowKey === 'running' && i <= 5) return eliRunDone(ctx.run, date);
+    if (rowKey === 'running' && i <= 5) return eliRunDone(ctx.run, date) || c('eli').activity === EXCUSED;
     if (rowKey === 'chores') return allChores('eli');
     if (rowKey === 'school' && i <= 4) return isDone(c('eli').missing);
-    if (rowKey === 'kind' || rowKey === 'listen') return c('eli')[rowKey] === true;
+    if (rowKey === 'kind' || rowKey === 'listen') return yes('eli');
   }
   if (chartId === 'trombone') {
-    if (rowKey === 'trombone' && i >= 4) return !!c('rhett').trombone; // Fri, Sat, Sun: ticked on his checklist
-    if (rowKey === 'chores' && i <= 5) return allChores('rhett');
-    if (rowKey === 'duolingo' && i <= 5) return !!c('rhett').duolingo;
-    if (rowKey === 'move' && [0, 1, 2, 4, 5].includes(i)) return !!c('rhett').activity;
-    if (rowKey === 'racquetball' && i === 3) return !!c('rhett').activity;
+    if (rowKey === 'trombone' && i >= 4) return isDone(c('rhett').trombone); // Fri, Sat, Sun: ticked on his checklist
+    if (rowKey === 'chores' && (i <= 5 || tied)) return allChores('rhett');
+    if (rowKey === 'duolingo' && i <= 5) return isDone(c('rhett').duolingo);
+    if (rowKey === 'typing') return isDone(c('rhett').typing);
+    if (rowKey === 'move' && (tied ? i <= 5 : [0, 1, 2, 4, 5].includes(i))) return isDone(c('rhett').activity);
+    if (rowKey === 'racquetball' && i === 3) return isDone(c('rhett').activity);
+    if (CHECKS.rhett.some((k) => k.key === rowKey)) return yes('rhett');
   }
-  return undefined; // filled by hand only
+  if (chartId === 'zay') {
+    if (rowKey === 'soccer' && i <= 4) return touchedOn(ctx.isaiah, ymd(date)) || c('isaiah').activity === EXCUSED;
+    if (rowKey === 'chores') return allChores('isaiah');
+    if (CHECKS.isaiah.some((k) => k.key === rowKey)) return yes('isaiah');
+  }
+  return undefined; // filled by hand only (older weeks)
 }
+// From TIED_FROM on, every box is the checklist's answer. Before that a parent's hand tick
+// (stored as true or 'off') wins over the derived value.
 export function cellOn(chartId, rowKey, i, monday, weekData, ctx) {
   const stored = (((weekData || {}).checks || {})[rowKey] || {})[i];
-  if (stored === true) return true;
-  if (stored === 'off') return false;
+  if (ymd(monday) < TIED_FROM) {
+    if (stored === true) return true;
+    if (stored === 'off') return false;
+  }
   return !!derivedCell(chartId, rowKey, i, monday, ctx);
 }
 // Same shape weekProgress expects: { checks: { row: { day: true } } }
@@ -172,12 +200,21 @@ export function readingWeek(ctx, kid, monday, upTo) {
   return { read, excused, nights };
 }
 
-// ---- Eli's weekend game time ----
+// ---- Weekend game time (all three boys) ----
 // End-of-day checks, set by a parent: true = yes, 'no' = not today.
-export const DAY_CHECKS = [
-  { key: 'kind', label: 'Kind to his brothers', sub: 'No hurting them, physically or with words' },
-  { key: 'listen', label: 'Listened to Mom and Dad', sub: 'Without arguing' }
-];
+export const CHECKS = {
+  eli: [
+    { key: 'kind', label: 'Kind to his brothers', sub: 'No hurting them, physically or with words' },
+    { key: 'listen', label: 'Listened to Mom and Dad', sub: 'Without arguing' }
+  ],
+  rhett: [
+    { key: 'noYell', label: 'No yelling', sub: 'Didn’t yell or raise his voice with Mom and Dad' },
+    { key: 'firstTime', label: 'Listened the first time', sub: 'To Mom and Dad, the first time they asked' },
+    { key: 'noLies', label: 'No lies today', sub: '' }
+  ]
+};
+CHECKS.isaiah = CHECKS.rhett;
+export const DAY_CHECKS = CHECKS.eli; // (kept for older callers)
 export const GAME = { perDay: 30, days: [0, 1, 2, 3, 4] }; // 30 min for each full school day = up to 2.5 hours
 // A school day earns its 30 minutes when the whole checklist (after school + bedtime, excused items count)
 // is done and both end-of-day checks are yes.
@@ -185,11 +222,17 @@ export function gameDay(ctx, kid, date) {
   const ls = lists(ctx, kid, date);
   const left = [...progress(ctx, kid, date, ls.day).left, ...progress(ctx, kid, date, ls.bed).left].map((i) => i.label.replace(/^Chore: /, ''));
   const c = dayChecks(ctx, kid, date);
-  DAY_CHECKS.forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
+  (CHECKS[kid] || []).forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
   return { earned: !left.length, left };
+}
+// Game time used is logged in pieces: routines game/<kid>/<monday>/<timestamp> = minutes.
+export function gameUses(ctx, kid, monday) {
+  const log = ((((ctx.routines || {}).game || {})[kid] || {})[ymd(monday)]) || {};
+  return Object.entries(log).filter(([, m]) => Number(m) > 0).map(([at, m]) => ({ at: Number(at), minutes: Number(m) })).sort((a, b) => a.at - b.at);
 }
 export function gameWeek(ctx, kid, monday) {
   const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });
   const minutes = days.filter((d) => d.earned).length * GAME.perDay;
-  return { days, minutes, max: GAME.days.length * GAME.perDay };
+  const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
+  return { days, minutes, max: GAME.days.length * GAME.perDay, uses, used, left: Math.max(0, minutes - used) };
 }
