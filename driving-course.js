@@ -142,5 +142,33 @@ export const LESSONS = [
       { ...q('w2d1q8', 'A white sign like this gives you:', ['Laws you must follow (regulatory)', 'Directions', 'Services', 'A general warning'], 0,
         'White signs are regulatory: speed limits, turn rules and other laws.', 6, 'Regulatory. Provides information regarding enforceable laws and ordinances.'), sign: { shape: 'rectangle', color: 'white' } }
     ]
+  },
+  {
+    id: 'w2d2', title: 'Stop, yield and other regulatory signs',
+    key: [k('Stop sign: come to a full stop, at the stop line if there is one.', 8, 'Stop at the stop line if one is present.'),
+      k('Yield sign: slow down and let traffic you’re crossing or entering go first.', 8, 'A yield sign means you must slow down and yield the right of way to traffic in the intersection you are crossing or roadway you are entering.'),
+      k('A red circle with a slash means you can’t do what’s shown.', 8, 'These indicate you cannot do something')],
+    videos: [{ yt: 'oAEXSBJJqc4', title: 'Stop vs Yield: The Mistake That Fails Your Driving Test', channel: 'Zutobi Drivers Ed', len: '7:26',
+      iowa: 'Iowa’s manual: at a stop sign, stop at the stop line if there is one, then you may pull forward to see before going. At a yield sign, slow down and be ready to stop.' }],
+    questions: [
+      { ...q('w2d2q1', 'At a sign like this, you must:', ['Slow down and go if it looks clear', 'Come to a full stop and wait until crossing traffic and the crosswalk are clear', 'Stop only if other cars are coming', 'Honk, then go'], 1,
+        'A full stop every time, even when nobody is coming.', 8, 'A stop sign means you must come to a full stop and wait until crossing vehicles and the cross-walk are clear before proceeding.'), sign: { shape: 'octagon', color: 'red' } },
+      q('w2d2q2', 'There’s a white stop line painted before the stop sign. Where do you stop?', ['At the stop line', 'Past the sign, at the corner', 'In the crosswalk', 'Anywhere near the sign'], 0,
+        'Then, if you can’t see, you may pull forward carefully before going.', 8, 'Stop at the stop line if one is present.'),
+      { ...q('w2d2q3', 'A sign like this means:', ['Stop every time', 'Speed up to merge ahead of traffic', 'Slow down and let traffic you’re crossing or entering go first', 'No turns allowed'], 2,
+        'Yield: be ready to stop if traffic is coming.', 8, 'A yield sign means you must slow down and yield the right of way to traffic in the intersection you are crossing or roadway you are entering.'), sign: { shape: 'yield' } },
+      q('w2d2q4', 'A red circle with a red slash over a symbol (like a U-turn arrow) means:', ['You must do what the symbol shows', 'You can’t do what the symbol shows', 'The road is closed', 'Caution ahead'], 1,
+        'For example: no left turn, no right turn, or no U-turn.', 8, 'These indicate you cannot do something; for example, no left turn, no right turn, or no U-turn.'),
+      q('w2d2q5', 'The road is slippery or foggy. What about the posted speed limit?', ['Drive at it; it’s the legal speed', 'You may need to drive slower than it', 'It goes up in bad weather', 'It becomes the minimum speed'], 1,
+        'Limits are for ideal conditions; rain, snow and fog call for less.', 8, 'Sometimes you must reduce your speed when conditions require it'),
+      q('w2d2q6', 'You see a red-and-white DO NOT ENTER sign at an opening in the road. It means:', ['Enter carefully', 'Enter only to turn around', 'One lane ahead', 'Do not enter that road opening'], 3,
+        'You’ll see them at exit ramps, crossovers on divided roads, and one-way roads.', 8, 'You will see this sign at roadway openings you are not to enter.'),
+      q('w2d2q7', 'You pass a WRONG WAY sign. What happened?', ['You turned wrong and you’re in a lane of oncoming traffic', 'Nothing; it’s for other drivers', 'You missed your exit', 'The road ahead is closed'], 0,
+        'Get off the traveled road, stop, and turn around as quickly and safely as you can.', 8, 'You made a wrong turn and have entered a lane of oncoming traffic.'),
+      q('w2d2q8', 'A KEEP RIGHT sign (an arrow curving around a small island) means:', ['The road ahead is divided: go around the island or barrier', 'The right lane ends', 'Right turn only', 'Slow vehicles keep right'], 0,
+        'Pass on the side the arrow shows.', 8, 'The road ahead is divided. This sign directs traffic around an island or barrier.'),
+      q('w2d2q9', 'A high-speed road has a minimum speed that is too fast for you. What should you do?', ['Drive slower with your flashers on', 'Use another route', 'Drive on the shoulder', 'Ignore the minimum'], 1,
+        'Driving far below the flow of traffic is dangerous too.', 8, 'If this minimum speed is too fast for you, then you should use another route.')
+    ]
   }
 ];
