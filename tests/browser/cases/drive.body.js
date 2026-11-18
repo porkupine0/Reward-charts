@@ -50,6 +50,7 @@ export const LESSONS = [
   await p.click('.dq:nth-of-type(1) [data-pick$="|0"]'); await p.waitForTimeout(150);   // right
   await p.click('.dq:nth-of-type(2) [data-pick$="|1"]'); await p.waitForTimeout(150);   // wrong
   check(/Right answer: Alpha/.test(await p.$eval('.dq:nth-of-type(2)', (e) => e.textContent)), 'a wrong answer shows the right one and why');
+  check(await p.$eval('.dq:nth-of-type(2)', (e) => e.querySelectorAll('.dq-choice[disabled]').length === 3 && !!e.querySelector('.dq-choice.picked') && !!e.querySelector('.dq-choice.right') && e.querySelector('.dq-choices').compareDocumentPosition(e.querySelector('.dq-result')) === 4), 'answered: the choices stay (disabled, his pick and the right one marked), result below them');
   await visit('drive.html', 'drive-reload');
   check(JSON.stringify(await p.$$eval('.dq-q', (els) => els.map((e) => e.textContent))) === JSON.stringify(qs), 'same questions after a reload');
   for (let k = 0; k < 3; k++) { await p.click('.dq-choice:not([disabled])'); await p.waitForTimeout(150); }

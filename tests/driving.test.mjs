@@ -113,6 +113,16 @@ test('driving: the unit test is 4 questions from each finished lesson of its uni
   assert.ok(D.quizFor(ten, 9, p2).every((x) => /^L[6-9]q/.test(x.id)));
 });
 
+test('driving: a unit test whose lessons were all skipped is passed over (it would have no questions)', () => {
+  const ten = course(11), p = { approved: { L1: '2026-11-01', L2: '2026-11-01', L3: '2026-11-01', L4: '2026-11-01', L6: 'skip:2026-12-01', L7: 'skip:2026-12-01', L8: 'skip:2026-12-01', L9: 'skip:2026-12-01', L11: '2026-12-01' },
+    done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4), L5: day(5) }, answers: {} };
+  assert.equal(D.lessonFor(ten, p, day(8)).lesson.id, 'L11', 'unit 2 skipped: its test is passed over, on to L11');
+  assert.equal(D.dueOn(ten, p, day(8), 1).lesson.id, 'L11');
+  p.done.L7 = day(7); delete p.approved.L7; p.approved.L7 = '2026-11-01';
+  assert.equal(D.lessonFor(ten, p, day(8)).lesson.id, 'L10', 'one lesson of the unit finished: its test is on');
+  assert.equal(D.quizFor(ten, 9, p).length, 4);
+});
+
 test('driving: the unit test stays the same while he takes it, and its misses come back afterwards', () => {
   const p = { done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4) }, answers: {} };
   const before = D.quizFor(LESSONS, 4, p).map((x) => x.id);

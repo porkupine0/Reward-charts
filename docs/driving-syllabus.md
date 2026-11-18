@@ -3,7 +3,7 @@
 **Goal (permit test in about 3 months, mid-February 2027):** pass Iowa's written permit test (practice test: 25 questions, 80% to pass; the real test's length and pass mark aren't confirmed by an official page) and know the road before he drives.
 
 ## Shape of the course
-- **10 units of 5 lesson days each, then a final week: 55 lesson days** (days 1–4: a video lesson with a 5-question quiz; **day 5: the unit test**, about 15 questions on that unit, scored, shown on the Parents page). Lessons run Monday to Friday, one a day. From Nov 19 to Feb 18 there are 66 weekdays, so this leaves about 11 days of slack for Thanksgiving, Christmas, New Year's, sick days and chore-locked days.
+- **10 units of 5 lesson days each, then a final week: 55 lesson days** (days 1–4: a video lesson with a 5-question quiz; **day 5: the unit test**, 16 questions: 4 from each of the unit's lessons, never-asked ones first, then ones he missed; scored, shown on the Parents page). Lessons run Monday to Friday, one a day. From Nov 19 to Feb 18 there are 66 weekdays, so this leaves about 11 days of slack for Thanksgiving, Christmas, New Year's, sick days and chore-locked days.
 - **Knowledge tests** (25 questions like the real test, same topic mix every time, scored per topic, no answers shown):
   - **Baseline** (Form A): now, before lesson 1. **Built.**
   - **Progress tests** every two units: each opens once the unit test of units 2, 4, 6 and 8 is finished (about every two weeks, usually a weekend).
@@ -48,7 +48,7 @@ Each of Iowa DOT's 68 practice questions maps to a unit: signs, signals and the 
 
 ## Counts
 - Videos: 65 picked for 42 video days (12 Iowa-made: 10 from Iowa DOT, 2 from Iowa news stations), plus 20 spares. All exist and can be embedded (checked with YouTube on Nov 18); titles, channels and lengths came from YouTube itself; **none watched yet**: the advisor approved them as a list to preview, not their content. Most days have 3 to 10 minutes of video; eleven days run 10 to 14 minutes (the longest: Iowa practice questions 13:50, passing 13:32, alcohol and drugs 13:22, backing and reverse parking 12:57). No video day is under 3 minutes.
-- Questions to write: about 6 per lesson (3 in that day's quiz, the rest for the unit test and review) ≈ 240, plus Forms B–F (125, all new wording). Written about two weeks ahead of Eli, one unit at a time.
+- Questions to write: about 7 per lesson (the first 3 are that day's quiz; the rest come back in later days' review questions and the unit test) ≈ 240, plus Forms B–F (125, all new wording). Written about two weeks ahead of Eli, one unit at a time.
 
 ## Code still to build (in order)
 1. Unit test as a lesson type (day 5; about 15 questions; scored); the "every 5th lesson is a review" rule becomes "every 5th is a unit test". w1d5 can only change if Eli hasn't finished it.

@@ -13,6 +13,9 @@
 export const isApproved = (v) => v === true || (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v));
 export const isSkipped = (v) => v === 'skip' || (typeof v === 'string' && v.startsWith('skip:'));
 const skipDay = (v) => (typeof v === 'string' && v.startsWith('skip:') ? v.slice(5) : '');
+// The first lesson of the unit that lesson i belongs to (the lesson after the previous unit test).
+const unitStart = (lessons, i) => { let s = i; while (s > 0 && !lessons[s - 1].review) s--; return s; };
+
 export function lessonFor(lessons, progress, dayKey) {
   const p = progress || {}, done = p.done || {}, approved = p.approved || {};
   const today = lessons.findIndex((l) => done[l.id] === dayKey);
@@ -20,8 +23,9 @@ export function lessonFor(lessons, progress, dayKey) {
   for (let i = 0; i < lessons.length; i++) {
     const l = lessons[i];
     if (done[l.id] || isSkipped(approved[l.id])) continue;
-    // a review has no video to approve: it's ready once any lesson before it is finished (else passed over)
-    if (l.review) { if (lessons.slice(0, i).some((x) => done[x.id])) return { lesson: l, index: i, status: 'ready' }; continue; }
+    // a unit test has no video to approve: it's ready once a lesson of its own unit is finished (else, e.g.
+    // every lesson of the unit skipped, it's passed over: it would have no questions)
+    if (l.review) { if (lessons.slice(unitStart(lessons, i), i).some((x) => done[x.id])) return { lesson: l, index: i, status: 'ready' }; continue; }
     return { lesson: l, index: i, status: isApproved(approved[l.id]) ? 'ready' : 'waiting' };
   }
   return { lesson: null, index: lessons.length, status: 'finished' };
@@ -48,7 +52,7 @@ export function dueOn(lessons, progress, dayKey, dow) {
     }
     if (done[l.id] === dayKey) return { lesson: l, due: 'required' };
     if (l.review) {
-      if (lessons.slice(0, i).some((x) => done[x.id] && done[x.id] < dayKey)) return due(l, 'required');
+      if (lessons.slice(unitStart(lessons, i), i).some((x) => done[x.id] && done[x.id] < dayKey)) return due(l, 'required');
       continue;
     }
     if (a === true || (typeof a === 'string' && isApproved(a) && a < dayKey)) return due(l, 'required');
@@ -107,9 +111,7 @@ export const PER_LESSON = 4;
 export function unitTestFor(lessons, index, progress) {
   const lesson = lessons[index], done = (progress || {}).done || {};
   if (!lesson) return [];
-  let start = index;
-  while (start > 0 && !lessons[start - 1].review) start--;
-  const out = [];
+  const start = unitStart(lessons, index), out = [];
   lessons.slice(start, index).forEach((l) => {
     if (!done[l.id]) return;
     const ranked = (l.questions || []).map((q, qi) => {

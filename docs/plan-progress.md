@@ -50,11 +50,11 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 7. 13-week plan with 67 videos picked (docs/driving-syllabus.md).
 - [x] 7b. Recut the plan to 55 lesson days (merge units 10 and 11; one final week).
 - [x] 8. Unit test: every 5th lesson; 4 questions from each finished lesson of its unit (never-asked, then missed, then least recent); answers hidden until all are in, then score + answers; finishes only when all are answered; score on the Parents page. w1d5 is now the Unit 1 test (2 questions appended to each unit 1 lesson). The daily quiz keeps its choices in place too.
-- [ ] 8b. "Not able to do it?" for driving lessons (approved by the family Nov 18): a parent-excused weekday keeps his streak (like run/swim). Needed before Thanksgiving, Nov 26.
+- [ ] 8b. (unit tests whose lessons were all skipped are now passed over) "Not able to do it?" for driving lessons (approved by the family Nov 18): a parent-excused weekday keeps his streak (like run/swim). Needed before Thanksgiving, Nov 26.
 - [ ] 9b. Weekly hazard ride (approved Nov 18): once a week, a 10-minute ride with Eli as passenger calling out hazards; a parent ticks it on the Driving page (outside game time). Put it on the plan's quietest lesson day each week.
 - [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
 - [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).
-- [ ] 11. Week 2 content (unit 2: signs and signals), questions ~6 per lesson. Re-run scripts/check-videos.mjs first.
+- [ ] 11. **Deadline: on main by Saturday Nov 21** (so a parent can preview and approve it before Wed Nov 25, the earliest he could need it; sign shapes, step 10, come first). Week 2 content (unit 2: signs and signals), questions ~6 per lesson. Re-run scripts/check-videos.mjs first.
 - [ ] 12. Progress tests: a new form each sitting (B after unit 2, C after 4, D after 6, E after 8, F = final). Hand-written, one ahead of each sitting, same blueprint and same count of number questions as Form A, no lesson question's wording. Form B due when unit 2's test is done (about the first week of December).
 
 Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
