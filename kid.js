@@ -1,16 +1,17 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795009193';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795009193';
-import { CHARTS, weekProgress } from './charts.js?v=1795009193';
-import { planFor } from './plan.js?v=1795009193';
-import * as L from './lists.js?v=1795009193';
-import { score, fmt, nextMilestone } from './trials.js?v=1795009193';
-import { dayStreak } from './streaks.js?v=1795009193';
-import { nowHtml } from './nowview.js?v=1795009193';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795009740';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795009740';
+import { CHARTS, weekProgress } from './charts.js?v=1795009740';
+import { planFor } from './plan.js?v=1795009740';
+import * as L from './lists.js?v=1795009740';
+import { score, fmt, nextMilestone } from './trials.js?v=1795009740';
+import { dayStreak } from './streaks.js?v=1795009740';
+import { lessonFor } from './driving.js?v=1795009740';
+import { nowHtml } from './nowview.js?v=1795009740';
 
 const $ = (id) => document.getElementById(id);
-const ctx = { routines: {}, run: {}, isaiah: {} };
+const ctx = { routines: {}, run: {}, isaiah: {}, drive: {} };
 const charts = { eli: {}, trombone: {}, zay: {} };
 let trials = {};
 const remembered = () => { try { return localStorage.getItem('rc:lastKid'); } catch (e) { return null; } };
@@ -44,6 +45,10 @@ function render() {
     links.push(card('eli.html', 'eli', 'Reward chart', 'Weekend game time · Run or swim · Chores · School', 'Game time: ' + g.minutes + ' of ' + g.max + ' min' + (L.GAME.days.includes(L.dowOf(now)) && !L.gameDay(ctx, 'eli', now).earned ? ' · today not yet' : '')));
     const pl = planFor(now), sc = score(trials), nx = nextMilestone('mile', sc), n5 = nextMilestone('5k', sc);
     links.push(card('run.html', 'run', 'Training', 'Today’s run · Time trials · History', pl ? 'Today: ' + pl.title + (L.eliRunDone(ctx.run, now) ? ' · done!' : '') : 'Plan finished'));
+    // Driving: ready, done, waiting for approval, or locked until chores
+    const course = L.course(), st = lessonFor(course, ctx.drive, ymd(now)), lock = L.computerLock(ctx, 'eli', now);
+    const dtext = !course.length ? 'No lessons yet' : st.status === 'done' ? 'Today’s lesson done ✓' : st.status === 'finished' ? 'Course finished' : st.status === 'waiting' ? 'Next lesson waiting for Mom or Dad' : L.dowOf(now) > 4 ? 'Next lesson Monday' : lock ? 'Today’s lesson: chores first' : 'Today’s lesson is ready';
+    links.push(card('drive.html', 'run', 'Driving', 'A short video and 5 questions, Mon–Fri', dtext));
     links.push(card('trials.html', 'trials', 'Time trials', 'Milestones · Prizes', (nx ? 'Next mile: under ' + fmt(nx[0]) : 'Mile done') + ' · ' + (n5 ? '5K: under ' + fmt(n5[0]) : '5K done')));
   }
   if (kid === 'rhett') {
@@ -69,6 +74,7 @@ setInterval(render, 60000); // the time of day moves on
 watch('routines', (d) => { ctx.routines = d; render(); }, statusPill($('sync')));
 watch('eli-run', (d) => { ctx.run = d; render(); });
 watch('isaiah', (d) => { ctx.isaiah = d; render(); });
+watch('eli-drive', (d) => { ctx.drive = d || {}; render(); });
 watch('eli', (d) => { charts.eli = d; render(); });
 watch('trombone', (d) => { charts.trombone = d; render(); });
 watch('zay', (d) => { charts.zay = d; render(); });

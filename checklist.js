@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795009193';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795009193';
-import { SETTINGS } from './settings.js?v=1795009193';
-import { askParent } from './parent.js?v=1795009193';
-import * as L from './lists.js?v=1795009193';
-import { dayStreak, cheerIf } from './streaks.js?v=1795009193';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795009740';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795009740';
+import { SETTINGS } from './settings.js?v=1795009740';
+import { askParent } from './parent.js?v=1795009740';
+import * as L from './lists.js?v=1795009740';
+import { dayStreak, cheerIf } from './streaks.js?v=1795009740';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -262,7 +262,7 @@ document.addEventListener('click', (e) => {
   }
   // Eli's Running is done on Training; Isaiah's 600 touches is shared with Ball Master.
   const item = L.lists(ctx, kid, date).day.find((i) => i.key === key);
-  if (item && item.derived === 'drive') { location.href = 'drive.html'; return; }
+  if (item && item.derived === 'drive') { location.href = 'drive.html' + (ymd(date) === ymd(new Date()) ? '' : '?date=' + ymd(date)); return; }
   if (item && item.derived === 'run') { location.href = 'run.html' + (ymd(date) === ymd(new Date()) ? '' : '?date=' + ymd(date)); return; }
   if (item && item.derived === 'touches') { save('isaiah', 'touchDays/' + ymd(date), isOn(item) ? null : true); return; }
   if (key.startsWith('w:')) {

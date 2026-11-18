@@ -48,7 +48,7 @@
     return { n, worst: +worst.toFixed(2), bad: [...new Set(bad)].slice(0, 12) };
   });
   const pages = ['checklist.html?kid=rhett&date=2026-11-19', 'checklist.html?kid=rhett&date=2026-11-18', 'checklist.html?kid=eli&date=2026-11-19', 'checklist.html?kid=isaiah', 'checklist.html?kid=isaiah&date=2026-11-18', 'zay.html', 'trombone.html', 'eli.html?week=2026-11-23',
-    'kid.html?kid=isaiah', 'index.html', 'parents.html', 'run.html', 'trials.html', 'isaiah.html', 'history.html?kid=rhett', 'stats.html', 'settings.html'];
+    'kid.html?kid=isaiah', 'kid.html?kid=eli', 'drive.html', 'index.html', 'parents.html', 'run.html', 'trials.html', 'isaiah.html', 'history.html?kid=rhett', 'stats.html', 'settings.html'];
   for (const scheme of ['light', 'dark']) {
     await p.emulateMedia({ colorScheme: scheme });
     for (const u of pages) {

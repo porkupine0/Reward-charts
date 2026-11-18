@@ -680,3 +680,29 @@ input[type="time"], .field input, select { background: var(--surface); color: va
   body.soccer .pillbtn, body.soccer .num, body.soccer .num.juggle { color: #0F1620; }
 }
 @media (prefers-color-scheme: dark) { .treat.given { background: #183324; border-color: #2E5A40; } }
+
+/* Driving page */
+.drivecard h2 { margin: 2px 0 8px; }
+.dv { margin: 10px 0; }
+.dv-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--soft); border-radius: 10px; overflow: hidden; }
+.dv-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.dv-meta { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); }
+.dv-meta b { color: var(--ink); }
+.dv-iowa { margin: 6px 0 0; font-size: 13.5px; padding: 8px 10px; border-left: 4px solid var(--accent); background: var(--soft); border-radius: 6px; }
+.dv-open { margin: 4px 0 0; }
+.dv-done { font-weight: 800; color: var(--accent-ink); margin: 8px 0; }
+.dv-done.big { font-size: 18px; }
+.lockmsg { font-weight: 700; }
+.dquiz h3 { margin: 16px 0 6px; }
+.dq { border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 8px 0; }
+.dq-q { margin: 0 0 8px; font-weight: 700; }
+.dq-choices { display: flex; flex-direction: column; gap: 6px; }
+.dq-choice { text-align: left; min-height: 44px; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+.dq.ok { border-color: #2E7D4F; }
+.dq.miss { border-color: #B3471B; }
+.dq-result { margin: 0 0 4px; }
+.dq-why { margin: 0; font-size: 14px; color: var(--muted); }
+.dq-why small { color: var(--muted); }
+.dprev { border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 10px; }
+.dprev h3 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin: 0 0 6px; }
+.dprev-q { margin: 8px 0; padding-left: 20px; font-size: 14px; }

@@ -46,6 +46,7 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await ctx.route(/firebase-app\.js/, r => offline ? r.abort() : r.fulfill({ contentType: 'text/javascript', body: 'export function initializeApp(){return {}}' }));
   await ctx.route(/firebase-database\.js/, r => offline ? r.abort() : r.fulfill({ contentType: 'text/javascript', body: MOCK_DB }));
   await ctx.route(/fonts\.(googleapis|gstatic)/, r => r.abort());
+  await ctx.route(/youtube(-nocookie)?\.com|ytimg\.com/, r => r.abort()); // videos never load in tests
   const p = await ctx.newPage();
   await p.clock.setFixedTime(NOW); // a case can set its own clock
   let cur = '';

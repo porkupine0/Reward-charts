@@ -1,15 +1,16 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795009193';
-import { CHARTS, weekProgress } from './charts.js?v=1795009193';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795009193';
-import * as L from './lists.js?v=1795009193';
-import { owed, score, planned, fmt } from './trials.js?v=1795009193';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795009193';
-import { askParent, setParent, changePin } from './parent.js?v=1795009193';
-import { dayFull } from './streaks.js?v=1795009193';
-import { owedItems } from './owed.js?v=1795009193';
-import { pruneList, pruneCutoff } from './prune.js?v=1795009193';
-import { nowHtml } from './nowview.js?v=1795009193';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795009740';
+import { CHARTS, weekProgress } from './charts.js?v=1795009740';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795009740';
+import * as L from './lists.js?v=1795009740';
+import { owed, score, planned, fmt } from './trials.js?v=1795009740';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795009740';
+import { askParent, setParent, changePin } from './parent.js?v=1795009740';
+import { dayFull } from './streaks.js?v=1795009740';
+import { owedItems } from './owed.js?v=1795009740';
+import { pruneList, pruneCutoff } from './prune.js?v=1795009740';
+import { lessonFor } from './driving.js?v=1795009740';
+import { nowHtml } from './nowview.js?v=1795009740';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -88,6 +89,9 @@ function render() {
       });
     });
   }
+  // Eli's next driving lesson needs a parent's preview
+  const ds = L.course().length ? lessonFor(L.course(), D['eli-drive'], ymd(today)) : null;
+  if (ds && ds.status === 'waiting') ex.unshift(row('Eli', KIDS.eli.accent, 'Driving lesson waiting for your preview: ' + esc(ds.lesson.title), '', '<a class="tbtn approve" href="drive.html#preview">Preview</a>'));
   $('excuses').innerHTML = ex.join('') || '<p class="muted">Nothing waiting.</p>';
 
   // Reading: this week and the 3 before, per kid

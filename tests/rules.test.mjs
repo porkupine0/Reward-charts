@@ -69,7 +69,7 @@ test('rules: reads stay open (the app has no sign-in)', () => {
 
 test('rules: every save() in the app is covered by a WRITES example', () => {
   // A rough guard: each chart a page saves to appears in WRITES.
-  const src = ['checklist.js', 'parents.js', 'run.js', 'settings-page.js', 'soccer.js', 'trials.js', 'weekly.js', 'parent.js']
+  const src = ['checklist.js', 'parents.js', 'run.js', 'settings-page.js', 'soccer.js', 'trials.js', 'weekly.js', 'parent.js', 'drive-page.js']
     .map((f) => readFileSync(new URL('../' + f, import.meta.url), 'utf8')).join('\n');
   const literal = [...src.matchAll(/save\('([a-z-]+)'/g)].map((m) => m[1]);
   const covered = new Set(WRITES.map((p) => p.split('/')[1]));

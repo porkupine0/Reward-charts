@@ -1,0 +1,64 @@
+  // Driving page with a fixture course (the real course ships empty): parent approves with the real PIN;
+  // locked until chores (row has no Open link); Watched; quiz; reload mid-quiz; finishing; the checklist row
+  // fills; a finished lesson shows its stored answers; skip.
+  const PINHASH = '30fb85852fe669dfbf8e52b679886067b7ac636b8478c831607e50cade42329d'; // 2468
+  const FIX = `const q = (l, k, ans) => ({ id: l + 'q' + k, q: 'Fixture question ' + l + '-' + k + '?', choices: ['Alpha', 'Bravo', 'Charlie'], answer: ans, why: 'Because ' + k + '.', ref: "Iowa Driver's Manual p.1" });
+export const LESSONS = [
+  { id: 'F1', title: 'Fixture lesson one', videos: [{ yt: 'AAAAAAAAAAA', title: 'Fixture video', channel: 'Fixture channel', len: '5:00', iowa: 'Iowa note.' }], questions: [1, 2, 3, 4, 5].map((k) => q('F1', k, 0)) },
+  { id: 'F2', title: 'Fixture lesson two', videos: [{ yt: 'BBBBBBBBBBB', title: 'Fixture video 2', channel: 'Fixture channel', len: '6:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F2', k, 1)) }
+];`;
+  const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
+  await ctx.route(/driving-course\.js/, course);
+  await p.goto(B + 'index.html');
+  await p.evaluate((h) => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { settings: { pinHash: h },
+    routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } } } })); }, PINHASH);
+  // nothing approved yet: Eli sees "waiting"; Parents page says so
+  await visit('drive.html', 'drive-waiting');
+  check(/Waiting for Mom or Dad/.test(await p.$eval('#today', (e) => e.textContent)), 'waiting for approval');
+  await visit('parents.html', 'drive-parents');
+  check(/Driving lesson waiting for your preview: Fixture lesson one/.test(await p.$eval('#excuses', (e) => e.textContent)), 'Parents page: waiting line');
+  // parent preview: answers only after the PIN; approve F1 with the real PIN box
+  await visit('drive.html', 'drive-preview');
+  check(!(await p.$('.dprev')), 'no answers before the PIN');
+  await p.click('#previewbtn');
+  await p.waitForSelector('.pindlg input', { timeout: 2000 });
+  await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
+  check((await p.$$('.dprev')).length === 2, 'preview lists both lessons');
+  await p.click('[data-approve="F1|yes"]'); await p.waitForTimeout(300);
+  check((await db()).charts['eli-drive'].approved.F1 === true, 'F1 approved');
+  // Wednesday's chore not done: locked, on the page and on the checklist
+  await visit('drive.html', 'drive-locked');
+  check(/Do today’s chores first/.test(await p.$eval('#today', (e) => e.textContent)), 'page locked until chores');
+  await visit('checklist.html?kid=eli', 'drive-row-locked');
+  const rowLocked = await p.$('.ck.locked .ckbtn[data-key="drive"]');
+  check(!!rowLocked, 'checklist row shows, locked');
+  check(!(await p.$('.ck.locked:has(.ckbtn[data-key="drive"]) .cklink')), 'no Open link on the locked row');
+  await rowLocked.click({ force: true }); await p.waitForTimeout(300);
+  check(/checklist\.html/.test(p.url()), 'tapping the locked row goes nowhere');
+  // chores done: the lesson opens
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-18/eli/chore', true); });
+  await visit('drive.html', 'drive-open');
+  check(!!(await p.$('[data-watched="F1"]')) && !(await p.$('.dq')), 'video and Watched; questions after watching');
+  check(/In Iowa:/.test(await p.$eval('#today', (e) => e.textContent)), 'the Iowa note shows');
+  await p.click('[data-watched="F1"]'); await p.waitForTimeout(200);
+  const qs = await p.$$eval('.dq-q', (els) => els.map((e) => e.textContent));
+  check(qs.length === 5, '5 questions');
+  await p.click('.dq:nth-of-type(1) [data-pick$="|0"]'); await p.waitForTimeout(150);   // right
+  await p.click('.dq:nth-of-type(2) [data-pick$="|1"]'); await p.waitForTimeout(150);   // wrong
+  check(/Right answer: Alpha/.test(await p.$eval('.dq:nth-of-type(2)', (e) => e.textContent)), 'a wrong answer shows the right one and why');
+  await visit('drive.html', 'drive-reload');
+  check(JSON.stringify(await p.$$eval('.dq-q', (els) => els.map((e) => e.textContent))) === JSON.stringify(qs), 'same questions after a reload');
+  for (let k = 0; k < 3; k++) { await p.click('.dq-choice'); await p.waitForTimeout(150); }
+  check(/Lesson done for today/.test(await p.$eval('#today', (e) => e.textContent)), 'finished after 5 answers (no pass mark)');
+  check((await db()).charts['eli-drive'].done.F1 === '2026-11-18', 'done stored for today');
+  await visit('checklist.html?kid=eli', 'drive-row-done');
+  check(await p.$eval('.ckbtn[data-key="drive"]', (e) => e.getAttribute('aria-pressed')) === 'true', 'checklist row filled');
+  // the next day: the stored answers for Nov 18
+  await visit('drive.html?date=2026-11-18', 'drive-past');
+  check((await p.$$('.dq.answered')).length === 5 && !(await p.$('.dq-choice')), 'past lesson shows the stored answers');
+  // skip
+  await visit('drive.html', 'drive-skip');
+  await p.click('#previewbtn'); await p.waitForTimeout(300);
+  await p.click('[data-approve="F2|skip"]'); await p.waitForTimeout(300);
+  check((await db()).charts['eli-drive'].approved.F2 === 'skip', 'F2 skipped');
+  await ctx.unroute(/driving-course\.js/, course);
