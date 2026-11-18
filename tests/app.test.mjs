@@ -203,10 +203,17 @@ test("Rhett: trombone Fri/Sat/Sun, typing every day, chores before any computer 
     const firstComputer = list.findIndex((i) => i.computer);
     assert.ok(lastChore >= 0 && firstComputer > lastChore, 'chores come first on day ' + dow);
   });
-  ['eli', 'isaiah'].forEach((kid) => week.forEach((day) => {
-    const keys = L.lists(ctx, kid, d(day)).day.map((i) => i.key);
-    assert.equal(keys.includes('typing') || keys.includes('trombone'), false, kid + ' is unchanged');
-  }));
+  week.forEach((day) => {
+    const keys = L.lists(ctx, 'isaiah', d(day)).day.map((i) => i.key);
+    assert.equal(keys.includes('typing') || keys.includes('trombone'), false, 'Isaiah is unchanged');
+    assert.equal(L.lists(ctx, 'eli', d(day)).day.some((i) => i.key === 'trombone'), false, 'no trombone for Eli');
+  });
+  // Eli: typing 10 min Monday to Saturday from Nov 19 (not before; not Sundays), required, no "chores first" lock
+  for (let x = d('2026-11-16'); ymd(x) <= '2026-11-29'; x = addDays(x, 1)) {
+    const it = L.lists(ctx, 'eli', x).day.find((i) => i.key === 'typing'), want = ymd(x) >= '2026-11-19' && L.dowOf(x) <= 5;
+    assert.equal(!!it, want, 'Eli typing on ' + ymd(x));
+    if (it) { assert.match(it.label, /10 min/); assert.equal(!!it.opt || !!it.computer, false); }
+  }
 });
 
 test("Rhett: computer tasks stay locked until every chore is ticked", () => {
