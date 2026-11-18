@@ -1,4 +1,5 @@
-// APPEND ONLY: never reorder or remove lessons. Past days (his streak) are rebuilt from this order.
+// APPEND ONLY: never reorder or remove lessons, and add new questions only at the END of a lesson's list
+// (the first 3 are that day's quiz). Past days (his streak) are rebuilt from this order.
 // Eli's driving course content. Each lesson is checked by checkCourse() in driving.js, every question's
 // quote is checked against the saved Iowa Driver's License Manual (docs/iowa/drivers-manual.txt, page
 // numbers as printed), and a parent previews and approves each lesson before Eli sees it.
@@ -21,7 +22,11 @@ export const LESSONS = [
       q('w1d1q4', 'What is the “escape route” the manual tells you to always leave yourself?', ['A place to move your vehicle if your path is suddenly blocked', 'The fastest way home', 'The shoulder you use to pass slow cars', 'The nearest exit ramp'], 0,
         'If the car ahead stops suddenly, having somewhere to go can keep you out of a crash.', 47, 'a place to move your vehicle if your immediate path of travel is suddenly blocked'),
       q('w1d1q5', 'Besides other cars, what does the manual say to keep an eye on along the road?', ['Only traffic lights', 'Billboards and signs', 'Pedestrians, bicyclists, and animals', 'Nothing else; watch the cars'], 2,
-        'People, bikes and animals can move into the road quickly; scanning catches them early.', 47, 'Also, keep an eye on pedestrians, bicyclists, and animals along the road.')
+        'People, bikes and animals can move into the road quickly; scanning catches them early.', 47, 'Also, keep an eye on pedestrians, bicyclists, and animals along the road.'),
+      q('w1d1q6', 'How many serious crashes does the manual say are due to dangerous choices or errors people make behind the wheel?', ['About 25 percent', 'About half', '94 percent', 'Almost none; most are bad luck'], 2,
+        'Almost every serious crash comes down to a driver’s choice or mistake, which is why defensive driving works.', 47, '94 percent of serious crashes are due to dangerous choices or errors people make behind the wheel.'),
+      q('w1d1q7', 'A driver near you is driving so dangerously that you’re worried. What does the manual suggest?', ['Try to get off the road by turning right or taking the next exit, if it’s safe', 'Follow them to read their license plate', 'Pass them as fast as you can', 'Flash your headlights at them'], 0,
+        'Put distance between you and them; don’t engage.', 47, 'try to get off the roadway by turning right or taking the next exit if it’s safe to do so.')
     ]
   },
   {
@@ -41,7 +46,11 @@ export const LESSONS = [
       q('w1d2q4', 'Someone is tailgating you. What does the manual suggest?', ['Move slightly to the right and signal early for turns, stops, or lane changes', 'Brake hard so they back off', 'Speed up to get away', 'Stop in your lane'], 0,
         'The manual adds: try slowing down and encouraging the driver behind you to pass.', 48, 'If you are being tailgated, move slightly to the right and give the tailgater a better view of what is ahead and signal early for turns, stops, or lane changes.'),
       q('w1d2q5', 'Why do faster speeds need more following distance?', ['Higher speeds require greater stopping distances', 'Fast cars have weaker brakes', 'It only matters at night', 'They don’t; distance is the same at any speed'], 0,
-        'The faster you go, the farther you travel before you can stop.', 48, 'Higher speeds require greater stopping distances.')
+        'The faster you go, the farther you travel before you can stop.', 48, 'Higher speeds require greater stopping distances.'),
+      q('w1d2q6', 'You spot a slow farm vehicle far ahead. Why does spotting it early help?', ['You can honk at it sooner', 'You can pass it on the shoulder', 'It doesn’t; brake hard when you reach it', 'You have time to change lanes or slow down safely'], 3,
+        'Slowing suddenly can cause a crash; seeing it early gives you time.', 48, 'If you spot these vehicles early, you have time to change lanes or slow down safely.'),
+      q('w1d2q7', 'According to the manual, when are roads safest?', ['When some cars go well below the speed of traffic', 'When all vehicles travel the same speed without going over the limit', 'When drivers weave to pass slower cars', 'When you drive faster than traffic to stay ahead'], 1,
+        'Cars going faster or slower than the flow cause more lane changes, passing and tailgating.', 48, 'The safest roadways are when all vehicles travel the same speed but do not exceed the speed limit.')
     ]
   },
   {
@@ -58,7 +67,11 @@ export const LESSONS = [
       q('w1d3q3', 'Why should you never stay alongside a truck or bus?', ['It’s against the law', 'They always speed up suddenly', 'They have large blind spots and it’s hard for them to see you', 'Their mirrors are smaller'], 2,
         'Big vehicles have big blind spots; get past or drop back.', 34, 'These vehicles have large blind spots and it is hard for them to see you.'),
       q('w1d3q4', 'How does the manual say to set your left-side mirror?', ['So you can see the whole side of your car', 'Lean your head toward the left window, then set it so you can barely see the side of the car', 'Point it at the road right behind you', 'So you can see the back seat'], 1,
-        'The manual says this method gives the best view of the lanes next to you.', 25, 'Lean your head toward the left-side window, and set the left mirror so you can barely see the side of the car.')
+        'The manual says this method gives the best view of the lanes next to you.', 25, 'Lean your head toward the left-side window, and set the left mirror so you can barely see the side of the car.'),
+      q('w1d3q7', 'How should you set the inside rearview mirror?', ['So you can see the back seat', 'Tilted down toward the trunk', 'So it frames the entire rear window', 'Angled toward the left lane'], 2,
+        'It’s your main mirror for what’s behind you.', 25, 'adjust the inside mirror so that it frames the entire rear window.'),
+      q('w1d3q8', 'When you turn your head to check a blind spot, what should your hands do?', ['Keep the steering wheel straight', 'Turn the wheel the way you’re looking', 'Let go with one hand', 'Turn the wheel slightly the other way'], 0,
+        'People tend to turn their arms the same way as their head, which pulls the car over.', 44, 'make sure you keep the steering wheel straight')
     ]
   },
   {
@@ -75,8 +88,12 @@ export const LESSONS = [
       q('w1d4q4', 'What does the law about right-of-way do?', ['It says who must yield; it doesn’t give anyone the right-of-way', 'It gives bigger vehicles the right-of-way', 'It lets whoever arrives first go no matter what', 'It only applies to trucks'], 0,
         'Whoever should yield, you should do everything you can to avoid hitting a pedestrian or another vehicle.', 18, 'The law says who must yield the right-of-way; it does not give anyone the right-of-way.'),
       q('w1d4q6', 'A bicyclist at an intersection should yield to you, but starts to go. What does the manual say?', ['Keep going; it’s your right-of-way', 'Be ready to yield, even when the bicyclist should yield to you', 'Honk and keep going', 'Speed up to get past first'], 1,
-        'Bicyclists have no defense against a vehicle, so it’s your job to watch out for them.', 18, 'Be ready to yield the right-of-way, even at times the bicyclists should yield to you.')
+        'Bicyclists have no defense against a vehicle, so it’s your job to watch out for them.', 18, 'Be ready to yield the right-of-way, even at times the bicyclists should yield to you.'),
+      q('w1d4q7', 'What is step 1 before you enter an intersection?', ['Speed up to get through it quickly', 'Look ahead to see what kind of intersection it is and its signs, signals or markings', 'Honk to warn other drivers', 'Turn on your hazard lights'], 1,
+        'Knowing the kind of intersection tells you who goes first and what to watch for.', 50, 'look ahead to identify the type of intersection and any traffic control devices'),
+      q('w1d4q8', 'Why be extra careful about a motorcycle’s turn signal?', ['Motorcycle turn signals often don’t turn off by themselves', 'Motorcycles never use turn signals', 'A motorcycle signal means the rider will stop', 'Motorcycle signals blink faster'], 0,
+        'The rider may have forgotten it’s on; wait until they actually start to turn.', 50, 'their signals often do not cancel by themselves.')
     ]
   },
-  { id: 'w1d5', title: 'Week 1 review', review: true, videos: [], questions: [] }
+  { id: 'w1d5', title: 'Unit 1 test', review: true, videos: [], questions: [] }
 ];

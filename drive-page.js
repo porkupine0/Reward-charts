@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795030584';
-import { applyConfig } from './routines.js?v=1795030584';
-import { askParent } from './parent.js?v=1795030584';
-import * as L from './lists.js?v=1795030584';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795030584';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795030584';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795037667';
+import { applyConfig } from './routines.js?v=1795037667';
+import { askParent } from './parent.js?v=1795037667';
+import * as L from './lists.js?v=1795037667';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795037667';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795037667';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
