@@ -31,7 +31,25 @@
   await visit('parents.html', 'unlock-lock');
   await p.click('#lock'); await p.waitForTimeout(100);
   check(await p.evaluate(() => localStorage.getItem('rc:unlock') === null), 'Lock this phone clears the unlock');
-  // 4. a phone with the old forever flag is asked
+  // 4. old forever flag: honoured until Mon Nov 23, Lock clears it, from Nov 23 it asks and is removed
   await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rc:parent', '1'); });
-  check(await asks('2026-11-19'), 'old forever flag: asks');
-  check(await p.evaluate(() => localStorage.getItem('rc:parent') === null), 'old flag removed');
+  check(!(await asks('2026-11-19')), 'old flag: no ask before Nov 23');
+  await visit('index.html', 'unlock-home-legacy');
+  notes.push('home line: ' + (await p.$eval('#parentline', (e) => e.textContent)).slice(0, 60));
+  check(/until Monday, Nov 23/.test(await p.$eval('#parentline', (e) => e.textContent)), 'home explains the switch');
+  await visit('parents.html', 'unlock-lock2');
+  await p.click('#lock'); await p.waitForTimeout(100);
+  check(await asks('2026-11-19'), 'old flag: Lock makes it ask');
+  await p.click('.pindlg [data-pin="cancel"]');
+  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rc:parent', '1'); });
+  await p.clock.setSystemTime(new Date(2026, 10, 23, 20, 0).getTime());
+  await visit('parents.html', 'unlock-nov23');
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-23/eli', null); });
+  await p.click('[data-allgood="2026-11-23|eli"]');
+  check(await p.waitForSelector('.pindlg input', { timeout: 1500 }).then(() => true).catch(() => false), 'old flag: asks from Nov 23');
+  check(await p.evaluate(() => localStorage.getItem('rc:parent') === null), 'old flag removed from Nov 23');
+  // the PIN box, light and dark
+  await p.screenshot({ path: OUT + 'pin-light.png' });
+  await p.emulateMedia({ colorScheme: 'dark' });
+  await p.screenshot({ path: OUT + 'pin-dark.png' });
+  await p.emulateMedia({ colorScheme: 'light' });

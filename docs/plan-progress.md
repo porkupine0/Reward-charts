@@ -19,7 +19,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 ## Tier 2: parent workload
 - [x] 9. A "Tonight" card on the Parents page: evening checks, today's excuses, tonight's late bedtime, and "All good" per boy.
 - [x] 10. Isaiah's weekend checks: shown in Tonight (one tap).
-- [ ] 11. Parent unlock: parent phones stay unlocked, other devices for a short time.
+- [x] 11. Parent unlock: parent phones stay unlocked, other devices for a short time.
 - [ ] 12. Settings: evening checks, game-time minutes, bedtime grace.
 
 ## Tier 3: data safety
@@ -39,9 +39,12 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 
 - Tonight's excuse requests show both in Tonight and in "Waiting for your OK" (harmless duplicate).
 
+- One-time switch in parent.js (LEGACY_UNTIL): phones unlocked the old way stay unlocked until Mon Nov 23, 2026, then ask once. Delete that code after November.
+
 ## Log
 - Nov 18: browser tests and this plan moved into the repo. Item 3 done.
 - Nov 18: items 1, 2 and 7 done. Eli's run/swim boxes follow his plan, his Saturday run is on his checklist, and a new test checks every chart box against the checklist.
 - Nov 18: item 8 done. The "next" ring follows the time of day, Parents "This week" counts Monday to today, trials say Saturday, and Eli's box labels follow his plan.
 - Nov 18: item 6 done. The lock is narrowed, the held game time is shown, and chores can be excused from the Finish-first box.
 - Nov 18: items 9 and 10 done. The Parents page has a Tonight card (All good per boy, never overrides Not today, back six nights).
+- Nov 18: item 11 done. A parent's phone stays unlocked (tick box); other devices unlock for 15 minutes; old unlocks last until Nov 23.
