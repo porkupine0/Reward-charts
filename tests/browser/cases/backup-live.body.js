@@ -18,3 +18,13 @@
   await visit('parents.html', 'backup-live');
   await p.click('#backup'); await p.waitForTimeout(500);
   check(downloads === 1, 'backup works once everything is live');
+  // a real clear: the 2020 checklist day goes; an old Training day and a recent checklist day stay
+  await p.evaluate(() => { const db = JSON.parse(sessionStorage.getItem('mockdb')); db.charts['eli-run'] = { days: { '2020-01-02': { items: { run: true } } } }; db.charts.routines.days['2026-11-17'] = { eli: { teeth: true } }; sessionStorage.setItem('mockdb', JSON.stringify(db)); });
+  await visit('parents.html', 'prune-live');
+  await p.click('#prune'); await p.waitForTimeout(800);
+  notes.push('after clear: ' + await p.$eval('#datamsg', (e) => e.textContent));
+  const after = (await db()).charts;
+  check(downloads === 2, 'a backup downloaded first');
+  check(!after.routines.days['2020-01-01'], 'the 2020 checklist day is gone');
+  check(!!after.routines.days['2026-11-17'], 'the recent checklist day stays');
+  check(!!after['eli-run'].days['2020-01-02'], 'the old Training day stays');

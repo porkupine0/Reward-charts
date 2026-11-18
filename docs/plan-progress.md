@@ -27,7 +27,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 
 ## Tier 3: data safety
 - [ ] 13. Database safety rules and a daily backup.
-- [ ] 14. Clearing old logs keeps training history and what charts and streaks need.
+- [x] 14. Clearing old logs keeps training history and what charts and streaks need.
 - [x] 15. Offline saves: replay order and showing failed saves.
 - [ ] 16. Settings changes don't rewrite past days.
 
@@ -44,6 +44,9 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 
 - One-time switch in parent.js (LEGACY_UNTIL): phones unlocked the old way stay unlocked until Mon Nov 23, 2026, then ask once. Delete that code after November.
 
+- Storage: two years of checklist days is about 0.9 MB (roughly 1.8 MB in phone storage, which is usually limited to about 5 MB per site). Fine for now; watch it if more is added to daily logs.
+- "Clear checklist days over 2 years old" will find nothing to clear until late 2028.
+
 ## Log
 - Nov 18: browser tests and this plan moved into the repo. Item 3 done.
 - Nov 18: items 1, 2 and 7 done. Eli's run/swim boxes follow his plan, his Saturday run is on his checklist, and a new test checks every chart box against the checklist.
@@ -52,3 +55,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: items 9 and 10 done. The Parents page has a Tonight card (All good per boy, never overrides Not today, back six nights).
 - Nov 18: item 11 done. A parent's phone stays unlocked (tick box); other devices unlock for 15 minutes; old unlocks last until Nov 23.
 - Nov 18: item 15 done. Clearing drops queued writes beneath it; a quick correction is sent; pages share one queue. When the app is reopened after being offline, a change another phone made meanwhile wins and a notice shows (a page left open through an outage isn't covered). The pill can say "Saving…" or "Not saved, retrying".
+- Nov 18: item 14 done. Cleanup keeps 2 years of checklist days (the streak look-back), never clears Eli's Training log, and backup and cleanup wait for fresh data.

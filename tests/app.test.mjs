@@ -442,6 +442,12 @@ test("clearing old logs: only checklist days past the 2-year look-back; nothing 
   ['2026-10-05', '2026-10-06', '2026-11-02'].forEach((k) => { tick(k, 'rhett'); run.days[k] = { items: { run: true } }; });
   for (let i = 1; i <= 20; i++) { const k = ymd(addDays(today, -i)); tick(k, 'rhett'); tick(k, 'isaiah'); }
   const D = { routines, 'eli-run': run, isaiah: {}, eli: {}, trombone: {}, zay: {}, 'eli-trials': {}, config: {} };
+  // the boundary: a day on the cutoff stays, the day before goes; the cutoff is no later than the
+  // earliest week the perfect-week streak can reach (this Monday minus 104 weeks)
+  const cut = P.pruneCutoff(today);
+  assert.ok(cut <= ymd(addDays(mondayOf(today), -7 * 104)));
+  const edge = { routines: { days: { [cut]: {}, [ymd(addDays(d(cut), -1))]: {} } } };
+  assert.deepEqual(P.pruneList(edge, today), [['routines', 'days/' + ymd(addDays(d(cut), -1))]]);
   const list = P.pruneList(D, today);
   assert.ok(list.length >= 1, 'old days are listed');
   assert.ok(list.every(([id, path]) => id === 'routines' && path.slice(5) < P.pruneCutoff(today)), 'only older checklist days');
@@ -456,6 +462,7 @@ test("clearing old logs: only checklist days past the 2-year look-back; nothing 
     });
   };
   const before = view(D);
+  assert.ok(JSON.parse(before).streaks[1] > 0, 'Rhett has a streak, so the comparison means something');
   const after = JSON.parse(JSON.stringify(D));
   list.forEach(([, path]) => { delete after.routines.days[path.slice(5)]; });
   assert.equal(view(after), before);

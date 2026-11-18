@@ -1,15 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794987037';
-import { CHARTS, weekProgress } from './charts.js?v=1794987037';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794987037';
-import * as L from './lists.js?v=1794987037';
-import { owed, score, planned, fmt } from './trials.js?v=1794987037';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794987037';
-import { askParent, setParent, changePin } from './parent.js?v=1794987037';
-import { dayFull } from './streaks.js?v=1794987037';
-import { owedItems } from './owed.js?v=1794987037';
-import { pruneList, pruneCutoff } from './prune.js?v=1794987037';
-import { nowHtml } from './nowview.js?v=1794987037';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794987355';
+import { CHARTS, weekProgress } from './charts.js?v=1794987355';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794987355';
+import * as L from './lists.js?v=1794987355';
+import { owed, score, planned, fmt } from './trials.js?v=1794987355';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794987355';
+import { askParent, setParent, changePin } from './parent.js?v=1794987355';
+import { dayFull } from './streaks.js?v=1794987355';
+import { owedItems } from './owed.js?v=1794987355';
+import { pruneList, pruneCutoff } from './prune.js?v=1794987355';
+import { nowHtml } from './nowview.js?v=1794987355';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -155,10 +155,10 @@ $('prune').onclick = async () => {
   if (!(await askParent())) return;
   const old = pruneList(D, new Date()), cut = pruneCutoff(new Date());
   if (!old.length) { $('datamsg').textContent = 'Nothing to clear: checklist days are kept for two years (streaks look back that far), and Eli’s Training log is always kept.'; return; }
-  if (!confirm('Clear ' + old.length + ' checklist days from before ' + cut + '? Streaks, charts and Eli’s Training log are kept; History for those older months will be blank. A backup downloads first.')) return;
+  if (!confirm('Clear ' + old.length + ' checklist days from before ' + cut + '? Streaks and Eli’s Training log are kept. History and the weekly charts for those older months will be blank. A backup downloads first.')) return;
   backup();
   old.forEach(([id, path]) => save(id, path, null));
-  $('datamsg').textContent = 'Cleared ' + old.length + ' old checklist days.';
+  $('datamsg').textContent = 'Cleared ' + old.length + ' old checklist day' + (old.length > 1 ? 's' : '') + '.';
 };
 
 function download(name, type, text) {
