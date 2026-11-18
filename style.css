@@ -7,8 +7,8 @@
   --bg: #FFFFFF;
   --surface: #FFFFFF;        /* cards, buttons, inputs */
   --panel: #1B2A41;          /* dark blocks that stay dark in both themes */
-  --tint: var(--tint);           /* warm highlight (earned, today) */
-  --tint-good: var(--tint-good);
+  --tint: #fdf1ea;              /* warm highlight (earned, today) */
+  --tint-good: #eef6f0;
   --tint-warn: #FFF9E6;
   --tint-bad: #FDEFE6;
   --treat: #FFF9E8;

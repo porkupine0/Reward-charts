@@ -327,3 +327,9 @@ test("a chore missed earlier this week locks the after-school list until it's do
   // Monday and Tuesday (before Nov 18) don't count
   assert.equal(L.choresOwed({ routines: {}, run: {}, isaiah: {} }, 'isaiah', d('2026-11-18')).length, 0);
 });
+
+test("style.css: no colour variable is defined as itself (it would render as nothing)", () => {
+  const css = readFileSync(new URL('../style.css', import.meta.url), 'utf8');
+  const self = [...css.matchAll(/(--[\w-]+)\s*:\s*var\(\s*(--[\w-]+)\s*\)/g)].filter((m) => m[1] === m[2]).map((m) => m[1]);
+  assert.deepEqual(self, []);
+});
