@@ -6,46 +6,100 @@ import { readFileSync } from 'node:fs';
 const V = JSON.parse(readFileSync(new URL('../version.json', import.meta.url))).v;
 const D = await import('../driving.js?v=' + V);
 
-const q = (id) => ({ id, q: 'Q ' + id, choices: ['a', 'b', 'c'], answer: 0, why: 'because', ref: 'Manual p.1' });
-const lesson = (n, review) => ({ id: 'L' + n, title: 'Lesson ' + n, review: !!review, videos: [], questions: review ? [] : [1, 2, 3, 4].map((k) => q('L' + n + 'q' + k)) });
-const LESSONS = [lesson(1), lesson(2), lesson(3), lesson(4), lesson(5, true), lesson(6)];
+const q = (id) => ({ id, q: 'Q ' + id, choices: ['a', 'b', 'c'], answer: 0, why: 'because', ref: "Iowa Driver's Manual p.1" });
+// every 5th lesson is a review (no questions of its own)
+const course = (n) => Array.from({ length: n }, (_, i) => {
+  const review = (i + 1) % 5 === 0, id = 'L' + (i + 1);
+  return { id, title: 'Lesson ' + (i + 1), review, videos: review ? [] : [{ id: 'v' }], questions: review ? [] : [1, 2, 3, 4, 5].map((k) => q(id + 'q' + k)) };
+});
+const LESSONS = course(6);
+const day = (n) => '2026-12-' + String(n).padStart(2, '0');
+// record one answer (the first answer for a question in a lesson counts)
+const answer = (p, qid, lid, ok, on) => { const a = (p.answers[qid] = p.answers[qid] || {}); if (!a[lid]) a[lid] = { ok, on }; };
 
 test('driving: lessons go in order, one new a day, only once a parent approves', () => {
   const p = { approved: { L1: true, L2: true }, done: {}, answers: {} };
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-23').lesson.id, 'L1');
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-23').status, 'ready');
-  p.done.L1 = '2026-11-23';
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-23').lesson.id, 'L1', 'one a day: today stays on L1');
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-23').status, 'done');
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-24').lesson.id, 'L2', 'next day: L2');
-  p.done.L2 = '2026-11-24';
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-25').status, 'waiting', 'L3 not approved yet');
+  assert.equal(D.lessonFor(LESSONS, p, day(1)).lesson.id, 'L1');
+  assert.equal(D.lessonFor(LESSONS, p, day(1)).status, 'ready');
+  p.done.L1 = day(1);
+  assert.equal(D.lessonFor(LESSONS, p, day(1)).lesson.id, 'L1', 'one a day: today stays on L1');
+  assert.equal(D.lessonFor(LESSONS, p, day(1)).status, 'done');
+  assert.equal(D.lessonFor(LESSONS, p, day(2)).lesson.id, 'L2');
+  p.done.L2 = day(2);
+  assert.equal(D.lessonFor(LESSONS, p, day(3)).status, 'waiting', 'L3 not approved yet');
   p.approved.L3 = 'skip'; p.approved.L4 = true;
-  assert.equal(D.lessonFor(LESSONS, p, '2026-11-25').lesson.id, 'L4', 'a skipped lesson is passed over');
-  const all = { approved: Object.fromEntries(LESSONS.map((l) => [l.id, true])), done: Object.fromEntries(LESSONS.map((l, i) => [l.id, '2026-12-0' + (i + 1)])) };
-  assert.equal(D.lessonFor(LESSONS, all, '2026-12-20').status, 'finished');
+  assert.equal(D.lessonFor(LESSONS, p, day(3)).lesson.id, 'L4', 'a skipped lesson is passed over');
+  const all = { approved: {}, done: Object.fromEntries(LESSONS.map((l, i) => [l.id, day(i + 1)])) };
+  assert.equal(D.lessonFor(LESSONS, all, day(20)).status, 'finished');
 });
 
-test('driving: quiz is 3 from today and 2 from earlier, missed first, the same on reload', () => {
-  const none = { answers: {} };
-  assert.deepEqual(D.quizFor(LESSONS, 0, none).map((x) => x.id), ['L1q1', 'L1q2', 'L1q3', 'L1q4'], 'day 1: only its own questions');
-  assert.deepEqual(D.quizFor(LESSONS, 2, none).map((x) => x.id), ['L3q1', 'L3q2', 'L3q3', 'L1q1', 'L1q2'], 'earlier: in course order when nothing answered');
-  const p = { answers: { L1q1: [{ on: '2026-11-23', ok: true }], L1q2: [{ on: '2026-11-23', ok: true }], L2q4: [{ on: '2026-11-24', ok: false }], L1q3: [{ on: '2026-11-23', ok: false }, { on: '2026-11-25', ok: true }] } };
+test('driving: the quiz does not change while he takes it', () => {
+  const p = { done: { L1: day(1), L2: day(2) }, answers: {} };
+  ['L1q1', 'L1q2', 'L1q3', 'L2q1', 'L2q2', 'L2q3'].forEach((id, i) => answer(p, id, id.slice(0, 2), true, day(id[1] === '1' ? 1 : 2)));
+  const before = D.quizFor(LESSONS, 2, p).map((x) => x.id);
+  assert.deepEqual(before.slice(0, 3), ['L3q1', 'L3q2', 'L3q3']);
+  before.forEach((id) => { answer(p, id, 'L3', id === before[3] ? false : true, day(3)); assert.deepEqual(D.quizFor(LESSONS, 2, p).map((x) => x.id), before, 'same after answering ' + id); });
+});
+
+test('driving: earlier questions come only from finished lessons (not skipped ones)', () => {
+  const p = { done: { L1: day(1) }, approved: { L1: true, L2: 'skip', L3: true }, answers: {} };
   const quiz = D.quizFor(LESSONS, 2, p).map((x) => x.id);
-  assert.deepEqual(quiz.slice(0, 3), ['L3q1', 'L3q2', 'L3q3']);
-  assert.equal(quiz[3], 'L2q4', 'the one last answered wrong comes first');
-  assert.equal(quiz[4], 'L1q3', 'then the one missed before');
-  assert.deepEqual(D.quizFor(LESSONS, 2, p).map((x) => x.id), quiz, 'same quiz on reload');
+  assert.ok(!quiz.some((id) => id.startsWith('L2')), 'nothing from the skipped lesson: ' + quiz);
+  assert.ok(quiz.slice(3).every((id) => id.startsWith('L1')));
+});
+
+test('driving: a missed question comes back twice, then rotates out; review slots rotate', () => {
+  const L = course(15), p = { done: {}, answers: {} };
+  const asked = [], ever = new Set(), early = [];
+  let missedOnce = false, missedId = null;
+  L.forEach((lesson, i) => {
+    const quiz = D.quizFor(L, i, p).map((x) => x.id), date = day(i + 1);
+    const review = quiz.filter((id) => !id.startsWith(lesson.id + 'q'));
+    review.forEach((id) => asked.push([i, id]));
+    // a review question already asked before, while a finished lesson still has a never-asked one, is too early
+    const pool = L.filter((l) => p.done[l.id]).flatMap((l) => l.questions.map((x) => x.id));
+    review.forEach((id) => { if (ever.has(id) && id !== missedId && pool.some((x) => !ever.has(x) && !review.includes(x))) early.push(lesson.id + ':' + id); });
+    quiz.forEach((id) => ever.add(id));
+    quiz.forEach((id) => {
+      // one early miss: the first review question asked, the first time
+      const wrong = !missedOnce && review.length && id === review[0];
+      if (wrong) { missedOnce = true; missedId = id; }
+      answer(p, id, lesson.id, !wrong, date);
+    });
+    p.done[lesson.id] = date;
+  });
+  assert.ok(missedId, 'a question was missed');
+  const times = asked.filter(([, id]) => id === missedId).map(([i]) => i);
+  assert.ok(times.length >= 3, 'the missed one came back: asked on lessons ' + times.map((i) => i + 1));
+  const firstMiss = times[0];
+  assert.deepEqual(times.slice(1, 3), [firstMiss + 1, firstMiss + 2], 'right away, twice');
+  // apart from those two returns, nothing repeats while a finished lesson still has a question never asked
+  assert.deepEqual(early, []);
+  assert.ok(asked.length > 20);
 });
 
 test('driving: a review lesson is all earlier questions', () => {
-  const quiz = D.quizFor(LESSONS, 4, { answers: {} });
+  const p = { done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4) }, answers: {} };
+  const quiz = D.quizFor(LESSONS, 4, p);
   assert.equal(quiz.length, 5);
   assert.ok(quiz.every((x) => /^L[1-4]q/.test(x.id)));
 });
 
 test('driving: grading', () => {
-  const quiz = D.quizFor(LESSONS, 1, { answers: {} });
+  const quiz = D.quizFor(LESSONS, 1, { done: { L1: day(1) }, answers: {} });
   const g = D.grade(quiz, { L2q1: 0, L2q2: 1, L2q3: 0, L1q1: 0 });
   assert.equal(g.total, 5); assert.equal(g.right, 3); assert.deepEqual(g.missed, ['L2q2', 'L1q2']);
+});
+
+test('driving: the content checker catches bad lessons and questions', () => {
+  assert.deepEqual(D.checkCourse(course(10)), []);
+  const bad = course(6);
+  bad[0].questions[1].id = bad[0].questions[0].id;        // duplicate id
+  bad[1].questions.pop();                                   // only 4 questions
+  bad[2].questions[0].answer = 7;                           // answer not a choice
+  bad[2].questions[1].why = '';                             // no explanation
+  bad[2].questions[2].ref = 'the video';                    // no manual page
+  bad[3].review = true;                                     // review in the wrong place
+  const problems = D.checkCourse(bad).join('\n');
+  ['id used twice', 'at least 5 questions', 'not one of the choices', 'explanation', 'manual page', 'should not be a review', 'L6: lesson 6 should not'].forEach((t) => assert.ok(problems.includes(t) || t.startsWith('L6'), t + '\n' + problems));
 });
