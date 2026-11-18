@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984453';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794984453';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794984453';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984453';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984530';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794984530';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794984530';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984530';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -77,15 +77,18 @@ export function lists(ctx, kid, date) {
 
 // A computer task (typing, Duolingo, checking assignments, homework) can't be ticked until every chore in the day's list is done.
 // One that is already ticked can still be un-ticked.
+// Screen and school tasks: Rhett's computer items, Eli's assignments and homework. Run, swim, soccer,
+// snack, put-away, clothes and today's chores never lock.
+export const lockable = (kid, it) => !it.derived && it.key !== 'activity' && (!!it.computer || (kid === 'eli' && ['due', 'missing', 'homework'].includes(it.key)));
 export function lockedBy(ctx, kid, date, it, list) {
   if (isOn(ctx, kid, date, it)) return false;
-  if (lists(ctx, kid, date).day.some((i) => i.key === it.key) && choresOwed(ctx, kid, date).length) return 'owed'; // an earlier day's chore comes first
+  if (lockable(kid, it) && lists(ctx, kid, date).day.some((i) => i.key === it.key) && choresOwed(ctx, kid, date).length) return 'owed'; // an earlier day's chore comes first
   if (!it.computer) return false;
   return (list || []).filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c)) ? 'chores' : false;
 }
 
-// Chores left undone on an earlier day this week (from Nov 18, 2026). Until they're done,
-// the after-school (or weekend) list is locked. [{ date, item }]
+// Chores left undone on an earlier day this week (from Nov 18, 2026). Until they're done (or excused
+// by Mom or Dad), screen and school tasks are locked and today earns no game time. [{ date, item }]
 export const OWED_FROM = '2026-11-18';
 export function choresOwed(ctx, kid, date) {
   const out = [], mon = mondayOf(date);
@@ -233,6 +236,7 @@ export function gameDay(ctx, kid, date) {
   const ls = lists(ctx, kid, date);
   const left = [...progress(ctx, kid, date, ls.day).left, ...progress(ctx, kid, date, ls.bed).left].map((i) => i.label.replace(/^Chore: /, ''));
   const c = dayChecks(ctx, kid, date);
+  choresOwed(ctx, kid, date).forEach((o) => left.push('Finish ' + o.date.toLocaleDateString('en-US', { weekday: 'long' }) + '’s chore first'));
   (CHECKS[kid] || []).forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
   return { earned: !left.length, left };
 }

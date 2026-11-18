@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794984453';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794984453';
-import { askParent } from './parent.js?v=1794984453';
-import * as L from './lists.js?v=1794984453';
-import { dayStreak, cheerIf } from './streaks.js?v=1794984453';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794984530';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794984530';
+import { askParent } from './parent.js?v=1794984530';
+import * as L from './lists.js?v=1794984530';
+import { dayStreak, cheerIf } from './streaks.js?v=1794984530';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -29,7 +29,7 @@ function itemHtml(it, checks, extra) {
   const v = isOn(it);
   const on = !!v;
   const locked = !!(extra && extra.locked);
-  const lockMsg = extra && extra.locked === 'owed' ? 'Finish the chore you missed first (top of this list)' : 'Do your chores first';
+  const lockMsg = extra && extra.locked === 'owed' ? 'Locked · see Finish first' : 'Do your chores first';
   // "Not able to complete": regular items only (not ones filled from other pages, weekly or multi-part ones)
   const raw = checks[it.key];
   const canExcuse = EXCUSABLE.includes(it.key) && (!it.derived || it.key === 'activity') && !locked;
@@ -133,10 +133,17 @@ function render() {
   $('day').hidden = !items.length;
   const owed = L.choresOwed(ctx, kid, date);
   if (owed.length && items.length) {
+    const locks = items.some((i) => L.lockable(kid, i));
     $('day').querySelector('.rhead').insertAdjacentHTML('afterend', '<div class="owed"><strong>Finish first: a chore from earlier this week</strong>' +
-      '<small>The rest of this list unlocks once it’s done.</small>' +
-      owed.map((o) => '<button class="ckbtn owedbtn" data-owed="' + ymd(o.date) + '|' + o.item.key + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
-        '<span class="cktext"><strong>' + esc(o.item.label) + '</strong><small>From ' + esc(o.date.toLocaleDateString('en-US', { weekday: 'long' })) + '</small></span></button>').join('') + '</div>');
+      '<small>' + (locks ? 'Homework and screen time unlock once it’s done. ' : '') + 'No game time today until it’s done (or Mom or Dad excuses it).</small>' +
+      owed.map((o) => {
+        const v = L.dayChecks(ctx, kid, o.date)[o.item.key], ref = ymd(o.date) + '|' + o.item.key;
+        return '<button class="ckbtn owedbtn" data-owed="' + ref + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
+          '<span class="cktext"><strong>' + esc(o.item.label) + '</strong><small>From ' + esc(o.date.toLocaleDateString('en-US', { weekday: 'long' })) + '</small></span></button>' +
+          (v === SKIP
+            ? '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-owedex="approve|' + ref + '">Approve</button><button class="linkbtn" data-owedex="undo|' + ref + '">Undo</button></div>'
+            : '<button class="linkbtn excuse-ask" data-owedex="mark|' + ref + '">Not able to do it?</button>');
+      }).join('') + '</div>');
   }
   // Candy handed out this afternoon: this morning's checklist + last night's bedtime.
   const candy = MORNING_REWARD[kid];
@@ -382,6 +389,17 @@ document.addEventListener('click', (e) => {
   e.stopPropagation();
   const [d, k] = b.dataset.owed.split('|');
   save(ID, 'days/' + d + '/' + kid + '/' + k, true);
+}, true);
+
+// Excusing a missed chore: saved on the day it was for. Waiting doesn't unlock; approved does.
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-owedex]');
+  if (!b) return;
+  e.stopPropagation();
+  const [a, d, k] = b.dataset.owedex.split('|'), path = 'days/' + d + '/' + kid + '/' + k;
+  if (a === 'mark') save(ID, path, SKIP);
+  if (a === 'undo') save(ID, path, null);
+  if (a === 'approve') askParent().then((ok) => { if (ok) save(ID, path, EXCUSED); });
 }, true);
 
 // End-of-day checks: parents only

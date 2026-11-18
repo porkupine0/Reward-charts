@@ -55,7 +55,7 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await visit('checklist.html?kid=isaiah&date=2026-11-19', 'n-owed');
   const owedTxt = await p.$eval('.owed', e => e.textContent).catch(() => '');
   check(/Finish first/.test(owedTxt), 'owed block missing: ' + owedTxt);
-  check((await p.$$('#day .ck.locked')).length > 3, 'day list not locked');
+  check((await p.$$('#day .ck.locked')).length === 0, 'Isaiah: nothing on his list locks (no screen tasks)');
   check((await p.$$('#bed .ck.locked')).length === 0, 'bed locked');
   check((await p.$$('[data-daycheck]')).length === 6, 'isaiah 3 checks');
   await tap('[data-owed]');

@@ -313,16 +313,30 @@ test("not able to: Eli's run/swim and Isaiah's soccer can be excused by a parent
   assert.equal(!!L.derivedCell('zay', 'soccer', 1, mon, ctx('~excused')), true);
 });
 
-test("a chore missed earlier this week locks the after-school list until it's done", () => {
-  const thu = '2026-11-19';
-  const make = (wedChore) => ({ routines: { days: { '2026-11-18': { isaiah: { chore: wedChore } } } }, run: {}, isaiah: {} });
-  const owed = L.choresOwed(make(null), 'isaiah', d(thu));
+test("a chore missed earlier this week: locks screen/school tasks, stops today's game time, can be excused", () => {
+  const thu = '2026-11-19', wed = '2026-11-18';
+  const make = (kid, wedChore) => ({ routines: { days: { [wed]: { [kid]: { chore: wedChore } } } }, run: {}, isaiah: {} });
+  // Isaiah: nothing on his list locks, but no game time today until it's done or excused
+  const iz = make('isaiah', null), day = L.lists(iz, 'isaiah', d(thu)).day, bed = L.lists(iz, 'isaiah', d(thu)).bed;
+  const owed = L.choresOwed(iz, 'isaiah', d(thu));
   assert.equal(owed.length, 1);
-  assert.equal(ymd(owed[0].date), '2026-11-18');
-  const day = L.lists(make(null), 'isaiah', d(thu)).day, bed = L.lists(make(null), 'isaiah', d(thu)).bed;
-  assert.equal(L.lockedBy(make(null), 'isaiah', d(thu), day[0], day), 'owed');
-  assert.equal(L.lockedBy(make(null), 'isaiah', d(thu), bed[0], bed), false, 'bedtime is not locked');
-  assert.equal(L.choresOwed(make(true), 'isaiah', d(thu)).length, 0);
+  assert.equal(ymd(owed[0].date), wed);
+  assert.equal(L.lockedBy(iz, 'isaiah', d(thu), day.find((i) => i.key === 'afterSnack'), day), false, 'snack stays open');
+  day.forEach((i) => assert.equal(L.lockedBy(iz, 'isaiah', d(thu), i, day), false, i.key + ' open for Isaiah'));
+  bed.forEach((i) => assert.equal(L.lockedBy(iz, 'isaiah', d(thu), i, bed), false, 'bedtime untouched'));
+  assert.ok(L.gameDay(iz, 'isaiah', d(thu)).left.some((x) => /Wednesday’s chore first/.test(x)));
+  assert.ok(L.gameDay(make('isaiah', '~skip'), 'isaiah', d(thu)).left.some((x) => /chore first/.test(x)), 'waiting for OK still owes it');
+  assert.equal(L.choresOwed(make('isaiah', '~excused'), 'isaiah', d(thu)).length, 0, 'approved excuse clears it');
+  assert.equal(L.choresOwed(make('isaiah', true), 'isaiah', d(thu)).length, 0);
+  // Rhett: computer tasks lock, run/move/snack don't
+  const rh = make('rhett', null), rday = L.lists(rh, 'rhett', d(thu)).day;
+  assert.equal(L.lockedBy(rh, 'rhett', d(thu), rday.find((i) => i.key === 'homework'), rday), 'owed');
+  assert.equal(L.lockedBy(rh, 'rhett', d(thu), rday.find((i) => i.key === 'afterSnack'), rday), false);
+  assert.equal(L.lockedBy(rh, 'rhett', d(thu), rday.find((i) => i.key === 'activity'), rday), false);
+  // Eli: homework locks, his run never does
+  const el = make('eli', null), eday = L.lists(el, 'eli', d(thu)).day;
+  assert.equal(L.lockedBy(el, 'eli', d(thu), eday.find((i) => i.key === 'homework'), eday), 'owed');
+  assert.equal(L.lockedBy(el, 'eli', d(thu), eday.find((i) => i.key === 'activity'), eday), false);
   // Monday and Tuesday (before Nov 18) don't count
   assert.equal(L.choresOwed({ routines: {}, run: {}, isaiah: {} }, 'isaiah', d('2026-11-18')).length, 0);
 });
@@ -338,10 +352,10 @@ test("style.css: no colour variable is defined as itself (it would render as not
 // match a required checklist item (an optional or missing item can't back a required box).
 test("charts: every required box is backed by a required checklist item, Nov 16 to Feb 28", () => {
   const SOURCE = { running: ['activity'], school: ['missing'], move: ['activity'], racquetball: ['activity'], typing: ['typing'], trombone: ['trombone'], duolingo: ['duolingo'], soccer: ['activity'] };
-  const bad = [];
+  const bad = [], routines = { days: {} }, run = { days: {} }, isaiah = { touchDays: {} };
   for (let day = d('2026-11-16'); ymd(day) <= '2027-02-28'; day = addDays(day, 1)) {
     const k = ymd(day), mon = mondayOf(day), i = L.dowOf(day);
-    const routines = { days: { [k]: {} } }, run = { days: {} }, isaiah = { touchDays: { [k]: true } };
+    routines.days[k] = {}; isaiah.touchDays[k] = true; // earlier days stay done too
     for (const kid of ['eli', 'rhett', 'isaiah']) {
       const c = routines.days[k][kid] = {};
       const ls = L.lists({ routines: {}, run: {}, isaiah: {} }, kid, day);
