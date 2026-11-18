@@ -1,18 +1,18 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795008818';
-import { CHARTS, weekProgress } from './charts.js?v=1795008818';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795008818';
-import * as L from './lists.js?v=1795008818';
-import { owed, score, planned, fmt } from './trials.js?v=1795008818';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795008818';
-import { askParent, setParent, changePin } from './parent.js?v=1795008818';
-import { dayFull } from './streaks.js?v=1795008818';
-import { owedItems } from './owed.js?v=1795008818';
-import { pruneList, pruneCutoff } from './prune.js?v=1795008818';
-import { nowHtml } from './nowview.js?v=1795008818';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795009193';
+import { CHARTS, weekProgress } from './charts.js?v=1795009193';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795009193';
+import * as L from './lists.js?v=1795009193';
+import { owed, score, planned, fmt } from './trials.js?v=1795009193';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795009193';
+import { askParent, setParent, changePin } from './parent.js?v=1795009193';
+import { dayFull } from './streaks.js?v=1795009193';
+import { owedItems } from './owed.js?v=1795009193';
+import { pruneList, pruneCutoff } from './prune.js?v=1795009193';
+import { nowHtml } from './nowview.js?v=1795009193';
 
 const $ = (id) => document.getElementById(id);
-const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
+const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
 const D = Object.fromEntries(IDS.map((id) => [id, {}]));
 const ctx = { get routines() { return D.routines; }, get run() { return D['eli-run']; }, get isaiah() { return D.isaiah; } };
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

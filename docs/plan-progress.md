@@ -42,7 +42,7 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 1. Eli's computer work (typing, and the driving lesson) locked until today's chores are done.
 - [x] 2. Leftover game time: a parent check on the Parents page each week ("Add N min to this week?").
 - [x] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
-- [ ] 4a. Wiring, no page: one lock helper (today's chores done and none owed), Open link hidden on locked rows, checklist row (today if a lesson is ready; past dates a lesson was finished; Mon–Fri; outside all scoring), database rules.
+- [x] 4a. Wiring, no page: one lock helper (today's chores done and none owed), Open link hidden on locked rows, checklist row (today if a lesson is ready; past dates a lesson was finished; Mon–Fri; outside all scoring), database rules.
 - [ ] 4b. Driving page and parent preview (course file ships empty; browser tests use a fixture course): checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
 - [ ] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
 
@@ -91,3 +91,4 @@ Unanswered (defaults in force): Eli's assignments and homework don't wait for ch
 - Nov 18: items 19 and 20 done. Every page passes contrast in light and dark; small links are 44px tall (Isaiah's checklist grew 90px); the game card says "not earned" with the reason.
 - Nov 18: driving steps 0 and 1 done. Iowa manual saved (docs/iowa/); Eli's typing waits for today's chores.
 - Nov 18: driving steps 2 and 3 done. Leftover game time asks once per boy (No lets it go); course rules tested with fixtures.
+- Nov 18: driving step 4a done. Checklist row wired (empty course, so nothing shows yet); computer work, including the driving row, goes through one lock.
