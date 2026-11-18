@@ -1,0 +1,20 @@
+  // Backup and cleanup wait for fresh data from every chart (one chart held back here).
+  const HOLD = MOCK_DB.replace("if (p === 'charts/settings' && window.__slowSettings) return;", "if (p === 'charts/settings' && window.__slowSettings) return; if (p === 'charts/zay') return;");
+  const swap = (r) => r.fulfill({ contentType: 'text/javascript', body: HOLD });
+  await ctx.route(/firebase-database\.js/, swap);
+  await p.goto(B + 'index.html');
+  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rc:unlock', JSON.stringify({ always: true })); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2020-01-01': { eli: { teeth: true } } } } } })); });
+  await visit('parents.html', 'backup-hold');
+  let downloads = 0; p.on('download', () => downloads++);
+  await p.click('#backup'); await p.waitForTimeout(300);
+  let msg = await p.$eval('#datamsg', (e) => e.textContent);
+  notes.push('backup while not live: ' + msg);
+  check(/Still connecting/.test(msg) && downloads === 0, 'backup refused before data is live');
+  await p.click('#prune'); await p.waitForTimeout(300);
+  msg = await p.$eval('#datamsg', (e) => e.textContent);
+  check(/Still connecting/.test(msg), 'cleanup refused before data is live');
+  check(!!(await db()).charts.routines.days['2020-01-01'], 'nothing was cleared');
+  await ctx.unroute(/firebase-database\.js/, swap);
+  await visit('parents.html', 'backup-live');
+  await p.click('#backup'); await p.waitForTimeout(500);
+  check(downloads === 1, 'backup works once everything is live');

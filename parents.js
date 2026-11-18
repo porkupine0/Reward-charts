@@ -1,14 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794986899';
-import { CHARTS, weekProgress } from './charts.js?v=1794986899';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794986899';
-import * as L from './lists.js?v=1794986899';
-import { owed, score, planned, fmt } from './trials.js?v=1794986899';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794986899';
-import { askParent, setParent, changePin } from './parent.js?v=1794986899';
-import { dayFull } from './streaks.js?v=1794986899';
-import { owedItems } from './owed.js?v=1794986899';
-import { nowHtml } from './nowview.js?v=1794986899';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794987037';
+import { CHARTS, weekProgress } from './charts.js?v=1794987037';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794987037';
+import * as L from './lists.js?v=1794987037';
+import { owed, score, planned, fmt } from './trials.js?v=1794987037';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794987037';
+import { askParent, setParent, changePin } from './parent.js?v=1794987037';
+import { dayFull } from './streaks.js?v=1794987037';
+import { owedItems } from './owed.js?v=1794987037';
+import { pruneList, pruneCutoff } from './prune.js?v=1794987037';
+import { nowHtml } from './nowview.js?v=1794987037';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -145,16 +146,19 @@ document.addEventListener('click', async (e) => {
 });
 $('lock').onclick = () => { setParent(false); $('datamsg').textContent = 'This phone is locked. Parent boxes will ask for the PIN.'; };
 $('pin').onclick = async () => { if (await changePin()) $('datamsg').textContent = 'PIN changed.'; };
-$('backup').onclick = () => backup();
+// Backup and cleanup only from fresh data: a phone that hasn't synced could save an old copy.
+const allLive = () => IDS.every((id) => isLive(id));
+const notLive = () => { $('datamsg').textContent = 'Still connecting. Backup and cleanup wait until this phone has the latest data from every chart.'; };
+$('backup').onclick = () => (allLive() ? backup() : notLive());
 $('prune').onclick = async () => {
+  if (!allLive()) return notLive();
   if (!(await askParent())) return;
-  const cut = ymd(addDays(new Date(), -180));
-  const old = [['routines', D.routines], ['eli-run', D['eli-run']]].flatMap(([id, d]) => Object.keys(d.days || {}).filter((k) => k < cut).map((k) => [id, k]));
-  if (!old.length) { $('datamsg').textContent = 'Nothing older than 6 months to clear.'; return; }
-  if (!confirm('Clear ' + old.length + ' daily logs older than 6 months? A backup downloads first.')) return;
+  const old = pruneList(D, new Date()), cut = pruneCutoff(new Date());
+  if (!old.length) { $('datamsg').textContent = 'Nothing to clear: checklist days are kept for two years (streaks look back that far), and Eli’s Training log is always kept.'; return; }
+  if (!confirm('Clear ' + old.length + ' checklist days from before ' + cut + '? Streaks, charts and Eli’s Training log are kept; History for those older months will be blank. A backup downloads first.')) return;
   backup();
-  old.forEach(([id, k]) => save(id, 'days/' + k, null));
-  $('datamsg').textContent = 'Cleared ' + old.length + ' old daily logs.';
+  old.forEach(([id, path]) => save(id, path, null));
+  $('datamsg').textContent = 'Cleared ' + old.length + ' old checklist days.';
 };
 
 function download(name, type, text) {

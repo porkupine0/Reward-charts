@@ -22,7 +22,8 @@
 
   // a server that refuses one path
   const REJECT = MOCK_DB.replace('export async function set(p, v) {', "export async function set(p, v) { if (/putaway/.test(p)) throw new Error('PERMISSION_DENIED');");
-  await ctx.route(/firebase-database\.js/, (r) => r.fulfill({ contentType: 'text/javascript', body: REJECT }));
+  const swap = (r) => r.fulfill({ contentType: 'text/javascript', body: REJECT });
+  await ctx.route(/firebase-database\.js/, swap);
   await visit('checklist.html?kid=rhett', 'off-3');
   await tap('.ckbtn[data-key="putaway"]');
   await p.waitForTimeout(400);
@@ -30,4 +31,4 @@
   notes.push('pill after refused save: ' + pill);
   check(pill === 'Not saved, retrying', 'pill shows the refused save');
   check(await p.evaluate(() => (JSON.parse(localStorage.getItem('rc:queue') || '[]')).some((e) => /putaway/.test(e.path))), 'refused change stays queued');
-  await ctx.unroute(/firebase-database\.js/);
+  await ctx.unroute(/firebase-database\.js/, swap);

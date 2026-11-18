@@ -433,3 +433,31 @@ test("Tonight card: which evening, the checks, and All good never overrides Not 
   assert.deepEqual(L.allGoodKeys(ctx, 'isaiah', d(wed)), ['noYell', 'firstTime', 'noLies']);
   assert.equal(L.tonight(ctx, d('2026-11-21')).find((x) => x.kid === 'isaiah').checks.length, 3, 'weekends too');
 });
+
+test("clearing old logs: only checklist days past the 2-year look-back; nothing that shows changes", async () => {
+  const P = await load('prune.js'), S = await load('streaks.js'), O = await load('owed.js');
+  const today = new Date(2028, 10, 22, 12); // two years on
+  const routines = { days: {} }, run = { days: {} };
+  const tick = (k, kid) => { const c = routines.days[k] = routines.days[k] || {}; const ls = L.lists({ routines: {}, run: {}, isaiah: {} }, kid, d(k)); c[kid] = {}; [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => { if (it.parts) it.parts.forEach((p) => { c[kid][L.partKey(it.key, p)] = true; }); else c[kid][it.key] = it.choices ? it.choices[0] : true; }); };
+  ['2026-10-05', '2026-10-06', '2026-11-02'].forEach((k) => { tick(k, 'rhett'); run.days[k] = { items: { run: true } }; });
+  for (let i = 1; i <= 20; i++) { const k = ymd(addDays(today, -i)); tick(k, 'rhett'); tick(k, 'isaiah'); }
+  const D = { routines, 'eli-run': run, isaiah: {}, eli: {}, trombone: {}, zay: {}, 'eli-trials': {}, config: {} };
+  const list = P.pruneList(D, today);
+  assert.ok(list.length >= 1, 'old days are listed');
+  assert.ok(list.every(([id, path]) => id === 'routines' && path.slice(5) < P.pruneCutoff(today)), 'only older checklist days');
+  assert.ok(!list.some(([id]) => id === 'eli-run'), 'never Eli’s Training log');
+  const view = (DD) => {
+    const ctx = { routines: DD.routines, run: DD['eli-run'], isaiah: DD.isaiah };
+    return JSON.stringify({
+      streaks: ['eli', 'rhett', 'isaiah'].map((k) => S.dayStreak(ctx, k, today)),
+      weeks: Object.values(CHARTS).map((ch) => S.weekStreak(ch, DD[ch.id], ctx, today)),
+      progress: Object.values(CHARTS).map((ch) => weekProgress(ch, L.effectiveWeek(ch, mondayOf(today), {}, ctx))),
+      owed: O.owedItems(DD, ctx, (...a) => a.join('|'), (...a) => a.join('|'))
+    });
+  };
+  const before = view(D);
+  const after = JSON.parse(JSON.stringify(D));
+  list.forEach(([, path]) => { delete after.routines.days[path.slice(5)]; });
+  assert.equal(view(after), before);
+  assert.equal(Object.keys(after['eli-run'].days).length, 3);
+});
