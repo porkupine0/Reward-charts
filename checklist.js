@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794984530';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794984530';
-import { askParent } from './parent.js?v=1794984530';
-import * as L from './lists.js?v=1794984530';
-import { dayStreak, cheerIf } from './streaks.js?v=1794984530';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794984765';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794984765';
+import { askParent } from './parent.js?v=1794984765';
+import * as L from './lists.js?v=1794984765';
+import { dayStreak, cheerIf } from './streaks.js?v=1794984765';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -133,9 +133,9 @@ function render() {
   $('day').hidden = !items.length;
   const owed = L.choresOwed(ctx, kid, date);
   if (owed.length && items.length) {
-    const locks = items.some((i) => L.lockable(kid, i));
+    const locks = items.some((i) => L.lockable(kid, i)), held = L.owedHeld(ctx, kid, date);
     $('day').querySelector('.rhead').insertAdjacentHTML('afterend', '<div class="owed"><strong>Finish first: a chore from earlier this week</strong>' +
-      '<small>' + (locks ? 'Homework and screen time unlock once it’s done. ' : '') + 'No game time today until it’s done (or Mom or Dad excuses it).</small>' +
+      '<small>' + (locks ? 'Homework and screen time unlock once it’s done. ' : '') + (held ? 'It’s holding up to ' + held + ' min of game time until it’s done (or Mom or Dad excuses it).' : 'Get it done (or ask Mom or Dad to excuse it).') + '</small>' +
       owed.map((o) => {
         const v = L.dayChecks(ctx, kid, o.date)[o.item.key], ref = ymd(o.date) + '|' + o.item.key;
         return '<button class="ckbtn owedbtn" data-owed="' + ref + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +

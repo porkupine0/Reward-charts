@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984530';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794984530';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794984530';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984530';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984765';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794984765';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794984765';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984765';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -244,6 +244,15 @@ export function gameDay(ctx, kid, date) {
 export function gameUses(ctx, kid, monday) {
   const log = ((((ctx.routines || {}).game || {})[kid] || {})[ymd(monday)]) || {};
   return Object.entries(log).filter(([, m]) => Number(m) > 0).map(([at, m]) => ({ at: Number(at), minutes: Number(m) })).sort((a, b) => a.at - b.at);
+}
+// Game time a missed chore is holding back right now: the missed school days (they earn back when
+// it's done, since a late chore counts) plus today if today is a school day.
+export function owedHeld(ctx, kid, date) {
+  const owed = choresOwed(ctx, kid, date);
+  if (!owed.length) return 0;
+  const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date))).map((o) => ymd(o.date)));
+  if (GAME.days.includes(dowOf(date))) days.add(ymd(date));
+  return days.size * GAME.perDay;
 }
 export function gameWeek(ctx, kid, monday) {
   const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });

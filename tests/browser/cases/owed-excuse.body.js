@@ -9,6 +9,7 @@
   check(locked.includes('homework') && !locked.includes('afterSnack') && !locked.includes('activity'), 'only screen/school tasks lock');
   await tap('[data-owedex^="mark|2026-11-18"]');
   check(!!(await p.$('[data-owedex^="approve|2026-11-18"]')), 'waiting shown in Finish-first');
+  await p.screenshot({ path: OUT + 'owed-rhett-waiting.png', fullPage: false });
   check((await p.$$('#day .ck.locked')).length > 0, 'still locked while waiting');
   await visit('parents.html', 'owed-parents');
   const wait = await p.$eval('#excuses', (e) => e.textContent);

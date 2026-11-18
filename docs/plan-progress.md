@@ -14,7 +14,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 2. Eli's Saturday run is missing from his weekend checklist.
 - [x] 7. After Eli's plan ends (Jan 25): a required "Running" item and chart row with nothing behind them.
 - [x] 8. Small fixes: Parents "This week" counts tomorrow, the trials text says Thursday, and the "next" highlight is in the wrong section.
-- [ ] 6. The chore lock is too broad: lock only homework and screen tasks, show one message, and allow chores to be excused.
+- [x] 6. The chore lock is too broad: lock only homework and screen tasks, show one message, and allow chores to be excused.
 
 ## Tier 2: parent workload
 - [ ] 9. A "Tonight" card on the Parents page: evening checks, today's excuses, tonight's late bedtime, and "All good" per boy.
@@ -34,7 +34,11 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 
 - Training text still names old days (needs a coach's call, not changed): Plyometrics says Tuesday (now Wednesday), Core A says "Mon, Wed (+ optional Fri)" (Monday is swim now), and the Strength B note mentions jumps on "interval Thursdays" (Thursday is lifts only now).
 
+- Missed-chore lock now: homework and screen tasks lock (Rhett's computer tasks; Eli's assignments and homework). For Isaiah, and for Eli on weekends, it's the Finish-first box plus held game time. One missed chore holds the game time of every school day from then until it's done or excused. A missed Saturday chore has no consequence on Sunday for Eli or Isaiah.
+- Isaiah's weekend evening checks will show in the Tonight card (one "All good" tap).
+
 ## Log
 - Nov 18: browser tests and this plan moved into the repo. Item 3 done.
 - Nov 18: items 1, 2 and 7 done. Eli's run/swim boxes follow his plan, his Saturday run is on his checklist, and a new test checks every chart box against the checklist.
 - Nov 18: item 8 done. The "next" ring follows the time of day, Parents "This week" counts Monday to today, trials say Saturday, and Eli's box labels follow his plan.
+- Nov 18: item 6 done. The lock is narrowed, the held game time is shown, and chores can be excused from the Finish-first box.

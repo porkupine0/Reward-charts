@@ -7,8 +7,7 @@
   const jan25 = await p.$$('button.cell[data-row="running"]');
   notes.push('Jan 25 run/swim boxes: ' + jan25.length);
   check(jan25.length === 0, 'after the plan, run/swim boxes are off');
-  // chores Wed-Fri done, so the Saturday list isn't locked by the missed-chore rule
-  await p.evaluate(() => sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-18': { eli: { chore: true } }, '2026-11-19': { eli: { chore: true } }, '2026-11-20': { eli: { chore: true } } } } } })));
+  // Wed-Fri chores are still owed here: his run must stay open anyway
   await visit('checklist.html?kid=eli&date=2026-11-21', 'eli-sat21');
   const sat = await p.$('#day .ckbtn[data-key="activity"]');
   check(!!sat, 'Sat Nov 21 has the run item');

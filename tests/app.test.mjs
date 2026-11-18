@@ -403,3 +403,18 @@ test("Eli's run/swim box labels follow the plan day", () => {
   const xmas = rowsFor(CHARTS.eli, d('2026-12-21')).find((x) => x.key === 'running');
   assert.equal(xmas.cells[4].t, 'Off'); // Christmas Day: planned day off, fills itself
 });
+
+test("game time a missed chore holds back: school days only", () => {
+  const ctx = { routines: { days: {} }, run: {}, isaiah: {} };
+  // Wednesday's chore missed, seen Thursday: Wednesday's and Thursday's 30 min
+  assert.equal(L.owedHeld(ctx, 'isaiah', d('2026-11-19')), 60);
+  // Saturday, Wed-Fri chores missed: those three school days, nothing for Saturday itself
+  assert.equal(L.owedHeld(ctx, 'isaiah', d('2026-11-21')), 90);
+  // Saturday, only Friday's chore missed
+  const fri = { routines: { days: { '2026-11-18': { isaiah: { chore: true } }, '2026-11-19': { isaiah: { chore: true } } } }, run: {}, isaiah: {} };
+  assert.equal(L.owedHeld(fri, 'isaiah', d('2026-11-21')), 30);
+  // Sunday, only Saturday's chore missed: no game time is at stake
+  const sat = { routines: { days: { '2026-11-18': { isaiah: { chore: true } }, '2026-11-19': { isaiah: { chore: true } }, '2026-11-20': { isaiah: { chore: true } } } }, run: {}, isaiah: {} };
+  assert.equal(L.choresOwed(sat, 'isaiah', d('2026-11-22')).length, 1);
+  assert.equal(L.owedHeld(sat, 'isaiah', d('2026-11-22')), 0);
+});
