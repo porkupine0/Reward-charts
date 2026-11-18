@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795028240';
-import { CHARTS, weekProgress } from './charts.js?v=1795028240';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795028240';
-import * as L from './lists.js?v=1795028240';
-import { owed, score, planned, fmt } from './trials.js?v=1795028240';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795028240';
-import { askParent, setParent, changePin } from './parent.js?v=1795028240';
-import { dayFull } from './streaks.js?v=1795028240';
-import { owedItems } from './owed.js?v=1795028240';
-import { pruneList, pruneCutoff } from './prune.js?v=1795028240';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795028240';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795028240';
-import { nowHtml } from './nowview.js?v=1795028240';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795028743';
+import { CHARTS, weekProgress } from './charts.js?v=1795028743';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795028743';
+import * as L from './lists.js?v=1795028743';
+import { owed, score, planned, fmt } from './trials.js?v=1795028743';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795028743';
+import { askParent, setParent, changePin } from './parent.js?v=1795028743';
+import { dayFull } from './streaks.js?v=1795028743';
+import { owedItems } from './owed.js?v=1795028743';
+import { pruneList, pruneCutoff } from './prune.js?v=1795028743';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795028743';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795028743';
+import { nowHtml } from './nowview.js?v=1795028743';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];

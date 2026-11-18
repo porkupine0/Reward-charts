@@ -43,7 +43,7 @@ Each of Iowa DOT's 68 practice questions maps to a unit: signs, signals and the 
 **Sign pictures:** 17 of Iowa DOT's practice questions show a sign ("a sign of this shape and color means…"). The quiz needs simple drawn sign shapes (octagon, triangle, diamond, pennant, circle, pentagon, in the right colors) before unit 2 and Form B.
 
 ## Counts
-- Videos: 67 picked across 46 lesson days (12 Iowa DOT or Iowa-made), plus 16 spares. All exist and can be embedded (checked with YouTube on Nov 18); titles, channels and lengths came from YouTube itself; **none watched yet**: the advisor approved them as a list to preview, not their content. Lessons with two or three short videos run 5–10 minutes; the longest single video is 13:32.
+- Videos: 67 picked across 46 lesson days (12 Iowa DOT or Iowa-made), plus 16 spares. All exist and can be embedded (checked with YouTube on Nov 18); titles, channels and lengths came from YouTube itself; **none watched yet**: the advisor approved them as a list to preview, not their content. Most days have 3 to 10 minutes of video; ten days run 10 to 14 minutes (the longest: passing 13:32, alcohol and drugs 13:22, and a week-12 practice video 13:50). **Four days have under 3 minutes** (after a crash 2:52, Iowa licensing rules 1:26, dashboard and driver-assist 2:08, pulled over by police 1:55): those lean on the Key points card, and are the first to fill if a better video turns up.
 - Questions to write: about 6 per lesson (3 in that day's quiz, the rest for the unit test and review) ≈ 260, plus Forms B and C (50). Written about two weeks ahead of Eli, one unit at a time.
 
 ## Code still to build (in order)

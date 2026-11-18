@@ -109,6 +109,11 @@ doc = open('docs/driving-syllabus.md').read()
 a, b = doc.index('<!-- units -->'), doc.index('<!-- /units -->')
 doc = doc[:a] + '<!-- units -->\n' + '\n'.join(rows) + '\n' + doc[b:]
 open('docs/driving-syllabus.md', 'w').write(doc)
+secs_of = lambda ln: int(ln.split(':')[0]) * 60 + int(ln.split(':')[1])
+for u in data['units']:
+    for d in u['days']:
+        t = sum(secs_of(v['len']) for v in d['videos'])
+        if t < 180 or t > 600: print('  unit %d day %d (%s): %d:%02d of video' % (u['unit'], d['day'], d['topic'], t // 60, t % 60))
 n = sum(len(d['videos']) for u in data['units'] for d in u['days'])
 print('planned videos', n, 'spares', len(data['spares']), 'lesson days', sum(len(u['days']) for u in data['units']),
       'IA', sum(1 for u in data['units'] for d in u['days'] for v in d['videos'] if v['notes'].startswith('IA')))

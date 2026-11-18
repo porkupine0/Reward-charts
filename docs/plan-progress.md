@@ -48,11 +48,11 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
 - [x] 6. Baseline knowledge test (Form A, 25 questions, weighted like Iowa DOT's practice test; score and topics on the Driving and Parents pages; outside streak and game time).
 - [x] 7. 13-week plan with 67 videos picked (docs/driving-syllabus.md).
-- [ ] 8. Unit test as a lesson type: every 5th lesson is a unit test (~15 questions, scored). w1d5 changes only if Eli hasn't finished it (ask).
+- [ ] 8. Unit test as a lesson type: every 5th lesson is a unit test (~15 questions, scored). Answered questions stay in place (as in the knowledge test: first tap is final). w1d5 changes only if Eli hasn't finished it (ask).
 - [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
 - [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).
 - [ ] 11. Week 2 content (unit 2: signs and signals), questions ~6 per lesson. Re-run scripts/check-videos.mjs first.
-- [ ] 12. Form B, opening after unit 2's test (due about 2 weeks after he starts), then Form C; final = Form A again.
+- [ ] 12. Progress tests: WAIT for the parent's answer (same test every time, or Forms B and C alternating with Form A as the final). Opens after unit 2's test, about 2 weeks after he starts.
 
 Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
 Decided Nov 18: only Eli's typing and driving wait for today's chores (assignments and homework don't; homework still locks when an earlier day's chore is owed). The driving lesson counts toward his daily streak, not game time.

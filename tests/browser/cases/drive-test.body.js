@@ -15,12 +15,19 @@
   check(!(await p.$('#tests .dq')), 'questions only after Start');
   await p.click('[data-tstart="base"]'); await p.waitForTimeout(200);
   check((await p.$$('#tests .dq')).length === 25, '25 questions');
-  const q2top = await p.$eval('#tests .dq:nth-of-type(2)', (e) => e.getBoundingClientRect().top);
-  await p.click('#tests .dq:nth-of-type(1) .dq-choice'); await p.waitForTimeout(200);
+  // at phone width, answering (the longest choice) must not move anything below it
+  await p.setViewportSize({ width: 320, height: 800 });
+  await p.waitForTimeout(200);
+  const tops = async () => p.$$eval('#tests .dq', (els) => els.map((e) => Math.round(e.getBoundingClientRect().top + window.scrollY)));
+  const before = await tops();
+  await p.$eval('#tests .dq:nth-of-type(1)', (q) => { const b = [...q.querySelectorAll('.dq-choice')].sort((x, y) => y.textContent.length - x.textContent.length)[0]; b.click(); });
+  await p.waitForTimeout(250);
+  const after = await tops();
+  check(JSON.stringify(before) === JSON.stringify(after), 'phone width: nothing moves after an answer (' + before.slice(0, 3) + ' / ' + after.slice(0, 3) + ')');
+  await p.setViewportSize({ width: 375, height: 812 });
   const first = await p.$eval('#tests .dq:nth-of-type(1)', (e) => e.textContent);
-  check(/Your answer:/.test(first) && !/Right|✓|✗|Iowa Driver/.test(first), 'answered: his pick only, no right/wrong or explanation');
+  check(!/Right|✓|✗|Iowa Driver/.test(first) && /^Your answer: /.test(await p.$eval('#tests .dq:nth-of-type(1) .picked', (e) => e.getAttribute('aria-label'))), 'answered: his pick only (marked, labelled for screen readers), no right/wrong or explanation');
   check((await p.$$('#tests .dq:nth-of-type(1) .dq-choice[disabled]')).length === 4 && (await p.$$('#tests .dq:nth-of-type(1) .dq-choice.picked')).length === 1, 'answered: the 4 choices stay, disabled, his pick marked');
-  check(Math.abs(await p.$eval('#tests .dq:nth-of-type(2)', (e) => e.getBoundingClientRect().top) - q2top) < 2, 'the next question does not move after an answer');
   await visit('drive.html', 'test-reload');
   check((await p.$$('#tests .dq')).length === 25 && /1 of 25 answered/.test(await p.$eval('#tests', (e) => e.textContent)), 'a reload keeps his place');
   for (let k = 0; k < 24; k++) { await p.click('#tests .dq-choice:not([disabled])'); await p.waitForTimeout(60); }

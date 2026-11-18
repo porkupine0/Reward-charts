@@ -1,12 +1,12 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795028240';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795028240';
-import { SETTINGS, onSettings } from './settings.js?v=1795028240';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795028240';
-import { LESSONS } from './driving-course.js?v=1795028240';
-import { dueOn } from './driving.js?v=1795028240';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795028240';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795028743';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795028743';
+import { SETTINGS, onSettings } from './settings.js?v=1795028743';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795028743';
+import { LESSONS } from './driving-course.js?v=1795028743';
+import { dueOn } from './driving.js?v=1795028743';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795028743';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.

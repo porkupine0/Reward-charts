@@ -705,7 +705,7 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .dq-why small { color: var(--muted); }
 .dt-score { font-size: 18px; margin: 4px 0 10px; }
 .dq-choice[disabled] { cursor: default; opacity: 1; color: var(--muted); }
-.dq-choice.picked { color: var(--ink); border-color: var(--accent); font-weight: 700; }
+.dq-choice.picked { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 .dt-count { font-weight: 700; margin: 4px 0; }
 .dt-topics td:last-child { text-align: right; white-space: nowrap; }
 .dt-weak td:first-child { font-weight: 700; }
