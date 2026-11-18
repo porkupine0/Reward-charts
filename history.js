@@ -1,8 +1,8 @@
 // History: each kid's month at a glance.
-import { watch, ymd, addDays, mondayOf, esc, statusPill } from './store.js?v=1795010309';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795010309';
-import * as L from './lists.js?v=1795010309';
-import { dayFull } from './streaks.js?v=1795010309';
+import { watch, ymd, addDays, mondayOf, esc, statusPill } from './store.js?v=1795019773';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795019773';
+import * as L from './lists.js?v=1795019773';
+import { dayFull } from './streaks.js?v=1795019773';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {} };
@@ -24,7 +24,7 @@ function render() {
     if (!inMonth || key > today) { h += '<span class="calday' + (inMonth ? ' future' : ' out') + '">' + (inMonth ? d.getDate() : '') + '</span>'; d = addDays(d, 1); continue; }
     past++;
     const ls = L.lists(ctx, kid, d);
-    const all = [...ls.day, ...ls.bed].filter((i) => !i.opt && !i.unscored);
+    const all = [...ls.day, ...ls.bed].filter((i) => !i.opt);
     const n = all.filter((i) => L.isOn(ctx, kid, d, i)).length;
     const isFull = dayFull(ctx, kid, d);
     const c = L.dayChecks(ctx, kid, d), r = timerResult(kid, d, c.bedTimer, c);

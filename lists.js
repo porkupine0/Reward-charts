@@ -1,12 +1,12 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795010309';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795010309';
-import { SETTINGS, onSettings } from './settings.js?v=1795010309';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795010309';
-import { LESSONS } from './driving-course.js?v=1795010309';
-import { lessonFor } from './driving.js?v=1795010309';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795010309';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795019773';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795019773';
+import { SETTINGS, onSettings } from './settings.js?v=1795019773';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795019773';
+import { LESSONS } from './driving-course.js?v=1795019773';
+import { dueOn } from './driving.js?v=1795019773';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795019773';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -75,12 +75,11 @@ function listsOn(ctx, kid, date) {
       const at = day.findIndex((i) => i.key === 'activity');
       at >= 0 ? day.splice(at, 0, typing) : day.push(typing);
     }
-    // Driving lesson (Mon–Fri): shown today when a lesson is ready (or finished today), and on past days a
-    // lesson was finished. Computer work (waits for chores). Not scored: no game time, streak or "all done".
+    // Driving lesson (Mon–Fri) on days one was due (see dueOn): counts toward his full day and streak, not
+    // game time. Approved that same day: optional. Computer work (waits for chores).
     if (dow <= 4) {
-      const d = ctx.drive || {}, key = ymd(date), finished = Object.values(d.done || {}).includes(key);
-      const today = key === ymd(todayFn()) && ['ready', 'done'].includes(lessonFor(driveCourse, d, key).status);
-      if (finished || today) day.push({ key: 'drive', label: 'Driving lesson', sub: 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, unscored: true });
+      const due = dueOn(driveCourse, ctx.drive || {}, ymd(date), dow);
+      if (due) day.push({ key: 'drive', label: 'Driving lesson', sub: 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' });
     }
     // After the training plan ends there's nothing to check off, so no Running item
     if (!p && ymd(date) >= planEndYmd()) { const at = day.findIndex((i) => i.key === 'activity'); if (at >= 0) day.splice(at, 1); }
@@ -101,9 +100,6 @@ export const lockable = (kid, it) => !it.derived && it.key !== 'activity' && (!!
 // The driving course (tests can swap in a fixture course).
 let driveCourse = LESSONS;
 export function useCourse(lessons) { driveCourse = lessons; }
-// "Today" for the driving row (tests pin it to a weekday).
-let todayFn = () => new Date();
-export function useToday(fn) { todayFn = fn || (() => new Date()); }
 export const course = () => driveCourse;
 // Computer work's lock for a day: 'owed' (a chore from earlier this week), 'chores' (today's chores not all
 // done) or false. The checklist rows and the Driving page both use it.
@@ -145,7 +141,7 @@ export function isOn(ctx, kid, date, it) {
 
 // Required (not optional) items and how many are done.
 export function progress(ctx, kid, date, list) {
-  const req = list.filter((i) => !i.opt && !i.unscored);
+  const req = list.filter((i) => !i.opt);
   const left = req.filter((i) => !isOn(ctx, kid, date, i));
   return { req, left, done: req.length - left.length };
 }
@@ -270,7 +266,8 @@ export const gameMinOn = (date) => atDate(date, () => SETTINGS.game);
 // is done and both end-of-day checks are yes.
 export function gameDay(ctx, kid, date) {
   const ls = lists(ctx, kid, date);
-  const left = [...progress(ctx, kid, date, ls.day).left, ...progress(ctx, kid, date, ls.bed).left].map((i) => i.label.replace(/^Chore: /, ''));
+  // (the driving lesson counts toward his full day and streak, not game time)
+  const left = [...progress(ctx, kid, date, ls.day).left, ...progress(ctx, kid, date, ls.bed).left].filter((i) => !i.noGame).map((i) => i.label.replace(/^Chore: /, ''));
   const c = dayChecks(ctx, kid, date);
   [...new Set(choresOwed(ctx, kid, date).map((o) => o.date.toLocaleDateString('en-US', { weekday: 'long' })))].forEach((day) => left.push('Finish ' + day + '’s chore first'));
   (CHECKS[kid] || []).forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });

@@ -26,7 +26,7 @@ export const LESSONS = [
   await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
   check((await p.$$('.dprev')).length === 3, 'preview lists the lessons');
   await p.click('[data-approve="F1|yes"]'); await p.waitForTimeout(300);
-  check((await db()).charts['eli-drive'].approved.F1 === true, 'F1 approved');
+  check((await db()).charts['eli-drive'].approved.F1 === '2026-11-18', 'F1 approved (stored as the day)');
   // Wednesday's chore not done: locked, on the page and on the checklist
   await visit('drive.html', 'drive-locked');
   check(/Do today’s chores first/.test(await p.$eval('#today', (e) => e.textContent)), 'page locked until chores');

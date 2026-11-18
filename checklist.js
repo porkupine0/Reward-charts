@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795010309';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795010309';
-import { SETTINGS } from './settings.js?v=1795010309';
-import { askParent } from './parent.js?v=1795010309';
-import * as L from './lists.js?v=1795010309';
-import { dayStreak, cheerIf } from './streaks.js?v=1795010309';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795019773';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795019773';
+import { SETTINGS } from './settings.js?v=1795019773';
+import { askParent } from './parent.js?v=1795019773';
+import * as L from './lists.js?v=1795019773';
+import { dayStreak, cheerIf } from './streaks.js?v=1795019773';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -68,8 +68,8 @@ function nextSection() {
 }
 function section(title, sub, items, checks, timed, phase) {
   if (!items.length) return '';
-  const done = items.filter((i) => isOn(i) || i.opt || i.unscored).length;
-  const req = items.filter((i) => !i.opt && !i.unscored);
+  const done = items.filter((i) => isOn(i) || i.opt).length;
+  const req = items.filter((i) => !i.opt);
   const doneReq = req.filter((i) => isOn(i)).length;
   const isToday = ymd(date) === ymd(new Date());
   let nextMarked = false;
@@ -262,7 +262,8 @@ document.addEventListener('click', (e) => {
   }
   // Eli's Running is done on Training; Isaiah's 600 touches is shared with Ball Master.
   const item = L.lists(ctx, kid, date).day.find((i) => i.key === key);
-  if (item && item.derived === 'drive') { location.href = 'drive.html' + (ymd(date) === ymd(new Date()) ? '' : '?date=' + ymd(date)); return; }
+  // a finished lesson on a past day opens its answers; otherwise today's lesson
+  if (item && item.derived === 'drive') { location.href = 'drive.html' + (ymd(date) !== ymd(new Date()) && isOn(item) ? '?date=' + ymd(date) : ''); return; }
   if (item && item.derived === 'run') { location.href = 'run.html' + (ymd(date) === ymd(new Date()) ? '' : '?date=' + ymd(date)); return; }
   if (item && item.derived === 'touches') { save('isaiah', 'touchDays/' + ymd(date), isOn(item) ? null : true); return; }
   if (key.startsWith('w:')) {

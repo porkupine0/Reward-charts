@@ -134,3 +134,20 @@ test('driving: the content checker catches bad lessons and questions', () => {
   const p3 = D.checkCourse(shape).join('\n');
   ['L1: video 1 needs an 11-character YouTube id', 'L2: video 1 needs a title, channel and length', 'L|3: lesson id must be letters and digits', 'L4: the right answer is in the same position'].forEach((t) => assert.ok(p3.includes(t), t + '\n' + p3));
 });
+
+test('driving: when a lesson is due (for the streak): approved the day before or earlier', () => {
+  const L5 = course(6), dow = (k) => (new Date(k + 'T12:00').getDay() + 6) % 7, due = (p, k) => { const r = D.dueOn(L5, p, k, dow(k)); return r ? r.lesson.id + ':' + r.due : null; };
+  const p = { approved: { L1: '2026-11-16' }, done: {} };              // approved Monday
+  assert.equal(due(p, '2026-11-16'), 'L1:optional', 'optional the day it is approved');
+  assert.equal(due(p, '2026-11-17'), 'L1:required', 'required from the next day');
+  assert.equal(due(p, '2026-11-21'), null, 'nothing on a Saturday');
+  p.done.L1 = '2026-11-18';
+  assert.equal(due(p, '2026-11-18'), 'L1:required', 'the day it was finished');
+  assert.equal(due(p, '2026-11-19'), null, 'L2 not approved: nothing due (waiting)');
+  assert.equal(due({ approved: {}, done: {} }, '2026-11-18'), null, 'nothing approved: nothing due');
+  assert.equal(due({ approved: { L1: true }, done: {} }, '2026-11-18'), 'L1:required', 'older approvals (true) count as before');
+  assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L2:required', 'a skipped lesson is passed over');
+  const r = { approved: { L1: '2026-11-01', L2: '2026-11-01', L3: '2026-11-01', L4: '2026-11-01' }, done: { L1: '2026-11-16', L2: '2026-11-17', L3: '2026-11-18', L4: '2026-11-19' } };
+  assert.equal(due(r, '2026-11-20'), 'L5:required', 'a review is due once an earlier lesson is finished');
+  assert.ok(D.isApproved('2026-11-16') && D.isApproved(true) && !D.isApproved('skip') && !D.isApproved(undefined));
+});
