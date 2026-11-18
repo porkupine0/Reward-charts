@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984765';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794984765';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794984765';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984765';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984872';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult } from './routines.js?v=1794984872';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794984872';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984872';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -259,4 +259,27 @@ export function gameWeek(ctx, kid, monday) {
   const minutes = days.filter((d) => d.earned).length * GAME.perDay;
   const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
   return { days, minutes, max: GAME.days.length * GAME.perDay, uses, used, left: Math.max(0, minutes - used) };
+}
+
+// ---- Parents' "Tonight" card: everything a parent signs off on for one evening ----
+// The evening a parent is closing out: before 5 am it's still last night (same as nowStatus).
+export function tonightDate(now) {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return now.getHours() < 5 ? addDays(d, -1) : d;
+}
+// Per boy: the evening checks (value 'yes' | 'no' | null), items waiting for an OK that night,
+// and whether that night's bedtime was late (and not yet OK'd).
+export function tonight(ctx, date) {
+  return Object.keys(CHECKS).map((kid) => {
+    const c = dayChecks(ctx, kid, date), ls = lists(ctx, kid, date);
+    const checks = CHECKS[kid].map((k) => ({ key: k.key, label: k.label, sub: k.sub, value: c[k.key] === true ? 'yes' : c[k.key] === 'no' ? 'no' : null }));
+    const excuses = [...ls.morning, ...ls.day, ...ls.bed].filter((it) => c[it.key] === SKIP).map((it) => ({ key: it.key, label: it.label.replace(/^Chore: /, '') }));
+    const r = timerResult(kid, date, c.bedTimer, c);
+    return { kid, checks, excuses, late: r && r.status === 'late' ? r.lateBy : 0, open: checks.filter((x) => !x.value).length };
+  });
+}
+// "All good": fill only the checks nobody has answered; never change a "Not today".
+export function allGoodKeys(ctx, kid, date) {
+  const c = dayChecks(ctx, kid, date);
+  return (CHECKS[kid] || []).filter((k) => c[k.key] !== true && c[k.key] !== 'no').map((k) => k.key);
 }

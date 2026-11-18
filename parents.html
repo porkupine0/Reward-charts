@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1794984765';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1794984872';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Parents · Reward Charts</title>
@@ -13,7 +13,7 @@
 <link rel="icon" href="icons/parents.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1794984765">
+<link rel="stylesheet" href="style.css?v=1794984872">
 </head>
 <body class="parents">
 <main class="wrap">
@@ -26,6 +26,12 @@
   <section class="pnow">
     <div class="rhead"><h2 id="nowhead">Right now</h2></div>
     <div id="nowall" class="nowall"></div>
+  </section>
+
+  <section class="card pcard" id="tncard">
+    <div class="rhead"><h2 id="tnhead">Tonight</h2><span class="tnnav"><button id="tnprev" class="navbtn" type="button" aria-label="Day before">&lsaquo;</button><button id="tnnext" class="navbtn" type="button" aria-label="Day after">&rsaquo;</button></span></div>
+    <p class="note">The evening checks for all three boys in one place. “All good” marks Yes on any check nobody has answered yet; it never changes a “Not today”.</p>
+    <div id="tonight"></div>
   </section>
 
   <section class="card pcard">
@@ -77,6 +83,6 @@
     <p class="note" id="datamsg"></p>
   </section>
 </main>
-<script type="module" src="parents.js?v=1794984765"></script>
+<script type="module" src="parents.js?v=1794984872"></script>
 </body>
 </html>

@@ -1,14 +1,14 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794984765';
-import { CHARTS, weekProgress } from './charts.js?v=1794984765';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794984765';
-import * as L from './lists.js?v=1794984765';
-import { owed, score, planned, fmt } from './trials.js?v=1794984765';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794984765';
-import { askParent, setParent, changePin } from './parent.js?v=1794984765';
-import { dayFull } from './streaks.js?v=1794984765';
-import { owedItems } from './owed.js?v=1794984765';
-import { nowHtml } from './nowview.js?v=1794984765';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794984872';
+import { CHARTS, weekProgress } from './charts.js?v=1794984872';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794984872';
+import * as L from './lists.js?v=1794984872';
+import { owed, score, planned, fmt } from './trials.js?v=1794984872';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794984872';
+import { askParent, setParent, changePin } from './parent.js?v=1794984872';
+import { dayFull } from './streaks.js?v=1794984872';
+import { owedItems } from './owed.js?v=1794984872';
+import { nowHtml } from './nowview.js?v=1794984872';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -25,8 +25,31 @@ const PAGES = { eli: [['Checklist', 'checklist.html?kid=eli'], ['Chart', 'eli.ht
   rhett: [['Checklist', 'checklist.html?kid=rhett'], ['Chart', 'trombone.html']],
   isaiah: [['Checklist', 'checklist.html?kid=isaiah'], ['Chart', 'zay.html'], ['Ball Master', 'isaiah.html']] };
 
+// Tonight: which evening (0 = tonight, back to Monday of this week)
+let tnBack = 0;
+const exBtns = (d, id, key) => '<span class="exbtns"><button class="tbtn approve" data-ex="' + d + '|' + id + '|' + key + '|ok">Approve</button><button class="linkbtn" data-ex="' + d + '|' + id + '|' + key + '|no">Not OK</button></span>';
+function renderTonight(today) {
+  const base = L.tonightDate(today), mon = mondayOf(base);
+  tnBack = Math.max(0, Math.min(tnBack, Math.round((base - mon) / 864e5)));
+  const date = addDays(base, -tnBack), dk = ymd(date);
+  $('tnhead').textContent = tnBack ? DAYS[(date.getDay() + 6) % 7] + ' ' + shortDate(date) : 'Tonight · ' + DAYS[(date.getDay() + 6) % 7];
+  $('tnprev').disabled = ymd(date) <= ymd(mon);
+  $('tnnext').disabled = tnBack === 0;
+  $('tonight').innerHTML = L.tonight(ctx, date).map((t) => {
+    const k = KIDS[t.kid];
+    const chip = (c, v, txt) => '<button class="chip' + (c.value === v ? ' on' + (v === 'no' ? ' no' : '') : '') + '" data-tn="' + dk + '|' + t.kid + '|' + c.key + '|' + v + '" aria-pressed="' + (c.value === v) + '">' + txt + '</button>';
+    return '<div class="tnkid" style="--accent:' + k.accent + '"><div class="tnkid-top"><strong>' + esc(k.name) + '</strong>' +
+      (t.open ? '<button class="tbtn approve" data-allgood="' + dk + '|' + t.kid + '">All good</button>' : '<span class="rcount all">Done</span>') + '</div>' +
+      t.checks.map((c) => '<div class="tnrow"><span>' + esc(c.label) + '</span><span class="dchk-btns">' + chip(c, 'yes', 'Yes') + chip(c, 'no', 'Not today') + '</span></div>').join('') +
+      t.excuses.map((x) => '<div class="tnrow"><span>Not able to: ' + esc(x.label) + '</span>' + exBtns(dk, t.kid, x.key) + '</div>').join('') +
+      (t.late ? '<div class="tnrow"><span>In bed ' + t.late + ' min late</span><button class="tbtn approve" data-bedok="' + dk + '|' + t.kid + '">Parent OK</button></div>' : '') +
+      '</div>';
+  }).join('');
+}
+
 function render() {
   const today = new Date(), mon = mondayOf(today);
+  renderTonight(today);
   // Right now: where each kid is, given the time of day
   $('nowhead').textContent = 'Right now · ' + today.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   $('nowall').innerHTML = Object.entries(KIDS).map(([id, k]) => '<div class="nowkid" style="--accent:' + k.accent + '"><div class="nowkid-top"><a class="nowname" href="kid.html?kid=' + id + '">' + esc(k.name) + '</a>' +
@@ -55,7 +78,7 @@ function render() {
       [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => {
         if (c[it.key] !== SKIP) return;
         ex.push(row(k.name, k.accent, esc(it.label.replace(/^Chore: /, '')), DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d),
-          '<span class="exbtns"><button class="tbtn approve" data-ex="' + ymd(d) + '|' + id + '|' + it.key + '|ok">Approve</button><button class="linkbtn" data-ex="' + ymd(d) + '|' + id + '|' + it.key + '|no">Not OK</button></span>'));
+          exBtns(ymd(d), id, it.key)));
       });
     });
   }
@@ -99,6 +122,20 @@ document.addEventListener('click', async (e) => {
   if (t) { if (await askParent()) save(t.dataset.chart, t.dataset.path, t.dataset.chart === 'eli' || t.dataset.chart === 'trombone' ? true : ymd(new Date())); return; }
   const xb = e.target.closest('[data-ex]');
   if (xb) { const [d, kid, key, a] = xb.dataset.ex.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/' + key, a === 'ok' ? EXCUSED : null); return; }
+  const tn = e.target.closest('[data-tn]');
+  if (tn) {
+    // Same storage and meaning as the checklist's End of day: true = yes, 'no' = not today; tap again to clear
+    const [d, kid, key, v] = tn.dataset.tn.split('|'), cur = L.dayChecks(ctx, kid, parseYmd(d))[key];
+    const next = v === 'yes' ? (cur === true ? null : true) : (cur === 'no' ? null : 'no');
+    if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/' + key, next);
+    return;
+  }
+  const ag = e.target.closest('[data-allgood]');
+  if (ag) {
+    const [d, kid] = ag.dataset.allgood.split('|'), keys = L.allGoodKeys(ctx, kid, parseYmd(d));
+    if (keys.length && await askParent()) keys.forEach((k) => save('routines', 'days/' + d + '/' + kid + '/' + k, true));
+    return;
+  }
   const b = e.target.closest('[data-bedok]');
   if (b) { const [d, kid] = b.dataset.bedok.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/bedOk', true); return; }
   const ic = e.target.closest('[data-ics]');
@@ -153,6 +190,8 @@ function ics(which) {
   }
   return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Reward Charts//EN', ...ev, 'END:VCALENDAR'].join('\r\n');
 }
+$('tnprev').onclick = () => { tnBack++; render(); };
+$('tnnext').onclick = () => { tnBack--; render(); };
 $('ics').innerHTML = Object.entries(KIDS).map(([id, k]) => '<button class="pillbtn" style="--accent:' + k.accent + '" data-ics="' + id + '">' + esc(k.name) + '’s lights out</button>').join('') +
   '<button class="pillbtn" style="--accent:#C2501C" data-ics="trials">Eli’s time trials</button>';
 

@@ -418,3 +418,18 @@ test("game time a missed chore holds back: school days only", () => {
   assert.equal(L.choresOwed(sat, 'isaiah', d('2026-11-22')).length, 1);
   assert.equal(L.owedHeld(sat, 'isaiah', d('2026-11-22')), 0);
 });
+
+test("Tonight card: which evening, the checks, and All good never overrides Not today", () => {
+  assert.equal(ymd(L.tonightDate(new Date(2026, 10, 19, 2, 30))), '2026-11-18', 'before 5 am is still last night');
+  assert.equal(ymd(L.tonightDate(new Date(2026, 10, 18, 21, 0))), '2026-11-18');
+  const wed = '2026-11-18', ctx = { routines: { days: { [wed]: { rhett: { noYell: true, noLies: 'no', homework: '~skip' } } } }, run: {}, isaiah: {} };
+  const t = L.tonight(ctx, d(wed));
+  assert.deepEqual(t.map((x) => x.kid), ['eli', 'rhett', 'isaiah']);
+  const r = t.find((x) => x.kid === 'rhett');
+  assert.deepEqual(r.checks.map((x) => x.value), ['yes', null, 'no']);
+  assert.equal(r.open, 1);
+  assert.deepEqual(r.excuses.map((x) => x.key), ['homework']);
+  assert.deepEqual(L.allGoodKeys(ctx, 'rhett', d(wed)), ['firstTime'], 'only the unanswered one');
+  assert.deepEqual(L.allGoodKeys(ctx, 'isaiah', d(wed)), ['noYell', 'firstTime', 'noLies']);
+  assert.equal(L.tonight(ctx, d('2026-11-21')).find((x) => x.kid === 'isaiah').checks.length, 3, 'weekends too');
+});
