@@ -1,11 +1,12 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795039349';
-import { applyConfig } from './routines.js?v=1795039349';
-import { askParent } from './parent.js?v=1795039349';
-import * as L from './lists.js?v=1795039349';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795039349';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795039349';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795039593';
+import { applyConfig } from './routines.js?v=1795039593';
+import { askParent } from './parent.js?v=1795039593';
+import * as L from './lists.js?v=1795039593';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795039593';
+import * as COURSE from './driving-course.js?v=1795039593';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795039593';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -45,7 +46,7 @@ function render() {
   const now = new Date(), key = ymd(now), dow = (now.getDay() + 6) % 7;
   const st = lessonFor(course, d, key);
   if (!course.length) { $('today').innerHTML = '<h2>No lessons yet</h2><p class="note">The first week of lessons is on its way.</p>'; return; }
-  if (st.status === 'finished') { $('today').innerHTML = '<h2>Course finished!</h2><p class="note">Every lesson done. Nice work.</p>'; return; }
+  if (st.status === 'finished') { $('today').innerHTML = course.length < (COURSE.PLANNED || 0) ? '<h2>More lessons coming</h2><p class="note">You’ve done every lesson so far. The next ones are being written; nothing is due until they’re approved.</p>' : '<h2>Course finished!</h2><p class="note">Every lesson done. Nice work.</p>'; return; }
   if (st.status === 'waiting') { $('today').innerHTML = '<h2>Next lesson: ' + esc(st.lesson.title) + '</h2><p class="note">Waiting for Mom or Dad to preview and approve it.</p>'; return; }
   if (st.status !== 'done' && dow > 4) { $('today').innerHTML = '<h2>See you Monday</h2><p class="note">Driving lessons are Monday to Friday.</p>'; return; }
   const lock = st.status === 'done' ? false : L.computerLock(ctx, 'eli', now);

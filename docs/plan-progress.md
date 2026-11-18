@@ -50,7 +50,7 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 7. 13-week plan with 67 videos picked (docs/driving-syllabus.md).
 - [x] 7b. Recut the plan to 55 lesson days (merge units 10 and 11; one final week).
 - [x] 8. Unit test: every 5th lesson; 4 questions from each finished lesson of its unit (never-asked, then missed, then least recent); answers hidden until all are in, then score + answers; finishes only when all are answered; score on the Parents page. w1d5 is now the Unit 1 test (2 questions appended to each unit 1 lesson). The daily quiz keeps its choices in place too.
-- [ ] 8b. (unit tests whose lessons were all skipped are now passed over) "Not able to do it?" for driving lessons (approved by the family Nov 18): a parent-excused weekday keeps his streak (like run/swim). Needed before Thanksgiving, Nov 26.
+- [x] 8b. "Not able to do it?" on the driving row (even while it is chore-locked); a parent approves on the Parents page (or on Eli's checklist: tap it, then Approve with the PIN, no need for Eli to ask first). The excused day counts; the same lesson is due the next school day. Unit tests whose lessons were all skipped are passed over. Checklist row says "Driving: unit test" on Fridays; "More lessons coming" when he catches up with what is written.
 - [ ] 9b. Weekly hazard ride (approved Nov 18): once a week, a 10-minute ride with Eli as passenger calling out hazards; a parent ticks it on the Driving page (outside game time). Put it on the plan's quietest lesson day each week.
 - [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
 - [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).
@@ -111,3 +111,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 18: a lesson he hasn't begun waits until the baseline is done (lesson 2's first question is close to a baseline question).
 - Nov 18: family answers: weekly hazard ride yes; a weekly check-in writes the next unit and lists the videos to preview (Saturdays); permit knowledge test probably at home (parent-proctored: apply 7-14 days ahead, computer not phone/tablet, link expires 72 h, then a DMV appointment for the permit).
 - Nov 18: step 8 done (unit tests).
+- Nov 18: step 8b done (lesson excuses for holidays).

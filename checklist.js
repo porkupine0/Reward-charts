@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795039349';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795039349';
-import { SETTINGS } from './settings.js?v=1795039349';
-import { askParent } from './parent.js?v=1795039349';
-import * as L from './lists.js?v=1795039349';
-import { dayStreak, cheerIf } from './streaks.js?v=1795039349';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795039593';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795039593';
+import { SETTINGS } from './settings.js?v=1795039593';
+import { askParent } from './parent.js?v=1795039593';
+import * as L from './lists.js?v=1795039593';
+import { dayStreak, cheerIf } from './streaks.js?v=1795039593';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -33,7 +33,8 @@ function itemHtml(it, checks, extra) {
   const lockMsg = extra && extra.locked === 'owed' ? 'Locked · see Finish first' : 'Do your chores first';
   // "Not able to complete": regular items only (not ones filled from other pages, weekly or multi-part ones)
   const raw = checks[it.key];
-  const canExcuse = EXCUSABLE.includes(it.key) && (!it.derived || it.key === 'activity') && !locked;
+  // the driving lesson can be excused even while it's locked (a holiday: no lesson and no chores that day)
+  const canExcuse = EXCUSABLE.includes(it.key) && (!it.derived || it.key === 'activity' || it.key === 'drive') && (!locked || it.key === 'drive');
   const excused = raw === EXCUSED, pending = raw === SKIP;
   let h = '<div class="ck' + (on ? ' on' : '') + (excused ? ' excused' : '') + (pending ? ' pending' : '') + (locked ? ' locked' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
   h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +

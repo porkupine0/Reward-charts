@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795039349';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795039593';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -13,7 +13,7 @@ export const KIDS = {
 export const SKIP = '~skip', EXCUSED = '~excused';
 export const isDone = (v) => !!v && v !== SKIP;
 // Items a kid can mark "not able to do it": schoolwork, reading and practice, not chores or bedtime basics.
-export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize', 'activity']; // activity = Eli's run/swim, Isaiah's soccer, Rhett's move/racquetball
+export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize', 'activity', 'drive']; // activity = Eli's run/swim, Isaiah's soccer, Rhett's move/racquetball; drive = Eli's driving lesson (holidays, sick days)
 
 // Chores, shower nights and lights out come from settings.js (editable on the Settings page).
 export { atDate };

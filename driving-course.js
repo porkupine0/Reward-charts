@@ -7,6 +7,9 @@
 
 const q = (id, question, choices, answer, why, page, quote) => ({ id, q: question, choices, answer, why, ref: "Iowa Driver's Manual p." + page, quote });
 
+// Lesson days in the whole plan (docs/driving-syllabus.md): while LESSONS is shorter, the page says more are coming.
+export const PLANNED = 55;
+
 export const LESSONS = [
   {
     id: 'w1d1', title: 'Look ahead: scanning the road',
