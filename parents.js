@@ -1,15 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795007993';
-import { CHARTS, weekProgress } from './charts.js?v=1795007993';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795007993';
-import * as L from './lists.js?v=1795007993';
-import { owed, score, planned, fmt } from './trials.js?v=1795007993';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007993';
-import { askParent, setParent, changePin } from './parent.js?v=1795007993';
-import { dayFull } from './streaks.js?v=1795007993';
-import { owedItems } from './owed.js?v=1795007993';
-import { pruneList, pruneCutoff } from './prune.js?v=1795007993';
-import { nowHtml } from './nowview.js?v=1795007993';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795008054';
+import { CHARTS, weekProgress } from './charts.js?v=1795008054';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795008054';
+import * as L from './lists.js?v=1795008054';
+import { owed, score, planned, fmt } from './trials.js?v=1795008054';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795008054';
+import { askParent, setParent, changePin } from './parent.js?v=1795008054';
+import { dayFull } from './streaks.js?v=1795008054';
+import { owedItems } from './owed.js?v=1795008054';
+import { pruneList, pruneCutoff } from './prune.js?v=1795008054';
+import { nowHtml } from './nowview.js?v=1795008054';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
