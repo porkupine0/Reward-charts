@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795003562';
-import { askParent } from './parent.js?v=1795003562';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795003562';
-import { applySettings, SETTINGS } from './settings.js?v=1795003562';
-import { weekStreak, cheerIf } from './streaks.js?v=1795003562';
-import { gameWeek } from './lists.js?v=1795003562';
-import * as L from './lists.js?v=1795003562';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795003562';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795004044';
+import { askParent } from './parent.js?v=1795004044';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795004044';
+import { applySettings, SETTINGS } from './settings.js?v=1795004044';
+import { weekStreak, cheerIf } from './streaks.js?v=1795004044';
+import { gameWeek } from './lists.js?v=1795004044';
+import * as L from './lists.js?v=1795004044';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795004044';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -46,9 +46,10 @@ function renderGame() {
   $('gamecard').classList.toggle('unlocked', g.minutes > 0);
   $('gtstatus').innerHTML = '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
   const t = g.days.find((d) => ymd(d.date) === today);
-  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+' + d.worth + ' min' : ymd(d.date) > today ? 'to come' : 'not yet') + '</span>' +
-      (!d.earned && ymd(d.date) <= today ? '<small>' + esc(d.left.slice(0, 3).join(' · ') + (d.left.length > 3 ? ' · +' + (d.left.length - 3) + ' more' : '')) + '</small>' : '') + '</div>').join('') + '</div>' +
-    (t && !t.earned ? '<p class="gt-today"><b>Today, still to do:</b> ' + esc(t.left.join(' · ')) + '</p>' : t ? '<p class="gt-today"><b>Today: +' + t.worth + ' min earned ✓</b></p>' : '') +
+  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => { const k = ymd(d.date); return '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+' + d.worth + ' min' : k > today ? 'to come' : k === today ? 'not yet' : 'not earned') + '</span></div>'; }).join('') + '</div>' +
+    // past days that didn't earn: why (a late chore or a filled-in check can still earn them)
+    g.days.filter((d) => !d.earned && ymd(d.date) < today).map((d) => '<p class="gt-why"><b>' + DAYS[(d.date.getDay() + 6) % 7] + ' not earned:</b> ' + esc(L.leftSummary(d.left).replace(/^\d+ still to do: /, '')) + '</p>').join('') +
+    (t && !t.earned ? '<p class="gt-today"><b>Today, ' + esc(L.leftSummary(t.left)).replace(': ', ':</b> ') + '</p>' : t ? '<p class="gt-today"><b>Today: +' + t.worth + ' min earned ✓</b></p>' : '') +
     '<div class="gt-sum"><span>Earned <b>' + fmtMin(g.minutes) + '</b></span><span>Used <b>' + fmtMin(g.used) + '</b></span><span>Left <b>' + fmtMin(g.left) + '</b></span></div>' +
     (g.left > 0 ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
       '<button class="chip" data-gtuse="other">Other…</button></div>' : '') +
@@ -146,8 +147,13 @@ document.addEventListener('click', (e) => {
   const gu = e.target.closest('[data-gtuse]');
   if (gu) {
     const g = gameWeek(ctx, kidId, week);
-    let m = gu.dataset.gtuse === 'other' ? Number(prompt('How many minutes did you play? (' + g.left + ' left)', '')) : Number(gu.dataset.gtuse);
-    if (!m || m < 0) return;
+    let m;
+    if (gu.dataset.gtuse === 'other') {
+      const typed = prompt('How long did you play? (' + g.left + ' min left) For example 45, 1 hr or 1:30', '');
+      if (typed === null) return;
+      m = L.parseMinutes(typed);
+      if (!m) { $('gtstatus').insertAdjacentHTML('afterend', '<p class="gt-msg" role="alert">Couldn’t read “' + esc(typed) + '”. Try 45, 1 hr or 1:30.</p>'); setTimeout(() => { const x = document.querySelector('.gt-msg'); if (x) x.remove(); }, 6000); return; }
+    } else m = Number(gu.dataset.gtuse);
     m = Math.min(Math.round(m), g.left);
     if (m > 0) save('routines', 'game/' + kidId + '/' + wk + '/' + Date.now(), m);
     return;

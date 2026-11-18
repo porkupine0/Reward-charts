@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795003562';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795003562';
-import { SETTINGS } from './settings.js?v=1795003562';
-import { askParent } from './parent.js?v=1795003562';
-import * as L from './lists.js?v=1795003562';
-import { dayStreak, cheerIf } from './streaks.js?v=1795003562';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795004044';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795004044';
+import { SETTINGS } from './settings.js?v=1795004044';
+import { askParent } from './parent.js?v=1795004044';
+import * as L from './lists.js?v=1795004044';
+import { dayStreak, cheerIf } from './streaks.js?v=1795004044';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -171,7 +171,7 @@ function renderOn() {
     const g = L.gameDay(ctx, kid, date), school = L.GAME.days.includes(dow);
     $('bed').insertAdjacentHTML('beforeend', '<div class="rhead dchk-head"><h2>End of day</h2><span class="rcount">Mom or Dad</span></div>' +
       dchecks.map(yn).join('') +
-      (school ? '<p class="gt-today">' + (g.earned ? '<b>+' + g.worth + ' min of weekend game time earned today ✓</b>' : '<b>For today’s ' + g.worth + ' min of game time:</b> ' + esc(g.left.join(' · '))) + '</p>' : ''));
+      (school ? '<p class="gt-today">' + (g.earned ? '<b>+' + g.worth + ' min of weekend game time earned today ✓</b>' : '<b>For today’s ' + g.worth + ' min of game time, ' + esc(L.leftSummary(g.left)).replace(': ', ':</b> ')) + '</p>' : ''));
   }
   // Celebrate finishing a whole list (only right after a tap on this phone)
   const k0 = kid + ymd(date);

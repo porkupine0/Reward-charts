@@ -1,15 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795003562';
-import { CHARTS, weekProgress } from './charts.js?v=1795003562';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795003562';
-import * as L from './lists.js?v=1795003562';
-import { owed, score, planned, fmt } from './trials.js?v=1795003562';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795003562';
-import { askParent, setParent, changePin } from './parent.js?v=1795003562';
-import { dayFull } from './streaks.js?v=1795003562';
-import { owedItems } from './owed.js?v=1795003562';
-import { pruneList, pruneCutoff } from './prune.js?v=1795003562';
-import { nowHtml } from './nowview.js?v=1795003562';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795004044';
+import { CHARTS, weekProgress } from './charts.js?v=1795004044';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795004044';
+import * as L from './lists.js?v=1795004044';
+import { owed, score, planned, fmt } from './trials.js?v=1795004044';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795004044';
+import { askParent, setParent, changePin } from './parent.js?v=1795004044';
+import { dayFull } from './streaks.js?v=1795004044';
+import { owedItems } from './owed.js?v=1795004044';
+import { pruneList, pruneCutoff } from './prune.js?v=1795004044';
+import { nowHtml } from './nowview.js?v=1795004044';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -88,7 +88,7 @@ function render() {
   // Reading: this week and the 3 before, per kid
   const weeks = [0, 1, 2, 3].map((w) => addDays(mon, -7 * w));
   $('reading').innerHTML = '<thead><tr><th></th>' + weeks.map((w, i) => '<th>' + (i ? 'Wk of ' + shortDate(w) : 'This week') + '</th>').join('') + '</tr></thead><tbody>' +
-    Object.entries(KIDS).map(([id, k]) => '<tr><td><b style="color:' + k.accent + '">' + esc(k.name) + '</b></td>' + weeks.map((w, i) => {
+    Object.entries(KIDS).map(([id, k]) => '<tr><td><b class="kidname" style="--accent:' + k.accent + '">' + esc(k.name) + '</b></td>' + weeks.map((w, i) => {
       const r = L.readingWeek(ctx, id, w, i ? null : today);
       return '<td><b>' + r.read + '</b>/' + r.nights + (r.excused ? ' <small>+' + r.excused + ' excused</small>' : '') + '</td>';
     }).join('') + '</tr>').join('') + '</tbody>';

@@ -1,5 +1,5 @@
-import { planFor, planEndYmd } from './plan.js?v=1795003562';
-import { SETTINGS } from './settings.js?v=1795003562';
+import { planFor, planEndYmd } from './plan.js?v=1795004044';
+import { SETTINGS } from './settings.js?v=1795004044';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -49,7 +49,7 @@ export const CHARTS = {
     // From the week of Nov 16, 2026: every box comes from his checklist, plus the evening checks and game time.
     altFrom: '2026-11-16',
     altRows: [
-      { key: 'move', label: 'Move Your Body', sub: '20 min · racquetball Thursday', cells: [m('20 min'), m('20 min'), m('20 min'), m('Racq.'), m('20 min'), m('20 min'), O] },
+      { key: 'move', label: 'Move Your Body', sub: '20 min · racquetball Thursday', cells: [m('20 min'), m('20 min'), m('20 min'), m('Racq'), m('20 min'), m('20 min'), O] },
       { key: 'chores', label: 'Chores', sub: 'All chores completed', cells: [X, X, X, X, X, X, X] },
       { key: 'typing', label: 'Typing', sub: 'Typing practice', cells: [X, X, X, X, X, X, X] },
       { key: 'trombone', label: 'Trombone', sub: 'Practice on the timer', cells: [O, O, O, O, m('20 min'), m('30 min'), m('30 min')] },

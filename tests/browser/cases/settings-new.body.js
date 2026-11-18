@@ -16,7 +16,7 @@
   await visit('checklist.html?kid=rhett', 'sn-check');
   const bedText = await p.$eval('#bed', (e) => e.textContent);
   check(bedText.includes(LONG), 'End of day shows the new words');
-  check(/For today’s 20 min of game time/.test(bedText) && bedText.includes(LONG + ' (Mom or Dad)'), 'game-time text uses the new words and 20 min');
+  check(/For today’s 20 min of game time, \d+ still to do/.test(bedText), 'game-time text uses 20 min (the next three items are listed; the new words show in End of day above)');
   await visit('parents.html', 'sn-parents');
   check((await p.$eval('#tonight', (e) => e.textContent)).includes(LONG), 'Tonight shows the new words');
   await visit('trombone.html', 'sn-chart');

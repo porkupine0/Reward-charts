@@ -592,3 +592,11 @@ test("Eli's plan runs through Feb 28; trial days match the trial schedule on eve
   sched.forEach(([kind, date]) => assert.equal(trialOn(d(date)), kind, kind + ' scheduled ' + date));
   assert.ok(T);
 });
+
+test("'Other…' game minutes: what a parent or kid might type", () => {
+  const cases = [['90', 90], ['45 min', 45], ['1 hr', 60], ['1 hour', 60], ['1:30', 90], ['0:45', 45], ['1.5 hours', 90], ['2h', 120],
+    ['', null], ['   ', null], ['0', null], ['0:00', null], ['junk', null], ['1:75', null], ['-5', null], [null, null]];
+  cases.forEach(([t, want]) => assert.equal(L.parseMinutes(t), want, JSON.stringify(t)));
+  assert.equal(L.leftSummary(['a', 'b', 'c', 'd', 'e']), '5 still to do: a · b · c · +2 more');
+  assert.equal(L.leftSummary(['a']), '1 still to do: a');
+});

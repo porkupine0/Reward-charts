@@ -1,10 +1,10 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795003562';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795003562';
-import { SETTINGS, onSettings } from './settings.js?v=1795003562';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795003562';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795003562';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795004044';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795004044';
+import { SETTINGS, onSettings } from './settings.js?v=1795004044';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795004044';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795004044';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -241,7 +241,7 @@ export function gameDay(ctx, kid, date) {
   const ls = lists(ctx, kid, date);
   const left = [...progress(ctx, kid, date, ls.day).left, ...progress(ctx, kid, date, ls.bed).left].map((i) => i.label.replace(/^Chore: /, ''));
   const c = dayChecks(ctx, kid, date);
-  choresOwed(ctx, kid, date).forEach((o) => left.push('Finish ' + o.date.toLocaleDateString('en-US', { weekday: 'long' }) + '’s chore first'));
+  [...new Set(choresOwed(ctx, kid, date).map((o) => o.date.toLocaleDateString('en-US', { weekday: 'long' })))].forEach((day) => left.push('Finish ' + day + '’s chore first'));
   (CHECKS[kid] || []).forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
   const worth = GAME.days.includes(dowOf(date)) ? gameMinOn(date) : 0;
   return { earned: !left.length, left, worth, minutes: left.length ? 0 : worth };
@@ -259,6 +259,22 @@ export function owedHeld(ctx, kid, date) {
   const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date))).map((o) => ymd(o.date)));
   if (GAME.days.includes(dowOf(date))) days.add(ymd(date));
   return [...days].reduce((a, k) => a + gameMinOn(parseYmd(k)), 0);
+}
+// Minutes typed into "Other…": "90", "45 min", "1 hr", "1:30", "1.5 hours". Anything else (or 0) is null.
+export function parseMinutes(text) {
+  const t = String(text == null ? '' : text).trim().toLowerCase();
+  let m = t.match(/^(\d{1,2}):(\d{2})$/);
+  if (m) return +m[2] < 60 && (+m[1] * 60 + +m[2]) > 0 ? +m[1] * 60 + +m[2] : null;
+  m = t.match(/^(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours)$/);
+  if (m) { const v = Math.round(parseFloat(m[1]) * 60); return v > 0 ? v : null; }
+  m = t.match(/^(\d+)\s*(m|min|mins|minute|minutes)?$/);
+  if (m) { const v = +m[1]; return v > 0 ? v : null; }
+  return null;
+}
+// "9 still to do: A · B · C · +6 more"
+export function leftSummary(left, n = 3) {
+  if (!left.length) return '';
+  return left.length + ' still to do: ' + left.slice(0, n).join(' · ') + (left.length > n ? ' · +' + (left.length - n) + ' more' : '');
 }
 export function gameWeek(ctx, kid, monday) {
   const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });
