@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795040710';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795041010';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },

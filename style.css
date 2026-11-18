@@ -704,6 +704,11 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .dq-why { margin: 0; font-size: 14px; color: var(--muted); }
 .dq-why small { color: var(--muted); }
 .dt-score { font-size: 18px; margin: 4px 0 10px; }
+.dkey { border-left: 4px solid var(--accent); padding: 4px 12px; margin: 8px 0 12px; background: var(--surface); }
+.dkey h3 { margin: 4px 0; }
+.dkey ul { margin: 4px 0 6px; padding-left: 18px; }
+.dkey li { margin: 4px 0; }
+.dkey small { color: var(--muted); }
 .dq-choice[disabled] { cursor: default; opacity: 1; color: var(--muted); }
 .dq-choice.picked { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 .dq-choice.right { color: var(--ink); border-color: #2E7D4F; }

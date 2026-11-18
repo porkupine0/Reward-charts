@@ -39,6 +39,7 @@
   check(!(await p.$('#tests .dq')), 'no questions or answers shown after finishing');
   check(await p.$eval('#tests', (e) => e.previousElementSibling.id === 'today'), 'a finished test moves below the lesson');
   check(!!(await p.$('#today [data-watched="w1d1"]')), 'baseline done: lesson 1 opens');
+  check((await p.$$('#today .dkey li')).length === 3 && await p.$eval('#today .dkey', (e) => !!(e.compareDocumentPosition(document.querySelector('#today .dv')) & 4)) && /Manual p\.47/.test(await p.$eval('#today .dkey', (e) => e.textContent)), 'lesson 1: 3 key points with manual pages, above the video');
   const dv = (await db()).charts['eli-drive'];
   check(Object.values(dv.answers).every((a) => a.base) && Object.keys(dv.answers).length === 25, 'answers stored under the sitting');
   check(!dv.done, 'not stored as a finished lesson');

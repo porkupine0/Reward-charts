@@ -11,7 +11,7 @@ const vid = { yt: 'AAAAAAAAAAA', title: 'T', channel: 'C', len: '5:00' };
 // every 5th lesson is a review (no questions of its own)
 const course = (n) => Array.from({ length: n }, (_, i) => {
   const review = (i + 1) % 5 === 0, id = 'L' + (i + 1);
-  return { id, title: 'Lesson ' + (i + 1), review, videos: review ? [] : [vid], questions: review ? [] : [1, 2, 3, 4, 5].map((k) => q(id + 'q' + k)) };
+  return { id, title: 'Lesson ' + (i + 1), review, videos: review ? [] : [vid], key: review ? [] : [{ t: 'A', ref: "Iowa Driver's Manual p.1", quote: 'x' }, { t: 'B', family: true }], questions: review ? [] : [1, 2, 3, 4, 5].map((k) => q(id + 'q' + k)) };
 });
 const LESSONS = course(6);
 const day = (n) => '2026-12-' + String(n).padStart(2, '0');
@@ -150,6 +150,8 @@ test('driving: grading', () => {
 test('driving: the content checker catches bad lessons and questions', () => {
   assert.deepEqual(D.checkCourse(course(10)), []);
   const bad = course(6);
+  const nokey = course(2); nokey[0].key = [nokey[0].key[0]]; nokey[1].key[0] = { t: 'C' };
+  assert.match(D.checkCourse(nokey).join(' | '), /L1: needs at least 2 key points.*L2: key point 1 needs a manual page and quote/);
   bad[0].questions[1].id = bad[0].questions[0].id;        // duplicate id
   bad[1].questions.pop();                                   // only 4 questions
   bad[2].questions[0].answer = 7;                           // answer not a choice
@@ -213,7 +215,7 @@ test('driving course and knowledge tests: pass the checkers, and every quote is 
   const { FORMS, SITTINGS, TOPICS, BLUEPRINT } = await import('../driving-tests.js?v=' + V);
   assert.deepEqual(D.checkTests(FORMS, SITTINGS, TOPICS, LESSONS, BLUEPRINT), []);
   assert.deepEqual(Object.keys(BLUEPRINT), TOPICS);
-  [...LESSONS.flatMap((l) => l.questions || []), ...Object.values(FORMS).flat()].forEach((q) => {
+  [...LESSONS.flatMap((l) => [...(l.questions || []), ...(l.key || []).filter((x) => !x.family).map((x, i) => ({ ...x, id: l.id + ' key ' + (i + 1) }))]), ...Object.values(FORMS).flat()].forEach((q) => {
     const page = q.ref.match(/p\.\s?(\d+)/)[1];
     if (!q.quote || !norm(pages[page] || '').includes(norm(q.quote))) missing.push(q.id + ' (p.' + page + '): ' + q.quote);
   });

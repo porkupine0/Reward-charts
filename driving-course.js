@@ -6,6 +6,11 @@
 // Video titles and channels were confirmed with YouTube (scripts/check-videos.mjs); lengths are approximate.
 
 const q = (id, question, choices, answer, why, page, quote) => ({ id, q: question, choices, answer, why, ref: "Iowa Driver's Manual p." + page, quote });
+// A key point (shown above the video): the fact in a few words, with the manual page and quote it comes from.
+// A family rule that isn't in the manual: fam(text), shown as "Family rule" and never quizzed.
+const k = (text, page, quote) => ({ t: text, ref: "Iowa Driver's Manual p." + page, quote });
+// eslint-disable-next-line no-unused-vars
+const fam = (text) => ({ t: text, family: true });
 
 // Lesson days in the whole plan (docs/driving-syllabus.md): while LESSONS is shorter, the page says more are coming.
 export const PLANNED = 55;
@@ -13,6 +18,9 @@ export const PLANNED = 55;
 export const LESSONS = [
   {
     id: 'w1d1', title: 'Look ahead: scanning the road',
+    key: [k('Scan 20 to 30 seconds ahead, and check your mirrors often.', 47, 'Check your mirrors frequently and scan conditions 20 to 30 seconds ahead of you.'),
+      k('Expect other drivers to make mistakes, like running a red light.', 47, 'Assume that drivers will run through red lights or stop signs and be prepared to react.'),
+      k('Always leave yourself an escape route.', 47, 'always leave yourself an out')],
     videos: [{ yt: 'nVWq4P1WMZQ', title: 'Vision in Driving - How to Scan Your Surroundings Correctly', channel: 'Zutobi Drivers Ed', len: '10:18',
       iowa: 'Iowa’s manual says to check your mirrors often and scan conditions 20 to 30 seconds ahead of you, keeping your eyes moving.' }],
     questions: [
@@ -34,6 +42,9 @@ export const LESSONS = [
   },
   {
     id: 'w1d2', title: 'Space ahead: following distance',
+    key: [k('New drivers: stay at least 3 seconds behind; 6 or more when it’s slippery or your view is blocked.', 41, 'An inexperienced or beginning driver should maintain at least a three-second following distance under normal driving conditions.'),
+      k('To count it: when the car ahead passes a sign, start counting slowly.', 41, 'Watch the vehicle ahead of you pass a landmark, such as a sign, and begin slowly counting.'),
+      k('Tailgated? Move slightly right and signal early.', 48, 'If you are being tailgated, move slightly to the right')],
     videos: [
       { yt: 'ksxfBi7Z-Vk', title: 'How To Set & Maintain A Safe Following Distance When Driving - The 3 Second Rule Saves Lives', channel: 'Stan Cravens', len: '3:32',
         iowa: 'Iowa uses a 3- to 4-second rule. As a new driver, keep at least three seconds in normal conditions, and six or more when the road is slippery or your view ahead is blocked.' },
@@ -58,6 +69,9 @@ export const LESSONS = [
   },
   {
     id: 'w1d3', title: 'Blind spots and mirrors',
+    key: [k('Blind spots are areas your mirrors can’t show.', 34, 'Blind spots are areas outside your vehicle that cannot be seen using mirrors.'),
+      k('Before changing lanes: mirrors, then look over your shoulder (wheel straight).', 44, 'Look over your shoulder in the direction you plan to move.'),
+      k('Don’t ride beside trucks and buses: their blind spots are big.', 34, 'These vehicles have large blind spots and it is hard for them to see you.')],
     videos: [{ yt: 'uJ4w63wZyFQ', title: 'How to Shoulder (Head) Check When Turning & Changing Lanes', channel: 'Smart Drive Test', len: '5:45',
       iowa: 'Iowa’s manual: blind spots are areas you can’t see in your mirrors. Look over your shoulder before changing lanes, and never stay alongside a truck or bus. (This channel may not be from the US: listen for km/h or rules that differ.)' }],
     questions: [
@@ -79,6 +93,9 @@ export const LESSONS = [
   },
   {
     id: 'w1d4', title: 'Seeing hazards at intersections',
+    key: [k('Look left, right, and left again.', 50, 'Look left, right, and left again for approaching vehicles and pedestrians.'),
+      k('Driveways and parking lots count as intersections too.', 50, 'Intersections are any place where traffic merges or crosses.'),
+      k('A turn signal isn’t a promise: wait until the car starts to turn.', 50, 'Wait until the other driver starts to turn and then proceed if it is safe to do so.')],
     videos: [{ yt: 'v0Soc-kicOQ', title: 'Scanning And Moving Through Intersections Safely', channel: 'Smart Drive Test', len: '7:27',
       iowa: 'Iowa’s manual: look left, right, and left again, and never assume another driver will give you space. (This channel may not be from the US: listen for km/h or rules that differ.)' }],
     questions: [

@@ -137,6 +137,11 @@ export function checkCourse(lessons) {
     if (!l.review && (l.questions || []).length < 5) out.push(l.id + ': needs at least 5 questions');
     if (!/^[A-Za-z0-9]+$/.test(l.id || '')) out.push((l.id || '?') + ': lesson id must be letters and digits');
     if (!l.review && !(l.videos || []).length) out.push(l.id + ': needs a video');
+    if (!l.review && (l.key || []).length < 2) out.push(l.id + ': needs at least 2 key points');
+    (l.key || []).forEach((x, ki) => {
+      if (!x.t) out.push(l.id + ': key point ' + (ki + 1) + ' needs text');
+      if (!x.family && !(/^Iowa Driver.s Manual p\.\s?\d+/.test(x.ref || '') && x.quote)) out.push(l.id + ': key point ' + (ki + 1) + ' needs a manual page and quote (or to be marked a family rule)');
+    });
     (l.videos || []).forEach((v, vi) => {
       if (!/^[A-Za-z0-9_-]{11}$/.test(v.yt || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs an 11-character YouTube id (yt)');
       if (!v.title || !v.channel || !/^\d{1,2}:\d{2}$/.test(v.len || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs a title, channel and length (m:ss)');

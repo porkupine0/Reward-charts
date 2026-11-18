@@ -1,12 +1,12 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795040710';
-import { applyConfig } from './routines.js?v=1795040710';
-import { askParent } from './parent.js?v=1795040710';
-import * as L from './lists.js?v=1795040710';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795040710';
-import * as COURSE from './driving-course.js?v=1795040710';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795040710';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795041010';
+import { applyConfig } from './routines.js?v=1795041010';
+import { askParent } from './parent.js?v=1795041010';
+import * as L from './lists.js?v=1795041010';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795041010';
+import * as COURSE from './driving-course.js?v=1795041010';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795041010';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -16,6 +16,8 @@ const pastDay = params.get('date') && parseYmd(params.get('date')) ? params.get(
 let previewOpen = false;
 let testOpen = null; // the sitting he's taking (questions shown)
 
+// The lesson's key points (above the video): each from the manual (page shown) or marked as a family rule.
+const keyCard = (l) => (l.key || []).length ? '<div class="dkey"><h3>Key points</h3><ul>' + l.key.map((x) => '<li>' + esc(x.t) + ' <small>(' + (x.family ? 'Family rule' : esc(x.ref).replace(/^Iowa Driver.s Manual /, 'Manual ')) + ')</small></li>').join('') + '</ul></div>' : '';
 const video = (v) => '<div class="dv">' +
   (v.yt ? '<div class="dv-frame"><iframe src="https://www.youtube-nocookie.com/embed/' + esc(v.yt) + '" title="' + esc(v.title) + '" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' : '') +
   '<p class="dv-meta"><b>' + esc(v.title) + '</b> · ' + esc(v.channel || '') + (v.len ? ' · about ' + esc(v.len) : '') + '</p>' +
@@ -64,8 +66,8 @@ function render() {
   let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>';
   if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
     : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
-  else if (noVideo) h += '<p class="note">No video for this one (Mom or Dad skipped it): just the questions.</p>';
-  else h += (lesson.videos || []).map(video).join('') + (watched ? '<p class="dv-done">✓ Watched</p>' : '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>');
+  else if (noVideo) h += keyCard(lesson) + '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>';
+  else h += keyCard(lesson) + (lesson.videos || []).map(video).join('') + (watched ? '<p class="dv-done">✓ Watched</p>' : '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>');
   if (watched || lesson.review) h += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
   if (st.status === 'done') h += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
   $('today').innerHTML = h;
@@ -132,7 +134,7 @@ function renderPreview() {
   const course = L.course(), d = ctx.drive || {}, ap = d.approved || {};
   const upcoming = course.filter((l) => !l.review && !(d.done || {})[l.id]).slice(0, 10);
   $('preview').innerHTML = upcoming.length ? upcoming.map((l) => '<div class="dprev"><h3>' + esc(l.title) + ' <span class="rcount">' + (isApproved(ap[l.id]) ? 'Approved ✓' : isSkipped(ap[l.id]) ? 'Video skipped' : 'Not reviewed') + '</span></h3>' +
-    (l.videos || []).map(video).join('') +
+    keyCard(l) + (l.videos || []).map(video).join('') +
     '<ol class="dprev-q">' + (l.questions || []).map((q) => '<li>' + esc(q.q) + ' <b>' + esc(q.choices[q.answer]) + '</b> <small>(' + esc(q.ref) + ')</small></li>').join('') + '</ol>' +
     '<span class="exbtns"><button class="tbtn approve" data-approve="' + esc(l.id) + '|yes">Approve</button><button class="linkbtn" data-approve="' + esc(l.id) + '|skip">Skip the video</button>' +
     (ap[l.id] !== undefined ? '<button class="linkbtn" data-approve="' + esc(l.id) + '|undo">Undo</button>' : '') + '</span></div>').join('') : '<p class="muted">No upcoming lessons.</p>';
