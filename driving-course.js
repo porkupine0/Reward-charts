@@ -115,5 +115,32 @@ export const LESSONS = [
         'The rider may have forgotten it’s on; wait until they actually start to turn.', 50, 'their signals often do not cancel by themselves.')
     ]
   },
-  { id: 'w1d5', title: 'Unit 1 test', review: true, videos: [], questions: [] }
+  { id: 'w1d5', title: 'Unit 1 test', review: true, videos: [], questions: [] },
+  // ---- Unit 2: signs and signals (manual 2.1-2.9). Facts on pp. 6-11 read off the page pictures (the saved text mixes the columns).
+  {
+    id: 'w2d1', title: 'Signs: colors and shapes',
+    key: [k('A sign’s shape and color tell you what kind of sign it is.', 6, 'The shape and color of traffic signs give clues to the type of information they provide.'),
+      k('Yellow means a general warning.', 6, 'General warning.'),
+      k('Orange means road work: watch for lower speed limits and workers.', 6, 'Be sure to watch for changing speed limits and workers on the road.')],
+    videos: [{ yt: 'oEXDKnD756k', title: 'Beginner Driving Lesson: Common Road Signs & Meanings Explained!', channel: 'Zutobi Drivers Ed', len: '7:52',
+      iowa: 'Iowa uses these same sign colors and shapes (manual pages 6 and 7). Fluorescent pink signs are for crash scenes and other incidents.' }],
+    questions: [
+      { ...q('w2d1q1', 'What does a green sign like this tell you?', ['Directions: where a place is, or how far away', 'A warning about a hazard ahead', 'Where to find food or fuel', 'A law you must obey'], 0,
+        'Green is for directions and distances.', 6, 'Direction. Indicates where a place is, or how far a place is from where you are.'), sign: { shape: 'rectangle', color: 'green' } },
+      { ...q('w2d1q2', 'What does a blue sign like this point you to?', ['Road work ahead', 'Services: rest areas, hospitals, fuel, food and lodging', 'Parks and historical sites', 'A school crossing'], 1,
+        'Blue is for services for travelers.', 6, 'Services for travelers.'), sign: { shape: 'rectangle', color: 'blue' } },
+      { ...q('w2d1q3', 'An orange sign like this means:', ['A hospital is nearby', 'A school zone', 'Road work, temporary traffic control or maintenance', 'A scenic route'], 2,
+        'Orange is for work zones: watch for changing speed limits and workers.', 6, 'Road work, temporary traffic control, and maintenance warnings.'), sign: { shape: 'diamond', color: 'orange' } },
+      { ...q('w2d1q4', 'A brown sign like this points you to:', ['Recreation and cultural places, like parks and historical sites', 'Gas stations', 'Interstate exits', 'Detours'], 0,
+        'Brown is for recreation and points of interest.', 6, 'Recreation and cultural points of interest.'), sign: { shape: 'rectangle', color: 'brown' } },
+      { ...q('w2d1q5', 'A fluorescent pink sign like this is used for:', ['School crossings', 'Incidents, like a crash cleanup or debris on the road', 'Bike lanes', 'Parking rules'], 1,
+        'Pink signs go up for incidents: be ready to slow down and follow them.', 6, 'Warning and guide signs for incident management such as crash clean up, debris removal, traffic, etc.'), sign: { shape: 'diamond', color: 'pink' } },
+      { ...q('w2d1q6', 'A five-sided sign shaped like this marks:', ['A railroad crossing', 'A no passing zone', 'A school area or school crossing', 'A hospital'], 2,
+        'The pentagon shape is for schools; watch for children.', 7, 'School crossing. Signs mark school areas and school crossings.'), sign: { shape: 'pentagon', color: 'yellow-green' } },
+      { ...q('w2d1q7', 'Where is a sideways-triangle (pennant) sign like this, and what does it warn of?', ['On the right side of the road; a curve', 'On the left side of the road; a no passing zone', 'Over the road; a lane closing', 'On the left side; a school'], 1,
+        'It’s on the left, where a driver about to pass will see it.', 7, 'This sign will be on the left side of the road. It warns you of a no passing zone.'), sign: { shape: 'pennant', color: 'yellow' } },
+      { ...q('w2d1q8', 'A white sign like this gives you:', ['Laws you must follow (regulatory)', 'Directions', 'Services', 'A general warning'], 0,
+        'White signs are regulatory: speed limits, turn rules and other laws.', 6, 'Regulatory. Provides information regarding enforceable laws and ordinances.'), sign: { shape: 'rectangle', color: 'white' } }
+    ]
+  }
 ];

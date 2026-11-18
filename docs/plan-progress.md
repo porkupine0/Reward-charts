@@ -116,3 +116,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 18: step 9 done (Key points cards). Next: step 10 sign shapes, then unit 2 by Sat Nov 21.
 - Nov 18: Approve/Skip switches keep the first date; the key points hide once the questions show (a skipped video: read the key points, tap I've read these, then the questions). NEXT: step 10 sign shapes (optional sign: {shape, color} on a question; blank shapes; verify against manual pp. 6-7 pictures; one shared question renderer; label describes the drawing, not its meaning; leave Form A alone), then unit 2 by Sat Nov 21.
 - Nov 18: step 10 done (sign shapes). Next: unit 2 content by Sat Nov 21.
+- Nov 18: unit 2 lesson 1 (w2d1, sign colors and shapes, 8 questions with sign shapes) written. Next: w2d2 (stop vs yield, regulatory signs, p. 8 from the page picture), w2d3, w2d4, then the unit 2 test entry (w2d5, review: true).
