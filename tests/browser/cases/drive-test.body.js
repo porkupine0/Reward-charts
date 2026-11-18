@@ -33,3 +33,19 @@
   check(!(await p.$('.ckbtn[data-key="drive"][aria-pressed="true"]')), 'checklist driving row not filled by the test');
   await visit('parents.html', 'test-parents');
   check(/Baseline knowledge test: \d+ of 25 \(\d+%\)/.test(await p.$eval('#testscores', (e) => e.textContent)) && !(await p.$eval('#testcard', (e) => e.hidden)), 'Parents page shows the score');
+  // the weekend: lessons wait for Monday, but the baseline can be taken once the day's chore is done
+  for (const [d, name] of [[21, 'Saturday'], [22, 'Sunday']]) {
+    await p.clock.setFixedTime(new Date(2026, 10, d, 11, 0));
+    await p.goto(B + 'index.html');
+    await p.evaluate((today) => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
+      routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } }, '2026-11-19': { eli: { chore: true } }, '2026-11-20': { eli: { chore: true } } } } } })); }, null);
+    await visit('drive.html', 'test-' + name + '-locked');
+    let wk = await p.$eval('#tests', (e) => (e.hidden ? '' : e.textContent));
+    check(/Baseline knowledge test/.test(wk) && /chores first|chore you missed/.test(wk) && !(await p.$('[data-tstart="base"]')), name + ': shown, locked until chores');
+    await p.evaluate(async (k) => { const m = await import('./store.js?v=' + window.__V);
+      for (const day of ['2026-11-21', k]) await m.save('routines', 'days/' + day + '/eli/chore', true); }, '2026-11-' + d);
+    await visit('drive.html', 'test-' + name);
+    wk = await p.$eval('#tests', (e) => (e.hidden ? '' : e.textContent));
+    notes.push(name + ': ' + wk.slice(0, 120));
+    check(!!(await p.$('[data-tstart="base"]')), name + ': chores done, Start shows');
+  }

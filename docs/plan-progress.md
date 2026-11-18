@@ -46,6 +46,13 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 4b. Driving page and parent preview (course file ships empty; browser tests use a fixture course): checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
 - [x] 4c. Streak: approval date stored; a lesson approved before a weekday is due that day (required for streak/full day, not game time).
 - [x] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
+- [x] 6. Baseline knowledge test (Form A, 25 questions, weighted like Iowa DOT's practice test; score and topics on the Driving and Parents pages; outside streak and game time).
+- [x] 7. 13-week plan with 67 videos picked (docs/driving-syllabus.md).
+- [ ] 8. Unit test as a lesson type: every 5th lesson is a unit test (~15 questions, scored). w1d5 changes only if Eli hasn't finished it (ask).
+- [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
+- [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).
+- [ ] 11. Week 2 content (unit 2: signs and signals), questions ~6 per lesson. Re-run scripts/check-videos.mjs first.
+- [ ] 12. Form B, opening after unit 2's test (due about 2 weeks after he starts), then Form C; final = Form A again.
 
 Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
 Decided Nov 18: only Eli's typing and driving wait for today's chores (assignments and homework don't; homework still locks when an earlier day's chore is owed). The driving lesson counts toward his daily streak, not game time.
@@ -96,3 +103,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 18: driving step 4b done. The Driving page, parent preview (Approve/Skip after the PIN), hub card (hidden while the course is empty) and the Parents "N of the next 2 lessons approved" line. A lesson is finished once he has watched and answered five; no pass mark.
 - Nov 18: driving step 4c done. The lesson counts toward Eli's full day and streak (not game time) on days it was due; approvals and skips carry their date so past days don't change; Parents, Home and History all agree.
 - Nov 18: driving step 5 done. Week 1 (scanning, following distance, blind spots and mirrors, intersections, review): 20 questions, each quoting its Iowa manual page (tested); 5 videos confirmed by title and channel. Next: week 2, signs and markings (manual pp. 6-17), as its own step.
+- Nov 18: driving steps 6 and 7. Baseline knowledge test live (take it before lesson 1); 13-week plan with 67 videos (13 Iowa DOT or Iowa). Next: steps 8-10 (code) before week 2, since the course file is append-only.
