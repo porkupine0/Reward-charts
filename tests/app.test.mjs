@@ -208,12 +208,18 @@ test("Rhett: trombone Fri/Sat/Sun, typing every day, chores before any computer 
     assert.equal(keys.includes('typing') || keys.includes('trombone'), false, 'Isaiah is unchanged');
     assert.equal(L.lists(ctx, 'eli', d(day)).day.some((i) => i.key === 'trombone'), false, 'no trombone for Eli');
   });
-  // Eli: typing 10 min Monday to Saturday from Nov 19 (not before; not Sundays), required, no "chores first" lock
+  // Eli: typing 10 min Monday to Saturday from Nov 19 (not before; not Sundays), required, computer work (chores first)
   for (let x = d('2026-11-16'); ymd(x) <= '2026-11-29'; x = addDays(x, 1)) {
     const it = L.lists(ctx, 'eli', x).day.find((i) => i.key === 'typing'), want = ymd(x) >= '2026-11-19' && L.dowOf(x) <= 5;
     assert.equal(!!it, want, 'Eli typing on ' + ymd(x));
-    if (it) { assert.match(it.label, /10 min/); assert.equal(!!it.opt || !!it.computer, false); }
+    if (it) { assert.match(it.label, /10 min/); assert.equal(!!it.opt, false); assert.equal(it.computer, true, 'computer work'); }
   }
+  // locked until today's chores are done, open after
+  const thu = d('2026-11-19'), done = { chore: true }, before = { routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } }, run: {}, isaiah: {} };
+  const ty = (c) => L.lists(c, 'eli', thu).day.find((i) => i.key === 'typing');
+  assert.equal(L.lockedBy(before, 'eli', thu, ty(before), L.lists(before, 'eli', thu).day), 'chores', 'Eli typing waits for chores');
+  before.routines.days['2026-11-19'] = { eli: done };
+  assert.equal(L.lockedBy(before, 'eli', thu, ty(before), L.lists(before, 'eli', thu).day), false, 'open once chores are done');
 });
 
 test("Rhett: computer tasks stay locked until every chore is ticked", () => {

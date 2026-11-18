@@ -1,10 +1,10 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795006006';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795006006';
-import { SETTINGS, onSettings } from './settings.js?v=1795006006';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795006006';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795006006';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795007223';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795007223';
+import { SETTINGS, onSettings } from './settings.js?v=1795007223';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795007223';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795007223';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -67,9 +67,9 @@ function listsOn(ctx, kid, date) {
     if (dow === 5 && p && ymd(date) >= '2026-11-21') {
       day.push({ key: 'activity', label: p.swim ? 'Swim practice' : 'Running: ' + p.title, sub: (p.optional ? 'Optional today. ' : '') + 'Checks itself off when today’s Training is done. Tap to open it.', link: 'run.html', opt: !!p.optional });
     }
-    // Typing, 10 min, Monday to Saturday (from Nov 19, 2026). No "chores first" rule for Eli.
+    // Typing, 10 min, Monday to Saturday (from Nov 19, 2026). Computer work: waits until today's chores are done.
     if (dow <= 5 && ymd(date) >= '2026-11-19') {
-      const typing = { key: 'typing', label: 'Typing practice · 10 min' };
+      const typing = { key: 'typing', label: 'Typing practice · 10 min', computer: true };
       const at = day.findIndex((i) => i.key === 'activity');
       at >= 0 ? day.splice(at, 0, typing) : day.push(typing);
     }
