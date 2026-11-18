@@ -1,14 +1,14 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794984035';
-import { CHARTS, weekProgress } from './charts.js?v=1794984035';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794984035';
-import * as L from './lists.js?v=1794984035';
-import { owed, score, planned, fmt } from './trials.js?v=1794984035';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794984035';
-import { askParent, setParent, changePin } from './parent.js?v=1794984035';
-import { dayFull } from './streaks.js?v=1794984035';
-import { owedItems } from './owed.js?v=1794984035';
-import { nowHtml } from './nowview.js?v=1794984035';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794984249';
+import { CHARTS, weekProgress } from './charts.js?v=1794984249';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794984249';
+import * as L from './lists.js?v=1794984249';
+import { owed, score, planned, fmt } from './trials.js?v=1794984249';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794984249';
+import { askParent, setParent, changePin } from './parent.js?v=1794984249';
+import { dayFull } from './streaks.js?v=1794984249';
+import { owedItems } from './owed.js?v=1794984249';
+import { nowHtml } from './nowview.js?v=1794984249';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -71,7 +71,7 @@ function render() {
 
   // This week
   $('weekhead').textContent = 'This week · ' + shortDate(mon) + '–' + shortDate(addDays(mon, 6));
-  const days = Math.min(7, Math.round((today - mon) / 864e5) + 1);
+  const days = L.daysSoFar(today); // Monday through today
   $('summary').innerHTML = Object.entries(KIDS).map(([id, k]) => {
     let full = 0, onTime = 0;
     for (let i = 0; i < days; i++) {

@@ -1,5 +1,5 @@
-import { planFor, planEndYmd } from './plan.js?v=1794984035';
-import { SETTINGS } from './settings.js?v=1794984035';
+import { planFor, planEndYmd } from './plan.js?v=1794984249';
+import { SETTINGS } from './settings.js?v=1794984249';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -103,7 +103,9 @@ export function rowsFor(chart, monday) {
       const day = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
       if (ymdOf(day) >= end) return O;
       const p = planFor(day);
-      return p && p.optional ? opt(c.t || 'Opt.') : c;
+      if (!p) return c;
+      const t = p.title === 'Off' ? 'Off' : p.swim ? 'Swim' : 'Run'; // the label follows the plan day
+      return p.optional ? opt(t) : m(t);
     })
   }));
 }

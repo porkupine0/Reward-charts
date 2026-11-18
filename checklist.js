@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794984035';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794984035';
-import { askParent } from './parent.js?v=1794984035';
-import * as L from './lists.js?v=1794984035';
-import { dayStreak, cheerIf } from './streaks.js?v=1794984035';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794984249';
+import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794984249';
+import { askParent } from './parent.js?v=1794984249';
+import * as L from './lists.js?v=1794984249';
+import { dayStreak, cheerIf } from './streaks.js?v=1794984249';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -59,7 +59,13 @@ function itemHtml(it, checks, extra) {
   return h + '</div>';
 }
 
-function section(title, sub, items, checks, timed) {
+// The "next" ring goes in the section for the time of day (same phase as Home's "next"), today only.
+function nextSection() {
+  if (ymd(date) !== ymd(new Date())) return '';
+  const ph = L.nowStatus(ctx, kid, new Date()).phase;
+  return ph === 'late' ? 'bed' : ph;
+}
+function section(title, sub, items, checks, timed, phase) {
   if (!items.length) return '';
   const done = items.filter((i) => isOn(i) || i.opt).length;
   const req = items.filter((i) => !i.opt);
@@ -70,7 +76,7 @@ function section(title, sub, items, checks, timed) {
     let extra = timed ? { time: it.time } : {};
     const lk = L.lockedBy(ctx, kid, date, it, items);
     if (lk) extra.locked = lk;
-    if (timed && isToday && !nextMarked && !isOn(it)) { extra.next = true; nextMarked = true; }
+    if (phase && phase === nextSection() && isToday && !nextMarked && !isOn(it) && !extra.locked && !it.opt) { extra.next = true; nextMarked = true; }
     return itemHtml(it, checks, extra);
   }).join('');
   const all = req.length && doneReq === req.length;
@@ -108,7 +114,7 @@ function render() {
   const mornDone = morn.filter((i) => isOn(i)).length;
   const earned = morn.length > 0 && mornDone === morn.length;
   if (morn.length) {
-    $('morning').innerHTML = section(dow === 6 ? 'Church morning' : 'Morning', prize ? '' : dow === 5 ? 'Optional on Saturdays. No rush!' : 'Optional. Time yourself if you want!', morn, checks, false);
+    $('morning').innerHTML = section(dow === 6 ? 'Church morning' : 'Morning', prize ? '' : dow === 5 ? 'Optional on Saturdays. No rush!' : 'Optional. Time yourself if you want!', morn, checks, false, 'morning');
     $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', mornTimerHtml());
     if (prize) $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', treatHtml(prize, when, mornDone, morn.length));
     const woke = checks.wokeAt || '';
@@ -122,8 +128,8 @@ function render() {
   const school = dow <= 4;
   const items = lst.day;
   $('day').innerHTML = school
-    ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false)
-    : section('Today', '', items, checks, false);
+    ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false, 'day')
+    : section('Today', '', items, checks, false, 'day');
   $('day').hidden = !items.length;
   const owed = L.choresOwed(ctx, kid, date);
   if (owed.length && items.length) {
@@ -143,7 +149,7 @@ function render() {
   }
 
   const bed = lst.bed;
-  $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true);
+  $('bed').innerHTML = section('Bedtime', dow === 2 ? 'Short night: 10 minutes of reading.' : '', bed, checks, true, 'bed');
   $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', timerHtml(checks));
   if (candy) $('bed').querySelector('.rhead').insertAdjacentHTML('afterend', bedTreatHtml(candy, bed, checks, dow));
   // End-of-day checks by Mom or Dad, and today's game time

@@ -373,3 +373,19 @@ test("charts: every required box is backed by a required checklist item, Nov 16 
   }
   assert.deepEqual(bad, []);
 });
+
+test("Parents 'This week' counts Monday through today, whatever the time", () => {
+  assert.equal(L.daysSoFar(new Date(2026, 10, 18, 15, 0)), 3); // Wed 3 pm
+  assert.equal(L.daysSoFar(new Date(2026, 10, 18, 23, 59)), 3);
+  assert.equal(L.daysSoFar(new Date(2026, 10, 16, 0, 1)), 1); // Monday
+  assert.equal(L.daysSoFar(new Date(2026, 10, 22, 12, 0)), 7); // Sunday
+});
+
+test("Eli's run/swim box labels follow the plan day", () => {
+  const rows = rowsFor(CHARTS.eli, d('2026-11-23')), r = rows.find((x) => x.key === 'running');
+  assert.equal(r.cells[3].t, 'Run'); // Thanksgiving: Turkey Trot
+  assert.equal(r.cells[3].opt, true);
+  assert.equal(r.cells[4].t, 'Swim');
+  const xmas = rowsFor(CHARTS.eli, d('2026-12-21')).find((x) => x.key === 'running');
+  assert.equal(xmas.cells[4].t, 'Off'); // Christmas Day: planned day off, fills itself
+});
