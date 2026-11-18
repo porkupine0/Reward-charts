@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795037948';
-import { applyConfig } from './routines.js?v=1795037948';
-import { askParent } from './parent.js?v=1795037948';
-import * as L from './lists.js?v=1795037948';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795037948';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795037948';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795038227';
+import { applyConfig } from './routines.js?v=1795038227';
+import { askParent } from './parent.js?v=1795038227';
+import * as L from './lists.js?v=1795038227';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795038227';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795038227';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -21,12 +21,18 @@ const video = (v) => '<div class="dv">' +
   (v.iowa ? '<p class="dv-iowa"><b>In Iowa:</b> ' + esc(v.iowa) + '</p>' : '') +
   (v.yt ? '<a class="cklink dv-open" href="https://www.youtube.com/watch?v=' + esc(v.yt) + '" target="_blank" rel="noopener">Open on YouTube &rarr;</a>' : '') + '</div>';
 
-// One question: the choices, or (once answered) his pick, the right answer, why, and the manual page.
-function questionHtml(q, a, lessonId) {
+// One question. Unanswered: the choices. Answered: the choices stay where they were (nothing moves under his
+// finger), his pick marked; then, unless `hide` (a unit test still in progress), the right answer, why, and
+// the manual page below them.
+function questionHtml(q, a, lessonId, hide) {
   const head = '<p class="dq-q">' + esc(q.q) + '</p>';
   if (!a) return '<div class="dq">' + head + '<div class="dq-choices">' + q.choices.map((c, i) =>
     '<button class="dq-choice" type="button" data-pick="' + esc(q.id) + '|' + esc(lessonId) + '|' + i + '">' + esc(c) + '</button>').join('') + '</div></div>';
-  return '<div class="dq answered ' + (a.ok ? 'ok' : 'miss') + '">' + head +
+  const show = !hide && a.pick !== undefined;
+  const choices = '<div class="dq-choices">' + q.choices.map((c, i) => '<button class="dq-choice' + (i === a.pick ? ' picked' : '') + (show && i === q.answer ? ' right' : '') +
+    '" type="button" disabled aria-pressed="' + (i === a.pick) + '"' + (i === a.pick ? ' aria-label="Your answer: ' + esc(c) + '"' : '') + '>' + esc(c) + '</button>').join('') + '</div>';
+  if (hide) return '<div class="dq answered">' + head + choices + '</div>';
+  return '<div class="dq answered ' + (a.ok ? 'ok' : 'miss') + '">' + head + choices +
     '<p class="dq-result">' + (a.ok ? '✓ Right: ' : '✗ You picked “' + esc(q.choices[a.pick] || '') + '”. Right answer: ') + '<b>' + esc(q.choices[q.answer]) + '</b></p>' +
     '<p class="dq-why">' + esc(q.why) + ' <small>(' + esc(q.ref) + ')</small></p></div>';
 }
@@ -51,11 +57,14 @@ function render() {
   const lesson = st.lesson, watched = !!(d.watched || {})[lesson.id];
   // the quiz is built without today's answers, so it stays the same while he takes it
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);
-  let h = '<p class="eyebrow">' + (lesson.review ? 'Review day' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>';
-  if (lesson.review) h += '<p class="note">No video today: 5 questions from earlier lessons.</p>';
+  // a unit test: no right/wrong until every question is answered, then the score and every answer
+  const answered = quiz.filter((q) => answerOf(q.id, lesson.id)), allIn = quiz.length > 0 && answered.length === quiz.length;
+  let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>';
+  if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
+    : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
   else h += (lesson.videos || []).map(video).join('') + (watched ? '<p class="dv-done">✓ Watched</p>' : '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>');
-  if (watched || lesson.review) h += '<div class="dquiz"><h3>5 questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id)).join('') + '</div>';
-  if (st.status === 'done') h += '<p class="dv-done big">Lesson done for today ✓</p>';
+  if (watched || lesson.review) h += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
+  if (st.status === 'done') h += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
   $('today').innerHTML = h;
 }
 // A finished lesson: the questions he answered in it, from what was stored (not a rebuilt quiz)

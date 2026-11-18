@@ -13,8 +13,8 @@ export const LESSONS = [{ id: 'F1', title: 'Fixture lesson one', videos: [{ yt: 
     routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } },
     'eli-drive': { approved: { F1: true }, watched: { F1: '2026-11-18' } } } })); });
   await visit('drive.html', 'slow-quiz');
-  for (let k = 0; k < 4; k++) { await p.click('.dq-choice'); await p.waitForTimeout(500); }
-  await p.click('.dq-choice'); // the fifth answer, then reload at once (inside the 400 ms gap)
+  for (let k = 0; k < 4; k++) { await p.click('.dq-choice:not([disabled])'); await p.waitForTimeout(500); }
+  await p.click('.dq-choice:not([disabled])'); // the fifth answer, then reload at once (inside the 400 ms gap)
   await p.reload(); await p.waitForTimeout(2500);
   const done = ((await db()).charts['eli-drive'].done || {}).F1;
   notes.push('done after reload: ' + done);

@@ -52,14 +52,14 @@ export const LESSONS = [
   check(/Right answer: Alpha/.test(await p.$eval('.dq:nth-of-type(2)', (e) => e.textContent)), 'a wrong answer shows the right one and why');
   await visit('drive.html', 'drive-reload');
   check(JSON.stringify(await p.$$eval('.dq-q', (els) => els.map((e) => e.textContent))) === JSON.stringify(qs), 'same questions after a reload');
-  for (let k = 0; k < 3; k++) { await p.click('.dq-choice'); await p.waitForTimeout(150); }
+  for (let k = 0; k < 3; k++) { await p.click('.dq-choice:not([disabled])'); await p.waitForTimeout(150); }
   check(/Lesson done for today/.test(await p.$eval('#today', (e) => e.textContent)), 'finished after 5 answers (no pass mark)');
   check((await db()).charts['eli-drive'].done.F1 === '2026-11-18', 'done stored for today');
   await visit('checklist.html?kid=eli', 'drive-row-done');
   check(await p.$eval('.ckbtn[data-key="drive"]', (e) => e.getAttribute('aria-pressed')) === 'true', 'checklist row filled');
   // the next day: the stored answers for Nov 18
   await visit('drive.html?date=2026-11-18', 'drive-past');
-  check((await p.$$('.dq.answered')).length === 5 && !(await p.$('.dq-choice')), 'past lesson shows the stored answers');
+  check((await p.$$('.dq.answered')).length === 5 && !(await p.$('.dq-choice:not([disabled])')), 'past lesson shows the stored answers');
   // approve F2 and skip F3; then Thursday: 3 questions from F2 and 2 from F1, including the one he missed
   await visit('drive.html', 'drive-approve2');
   await p.click('#previewbtn'); await p.waitForTimeout(300);
