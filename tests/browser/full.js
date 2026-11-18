@@ -145,9 +145,13 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await p.fill('#lights', '21:00'); await p.dispatchEvent('#lights', 'input');
   await p.click('#save'); await p.waitForTimeout(400);
   check((await db()).charts?.config?.lights?.eli === '21:00', 'settings not saved');
-  await visit('checklist.html?kid=eli&date=2026-11-10');
+  // a change applies from the day it's saved: a later school night follows it, an earlier one keeps 8:30
+  await visit('checklist.html?kid=eli&date=2027-03-09');
   const lo = await p.$$eval('#bed .rtime', e => e[e.length - 1].textContent);
   check(lo === '9:00', 'lights out did not follow settings: ' + lo);
+  await visit('checklist.html?kid=eli&date=2026-11-10');
+  const loPast = await p.$$eval('#bed .rtime', e => e[e.length - 1].textContent);
+  check(loPast === '8:30', 'an earlier night changed with the new setting: ' + loPast);
   await visit('settings.html'); await p.click('#reset'); await p.waitForTimeout(300);
 
   // 8. History
