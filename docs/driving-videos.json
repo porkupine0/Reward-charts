@@ -518,10 +518,12 @@
     },
     {
      "day": 2,
-     "topic": "Emergency vehicles and Move Over",
+     "topic": "Emergency vehicles, Move Over; after a crash, Steer It-Clear It",
      "sections": [
       "2.23",
-      "2.27"
+      "2.27",
+      "2.28",
+      "5.15"
      ],
      "videos": [
       {
@@ -532,11 +534,18 @@
        "notes": "IA"
       },
       {
-       "yt": "CdDBJoxHLGE",
-       "title": "What To Do When An Emergency Vehicle Approaches",
-       "channel": "Smart Drive Test",
-       "len": "4:38",
-       "notes": "CA"
+       "yt": "_4DApIKjEI0",
+       "title": "What to Do After a Collision Video",
+       "channel": "AAA",
+       "len": "1:38",
+       "notes": ""
+      },
+      {
+       "yt": "ljjGN6xST_A",
+       "title": "What to do after a car accident - GEICO",
+       "channel": "GEICO Insurance",
+       "len": "1:14",
+       "notes": ""
       }
      ]
     },
@@ -620,10 +629,8 @@
     },
     {
      "day": 3,
-     "topic": "Parking, no-parking distances, backing",
+     "topic": "Backing up and reverse parking (family rule: back into every space)",
      "sections": [
-      "2.25",
-      "2.26",
       "4.7"
      ],
      "videos": [
@@ -635,34 +642,27 @@
        "notes": ""
       },
       {
-       "yt": "2W-5VvXcwT0",
-       "title": "How to Parallel Park (Perfect Parallel Parking in 3 Easy Steps)",
+       "yt": "cWHj9EC9B1o",
+       "title": "How to Reverse Park Easily | Proper Reverse Parking Technique",
        "channel": "Zutobi Drivers Ed",
-       "len": "4:32",
+       "len": "7:08",
        "notes": ""
       }
      ]
     },
     {
      "day": 4,
-     "topic": "After a crash; Steer It-Clear It",
+     "topic": "Parking rules and parallel parking",
      "sections": [
-      "2.28",
-      "5.15"
+      "2.25",
+      "2.26"
      ],
      "videos": [
       {
-       "yt": "_4DApIKjEI0",
-       "title": "What to Do After a Collision Video",
-       "channel": "AAA",
-       "len": "1:38",
-       "notes": ""
-      },
-      {
-       "yt": "ljjGN6xST_A",
-       "title": "What to do after a car accident - GEICO",
-       "channel": "GEICO Insurance",
-       "len": "1:14",
+       "yt": "2W-5VvXcwT0",
+       "title": "How to Parallel Park (Perfect Parallel Parking in 3 Easy Steps)",
+       "channel": "Zutobi Drivers Ed",
+       "len": "4:32",
        "notes": ""
       }
      ]
@@ -827,7 +827,7 @@
     },
     {
      "day": 3,
-     "topic": "Drowsy driving, seat belts, loose objects; Iowa licensing rules and 511",
+     "topic": "Drowsy driving, seat belts, loose objects; Iowa permit and license rules (GDL), 511",
      "sections": [
       "3.5",
       "3.6",
@@ -850,7 +850,7 @@
        "title": "Teen Driving Restrictions: Passengers",
        "channel": "Partners for Safe Teen Driving (PFSTD)",
        "len": "1:26",
-       "notes": ""
+       "notes": "check: not Iowa-specific; Iowa rules from Iowa DOT pages"
       }
      ]
     },
@@ -951,6 +951,20 @@
    "title": "How To Use The Center Left Turn Lane Correctly - Do's & Don'ts That Can Make You A Safer Driver!",
    "channel": "Stan Cravens",
    "len": "6:05",
+   "notes": ""
+  },
+  {
+   "yt": "CdDBJoxHLGE",
+   "title": "What To Do When An Emergency Vehicle Approaches",
+   "channel": "Smart Drive Test",
+   "len": "4:38",
+   "notes": "CA"
+  },
+  {
+   "yt": "tpykT-JU7PM",
+   "title": "How To Drive in Reverse | Practice For Beginners 2025",
+   "channel": "Driving TV",
+   "len": "6:47",
    "notes": ""
   },
   {

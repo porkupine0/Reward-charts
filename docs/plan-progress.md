@@ -50,6 +50,7 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 7. 13-week plan with 67 videos picked (docs/driving-syllabus.md).
 - [x] 7b. Recut the plan to 55 lesson days (merge units 10 and 11; one final week).
 - [ ] 8. Unit test as a lesson type (w1d5 changes in place, keeps its id; on main before about Nov 25; add 2 more questions to each unit 1 lesson at the END of its list): every 5th lesson is a unit test (~15 questions, scored). Answered questions stay in place (as in the knowledge test: first tap is final).
+- [ ] 8b. "Not able to do it?" for driving lessons (approved by the family Nov 18): a parent-excused weekday keeps his streak (like run/swim). Needed before Thanksgiving, Nov 26.
 - [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
 - [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).
 - [ ] 11. Week 2 content (unit 2: signs and signals), questions ~6 per lesson. Re-run scripts/check-videos.mjs first.

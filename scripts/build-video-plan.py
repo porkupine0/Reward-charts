@@ -39,14 +39,14 @@ PLAN = [
    ('Passing', ['4.10'], [('QRQhb6Nlqnw', '13:32', 'CA')])]),
  (7, 'Sharing the road', [
    ('School buses', ['2.24'], [('06ertMlQ8Ig', '1:53', 'IA (Quad Cities news)'), ('dOjXX0dZx3s', '4:48', 'check: general US, Iowa rules may differ')]),
-   ('Emergency vehicles and Move Over', ['2.23', '2.27'], [('r2MYCsumOnI', '2:51', 'IA'), ('CdDBJoxHLGE', '4:38', 'CA')]),
+   ('Emergency vehicles, Move Over; after a crash, Steer It-Clear It', ['2.23', '2.27', '2.28', '5.15'], [('r2MYCsumOnI', '2:51', 'IA'), ('_4DApIKjEI0', '1:38', ''), ('ljjGN6xST_A', '1:14', '')]),
    ('Large trucks and farm equipment', ['5.9'], [('rHNUZn4e1ps', '4:19', ''), ('j_FfI8TDOD0', '1:54', '')]),
    ('Motorcycles, bicycles, hot cars', ['5.10', '5.12'], [('2gDCHSsOxmM', '8:14', 'check')])]),
  (8, 'Railroad, work zones, parking', [
    ('Railroad crossings', ['2.10'], [('Q33u7SSAPbk', '10:53', '')]),
    ('Work zones', ['2.11'], [('6aOHMHipXXk', '7:32', 'Pennsylvania')]),
-   ('Parking, no-parking distances, backing', ['2.25', '2.26', '4.7'], [('wBibYMNMatI', '5:49', ''), ('2W-5VvXcwT0', '4:32', '')]),
-   ('After a crash; Steer It-Clear It', ['2.28', '5.15'], [('_4DApIKjEI0', '1:38', ''), ('ljjGN6xST_A', '1:14', '')])]),
+   ('Backing up and reverse parking (family rule: back into every space)', ['4.7'], [('wBibYMNMatI', '5:49', ''), ('cWHj9EC9B1o', '7:08', '')]),
+   ('Parking rules and parallel parking', ['2.25', '2.26'], [('2W-5VvXcwT0', '4:32', '')])]),
  (9, 'Night, weather, rural Iowa', [
    ('Headlights and night driving', ['5.7'], [('_SSInig5Fxc', '3:21', ''), ('VkHxit723uM', '3:06', '')]),
    ('Rain and hydroplaning', ['5.13'], [('k6kxcZkE7DY', '4:32', 'IA'), ('TdwuftIUwYY', '4:39', '')]),
@@ -55,7 +55,7 @@ PLAN = [
  (10, 'The driver and the car', [
    ('Phones and distractions', ['3.7'], [('-gB4m2LN9TU', '6:25', '')]),
    ('Alcohol and drugs', ['3.8'], [('UgaT6n1N9mA', '10:13', ''), ('6zl4dmpy0WQ', '3:09', 'North Dakota')]),
-   ('Drowsy driving, seat belts, loose objects; Iowa licensing rules and 511', ['3.5', '3.6', '3.9', '1.1', '1.2', '1.3', '3.10'], [('KdN-gySbNlw', '9:47', ''), ('tbRC0BXi108', '1:26', '')]),
+   ('Drowsy driving, seat belts, loose objects; Iowa permit and license rules (GDL), 511', ['3.5', '3.6', '3.9', '1.1', '1.2', '1.3', '3.10'], [('KdN-gySbNlw', '9:47', ''), ('tbRC0BXi108', '1:26', 'check: not Iowa-specific; Iowa rules from Iowa DOT pages')]),
    ('The car: checks, warning lights, driver-assist; brake failure; pulled over by police', ['3.1', '3.3', '4.1', '4.2', '5.14', '5.16'], [('SzBO1CkIP8M', '1:40', ''), ('DswOF-reMRo', '2:08', 'CA'), ('6LrbFAvX4cA', '1:55', 'CA'), ('C_t-AOUrm0w', '1:55', 'IA (Des Moines news)')])]),
  (11, 'Final week', [
    ('Iowa practice questions + 5 questions', [], [('yrIxUbBuB7Q', '13:50', 'check: third-party quiz, answers may be wrong or not Iowa')]),
@@ -63,7 +63,7 @@ PLAN = [
    ('Iowa road signs + 5 questions', [], [('owwsk636beU', '11:48', 'check: third-party quiz, answers may be wrong or not Iowa')]),
    ('Iowa DOT online practice test + 5 questions', [], [])]),
 ]
-SPARES = [('ZRDw6RmQ-y4', '6:05', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
+SPARES = [('ZRDw6RmQ-y4', '6:05', ''), ('CdDBJoxHLGE', '4:38', 'CA'), ('tpykT-JU7PM', '6:47', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
   ('fba8OgJpWGI', '3:55', ''), ('ym4VOPoda4w', '6:20', 'North Carolina'), ('lWMg2IEtQT8', '8:01', ''), ('uIkanxT72KI', '1:43', 'Michigan'),
   ('lPPJ7S-ZLQE', '1:49', 'IA'), ('cTtEbLoJHyY', '11:58', ''), ('kxQHoBmjp4U', '13:01', ''), ('dWKsDvFBo6M', '12:34', ''),
   ('EJQQxcpQWE0', '0:31', 'IA'), ('xMutekpY0cs', '2:43', 'hazard-spotting'), ('oXh0uS9BHUo', '2:43', 'hazard-spotting'), ('-dQoLfMd-SI', '2:16', 'hazard-spotting')]
