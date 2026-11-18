@@ -10,9 +10,9 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 
 ## Tier 1: bugs
 - [x] 3. Light-mode highlight colours restored (they pointed at themselves).
-- [ ] 1. Optional swim days (Nov 27, Dec 24, Jan 1) and Thanksgiving Thursday can't fill Eli's box.
-- [ ] 2. Eli's Saturday run is missing from his weekend checklist.
-- [ ] 7. After Eli's plan ends (Jan 25): a required "Running" item and chart row with nothing behind them.
+- [x] 1. Optional swim days (Nov 27, Dec 24, Jan 1) and Thanksgiving Thursday can't fill Eli's box.
+- [x] 2. Eli's Saturday run is missing from his weekend checklist.
+- [x] 7. After Eli's plan ends (Jan 25): a required "Running" item and chart row with nothing behind them.
 - [ ] 8. Small fixes: Parents "This week" counts tomorrow, the trials text says Thursday, and the "next" highlight is in the wrong section.
 - [ ] 6. The chore lock is too broad: lock only homework and screen tasks, show one message, and allow chores to be excused.
 
@@ -28,5 +28,10 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [ ] 15. Offline saves: replay order and showing failed saves.
 - [ ] 16. Settings changes don't rewrite past days.
 
+## Open for the family
+- Eli's training plan ends Jan 24, 2027. After that his run/swim row is off and there's no Running item, so a new plan is needed.
+- Should the missed-chore lock also count Monday and Tuesday of the week of Nov 16? (It currently starts Nov 18.)
+
 ## Log
 - Nov 18: browser tests and this plan moved into the repo. Item 3 done.
+- Nov 18: items 1, 2 and 7 done. Eli's run/swim boxes follow his plan, his Saturday run is on his checklist, and a new test checks every chart box against the checklist.
