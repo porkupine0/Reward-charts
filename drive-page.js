@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795037667';
-import { applyConfig } from './routines.js?v=1795037667';
-import { askParent } from './parent.js?v=1795037667';
-import * as L from './lists.js?v=1795037667';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795037667';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795037667';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795037948';
+import { applyConfig } from './routines.js?v=1795037948';
+import { askParent } from './parent.js?v=1795037948';
+import * as L from './lists.js?v=1795037948';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795037948';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795037948';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -182,7 +182,9 @@ function finishLeftovers() {
   course.forEach((l) => {
     if ((d.done || {})[l.id] || !(l.review || (d.watched || {})[l.id])) return;
     const mine = Object.values(d.answers || {}).map((a) => a[l.id]).filter(Boolean);
-    if (mine.length >= 5) save(ID, 'done/' + l.id, mine.map((a) => a.on).sort().pop());
+    // a lesson needs its 5 answers; a unit test needs all of its questions answered
+    const need = l.review ? quizFor(course, course.indexOf(l), d).length : 5;
+    if (need && mine.length >= need) save(ID, 'done/' + l.id, mine.map((a) => a.on).sort().pop());
   });
 }
 const draw = () => { finishLeftovers(); render(); renderTests(); renderPreview(); };

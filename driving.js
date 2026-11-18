@@ -79,6 +79,7 @@ function priority(h) {
 export function quizFor(lessons, index, progress, size = 5) {
   const lesson = lessons[index];
   if (!lesson) return [];
+  if (lesson.review) return unitTestFor(lessons, index, progress);
   const done = (progress || {}).done || {};
   const fromToday = lesson.review ? [] : (lesson.questions || []).slice(0, 3);
   const pool = [];
@@ -97,6 +98,27 @@ export function quizFor(lessons, index, progress, size = 5) {
   // too few finished lessons (the first days): fill from this lesson
   const more = (lesson.questions || []).slice(fromToday.length);
   return [...fromToday, ...fromBefore, ...more].slice(0, size);
+}
+
+// The unit test (every 5th lesson): PER_LESSON questions from each finished lesson of its unit (the lessons
+// since the previous test): never-asked first, then missed ones, then the least recently asked, then course
+// order. Answers given in the test itself are left out, so the test stays the same while he takes it.
+export const PER_LESSON = 4;
+export function unitTestFor(lessons, index, progress) {
+  const lesson = lessons[index], done = (progress || {}).done || {};
+  if (!lesson) return [];
+  let start = index;
+  while (start > 0 && !lessons[start - 1].review) start--;
+  const out = [];
+  lessons.slice(start, index).forEach((l) => {
+    if (!done[l.id]) return;
+    const ranked = (l.questions || []).map((q, qi) => {
+      const h = history(progress, q.id, lesson.id);
+      return { q, qi, rank: !h.length ? 0 : priority(h) < 2 ? 1 : 2, last: h.length ? h[h.length - 1].on : '' };
+    }).sort((a, b) => a.rank - b.rank || (a.last < b.last ? -1 : a.last > b.last ? 1 : 0) || a.qi - b.qi);
+    ranked.slice(0, PER_LESSON).sort((a, b) => a.qi - b.qi).forEach((x) => out.push(x.q));
+  });
+  return out;
 }
 
 // Grade answers { questionId: choiceIndex }: { right, total, missed: [questionId] }.

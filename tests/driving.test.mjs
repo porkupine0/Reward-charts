@@ -95,11 +95,34 @@ test('driving: a missed question comes back twice, then rotates out; review slot
   assert.ok(asked.length > 20);
 });
 
-test('driving: a review lesson is all earlier questions', () => {
+test('driving: the unit test is 4 questions from each finished lesson of its unit, never-asked first', () => {
   const p = { done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4) }, answers: {} };
+  // asked in daily quizzes: L1q1-q4 (right); L3q1 (missed), L3q2-q3 (right)
+  ['L1q1', 'L1q2', 'L1q3', 'L1q4'].forEach((id) => answer(p, id, 'L1', true, day(1)));
+  answer(p, 'L3q1', 'L3', false, day(3)); answer(p, 'L3q2', 'L3', true, day(3)); answer(p, 'L3q3', 'L3', true, day(3));
   const quiz = D.quizFor(LESSONS, 4, p);
-  assert.equal(quiz.length, 5);
+  assert.equal(quiz.length, 16);
   assert.ok(quiz.every((x) => /^L[1-4]q/.test(x.id)));
+  const l1 = quiz.filter((x) => x.id.startsWith('L1')).map((x) => x.id);
+  assert.deepEqual(l1, ['L1q1', 'L1q2', 'L1q3', 'L1q5'], 'L1: its never-asked question first, then the least recently asked');
+  assert.deepEqual(quiz.filter((x) => x.id.startsWith('L3')).map((x) => x.id), ['L3q1', 'L3q2', 'L3q4', 'L3q5'], 'L3: never-asked, then the missed one, then the least recent');
+  // only finished lessons count
+  assert.equal(D.quizFor(LESSONS, 4, { done: { L1: day(1), L2: day(2) }, answers: {} }).length, 8);
+  // the next unit's test only uses its own unit (L6-L9)
+  const ten = course(10), p2 = { done: Object.fromEntries(ten.map((l, i) => [l.id, day(i + 1)])), answers: {} };
+  assert.ok(D.quizFor(ten, 9, p2).every((x) => /^L[6-9]q/.test(x.id)));
+});
+
+test('driving: the unit test stays the same while he takes it, and its misses come back afterwards', () => {
+  const p = { done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4) }, answers: {} };
+  const before = D.quizFor(LESSONS, 4, p).map((x) => x.id);
+  before.slice(0, 6).forEach((id, i) => answer(p, id, 'L5', i !== 2, day(5)));
+  assert.deepEqual(D.quizFor(LESSONS, 4, p).map((x) => x.id), before, 'same questions after some answers');
+  // finish the test (L5 done); the one he missed is first in line for the next lesson's review slots
+  before.slice(6).forEach((id) => answer(p, id, 'L5', true, day(5)));
+  p.done.L5 = day(5);
+  const next = D.quizFor(LESSONS, 5, p).map((x) => x.id);
+  assert.ok(next.slice(3).includes(before[2]), 'the missed question comes back: ' + next);
 });
 
 test('driving: grading', () => {
