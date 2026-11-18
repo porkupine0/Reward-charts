@@ -679,3 +679,4 @@ input[type="time"], .field input, select { background: var(--surface); color: va
   .linkbtn.danger { color: #F4A67E; }
   body.soccer .pillbtn, body.soccer .num, body.soccer .num.juggle { color: #0F1620; }
 }
+@media (prefers-color-scheme: dark) { .treat.given { background: #183324; border-color: #2E5A40; } }

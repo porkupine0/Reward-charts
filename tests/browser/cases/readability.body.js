@@ -7,7 +7,13 @@
     const late = { start: new Date(2026, 10, 18, 20, 0).getTime(), end: new Date(2026, 10, 18, 21, 30).getTime() };
     sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-17': { rhett: { chore: true } },
       '2026-11-18': { rhett: { putaway: true, afterSnack: 'Banana', clothes: true, mCandyGiven: true, homework: '~skip', reading: '~excused', bedTimer: late, noYell: true, firstTime: true, noLies: 'no' } } },
-      game: { rhett: { '2026-11-16': { 1795000000000: 15 } } } } } })); });
+      game: { rhett: { '2026-11-16': { 1795000000000: 15 } } } },
+      // Isaiah: in bed on time Tuesday, candy given Wednesday (the "Candy enjoyed" card); an old Ball Master challenge (the "ended" banner)
+      isaiah: { start: '2026-10-05' } } }));
+    const db = JSON.parse(sessionStorage.getItem('mockdb'));
+    db.charts.routines.days['2026-11-17'].isaiah = { bedTimer: { start: new Date(2026, 10, 17, 19, 30).getTime(), end: new Date(2026, 10, 17, 19, 50).getTime() } };
+    db.charts.routines.days['2026-11-18'].isaiah = { mCandyGiven: true };
+    sessionStorage.setItem('mockdb', JSON.stringify(db)); });
   const measure = () => p.evaluate(() => {
     const parse = (c) => {
       let m = c.match(/rgba?\(([^)]+)\)/);
@@ -41,13 +47,15 @@
     });
     return { n, worst: +worst.toFixed(2), bad: [...new Set(bad)].slice(0, 12) };
   });
-  const pages = ['checklist.html?kid=rhett&date=2026-11-19', 'checklist.html?kid=rhett&date=2026-11-18', 'checklist.html?kid=eli&date=2026-11-19', 'checklist.html?kid=isaiah', 'zay.html', 'trombone.html', 'eli.html?week=2026-11-23',
+  const pages = ['checklist.html?kid=rhett&date=2026-11-19', 'checklist.html?kid=rhett&date=2026-11-18', 'checklist.html?kid=eli&date=2026-11-19', 'checklist.html?kid=isaiah', 'checklist.html?kid=isaiah&date=2026-11-18', 'zay.html', 'trombone.html', 'eli.html?week=2026-11-23',
     'kid.html?kid=isaiah', 'index.html', 'parents.html', 'run.html', 'trials.html', 'isaiah.html', 'history.html?kid=rhett', 'stats.html', 'settings.html'];
   for (const scheme of ['light', 'dark']) {
     await p.emulateMedia({ colorScheme: scheme });
     for (const u of pages) {
       await visit(u, 'rd-' + scheme + '-' + u.split(/[.?]/)[0]);
       const m = await measure();
+      if (/isaiah&date=2026-11-18/.test(u)) check(!!(await p.$('.treat.given')), 'the candy-given card is on the page being measured');
+      if (/^isaiah\.html/.test(u)) check(!!(await p.$('#ended strong')), 'the challenge-ended banner is on the page being measured');
       notes.push(scheme + ' ' + u + ': worst ' + m.worst + (m.bad.length ? ' · below: ' + m.bad.join(' | ') : ''));
       if (STRICT) check(!m.bad.length, scheme + ' ' + u + ' text below contrast: ' + m.bad.join(' | '));
     }
