@@ -170,7 +170,7 @@ test('driving course content: passes the checker, and every quote is on its cite
   const manual = readFileSync(new URL('../docs/iowa/drivers-manual.txt', import.meta.url), 'utf8');
   const pages = {};
   manual.split(/\n===== PDF page (\d+) =====\n/).forEach((t, i, arr) => { if (i % 2) pages[arr[i]] = arr[i + 1]; });
-  const norm = (x) => x.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
+  const norm = (x) => x.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/-/g, '').replace(/\s+/g, ' ').trim(); // (ignores hyphens and line breaks)
   const missing = [];
   LESSONS.forEach((l) => (l.questions || []).forEach((q) => {
     const page = q.ref.match(/p\.\s?(\d+)/)[1];
