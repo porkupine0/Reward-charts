@@ -135,3 +135,60 @@ export function checkCourse(lessons) {
   });
   return out;
 }
+
+// ---- knowledge tests (driving-tests.js): fixed forms, scored overall and per topic ----
+// A sitting's score, from answers/<question>/<sitting>: { answered, right, total, done, pct, passed, byTopic }.
+// byTopic: [{ topic, right, total }] in the form's topic order.
+export function testScore(form, progress, sittingId, pass = 0.8) {
+  const ans = (progress || {}).answers || {};
+  const got = (form || []).map((x) => (ans[x.id] || {})[sittingId]).filter(Boolean);
+  const right = (form || []).filter((x) => ((ans[x.id] || {})[sittingId] || {}).ok).length;
+  const total = (form || []).length, done = total > 0 && got.length === total;
+  const byTopic = [];
+  (form || []).forEach((x) => {
+    let t = byTopic.find((b) => b.topic === x.topic);
+    if (!t) byTopic.push((t = { topic: x.topic, right: 0, total: 0 }));
+    t.total++;
+    if (((ans[x.id] || {})[sittingId] || {}).ok) t.right++;
+  });
+  const pct = total ? Math.round((100 * right) / total) : 0;
+  return { answered: got.length, right, total, done, pct, passed: done && right / total >= pass, byTopic };
+}
+// The day a sitting was finished: its last answer's day (null while unfinished).
+export function testDoneOn(form, progress, sittingId) {
+  const ans = (progress || {}).answers || {};
+  const got = (form || []).map((x) => (ans[x.id] || {})[sittingId]).filter(Boolean);
+  return got.length && got.length === (form || []).length ? got.map((a) => a.on).sort().pop() : null;
+}
+// Sittings open on this day: from its date, and (if it names one) once that lesson is finished.
+export function openSittings(sittings, progress, dayKey) {
+  const done = (progress || {}).done || {};
+  return (sittings || []).filter((s) => (!s.from || s.from <= dayKey) && (!s.after || (done[s.after] && done[s.after] <= dayKey)));
+}
+// Check the test bank: ids unique (also against the lessons), topics known, answers valid, a page per question.
+export function checkTests(forms, sittings, topics, lessons) {
+  const out = [], seen = new Set((lessons || []).flatMap((l) => (l.questions || []).map((x) => x.id)));
+  Object.entries(forms || {}).forEach(([name, form]) => {
+    if (form.length !== 25) out.push('form ' + name + ': ' + form.length + ' questions (should be 25)');
+    if (new Set(form.map((x) => x.answer)).size < 3) out.push('form ' + name + ': right answers bunched in too few positions');
+    form.forEach((x) => {
+      if (!/^[A-Za-z0-9]+$/.test(x.id || '')) out.push((x.id || '?') + ': question id must be letters and digits');
+      if (seen.has(x.id)) out.push(x.id + ': id used twice');
+      seen.add(x.id);
+      if (!(topics || []).includes(x.topic)) out.push(x.id + ': unknown topic ' + x.topic);
+      if (!Array.isArray(x.choices) || x.choices.length < 2) out.push(x.id + ': needs choices');
+      else if (!(Number.isInteger(x.answer) && x.answer >= 0 && x.answer < x.choices.length)) out.push(x.id + ': answer is not one of the choices');
+      if (!x.why) out.push(x.id + ': needs an explanation');
+      if (!/^Iowa Driver.s Manual p\.\s?\d+/.test(x.ref || '')) out.push(x.id + ': needs a manual page');
+    });
+  });
+  const ids = new Set((lessons || []).map((l) => l.id));
+  (sittings || []).forEach((s) => {
+    if (!/^[A-Za-z0-9]+$/.test(s.id || '')) out.push((s.id || '?') + ': sitting id must be letters and digits');
+    if (ids.has(s.id)) out.push(s.id + ': sitting id is also a lesson id');
+    ids.add(s.id);
+    if (!(forms || {})[s.form]) out.push(s.id + ': unknown form ' + s.form);
+    if (s.after && !(lessons || []).some((l) => l.id === s.after)) out.push(s.id + ': after names no lesson');
+  });
+  return out;
+}

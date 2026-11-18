@@ -1,15 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795021103';
-import { CHARTS, weekProgress } from './charts.js?v=1795021103';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795021103';
-import * as L from './lists.js?v=1795021103';
-import { owed, score, planned, fmt } from './trials.js?v=1795021103';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795021103';
-import { askParent, setParent, changePin } from './parent.js?v=1795021103';
-import { dayFull } from './streaks.js?v=1795021103';
-import { owedItems } from './owed.js?v=1795021103';
-import { pruneList, pruneCutoff } from './prune.js?v=1795021103';
-import { nowHtml } from './nowview.js?v=1795021103';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795025438';
+import { CHARTS, weekProgress } from './charts.js?v=1795025438';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795025438';
+import * as L from './lists.js?v=1795025438';
+import { owed, score, planned, fmt } from './trials.js?v=1795025438';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795025438';
+import { askParent, setParent, changePin } from './parent.js?v=1795025438';
+import { dayFull } from './streaks.js?v=1795025438';
+import { owedItems } from './owed.js?v=1795025438';
+import { pruneList, pruneCutoff } from './prune.js?v=1795025438';
+import { testScore, testDoneOn } from './driving.js?v=1795025438';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795025438';
+import { nowHtml } from './nowview.js?v=1795025438';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -95,6 +97,13 @@ function render() {
   const okd = upcoming.slice(0, 2).filter(okOf).length;
   if (upcoming.length && okd < Math.min(2, upcoming.length)) ex.unshift(row('Eli', KIDS.eli.accent, 'Driving: ' + okd + ' of the next ' + Math.min(2, upcoming.length) + ' lessons approved. Next to preview: ' + esc(upcoming.find((l) => !okOf(l)).title), '', '<a class="tbtn approve" href="drive.html#preview">Preview</a>'));
   $('excuses').innerHTML = ex.join('') || '<p class="muted">Nothing waiting.</p>';
+
+  // Eli's permit test practice: each finished sitting's score, weakest topics first
+  const sat = SITTINGS.map((st) => ({ st, sc: testScore(FORMS[st.form] || [], dv, st.id, PASS), on: testDoneOn(FORMS[st.form] || [], dv, st.id) })).filter((x) => x.sc.answered);
+  $('testcard').hidden = !sat.length;
+  $('testscores').innerHTML = sat.map(({ st, sc, on }) => row('Eli', KIDS.eli.accent, '<b>' + esc(st.title) + '</b>: ' + (sc.done ? sc.right + ' of ' + sc.total + ' (' + sc.pct + '%), ' + (sc.passed ? 'passing' : 'below the ' + Math.round(PASS * 100) + '% pass mark') +
+    '<br>Weakest: ' + esc(sc.byTopic.filter((t) => t.right < t.total).sort((a, b) => a.right / a.total - b.right / b.total).slice(0, 3).map((t) => t.topic + ' ' + t.right + '/' + t.total).join(', ') || 'none') : 'in progress, ' + sc.answered + ' of ' + sc.total + ' answered'),
+    on ? shortDate(parseYmd(on)) : '')).join('');
 
   // Reading: this week and the 3 before, per kid
   const weeks = [0, 1, 2, 3].map((w) => addDays(mon, -7 * w));

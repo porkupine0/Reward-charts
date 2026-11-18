@@ -1,10 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795021103';
-import { applyConfig } from './routines.js?v=1795021103';
-import { askParent } from './parent.js?v=1795021103';
-import * as L from './lists.js?v=1795021103';
-import { lessonFor, quizFor, isApproved, isSkipped } from './driving.js?v=1795021103';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795025438';
+import { applyConfig } from './routines.js?v=1795025438';
+import { askParent } from './parent.js?v=1795025438';
+import * as L from './lists.js?v=1795025438';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795025438';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795025438';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -12,6 +13,7 @@ const ctx = { routines: {}, run: {}, isaiah: {}, drive: {} };
 const params = new URLSearchParams(location.search);
 const pastDay = params.get('date') && parseYmd(params.get('date')) ? params.get('date') : null;
 let previewOpen = false;
+let testOpen = null; // the sitting he's taking (questions shown)
 
 const video = (v) => '<div class="dv">' +
   (v.yt ? '<div class="dv-frame"><iframe src="https://www.youtube-nocookie.com/embed/' + esc(v.yt) + '" title="' + esc(v.title) + '" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' : '') +
@@ -64,6 +66,40 @@ function renderPast(course, d) {
     '<div class="dquiz">' + storedQuiz(course, lesson.id).map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id)).join('') + '</div>';
 }
 
+// ---- knowledge tests: practice for the written permit test (outside the streak and game time) ----
+// While he takes one, an answered question shows only his pick (no right/wrong), so later sittings measure
+// what he knows, not what he remembers from this one. At the end: his score and how he did per topic.
+function scoreHtml(s, sc) {
+  return '<p class="dt-score"><b>' + sc.right + ' of ' + sc.total + '</b> (' + sc.pct + '%) · ' + (sc.passed ? 'at or above' : 'below') + ' the practice test’s ' + Math.round(PASS * 100) + '% pass mark</p>' +
+    '<table class="histtable dt-topics"><tbody>' + sc.byTopic.map((t) => '<tr' + (t.right < t.total ? ' class="dt-weak"' : '') + '><td>' + esc(t.topic) + '</td><td><b>' + t.right + '</b>/' + t.total + '</td></tr>').join('') + '</tbody></table>';
+}
+function renderTests() {
+  const el = $('tests');
+  if (!live() || pastDay) { el.innerHTML = ''; el.hidden = true; return; }
+  const d = ctx.drive || {}, now = new Date(), open = openSittings(SITTINGS, d, ymd(now));
+  if (!open.length) { el.innerHTML = ''; el.hidden = true; return; }
+  el.hidden = false;
+  let h = '<p class="eyebrow">Permit test practice</p>';
+  open.forEach((s) => {
+    const form = FORMS[s.form] || [], sc = testScore(form, d, s.id, PASS);
+    h += '<h2>' + esc(s.title) + '</h2>';
+    if (sc.done) { h += scoreHtml(s, sc); return; }
+    const lock = L.computerLock(ctx, 'eli', now);
+    if (lock) { h += '<p class="lockmsg">' + (lock === 'owed' ? 'Finish the chore you missed earlier this week first.' : 'Do today’s chores first, then come back.') + '</p>'; return; }
+    if (testOpen !== s.id && !sc.answered) {
+      h += '<p class="note">' + form.length + ' questions like Iowa’s written permit test, about 15 minutes. No video and no hints: answer what you know, and guess if you’re not sure. You’ll see your score and your strong and weak topics at the end.</p>' +
+        '<button class="tt-save" type="button" data-tstart="' + esc(s.id) + '">Start the test</button>';
+      return;
+    }
+    h += '<p class="dt-count">' + sc.answered + ' of ' + sc.total + ' answered</p><div class="dquiz">' + form.map((q, i) => {
+      const a = answerOf(q.id, s.id), head = '<p class="dq-q">' + (i + 1) + '. ' + esc(q.q) + '</p>';
+      if (a) return '<div class="dq answered">' + head + '<p class="dq-result">Your answer: <b>' + esc(q.choices[a.pick] || '') + '</b></p></div>';
+      return '<div class="dq">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice" type="button" data-tpick="' + esc(q.id) + '|' + esc(s.id) + '|' + ci + '">' + esc(c) + '</button>').join('') + '</div></div>';
+    }).join('') + '</div>';
+  });
+  el.innerHTML = h;
+}
+
 // ---- parent preview: upcoming lessons with their videos and answers (after the PIN) ----
 function renderPreview() {
   if (!previewOpen) { $('preview').innerHTML = ''; return; }
@@ -79,6 +115,16 @@ function renderPreview() {
 document.addEventListener('click', async (e) => {
   const w = e.target.closest('[data-watched]');
   if (w) { save(ID, 'watched/' + w.dataset.watched, ymd(new Date())); return; }
+  const tp = e.target.closest('[data-tpick]');
+  if (tp) {
+    const [qid, sid, pick] = tp.dataset.tpick.split('|'), s = SITTINGS.find((x) => x.id === sid), q = s && (FORMS[s.form] || []).find((x) => x.id === qid);
+    if (!q || answerOf(qid, sid)) return; // the first answer counts
+    const n = Object.values(ctx.drive.answers || {}).filter((a) => a[sid]).length + 1;
+    save(ID, 'answers/' + qid + '/' + sid, { ok: Number(pick) === q.answer, pick: Number(pick), on: ymd(new Date()), n });
+    return;
+  }
+  const ts = e.target.closest('[data-tstart]');
+  if (ts) { testOpen = ts.dataset.tstart; renderTests(); return; }
   const pk = e.target.closest('[data-pick]');
   if (pk) {
     const [qid, lessonId, pick] = pk.dataset.pick.split('|'), q = L.course().flatMap((l) => l.questions || []).find((x) => x.id === qid);
@@ -125,7 +171,7 @@ function finishLeftovers() {
     if (mine.length >= 5) save(ID, 'done/' + l.id, mine.map((a) => a.on).sort().pop());
   });
 }
-const draw = () => { finishLeftovers(); render(); renderPreview(); };
+const draw = () => { finishLeftovers(); render(); renderTests(); renderPreview(); };
 watch(ID, (v) => { ctx.drive = v || {}; draw(); }, statusPill($('sync')));
 watch('routines', (v) => { ctx.routines = v || {}; draw(); });
 watch('config', (v) => { applyConfig(v); draw(); });

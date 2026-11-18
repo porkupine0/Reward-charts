@@ -164,7 +164,7 @@ test('driving: a later skip does not rewrite the days he was waiting', () => {
   assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L2:required');
 });
 
-test('driving course content: passes the checker, and every quote is on its cited page of the Iowa manual', async () => {
+test('driving course and knowledge tests: pass the checkers, and every quote is on its cited page of the Iowa manual', async () => {
   const { LESSONS } = await import('../driving-course.js?v=' + V);
   assert.deepEqual(D.checkCourse(LESSONS), []);
   const manual = readFileSync(new URL('../docs/iowa/drivers-manual.txt', import.meta.url), 'utf8');
@@ -172,9 +172,42 @@ test('driving course content: passes the checker, and every quote is on its cite
   manual.split(/\n===== PDF page (\d+) =====\n/).forEach((t, i, arr) => { if (i % 2) pages[arr[i]] = arr[i + 1]; });
   const norm = (x) => x.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/-/g, '').replace(/\s+/g, ' ').trim(); // (ignores hyphens and line breaks)
   const missing = [];
-  LESSONS.forEach((l) => (l.questions || []).forEach((q) => {
+  const { FORMS, SITTINGS, TOPICS } = await import('../driving-tests.js?v=' + V);
+  assert.deepEqual(D.checkTests(FORMS, SITTINGS, TOPICS, LESSONS), []);
+  [...LESSONS.flatMap((l) => l.questions || []), ...Object.values(FORMS).flat()].forEach((q) => {
     const page = q.ref.match(/p\.\s?(\d+)/)[1];
     if (!q.quote || !norm(pages[page] || '').includes(norm(q.quote))) missing.push(q.id + ' (p.' + page + '): ' + q.quote);
-  }));
+  });
   assert.deepEqual(missing, []);
+});
+
+test('knowledge tests: score overall and per topic; done only when every question is answered', () => {
+  const form = [['a1', 'Signs'], ['a2', 'Signs'], ['a3', 'Right of way']].map(([id, topic]) => ({ id, topic, answer: 0 }));
+  const p = { answers: { a1: { base: { ok: true, on: day(1) } }, a3: { base: { ok: false, on: day(2) } }, a2: { L1: { ok: true, on: day(1) } } } };
+  let s = D.testScore(form, p, 'base');
+  assert.deepEqual([s.answered, s.right, s.done, s.passed], [2, 1, false, false], 'an answer from a lesson does not count for the test');
+  assert.equal(D.testDoneOn(form, p, 'base'), null);
+  p.answers.a2.base = { ok: true, on: day(3) };
+  s = D.testScore(form, p, 'base');
+  assert.deepEqual([s.answered, s.right, s.done, s.pct, s.passed], [3, 2, true, 67, false]);
+  assert.deepEqual(s.byTopic, [{ topic: 'Signs', right: 2, total: 2 }, { topic: 'Right of way', right: 0, total: 1 }]);
+  assert.equal(D.testDoneOn(form, p, 'base'), day(3));
+  p.answers.a3.base.ok = true;
+  assert.equal(D.testScore(form, p, 'base').passed, true);
+  assert.equal(D.testScore(form, p, 'p1').answered, 0, 'each sitting is scored on its own');
+});
+
+test('knowledge tests: a sitting opens on its date, and after its lesson is finished', () => {
+  const S = [{ id: 'base', form: 'A', from: day(1) }, { id: 'p1', form: 'A', from: day(1), after: 'L4' }];
+  assert.deepEqual(D.openSittings(S, {}, '2026-11-30').map((s) => s.id), []);
+  assert.deepEqual(D.openSittings(S, {}, day(1)).map((s) => s.id), ['base']);
+  assert.deepEqual(D.openSittings(S, { done: { L4: day(5) } }, day(5)).map((s) => s.id), ['base', 'p1']);
+});
+
+test('knowledge tests: the checker catches bad forms and sittings', () => {
+  const good = Array.from({ length: 25 }, (_, i) => ({ id: 't' + i, topic: 'Signs', q: 'Q', choices: ['a', 'b', 'c', 'd'], answer: i % 4, why: 'w', ref: "Iowa Driver's Manual p.6" }));
+  assert.deepEqual(D.checkTests({ A: good }, [{ id: 'base', form: 'A' }], ['Signs'], LESSONS), []);
+  const bad = good.slice(0, 24).concat([{ ...good[0], id: 'L1q1', topic: 'Nope', answer: 9, why: '' }]);
+  const out = D.checkTests({ A: bad }, [{ id: 'L1', form: 'B', after: 'nope' }], ['Signs'], LESSONS).join(' | ');
+  for (const m of ['L1q1: id used twice', 'unknown topic', 'answer is not one of the choices', 'needs an explanation', 'sitting id is also a lesson id', 'unknown form B', 'after names no lesson']) assert.ok(out.includes(m), m + ' in ' + out);
 });

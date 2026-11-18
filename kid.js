@@ -1,14 +1,14 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795021103';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795021103';
-import { CHARTS, weekProgress } from './charts.js?v=1795021103';
-import { planFor } from './plan.js?v=1795021103';
-import * as L from './lists.js?v=1795021103';
-import { score, fmt, nextMilestone } from './trials.js?v=1795021103';
-import { dayStreak } from './streaks.js?v=1795021103';
-import { lessonFor } from './driving.js?v=1795021103';
-import { nowHtml } from './nowview.js?v=1795021103';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795025438';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795025438';
+import { CHARTS, weekProgress } from './charts.js?v=1795025438';
+import { planFor } from './plan.js?v=1795025438';
+import * as L from './lists.js?v=1795025438';
+import { score, fmt, nextMilestone } from './trials.js?v=1795025438';
+import { dayStreak } from './streaks.js?v=1795025438';
+import { lessonFor } from './driving.js?v=1795025438';
+import { nowHtml } from './nowview.js?v=1795025438';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {}, drive: {} };
