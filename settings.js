@@ -45,15 +45,54 @@ export function onSettings(fn) { listeners.push(fn); }
 const arr = (v) => (Array.isArray(v) ? v : v && typeof v === 'object' ? Object.keys(v).sort((a, b) => a - b).map((k) => v[k]) : []);
 const clean = (list) => arr(list).map(String).map((s) => s.trim()).filter(Boolean);
 
-export function applySettings(cfg) {
-  const c = cfg || {};
-  const fresh = copy(DEFAULTS);
+// The day-to-day schedule (chores, shower nights, lights out), read from saved settings over the defaults.
+export const DATED = ['chores', 'showers', 'lights'];
+function schedule(c) {
+  const fresh = copy({ chores: DEFAULTS.chores, showers: DEFAULTS.showers, lights: DEFAULTS.lights });
   ['eli', 'rhett', 'isaiah'].forEach((kid) => {
     const days = c.chores && c.chores[kid];
     if (days) fresh.chores[kid] = [0, 1, 2, 3, 4, 5, 6].map((d) => clean(arr(days)[d]));
     if (c.showers && c.showers[kid] !== undefined) fresh.showers[kid] = arr(c.showers[kid]).map(Number).filter((d) => d >= 0 && d <= 6);
     if (c.lights && /^\d{1,2}:\d{2}$/.test(c.lights[kid] || '')) fresh.lights[kid] = c.lights[kid];
   });
+  return fresh;
+}
+
+// ---- Changes apply from the day they're saved ----
+// config/history/<YYYY-MM-DD> holds the schedule that applied BEFORE that date (written by the first save
+// that day). A day uses the earliest snapshot dated after it, else the current settings. No snapshots =
+// everything uses the current settings, exactly as before.
+let HISTORY = []; // [[date, schedule]] sorted by date
+const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+export function scheduleFor(date) {
+  const k = typeof date === 'string' ? date : ymdOf(date);
+  const hit = HISTORY.find(([at]) => k < at);
+  return hit ? hit[1] : null;
+}
+// Run fn with the schedule that applied on this date (synchronous callers only).
+export function atDate(date, fn) {
+  const snap = date && scheduleFor(date);
+  if (!snap) return fn();
+  const saved = {};
+  DATED.forEach((k) => { saved[k] = SETTINGS[k]; SETTINGS[k] = snap[k]; });
+  try { return fn(); } finally { DATED.forEach((k) => { SETTINGS[k] = saved[k]; }); }
+}
+// What to save before changing the schedule today: the current schedule, unless today already has one.
+export function snapshotToSave(cfg, today) {
+  const k = ymdOf(today);
+  if (cfg && cfg.history && cfg.history[k]) return null;
+  const value = copy({ chores: SETTINGS.chores, showers: SETTINGS.showers, lights: SETTINGS.lights });
+  // Firebase drops empty lists: save them the way the Settings page does (cleaned up on load)
+  Object.values(value.chores).forEach((days) => days.forEach((d, i) => { if (!d.length) days[i] = ['']; }));
+  Object.keys(value.showers).forEach((kid) => { if (!value.showers[kid].length) value.showers[kid] = [-1]; });
+  return { key: k, value };
+}
+
+export function applySettings(cfg) {
+  const c = cfg || {};
+  const fresh = copy(DEFAULTS);
+  Object.assign(fresh, schedule(c));
+  HISTORY = Object.entries(c.history || {}).filter(([k]) => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, schedule(v || {})]);
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => {
     const v = c.rewards && c.rewards[id] && clean(c.rewards[id][w]);
     if (v && v.length) fresh.rewards[id][w] = v;

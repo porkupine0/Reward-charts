@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794987355';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult } from './routines.js?v=1794987355';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794987355';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1794987355';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794987571';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1794987571';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794987571';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1794987571';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -51,7 +51,9 @@ function weeklyItems(ctx, kid, date) {
 }
 
 // The day's lists for one kid: { morning, day, bed }.
-export function lists(ctx, kid, date) {
+// (each day uses the chores, showers and lights out that applied that day)
+export function lists(ctx, kid, date) { return atDate(date, () => listsOn(ctx, kid, date)); }
+function listsOn(ctx, kid, date) {
   const dow = dowOf(date);
   // Teeth was added Nov 11, 2026; leave it off earlier mornings so past candy isn't undone.
   const morn = morning(kid, dow).filter((i) => i.key !== 'mTeeth' || ymd(date) >= '2026-11-11');
@@ -119,7 +121,8 @@ export function progress(ctx, kid, date, list) {
 // ---- weekly reward charts: boxes come from the checklists and Training ----
 // A box the checklist can fill is "derived". A parent can still tick or un-tick it by hand:
 // that's stored on the chart as true (on) or 'off', and wins over the derived value.
-export function derivedCell(chartId, rowKey, i, monday, ctx) {
+export function derivedCell(chartId, rowKey, i, monday, ctx) { return atDate(addDays(monday, i), () => derivedCellOn(chartId, rowKey, i, monday, ctx)); }
+function derivedCellOn(chartId, rowKey, i, monday, ctx) {
   const date = addDays(monday, i);
   const c = (kid) => dayChecks(ctx, kid, date);
   const allChores = (kid) => choreItems(kid, i).every((x) => isDone(c(kid)[x.key]));
@@ -205,7 +208,7 @@ export function readingWeek(ctx, kid, monday, upTo) {
   for (let i = 0; i < 7; i++) {
     const d = addDays(monday, i);
     if (ymd(d) > ymd(last)) break;
-    if (!bedtime(kid, dowOf(d)).some((s) => s.key === 'reading')) continue;
+    if (!atDate(d, () => bedtime(kid, dowOf(d))).some((s) => s.key === 'reading')) continue;
     nights++;
     const v = dayChecks(ctx, kid, d).reading;
     if (v === EXCUSED) excused++;

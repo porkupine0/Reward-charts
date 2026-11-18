@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin } from './settings.js?v=1794987355';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1794987571';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -16,6 +16,7 @@ export const isDone = (v) => !!v && v !== SKIP;
 export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize', 'activity']; // activity = Eli's run/swim, Isaiah's soccer, Rhett's move/racquetball
 
 // Chores, shower nights and lights out come from settings.js (editable on the Settings page).
+export { atDate };
 export const CHORES = new Proxy({}, { get: (_, kid) => SETTINGS.chores[kid] });
 export { applySettings as applyConfig };
 
@@ -199,7 +200,8 @@ export function lightsOut(kid, dow) {
 export const GRACE_MIN = 5;
 export const STATUS_LABEL = { ontime: 'On time', grace: 'Grace', approved: 'Parent OK', late: 'Late' };
 
-export function timerResult(kid, dateObj, rec, checks) {
+export function timerResult(kid, dateObj, rec, checks) { return atDate(dateObj, () => timerResultOn(kid, dateObj, rec, checks)); }
+function timerResultOn(kid, dateObj, rec, checks) {
   if (!rec || !rec.start || !rec.end) return null;
   const dow = (dateObj.getDay() + 6) % 7;
   const lo = lightsOut(kid, dow);

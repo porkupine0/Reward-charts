@@ -1,8 +1,8 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794987355';
-import { applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794987355';
-import { askParent } from './parent.js?v=1794987355';
-import * as L from './lists.js?v=1794987355';
-import { dayStreak, cheerIf } from './streaks.js?v=1794987355';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794987571';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794987571';
+import { askParent } from './parent.js?v=1794987571';
+import * as L from './lists.js?v=1794987571';
+import { dayStreak, cheerIf } from './streaks.js?v=1794987571';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -85,7 +85,9 @@ function section(title, sub, items, checks, timed, phase) {
     '<div class="checklist">' + body + '</div>';
 }
 
-function render() {
+// The page shows the chores, showers and lights out that applied on its date.
+function render() { return atDate(date, renderOn); }
+function renderOn() {
   const k = KIDS[kid];
   const dow = dowOf(date);
   const key = ymd(date);
@@ -274,7 +276,7 @@ document.addEventListener('click', (e) => {
   save(ID, base + key, next);
   // Checking a bedtime step starts the bedtime timer if nobody has (today only).
   if (next && ymd(date) === ymd(new Date()) && !(dayChecks().bedTimer || {}).start &&
-      bedtime(kid, dowOf(date)).some((b) => b.key === key)) {
+      atDate(date, () => bedtime(kid, dowOf(date))).some((b) => b.key === key)) {
     save(ID, base + 'bedTimer', { start: Date.now(), auto: true });
   }
   if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);

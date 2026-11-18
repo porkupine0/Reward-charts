@@ -1,9 +1,9 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc } from './store.js?v=1794987355';
-import { SETTINGS, DEFAULTS, applySettings } from './settings.js?v=1794987355';
-import { KIDS } from './routines.js?v=1794987355';
-import { LEVELS } from './trials.js?v=1794987355';
-import { askParent } from './parent.js?v=1794987355';
+import { watch, save, statusPill, esc } from './store.js?v=1794987571';
+import { SETTINGS, DEFAULTS, applySettings, snapshotToSave } from './settings.js?v=1794987571';
+import { KIDS } from './routines.js?v=1794987571';
+import { LEVELS } from './trials.js?v=1794987571';
+import { askParent } from './parent.js?v=1794987571';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -50,23 +50,31 @@ $('save').onclick = async () => {
   const cfg = copy(draft);
   Object.values(cfg.chores).forEach((days) => days.forEach((d, i) => { if (!d.length) days[i] = ['']; }));
   Object.keys(cfg.showers).forEach((k) => { if (!cfg.showers[k].length) cfg.showers[k] = [-1]; });
+  await keepPastDays();
   await save('config', 'chores', cfg.chores);
   await save('config', 'showers', cfg.showers);
   await save('config', 'lights', cfg.lights);
   await save('config', 'rewards', cfg.rewards);
   await save('config', 'prizeLevels', cfg.prizeLevels);
   dirty = false;
-  $('msg').textContent = 'Saved. Every phone will use the new settings.';
+  $('msg').textContent = 'Saved. Every phone uses the new settings from today; earlier days keep what they had.';
 };
 $('reset').onclick = async () => {
   if (!confirm('Go back to the original chores, bedtimes and prize lists?')) return;
   if (!(await askParent())) return;
+  await keepPastDays();
   ['chores', 'showers', 'lights', 'rewards', 'prizeLevels'].forEach((k) => save('config', k, null));
   draft = copy(DEFAULTS); dirty = false; renderAll();
   $('msg').textContent = 'Back to the original settings.';
 };
+// Changes apply from today: first, record what earlier days used (once per day).
+let cfgRaw = {};
+async function keepPastDays() {
+  const snap = snapshotToSave(cfgRaw, new Date());
+  if (snap) await save('config', 'history/' + snap.key, snap.value);
+}
 window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 draft = copy(SETTINGS);
 renderAll();
-watch('config', (d) => { applySettings(d); if (!dirty) { draft = copy(SETTINGS); renderAll(); } }, statusPill($('sync')));
+watch('config', (d) => { cfgRaw = d || {}; applySettings(d); if (!dirty) { draft = copy(SETTINGS); renderAll(); } }, statusPill($('sync')));

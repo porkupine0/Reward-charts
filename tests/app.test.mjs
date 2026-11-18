@@ -12,7 +12,7 @@ const { planFor, trialOn, dayDone } = await load('plan.js');
 const { score, nextMilestone, owed, planned, MILE, FIVE, mphFor } = await load('trials.js');
 const { CHARTS, weekProgress, rowsFor } = await load('charts.js');
 const L = await load('lists.js');
-const { applySettings, SETTINGS, DEFAULTS } = await load('settings.js');
+const { applySettings, SETTINGS, DEFAULTS, snapshotToSave } = await load('settings.js');
 
 const d = (s) => parseYmd(s);
 
@@ -467,4 +467,52 @@ test("clearing old logs: only checklist days past the 2-year look-back; nothing 
   list.forEach(([, path]) => { delete after.routines.days[path.slice(5)]; });
   assert.equal(view(after), before);
   assert.equal(Object.keys(after['eli-run'].days).length, 3);
+});
+
+test("settings changes apply from the day they're saved; earlier days keep what they had", () => {
+  const before = JSON.parse(JSON.stringify(SETTINGS));
+  // seeded data: every other day fully done, a bedtime timer every night
+  const routines = { days: {} };
+  for (let day = d('2026-11-16'); ymd(day) <= '2026-12-31'; day = addDays(day, 1)) {
+    const k = ymd(day), c = routines.days[k] = {};
+    for (const kid of ['eli', 'rhett', 'isaiah']) {
+      c[kid] = { bedTimer: { start: new Date(day.getFullYear(), day.getMonth(), day.getDate(), 19, 30).getTime(), end: new Date(day.getFullYear(), day.getMonth(), day.getDate(), 20, 20).getTime() } };
+      if (day.getDate() % 2) {
+        const ls = L.lists({ routines: {}, run: {}, isaiah: {} }, kid, day);
+        [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => { if (it.parts) it.parts.forEach((p) => { c[kid][L.partKey(it.key, p)] = true; }); else c[kid][it.key] = it.choices ? it.choices[0] : true; });
+        (L.CHECKS[kid] || []).forEach((x) => { c[kid][x.key] = true; });
+      }
+    }
+  }
+  const ctx = { routines, run: {}, isaiah: {} };
+  const record = () => {
+    const out = {};
+    for (let day = d('2026-11-16'); ymd(day) <= '2026-12-31'; day = addDays(day, 1)) {
+      const k = ymd(day), mon = mondayOf(day), i = L.dowOf(day);
+      out[k] = JSON.stringify(['eli', 'rhett', 'isaiah'].map((kid) => {
+        const ls = L.lists(ctx, kid, day), c = L.dayChecks(ctx, kid, day);
+        return { ls: [ls.day, ls.bed].map((l) => l.map((x) => x.key + (x.time || ''))), full: L.progress(ctx, kid, day, ls.day).left.length,
+          game: L.gameDay(ctx, kid, day).earned, bed: timerResult(kid, day, c.bedTimer, c) };
+      }).concat(Object.values(CHARTS).map((ch) => rowsFor(ch, mon).map((r) => r.cells[i] === '-' ? '-' : !!L.derivedCell(ch.id, r.key, i, mon, ctx)))));
+    }
+    return out;
+  };
+  const was = record();
+  // a change saved Dec 1: Rhett gets a second Tuesday chore, Isaiah's Monday shower moves to Tuesday, Eli's lights out moves
+  const cfg = { chores: { rhett: SETTINGS.chores.rhett.map((x, i) => (i === 1 ? x.concat('Wipe the bathroom mirrors') : x)) },
+    showers: { isaiah: [1, 3, 5] }, lights: { eli: '20:00' } };
+  const snap = (applySettings({}), { chores: SETTINGS.chores, showers: SETTINGS.showers, lights: SETTINGS.lights });
+  applySettings(Object.assign({}, cfg, { history: { '2026-12-01': JSON.parse(JSON.stringify(snap)) } }));
+  const now = record();
+  const changed = Object.keys(was).filter((k) => was[k] !== now[k]);
+  assert.ok(changed.length > 0, 'the change shows from Dec 1');
+  assert.deepEqual(changed.filter((k) => k < '2026-12-01'), [], 'no day before Dec 1 changed');
+  assert.ok(changed.includes('2026-12-01') && changed.includes('2026-12-08'), 'Tuesdays from Dec 1 have the new chore');
+  // two saves on one day keep the first snapshot
+  const SM = SETTINGS; // the Settings page asks before writing
+  assert.equal(snapshotToSave({ history: { '2026-12-01': {} } }, new Date(2026, 11, 1, 18)), null);
+  assert.equal(snapshotToSave({}, new Date(2026, 11, 1, 18)).key, '2026-12-01');
+  assert.ok(SM);
+  applySettings({}); // back to the defaults for the other tests
+  assert.deepEqual(JSON.parse(JSON.stringify(SETTINGS)), before);
 });

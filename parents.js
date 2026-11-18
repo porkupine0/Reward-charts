@@ -1,15 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794987355';
-import { CHARTS, weekProgress } from './charts.js?v=1794987355';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794987355';
-import * as L from './lists.js?v=1794987355';
-import { owed, score, planned, fmt } from './trials.js?v=1794987355';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794987355';
-import { askParent, setParent, changePin } from './parent.js?v=1794987355';
-import { dayFull } from './streaks.js?v=1794987355';
-import { owedItems } from './owed.js?v=1794987355';
-import { pruneList, pruneCutoff } from './prune.js?v=1794987355';
-import { nowHtml } from './nowview.js?v=1794987355';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794987571';
+import { CHARTS, weekProgress } from './charts.js?v=1794987571';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1794987571';
+import * as L from './lists.js?v=1794987571';
+import { owed, score, planned, fmt } from './trials.js?v=1794987571';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794987571';
+import { askParent, setParent, changePin } from './parent.js?v=1794987571';
+import { dayFull } from './streaks.js?v=1794987571';
+import { owedItems } from './owed.js?v=1794987571';
+import { pruneList, pruneCutoff } from './prune.js?v=1794987571';
+import { nowHtml } from './nowview.js?v=1794987571';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -65,7 +65,7 @@ function render() {
     const d = addDays(today, -i);
     Object.entries(KIDS).forEach(([id, k]) => {
       const c = L.dayChecks(ctx, id, d), r = timerResult(id, d, c.bedTimer, c);
-      if (r && r.status === 'late') late.push(row(k.name, k.accent, 'Late by ' + r.lateBy + ' min', DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d) + ' · lights out ' + bedtime(id, (d.getDay() + 6) % 7).slice(-1)[0].time, '<button class="tbtn approve" data-bedok="' + ymd(d) + '|' + id + '">Parent OK</button>'));
+      if (r && r.status === 'late') late.push(row(k.name, k.accent, 'Late by ' + r.lateBy + ' min', DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d) + ' · lights out ' + atDate(d, () => bedtime(id, (d.getDay() + 6) % 7)).slice(-1)[0].time, '<button class="tbtn approve" data-bedok="' + ymd(d) + '|' + id + '">Parent OK</button>'));
     });
   }
   $('late').innerHTML = late.join('') || '<p class="muted">No late nights in the last week.</p>';
