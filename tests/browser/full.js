@@ -34,22 +34,25 @@ function canWrite(path) {
 export async function set(p, v) { if (!canWrite(p)) { const r = JSON.parse(sessionStorage.getItem('refused') || '[]'); r.push(p); sessionStorage.setItem('refused', JSON.stringify(r)); throw new Error('PERMISSION_DENIED: ' + p); } setPath(p, v); subs.forEach(([sp, fn]) => { if (p.startsWith(sp)) fn({ val: () => JSON.parse(JSON.stringify(get(sp) ?? null)) }); }); }
 `;
 const errors = [], notes = [];
-const _t = new Date(); const TODAY = _t.getFullYear() + '-' + String(_t.getMonth() + 1).padStart(2, '0') + '-' + String(_t.getDate()).padStart(2, '0');
+// One fixed "now" for the pages and for this script, so results don't change as real days pass.
+const NOW = new Date(2026, 10, 18, 16, 0); // Wed Nov 18, 2026, 4 pm
+const _t = NOW; const TODAY = _t.getFullYear() + '-' + String(_t.getMonth() + 1).padStart(2, '0') + '-' + String(_t.getDate()).padStart(2, '0');
 const check = (ok, msg) => { if (!ok) errors.push(msg); };
 (async () => {
   const b = await chromium.launch();
-  const ctx = await b.newContext({ viewport: { width: 375, height: 812 }, deviceScaleFactor: 1 });
+  const ctx = await b.newContext({ viewport: { width: 375, height: 812 }, deviceScaleFactor: 1, timezoneId: process.env.TZ || 'UTC' });
   await ctx.addInitScript({ content: 'window.confirm = () => true;' });
   let offline = false;
   await ctx.route(/firebase-app\.js/, r => offline ? r.abort() : r.fulfill({ contentType: 'text/javascript', body: 'export function initializeApp(){return {}}' }));
   await ctx.route(/firebase-database\.js/, r => offline ? r.abort() : r.fulfill({ contentType: 'text/javascript', body: MOCK_DB }));
   await ctx.route(/fonts\.(googleapis|gstatic)/, r => r.abort());
   const p = await ctx.newPage();
+  await p.clock.setFixedTime(NOW); // a case can set its own clock
   let cur = '';
   p.on('pageerror', e => errors.push(cur + ' PAGEERROR ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|firebase/.test(m.text())) errors.push(cur + ' CONSOLE ' + m.text()); });
   p.on('dialog', d => d.accept());
-  const B = 'http://localhost:8765/';
+  const B = 'http://localhost:' + (process.env.PORT || 8765) + '/';
   async function visit(u, shot, expectSync = true) {
     cur = u; await p.goto(B + u); await p.waitForTimeout(450);
     const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -158,7 +161,7 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await p.click('#save'); await p.waitForTimeout(400);
   check((await db()).charts?.config?.lights?.eli === '21:00', 'settings not saved');
   // a change applies from the day it's saved: a later school night follows it, an earlier one keeps 8:30
-  const nt = new Date(); nt.setDate(nt.getDate() + 7 + ((2 - nt.getDay() + 7) % 7)); // a Tuesday at least a week from today
+  const nt = new Date(NOW); nt.setDate(nt.getDate() + 7 + ((2 - nt.getDay() + 7) % 7)); // a Tuesday at least a week from today
   const nextTue = nt.getFullYear() + '-' + String(nt.getMonth() + 1).padStart(2, '0') + '-' + String(nt.getDate()).padStart(2, '0');
   await visit('checklist.html?kid=eli&date=' + nextTue);
   const lo = await p.$$eval('#bed .rtime', e => e[e.length - 1].textContent);
@@ -209,4 +212,5 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   console.log(notes.join('\n'));
   console.log(errors.length ? 'ISSUES:\n' + errors.join('\n') : 'NO ISSUES');
   await b.close();
-})();
+  process.exit(errors.length ? 1 : 0);
+})().catch((e) => { console.error(e); process.exit(1); });
