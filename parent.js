@@ -1,17 +1,25 @@
-// Parent-only boxes ("Reward given", "Paid", "Parent OK", Settings). Each parent enters the PIN
-// once per phone and that phone remembers it. The PIN is stored as a hash, never as digits.
+// Parent-only boxes ("Reward given", "Paid", "Parent OK", Settings). After the PIN, a phone ticked
+// "This is a parent's phone" stays unlocked; any other device (a kid's phone, the shared iPad)
+// unlocks for 15 minutes. The PIN is stored as a hash, never as digits.
 // A new PIN can only be created once the saved settings have loaded and there truly isn't one,
 // so a slow connection can never replace the real PIN.
-import { watch, save, isLive } from './store.js?v=1794985052';
+import { watch, save, isLive } from './store.js?v=1794985159';
 
 let rec = {};
 watch('settings', (d) => { rec = d || {}; });
 
+export const UNLOCK_MIN = 15;
+const KEY = 'rc:unlock'; // { always: true } or { until: <ms> }
+try { localStorage.removeItem('rc:parent'); } catch (e) {} // the old "unlocked forever" flag: every phone asks once more
+function unlock() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
 export function isParent() {
-  try { return localStorage.getItem('rc:parent') === '1'; } catch (e) { return false; }
+  const u = unlock();
+  return !!u && (u.always === true || (typeof u.until === 'number' && Date.now() < u.until));
 }
-export function setParent(on) {
-  try { on ? localStorage.setItem('rc:parent', '1') : localStorage.removeItem('rc:parent'); } catch (e) {}
+// Unlocked for good on a parent's phone; otherwise for UNLOCK_MIN minutes.
+export function isParentPhone() { const u = unlock(); return !!u && u.always === true; }
+export function setParent(on, always) {
+  try { on ? localStorage.setItem(KEY, JSON.stringify(always ? { always: true } : { until: Date.now() + UNLOCK_MIN * 60000 })) : localStorage.removeItem(KEY); } catch (e) {}
 }
 
 async function hash(pin) {
@@ -22,12 +30,13 @@ async function hash(pin) {
 }
 
 // In-page PIN box (masked). Resolves to the typed PIN, or null if cancelled.
-function pinDialog(title, hint) {
+function pinDialog(title, hint, keepBox) {
   return new Promise((resolve) => {
     const d = document.createElement('dialog');
     d.className = 'pindlg';
     d.innerHTML = '<form><h2></h2><p class="note"></p>' +
       '<label class="field"><span class="flabel">Parent PIN</span><input type="password" inputmode="numeric" autocomplete="off" maxlength="12" id="pinbox"></label>' +
+      (keepBox ? '<label class="pinkeep"><input type="checkbox" id="pinkeep"> This is a parent’s phone (stay unlocked)</label><p class="note pinkeep-note">Leave it off on the kids’ phones and the shared iPad: they unlock for ' + UNLOCK_MIN + ' minutes.</p>' : '') +
       '<p class="pinerr" role="alert"></p><div class="pinrow"><button type="button" class="linkbtn" data-pin="cancel">Cancel</button><button type="submit" class="tt-save" data-pin="ok">OK</button></div></form>';
     d.querySelector('h2').textContent = title;
     d.querySelector('.note').textContent = hint;
@@ -40,7 +49,7 @@ function pinDialog(title, hint) {
       e.preventDefault();
       const v = input.value.trim();
       if (!/^\d{4,12}$/.test(v)) { err.textContent = 'Use 4 or more digits.'; return; }
-      done(v);
+      done(keepBox ? { pin: v, keep: !!d.querySelector('#pinkeep').checked } : v);
     };
     d.showModal();
     input.focus();
@@ -62,20 +71,21 @@ export async function askParent() {
   if (!isLive('settings')) { notice('Still connecting. Parent boxes unlock once this phone is online.'); return false; }
   const stored = rec.pinHash || (rec.pin ? 'legacy' : null);
   if (!stored) {
-    const p = await pinDialog('Set a parent PIN', 'No parent PIN yet. Pick one the kids won’t guess. Each parent enters it once per phone.');
-    if (p === null) return false;
-    await save('settings', 'pinHash', await hash(p));
-    setParent(true);
+    const r = await pinDialog('Set a parent PIN', 'No parent PIN yet. Pick one the kids won’t guess.', true);
+    if (r === null) return false;
+    await save('settings', 'pinHash', await hash(r.pin));
+    setParent(true, r.keep);
     return true;
   }
   for (let tries = 0; tries < 3; tries++) {
-    const p = await pinDialog('Parents only', tries ? 'That PIN didn’t match. Try again.' : 'Enter the parent PIN to unlock parent boxes on this phone.');
-    if (p === null) return false;
+    const r = await pinDialog('Parents only', tries ? 'That PIN didn’t match. Try again.' : 'Enter the parent PIN to unlock parent boxes.', true);
+    if (r === null) return false;
+    const p = r.pin;
     const ok = stored === 'legacy' ? p === String(rec.pin) : (await hash(p)) === rec.pinHash;
     if (ok) {
       // Older PINs were saved as plain digits: replace with a hash.
       if (stored === 'legacy') { await save('settings', 'pinHash', await hash(p)); save('settings', 'pin', null); }
-      setParent(true);
+      setParent(true, r.keep);
       return true;
     }
   }

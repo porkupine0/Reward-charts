@@ -102,7 +102,7 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await tap('.level'); await p.selectOption('select[data-path]', '0'); await p.waitForTimeout(120);
 
   // 4. Parent PIN: never created before settings load; set, wrong, right
-  await p.evaluate(() => { localStorage.removeItem('rc:parent'); });
+  await p.evaluate(() => { localStorage.removeItem('rc:unlock'); });
   await ctx.addInitScript({ content: 'window.__slowSettings = !!sessionStorage.getItem("slow");' });
   await p.evaluate(() => sessionStorage.setItem('slow', '1'));
   await visit('isaiah.html');
@@ -116,7 +116,7 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   const st = (await db()).charts?.settings || {};
   check(st.pinHash && st.pinHash.length === 64 && !st.pin, 'PIN not stored as hash: ' + JSON.stringify(st));
   check(Object.keys((await db()).charts?.isaiah?.cashed || {}).length === 1, 'cash-in after PIN failed');
-  await p.evaluate(() => localStorage.removeItem('rc:parent'));
+  await p.evaluate(() => localStorage.removeItem('rc:unlock'));
   await visit('trials.html');
   await p.click('.tt-kind [data-kind="mile"]'); await p.fill('#tmin', '6'); await p.fill('#tsec', '52'); await p.fill('#tdate', '2026-11-18'); await p.click('.tt-save'); await p.waitForTimeout(200);
   check(!(await p.$('[data-paid^="t_"]')), 'trial-finish reward still shown');

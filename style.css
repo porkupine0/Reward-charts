@@ -635,3 +635,6 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .tnrow { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-top: 1px dashed var(--line); font-size: 14.5px; }
 .tnrow > span:first-child { flex: 1 1 110px; min-width: 0; }
 .tnrow .dchk-btns, .tnrow .exbtns { flex: none; }
+.pinkeep { display: flex; gap: 8px; align-items: center; font-weight: 700; margin: 10px 0 2px; }
+.pinkeep input { width: 22px; height: 22px; }
+.pinkeep-note { margin: 0 0 6px; }

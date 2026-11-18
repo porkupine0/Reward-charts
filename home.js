@@ -1,11 +1,11 @@
 // Home: one button per person, each with a one-line "right now".
-import { watch, statusPill } from './store.js?v=1794985052';
-import { KIDS, applyConfig, timerResult } from './routines.js?v=1794985052';
-import * as L from './lists.js?v=1794985052';
-import { nowLine } from './nowview.js?v=1794985052';
-import { owedItems } from './owed.js?v=1794985052';
-import { isParent, setParent } from './parent.js?v=1794985052';
-import { addDays } from './store.js?v=1794985052';
+import { watch, statusPill } from './store.js?v=1794985159';
+import { KIDS, applyConfig, timerResult } from './routines.js?v=1794985159';
+import * as L from './lists.js?v=1794985159';
+import { nowLine } from './nowview.js?v=1794985159';
+import { owedItems } from './owed.js?v=1794985159';
+import { isParent, isParentPhone, setParent } from './parent.js?v=1794985159';
+import { addDays } from './store.js?v=1794985159';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -20,7 +20,7 @@ function render() {
   const late = Object.keys(KIDS).filter((id) => { const c = L.dayChecks(ctx, id, yd), r = timerResult(id, yd, c.bedTimer, c); return r && r.status === 'late'; }).length;
   $('n-parents').textContent = (owed ? owed + ' to pay or give' : 'Nothing owed') + (late ? ' · ' + late + ' late last night' : '') + ' · where everyone is now';
   $('parentline').innerHTML = isParent()
-    ? '<b>Parent phone.</b> Parent boxes are unlocked here. <button class="linkbtn" id="lockbtn">Lock this phone</button>'
+    ? (isParentPhone() ? '<b>Parent phone.</b> Parent boxes are unlocked here.' : '<b>Unlocked for a few minutes.</b> Parent boxes lock again by themselves.') + ' <button class="linkbtn" id="lockbtn">Lock this phone</button>'
     : 'Parent boxes (Reward given, Paid, Parent OK) ask for the parent PIN on this phone.';
   const lb = $('lockbtn'); if (lb) lb.onclick = () => { setParent(false); render(); };
 }

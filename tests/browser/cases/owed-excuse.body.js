@@ -2,7 +2,7 @@
   // Finish-first box; it shows on the Parents page dated Wednesday; Approve clears the lock.
   await p.clock.setFixedTime(new Date(2026, 10, 19, 16, 30));
   await p.goto(B + 'index.html');
-  await p.evaluate(() => { sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: {} } } })); localStorage.setItem('rc:parent', '1'); });
+  await p.evaluate(() => { sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: {} } } })); localStorage.setItem('rc:unlock', JSON.stringify({ always: true })); });
   await visit('checklist.html?kid=rhett', 'owed-rhett');
   const locked = await p.$$eval('#day .ck.locked .ckbtn', (els) => els.map((e) => e.dataset.key));
   notes.push('locked: ' + locked.join(','));

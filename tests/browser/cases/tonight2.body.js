@@ -5,7 +5,7 @@
   await p.goto(B + 'index.html');
   const lateStart = new Date(2026, 10, 18, 21, 0).getTime(), lateEnd = new Date(2026, 10, 18, 23, 40).getTime();
   await p.evaluate(([h, s, e]) => {
-    localStorage.removeItem('rc:parent');
+    localStorage.removeItem('rc:unlock');
     sessionStorage.setItem('mockdb', JSON.stringify({ charts: { settings: { pinHash: h }, routines: { days: { '2026-11-18': {
       rhett: { bedTimer: { start: s, end: e } }, eli: { reading: '~skip' } } } } } }));
   }, [PINHASH, lateStart, lateEnd]);

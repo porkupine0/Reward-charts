@@ -3,7 +3,7 @@
   await p.goto(B + 'index.html');
   await p.evaluate(() => {
     sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-18': { isaiah: { noLies: 'no' } } } } } }));
-    localStorage.setItem('rc:parent', '1');
+    localStorage.setItem('rc:unlock', JSON.stringify({ always: true }));
   });
   await visit('parents.html', 'tonight');
   check(/Tonight/.test(await p.$eval('#tnhead', (e) => e.textContent)), 'Tonight heading');
