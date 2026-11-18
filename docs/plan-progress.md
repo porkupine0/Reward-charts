@@ -38,8 +38,8 @@ Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all
 
 ## Driving course build (asked Nov 18; Iowa; parent previews videos; lessons outside game time)
 Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31 pm Central resume from here.
-- [ ] 0. Iowa driver's manual: fetch and read it; every age, rule and quiz answer comes from its text.
-- [ ] 1. Eli's computer work (typing, and the driving lesson) locked until today's chores are done.
+- [x] 0. Iowa driver's manual: fetch and read it; every age, rule and quiz answer comes from its text.
+- [x] 1. Eli's computer work (typing, and the driving lesson) locked until today's chores are done.
 - [ ] 2. Leftover game time: a parent check on the Parents page each week ("Add N min to this week?").
 - [ ] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
 - [ ] 4. Driving page and wiring: checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
@@ -85,3 +85,4 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - Nov 18: Eli's plan extended through Feb 28 (draft): recovery week, build week, then copies of the January weeks with a Feb 13 mile and Feb 27 final 5K.
 - Nov 18: item 17 done. GitHub runs the browser tests on every push as their own job (a deliberately broken check turned it red; reverted).
 - Nov 18: items 19 and 20 done. Every page passes contrast in light and dark; small links are 44px tall (Isaiah's checklist grew 90px); the game card says "not earned" with the reason.
+- Nov 18: driving steps 0 and 1 done. Iowa manual saved (docs/iowa/); Eli's typing waits for today's chores.
