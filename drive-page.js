@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795025438';
-import { applyConfig } from './routines.js?v=1795025438';
-import { askParent } from './parent.js?v=1795025438';
-import * as L from './lists.js?v=1795025438';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795025438';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795025438';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795026189';
+import { applyConfig } from './routines.js?v=1795026189';
+import { askParent } from './parent.js?v=1795026189';
+import * as L from './lists.js?v=1795026189';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795026189';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795026189';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -79,6 +79,9 @@ function renderTests() {
   const d = ctx.drive || {}, now = new Date(), open = openSittings(SITTINGS, d, ymd(now));
   if (!open.length) { el.innerHTML = ''; el.hidden = true; return; }
   el.hidden = false;
+  // an unfinished test comes first (the baseline is meant to be taken before the first lesson)
+  const first = open.some((s) => !testScore(FORMS[s.form] || [], d, s.id, PASS).done);
+  if (first !== (el.nextElementSibling === $('today'))) $('today').parentNode.insertBefore(el, first ? $('today') : $('today').nextSibling);
   let h = '<p class="eyebrow">Permit test practice</p>';
   open.forEach((s) => {
     const form = FORMS[s.form] || [], sc = testScore(form, d, s.id, PASS);

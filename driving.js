@@ -166,11 +166,20 @@ export function openSittings(sittings, progress, dayKey) {
   return (sittings || []).filter((s) => (!s.from || s.from <= dayKey) && (!s.after || (done[s.after] && done[s.after] <= dayKey)));
 }
 // Check the test bank: ids unique (also against the lessons), topics known, answers valid, a page per question.
-export function checkTests(forms, sittings, topics, lessons) {
+// Each form: the blueprint's count per topic, 4 choices per question, right answers spread evenly over the
+// four positions (never more than 3 in a row), and the right answer not often the longest choice.
+export function checkTests(forms, sittings, topics, lessons, blueprint) {
   const out = [], seen = new Set((lessons || []).flatMap((l) => (l.questions || []).map((x) => x.id)));
   Object.entries(forms || {}).forEach(([name, form]) => {
     if (form.length !== 25) out.push('form ' + name + ': ' + form.length + ' questions (should be 25)');
-    if (new Set(form.map((x) => x.answer)).size < 3) out.push('form ' + name + ': right answers bunched in too few positions');
+    if (blueprint) Object.entries(blueprint).forEach(([t, n]) => { const c = form.filter((x) => x.topic === t).length; if (c !== n) out.push('form ' + name + ': ' + c + ' ' + t + ' questions (blueprint says ' + n + ')'); });
+    if (form.some((x) => (x.choices || []).length !== 4)) out.push('form ' + name + ': every question needs 4 choices');
+    const per = [0, 1, 2, 3].map((i) => form.filter((x) => x.answer === i).length), even = form.length / 4;
+    if (per.some((c) => c < Math.floor(even) - 1 || c > Math.ceil(even) + 1)) out.push('form ' + name + ': right answers not spread evenly (' + per.join('/') + ')');
+    let run = 1;
+    form.forEach((x, i) => { run = i && x.answer === form[i - 1].answer ? run + 1 : 1; if (run === 4) out.push('form ' + name + ': 4 right answers in a row in the same position (' + x.id + ')'); });
+    const longest = form.filter((x) => (x.choices || []).length && (x.choices[x.answer] || '').length > Math.max(...x.choices.filter((_, i) => i !== x.answer).map((c) => c.length))).length;
+    if (longest > Math.ceil(form.length / 4)) out.push('form ' + name + ': the right answer is the longest choice ' + longest + ' times');
     form.forEach((x) => {
       if (!/^[A-Za-z0-9]+$/.test(x.id || '')) out.push((x.id || '?') + ': question id must be letters and digits');
       if (seen.has(x.id)) out.push(x.id + ': id used twice');

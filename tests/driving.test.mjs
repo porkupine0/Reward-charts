@@ -172,8 +172,9 @@ test('driving course and knowledge tests: pass the checkers, and every quote is 
   manual.split(/\n===== PDF page (\d+) =====\n/).forEach((t, i, arr) => { if (i % 2) pages[arr[i]] = arr[i + 1]; });
   const norm = (x) => x.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/-/g, '').replace(/\s+/g, ' ').trim(); // (ignores hyphens and line breaks)
   const missing = [];
-  const { FORMS, SITTINGS, TOPICS } = await import('../driving-tests.js?v=' + V);
-  assert.deepEqual(D.checkTests(FORMS, SITTINGS, TOPICS, LESSONS), []);
+  const { FORMS, SITTINGS, TOPICS, BLUEPRINT } = await import('../driving-tests.js?v=' + V);
+  assert.deepEqual(D.checkTests(FORMS, SITTINGS, TOPICS, LESSONS, BLUEPRINT), []);
+  assert.deepEqual(Object.keys(BLUEPRINT), TOPICS);
   [...LESSONS.flatMap((l) => l.questions || []), ...Object.values(FORMS).flat()].forEach((q) => {
     const page = q.ref.match(/p\.\s?(\d+)/)[1];
     if (!q.quote || !norm(pages[page] || '').includes(norm(q.quote))) missing.push(q.id + ' (p.' + page + '): ' + q.quote);
@@ -208,6 +209,12 @@ test('knowledge tests: the checker catches bad forms and sittings', () => {
   const good = Array.from({ length: 25 }, (_, i) => ({ id: 't' + i, topic: 'Signs', q: 'Q', choices: ['a', 'b', 'c', 'd'], answer: i % 4, why: 'w', ref: "Iowa Driver's Manual p.6" }));
   assert.deepEqual(D.checkTests({ A: good }, [{ id: 'base', form: 'A' }], ['Signs'], LESSONS), []);
   const bad = good.slice(0, 24).concat([{ ...good[0], id: 'L1q1', topic: 'Nope', answer: 9, why: '' }]);
-  const out = D.checkTests({ A: bad }, [{ id: 'L1', form: 'B', after: 'nope' }], ['Signs'], LESSONS).join(' | ');
-  for (const m of ['L1q1: id used twice', 'unknown topic', 'answer is not one of the choices', 'needs an explanation', 'sitting id is also a lesson id', 'unknown form B', 'after names no lesson']) assert.ok(out.includes(m), m + ' in ' + out);
+  const out = D.checkTests({ A: bad }, [{ id: 'L1', form: 'B', after: 'nope' }], ['Signs'], LESSONS, { Signs: 25 }).join(' | ');
+  for (const m of ['L1q1: id used twice', 'unknown topic', 'answer is not one of the choices', 'needs an explanation', 'sitting id is also a lesson id', 'unknown form B', 'after names no lesson', '24 Signs questions (blueprint says 25)']) assert.ok(out.includes(m), m + ' in ' + out);
+  // answers bunched in one position, a run of four, the right answer always the longest, 3 choices
+  const bunched = good.map((x, i) => ({ ...x, answer: i < 12 ? 1 : i % 4 }));
+  assert.match(D.checkTests({ A: bunched }, [], ['Signs'], []).join(' | '), /not spread evenly.*4 right answers in a row/);
+  const longest = good.map((x) => ({ ...x, choices: x.choices.map((c, i) => (i === x.answer ? 'a much longer right answer' : c)) }));
+  assert.match(D.checkTests({ A: longest }, [], ['Signs'], []).join(' | '), /the right answer is the longest choice 25 times/);
+  assert.match(D.checkTests({ A: good.map((x) => ({ ...x, choices: ['a', 'b', 'c'], answer: x.answer % 3 })) }, [], ['Signs'], []).join(' | '), /every question needs 4 choices/);
 });
