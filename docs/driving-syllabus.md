@@ -51,9 +51,9 @@ Each of Iowa DOT's 68 practice questions maps to a unit: signs, signals and the 
 - Questions to write: about 7 per lesson (the first 3 are that day's quiz; the rest come back in later days' review questions and the unit test) ≈ 240, plus Forms B–F (125, all new wording). Written about two weeks ahead of Eli, one unit at a time.
 
 ## Code still to build (in order)
-1. Unit test as a lesson type (day 5; about 15 questions; scored); the "every 5th lesson is a review" rule becomes "every 5th is a unit test". w1d5 can only change if Eli hasn't finished it.
-2. Key points card above each video.
+1. (done) Unit test as a lesson type (day 5; about 15 questions; scored); the "every 5th lesson is a review" rule becomes "every 5th is a unit test". w1d5 can only change if Eli hasn't finished it.
+2. (done) Key points card above each video.
 2b. Sign shapes drawn in the quiz (for unit 2, Form B).
-3. A parent Skip drops only the video (Key points + quiz still run), so a skipped video doesn't lose its questions.
+3. (done) A parent Skip drops only the video (Key points + quiz still run), so a skipped video doesn't lose its questions.
 4. Progress tests and final: Forms B–F in driving-tests.js, each written one ahead and opening after its unit test (B after unit 2, about the first week of December).
 5. Record his Iowa DOT practice-test scores (final week) on the Parents page.

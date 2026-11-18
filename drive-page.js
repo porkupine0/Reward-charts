@@ -1,12 +1,12 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795041010';
-import { applyConfig } from './routines.js?v=1795041010';
-import { askParent } from './parent.js?v=1795041010';
-import * as L from './lists.js?v=1795041010';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795041010';
-import * as COURSE from './driving-course.js?v=1795041010';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795041010';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795041811';
+import { applyConfig } from './routines.js?v=1795041811';
+import { askParent } from './parent.js?v=1795041811';
+import * as L from './lists.js?v=1795041811';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795041811';
+import * as COURSE from './driving-course.js?v=1795041811';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795041811';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -58,7 +58,7 @@ function render() {
   const begun = (l) => !!(d.watched || {})[l.id] || Object.values(d.answers || {}).some((a) => a[l.id]);
   if (st.status === 'ready' && !begun(st.lesson) && baselineOpen(d, key)) { $('today').innerHTML = '<h2>' + esc(st.lesson.title) + '</h2><p class="note">First, take the baseline knowledge test above. Today’s lesson opens as soon as it’s done.</p>'; return; }
   // a skipped video: the lesson runs without it (straight to the questions)
-  const lesson = st.lesson, noVideo = isSkipped((d.approved || {})[lesson.id]), watched = noVideo || !!(d.watched || {})[lesson.id];
+  const lesson = st.lesson, noVideo = isSkipped((d.approved || {})[lesson.id]), watched = !!(d.watched || {})[lesson.id];
   // the quiz is built without today's answers, so it stays the same while he takes it
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);
   // a unit test: no right/wrong until every question is answered, then the score and every answer
@@ -66,8 +66,10 @@ function render() {
   let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>';
   if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
     : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
-  else if (noVideo) h += keyCard(lesson) + '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>';
-  else h += keyCard(lesson) + (lesson.videos || []).map(video).join('') + (watched ? '<p class="dv-done">✓ Watched</p>' : '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>');
+  // the key points show until the questions do (then they'd give the answers away)
+  else if (watched) h += (noVideo ? '' : (lesson.videos || []).map(video).join('')) + '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';
+  else if (noVideo) h += '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>' + keyCard(lesson) + '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I’ve read these</button>';
+  else h += keyCard(lesson) + (lesson.videos || []).map(video).join('') + '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>';
   if (watched || lesson.review) h += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
   if (st.status === 'done') h += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
   $('today').innerHTML = h;
@@ -171,8 +173,11 @@ document.addEventListener('click', async (e) => {
     // approving an already-approved lesson keeps its first date
     if (!(await askParent())) return;
     const cur = ((ctx.drive || {}).approved || {})[lid], today = ymd(new Date());
-    if (a === 'yes' && isApproved(cur)) return;
-    save(ID, 'approved/' + lid, a === 'yes' ? today : a === 'skip' ? 'skip:' + today : null);
+    // switching between Approve and Skip keeps the FIRST date (it decides which past days the lesson was due)
+    const first = typeof cur === 'string' ? (isSkipped(cur) ? cur.slice(5) : cur) : '';
+    const when = /^\d{4}-\d{2}-\d{2}$/.test(first) ? first : today;
+    if ((a === 'yes' && isApproved(cur)) || (a === 'skip' && isSkipped(cur))) return;
+    save(ID, 'approved/' + lid, a === 'yes' ? when : a === 'skip' ? 'skip:' + when : null);
   }
 });
 $('previewbtn').onclick = async () => { if (await askParent()) { previewOpen = true; renderPreview(); } };

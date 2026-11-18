@@ -6,7 +6,7 @@
 export const LESSONS = [
   { id: 'F1', title: 'Fixture lesson one', videos: [{ yt: 'AAAAAAAAAAA', title: 'Fixture video', channel: 'Fixture channel', len: '5:00', iowa: 'Iowa note.' }], questions: [1, 2, 3, 4, 5].map((k) => q('F1', k, 0)) },
   { id: 'F2', title: 'Fixture lesson two', videos: [{ yt: 'BBBBBBBBBBB', title: 'Fixture video 2', channel: 'Fixture channel', len: '6:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F2', k, 1)) },
-  { id: 'F3', title: 'Fixture lesson three', videos: [{ yt: 'CCCCCCCCCCC', title: 'Fixture video 3', channel: 'Fixture channel', len: '7:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F3', k, 2)) }
+  { id: 'F3', title: 'Fixture lesson three', key: [{ t: 'Fixture point one.', ref: "Iowa Driver's Manual p.1", quote: 'x' }, { t: 'Fixture family rule.', family: true }], videos: [{ yt: 'CCCCCCCCCCC', title: 'Fixture video 3', channel: 'Fixture channel', len: '7:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F3', k, 2)) }
 ];`;
   const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
   await ctx.route(/driving-course\.js/, course);
@@ -68,6 +68,13 @@ export const LESSONS = [
   await p.click('[data-approve="F3|skip"]'); await p.waitForTimeout(300);
   check((await db()).charts['eli-drive'].approved.F3 === 'skip:2026-11-18', 'F3 video skipped (with the day)');
   check(/Video skipped/.test(await p.$eval('#preview', (e) => e.textContent)) && /Skip the video/.test(await p.$eval('#preview', (e) => e.textContent)), 'preview says the video was skipped');
+  // switching keeps the first date: F2 approved on Nov 10; today a parent skips its video, then approves again
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('eli-drive', 'approved/F2', '2026-11-10'); });
+  await p.waitForTimeout(300);
+  await p.click('[data-approve="F2|skip"]'); await p.waitForTimeout(300);
+  check((await db()).charts['eli-drive'].approved.F2 === 'skip:2026-11-10', 'Approve then Skip: keeps the first date (' + (await db()).charts['eli-drive'].approved.F2 + ')');
+  await p.click('[data-approve="F2|yes"]'); await p.waitForTimeout(300);
+  check((await db()).charts['eli-drive'].approved.F2 === '2026-11-10', 'Skip then Approve: keeps the first date');
   await p.clock.setFixedTime(new Date(2026, 10, 19, 16, 0));
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-19/eli/chore', true); });
   await visit('drive.html', 'drive-thu');
@@ -82,7 +89,9 @@ export const LESSONS = [
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-20/eli/chore', true); });
   await visit('drive.html', 'drive-fri-novideo');
   const fri = await p.$eval('#today', (e) => e.textContent);
-  check(/Fixture lesson three/.test(fri) && /No video for this one/.test(fri) && !(await p.$('#today iframe')) && !(await p.$('[data-watched]')) && (await p.$$('#today .dq')).length === 5, 'F3 runs without its video: straight to 5 questions');
+  check(/Fixture lesson three/.test(fri) && /No video for this one/.test(fri) && !(await p.$('#today iframe')) && !!(await p.$('#today .dkey li')) && !(await p.$('#today .dq')), 'F3 runs without its video: the key points first');
+  await p.click('[data-watched="F3"]'); await p.waitForTimeout(200);
+  check((await p.$$('#today .dq')).length === 5 && !(await p.$('#today .dkey')), 'after "I\'ve read these": 5 questions, key points hidden');
   for (let k = 0; k < 5; k++) { await p.click('.dq-choice:not([disabled])'); await p.waitForTimeout(150); }
   check(((await db()).charts['eli-drive'].done || {}).F3 === '2026-11-20', 'F3 finishes without a video');
   await ctx.unroute(/driving-course\.js/, course);
