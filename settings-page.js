@@ -1,9 +1,9 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc, isLive } from './store.js?v=1794988176';
-import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1794988176';
-import { KIDS } from './routines.js?v=1794988176';
-import { LEVELS } from './trials.js?v=1794988176';
-import { askParent } from './parent.js?v=1794988176';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1794988571';
+import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1794988571';
+import { KIDS } from './routines.js?v=1794988571';
+import { LEVELS } from './trials.js?v=1794988571';
+import { askParent } from './parent.js?v=1794988571';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -57,6 +57,10 @@ document.addEventListener('input', () => { dirty = true; $('msg').textContent = 
 const notLive = () => { $('msg').textContent = 'Still connecting. Save once this phone has the latest settings, so earlier days keep the right ones.'; };
 $('save').onclick = async () => {
   if (!isLive('config')) return notLive();
+  // numbers out of range: say so instead of quietly keeping the old value
+  const bad = [['gameMin', LIMITS.game, 'Game time per school day'], ['grace', LIMITS.grace, 'Grace after lights out']]
+    .filter(([id, lim]) => bounded($(id).value, lim, null) === null).map(([, [lo, hi], name]) => name + ' must be a whole number from ' + lo + ' to ' + hi + ' minutes.');
+  if (bad.length) { $('msg').textContent = bad.join(' ') + ' Nothing was saved.'; return; }
   readAll();
   if (!(await askParent())) return;
   // Firebase drops empty lists, so an empty chore day is saved as a blank line and cleaned up on load.

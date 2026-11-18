@@ -23,7 +23,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 9. A "Tonight" card on the Parents page: evening checks, today's excuses, tonight's late bedtime, and "All good" per boy.
 - [x] 10. Isaiah's weekend checks: shown in Tonight (one tap).
 - [x] 11. Parent unlock: parent phones stay unlocked, other devices for a short time.
-- [ ] 12. Settings: evening checks, game-time minutes, bedtime grace.
+- [x] 12. Settings: evening checks, game-time minutes, bedtime grace.
 
 ## Tier 3: data safety
 - [ ] 13. Database safety rules and a daily backup.
@@ -47,6 +47,8 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Storage: two years of checklist days is about 0.9 MB (roughly 1.8 MB in phone storage, which is usually limited to about 5 MB per site). Fine for now; watch it if more is added to daily logs.
 - "Clear checklist days over 2 years old" will find nothing to clear until late 2028.
 
+- Adding or removing an evening check isn't a setting (only the wording is): it changes chart rows and perfect weeks, so it's a code change.
+
 ## Log
 - Nov 18: browser tests and this plan moved into the repo. Item 3 done.
 - Nov 18: items 1, 2 and 7 done. Eli's run/swim boxes follow his plan, his Saturday run is on his checklist, and a new test checks every chart box against the checklist.
@@ -57,3 +59,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 15 done. Clearing drops queued writes beneath it; a quick correction is sent; pages share one queue. When the app is reopened after being offline, a change another phone made meanwhile wins and a notice shows (a page left open through an outage isn't covered). The pill can say "Saving…" or "Not saved, retrying".
 - Nov 18: item 14 done. Cleanup keeps 2 years of checklist days (the streak look-back), never clears Eli's Training log, and backup and cleanup wait for fresh data.
 - Nov 18: item 16 done. A settings change (chores, shower nights, lights out) applies from the day it's saved, today included; earlier days keep what they had. Save waits for the latest settings.
+- Nov 18: item 12 done. Settings has game-time minutes per school day and bedtime grace (both apply from the day they're saved) and the wording of each boy's evening checks.

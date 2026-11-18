@@ -22,5 +22,5 @@
   await visit('trombone.html', 'sn-chart');
   const labels = await p.$$eval('.g-label strong', (els) => els.map((e) => e.textContent));
   check(labels.includes(LONG), 'chart row uses the new words');
-  check(/20 minutes, up to 1 hr 40 min/.test(await p.$eval('#note', (e) => e.textContent)), 'chart note uses 20 minutes');
+  check(/= 20 minutes, to use on the weekend/.test(await p.$eval('#note', (e) => e.textContent)), 'chart note uses 20 minutes');
   await p.screenshot({ path: OUT + 'chart-long-label-375.png', fullPage: true });
