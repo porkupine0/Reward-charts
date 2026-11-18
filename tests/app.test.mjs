@@ -333,3 +333,37 @@ test("style.css: no colour variable is defined as itself (it would render as not
   const self = [...css.matchAll(/(--[\w-]+)\s*:\s*var\(\s*(--[\w-]+)\s*\)/g)].filter((m) => m[1] === m[2]).map((m) => m[1]);
   assert.deepEqual(self, []);
 });
+
+// Every chart box must have a checklist item behind it: when a kid does everything on that day's
+// checklist (and Training / Ball Master), every required box fills; and a required box must
+// match a required checklist item (an optional or missing item can't back a required box).
+test("charts: every required box is backed by a required checklist item, Nov 16 to Feb 28", () => {
+  const { rowsFor } = { rowsFor: (c, m) => (c.altFrom && ymd(m) >= c.altFrom ? c.altRows : c.rows) };
+  const SOURCE = { running: ['activity'], school: ['missing'], move: ['activity'], racquetball: ['activity'], typing: ['typing'], trombone: ['trombone'], duolingo: ['duolingo'], soccer: ['activity'] };
+  const bad = [];
+  for (let day = d('2026-11-16'); ymd(day) <= '2027-02-28'; day = addDays(day, 1)) {
+    const k = ymd(day), mon = mondayOf(day), i = L.dowOf(day);
+    const routines = { days: { [k]: {} } }, run = { days: {} }, isaiah = { touchDays: { [k]: true } };
+    for (const kid of ['eli', 'rhett', 'isaiah']) {
+      const c = routines.days[k][kid] = {};
+      const ls = L.lists({ routines: {}, run: {}, isaiah: {} }, kid, day);
+      [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => { if (it.parts) it.parts.forEach((p) => { c[L.partKey(it.key, p)] = true; }); else c[it.key] = it.choices ? it.choices[0] : true; });
+      (L.CHECKS[kid] || []).forEach((x) => { c[x.key] = true; });
+    }
+    const p = planFor(day);
+    if (p) run.days[k] = { items: Object.fromEntries(p.items.map((x) => [x.key, true])) };
+    const ctx = { routines, run, isaiah };
+    for (const ch of Object.values(CHARTS)) {
+      const kid = ch.kidId, ls = L.lists({ routines: {}, run: {}, isaiah: {} }, kid, day), all = [...ls.day, ...ls.bed];
+      rowsFor(ch, mon).forEach((r) => {
+        const cell = r.cells[i];
+        if (cell === '-' || (cell && cell.opt) || ymd(mon) < '2026-11-16') return;
+        const where = ch.id + ' ' + r.key + ' ' + k;
+        if (!L.derivedCell(ch.id, r.key, i, mon, ctx)) bad.push(where + ' (does not fill)');
+        const keys = SOURCE[r.key];
+        if (keys) keys.forEach((key) => { const it = all.find((x) => x.key === key); if (!it || it.opt) bad.push(where + ' (checklist item ' + (it ? 'optional' : 'missing') + ')'); });
+      });
+    }
+  }
+  assert.deepEqual(bad, []);
+});
