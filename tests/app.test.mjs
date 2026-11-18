@@ -536,3 +536,36 @@ test("settings by date: nested lookups and empty lists in a snapshot", () => {
   });
   applySettings({});
 });
+
+test("game-time minutes and bedtime grace are settings, by date", () => {
+  applySettings({});
+  const snap = snapshotToSave({}, new Date(2026, 11, 1)).value; // what applied before Dec 1 (30, 5)
+  applySettings({ game: 20, grace: 10, history: { '2026-12-01': JSON.parse(JSON.stringify(snap)) } });
+  const ctx = { routines: {}, run: {}, isaiah: {} };
+  assert.equal(L.gameWeek(ctx, 'eli', d('2026-11-23')).max, 150, 'earlier weeks keep 30 a day');
+  assert.equal(L.gameWeek(ctx, 'eli', d('2026-11-30')).max, 30 + 20 * 4, 'the week of the change mixes (Mon 30, Tue-Fri 20)');
+  assert.equal(L.gameWeek(ctx, 'eli', d('2026-12-07')).max, 100);
+  // a snapshot saved before these settings existed means the defaults (30, 5), not today's values
+  applySettings({ game: 20, grace: 10, history: { '2026-12-01': { lights: { eli: '20:30' } } } });
+  assert.equal(L.gameMinOn(d('2026-11-30')), 30);
+  assert.equal(atDate(d('2026-11-30'), () => SETTINGS.grace), 5);
+  assert.equal(L.gameMinOn(d('2026-12-01')), 20);
+  // 7 minutes late: late before the grace change, inside the grace after it (Rhett, lights out 8:00 on Mon/Tue)
+  const night = (k) => { const x = d(k); return { start: new Date(x.getFullYear(), x.getMonth(), x.getDate(), 19, 30).getTime(), end: new Date(x.getFullYear(), x.getMonth(), x.getDate(), 20, 7).getTime() }; };
+  assert.equal(timerResult('rhett', d('2026-11-24'), night('2026-11-24'), {}).status, 'late');
+  assert.equal(timerResult('rhett', d('2026-12-01'), night('2026-12-01'), {}).status, 'grace');
+  // bad values fall back to the defaults
+  applySettings({ game: 999, grace: -3 });
+  assert.equal(SETTINGS.game, 30); assert.equal(SETTINGS.grace, 5);
+  applySettings({});
+});
+
+test("evening check wording comes from Settings; the checks themselves stay fixed", () => {
+  applySettings({ checks: { rhett: { noLies: { label: 'Told the truth all day', sub: 'Even when it was hard' } } } });
+  assert.deepEqual(L.CHECKS.rhett.map((k) => k.key), ['noYell', 'firstTime', 'noLies']);
+  assert.equal(L.CHECKS.rhett[2].label, 'Told the truth all day');
+  assert.equal(L.CHECKS.isaiah[2].label, 'No lies today', 'Isaiah has his own list');
+  assert.equal(rowsFor(CHARTS.trombone, d('2026-11-16')).find((r) => r.key === 'noLies').label, 'Told the truth all day', 'the chart row uses the same words');
+  applySettings({});
+  assert.equal(L.CHECKS.rhett[2].label, 'No lies today');
+});

@@ -1,8 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794987938';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794987938';
-import { askParent } from './parent.js?v=1794987938';
-import * as L from './lists.js?v=1794987938';
-import { dayStreak, cheerIf } from './streaks.js?v=1794987938';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1794988176';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1794988176';
+import { SETTINGS } from './settings.js?v=1794988176';
+import { askParent } from './parent.js?v=1794988176';
+import * as L from './lists.js?v=1794988176';
+import { dayStreak, cheerIf } from './streaks.js?v=1794988176';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -170,7 +171,7 @@ function renderOn() {
     const g = L.gameDay(ctx, kid, date), school = L.GAME.days.includes(dow);
     $('bed').insertAdjacentHTML('beforeend', '<div class="rhead dchk-head"><h2>End of day</h2><span class="rcount">Mom or Dad</span></div>' +
       dchecks.map(yn).join('') +
-      (school ? '<p class="gt-today">' + (g.earned ? '<b>+30 min of weekend game time earned today ✓</b>' : '<b>For today’s 30 min of game time:</b> ' + esc(g.left.join(' · '))) + '</p>' : ''));
+      (school ? '<p class="gt-today">' + (g.earned ? '<b>+' + g.worth + ' min of weekend game time earned today ✓</b>' : '<b>For today’s ' + g.worth + ' min of game time:</b> ' + esc(g.left.join(' · '))) + '</p>' : ''));
   }
   // Celebrate finishing a whole list (only right after a tap on this phone)
   const k0 = kid + ymd(date);
@@ -228,10 +229,10 @@ function bedTreatHtml(prize, bed, checks, dow) {
   }
   if (timed) {
     return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No bedtime candy tonight</strong>' +
-      '<small>Lights out was ' + lo + ' (5-minute grace). Try again tomorrow night!</small></div>' + approveBtn('late') + '</div>';
+      '<small>Lights out was ' + lo + ' (' + SETTINGS.grace + '-minute grace). Try again tomorrow night!</small></div>' + approveBtn('late') + '</div>';
   }
   return '<div class="treat"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>In bed by ' + lo + ' = ' + esc(prize) + '!</strong>' +
-    '<small>Check off Lights out (or stop the timer) by ' + lo + ' (5 minutes grace). You get it ' + when + '.</small></div></div>';
+    '<small>Check off Lights out (or stop the timer) by ' + lo + ' (' + SETTINGS.grace + ' minutes grace). You get it ' + when + '.</small></div></div>';
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-candy]');
@@ -306,7 +307,7 @@ $('date').addEventListener('change', (e) => { if (e.target.value) { date = parse
 // ---------- bedtime timer ----------
 const clock = (secs) => Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
 function timerRec() { return dayChecks().bedTimer || {}; }
-// Parent override for a late night beyond the 5-minute grace.
+// Parent override for a late night beyond the grace minutes (Settings).
 function approveBtn(status) {
   if (status === 'late') return '<button class="tbtn approve" data-bedok="1">Parent OK</button>';
   if (status === 'approved') return '<button class="linkbtn" data-bedok="0">Undo OK</button>';

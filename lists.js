@@ -1,9 +1,10 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794987938';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1794987938';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794987938';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1794987938';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794988176';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1794988176';
+import { SETTINGS, onSettings } from './settings.js?v=1794988176';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794988176';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1794988176';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -193,7 +194,7 @@ export function nowStatus(ctx, kid, now) {
   if (min < bedStart) {
     return { phase: 'day', title: dayName, left: left(d), done: !d.left.length, sub: 'Bedtime starts ' + ls.bed[0].time };
   }
-  if (min <= lo.min + 5) {
+  if (min <= lo.min + atDate(date, () => SETTINGS.grace)) {
     const extra = d.left.length ? d.left.length + ' still left from ' + (school ? 'after school' : 'today') : '';
     return { phase: 'bed', title: 'Bedtime', left: left(b), done: !b.left.length, sub: 'Lights out ' + lo.time + (extra ? ' · ' + extra : '') };
   }
@@ -219,21 +220,22 @@ export function readingWeek(ctx, kid, monday, upTo) {
 
 // ---- Weekend game time (all three boys) ----
 // End-of-day checks, set by a parent: true = yes, 'no' = not today.
-export const CHECKS = {
-  eli: [
-    { key: 'kind', label: 'Kind to his brothers', sub: 'No hurting them, physically or with words' },
-    { key: 'listen', label: 'Listened to Mom and Dad', sub: 'Without arguing' }
-  ],
-  rhett: [
-    { key: 'noYell', label: 'No yelling', sub: 'Didn’t yell or raise his voice with Mom and Dad' },
-    { key: 'firstTime', label: 'Listened the first time', sub: 'To Mom and Dad, the first time they asked' },
-    { key: 'noLies', label: 'No lies today', sub: '' }
-  ]
-};
-CHECKS.isaiah = CHECKS.rhett;
+// The checks are fixed (they're chart rows); their wording comes from Settings. Rebuilt in place on changes.
+const CHECK_KEYS = { eli: ['kind', 'listen'], rhett: ['noYell', 'firstTime', 'noLies'], isaiah: ['noYell', 'firstTime', 'noLies'] };
+export const CHECKS = { eli: [], rhett: [], isaiah: [] };
+function wordChecks() {
+  Object.entries(CHECK_KEYS).forEach(([kid, keys]) => {
+    const w = (SETTINGS.checks || {})[kid] || {};
+    CHECKS[kid].splice(0, CHECKS[kid].length, ...keys.map((key) => ({ key, label: (w[key] || {}).label || key, sub: (w[key] || {}).sub || '' })));
+  });
+}
+wordChecks();
+onSettings(wordChecks);
 export const DAY_CHECKS = CHECKS.eli; // (kept for older callers)
-export const GAME = { perDay: 30, days: [0, 1, 2, 3, 4] }; // 30 min for each full school day = up to 2.5 hours
-// A school day earns its 30 minutes when the whole checklist (after school + bedtime, excused items count)
+export const GAME = { days: [0, 1, 2, 3, 4] }; // school days earn game time (minutes per day from Settings)
+// Minutes a school day is worth: that day's setting (a change applies from the day it's saved).
+export const gameMinOn = (date) => atDate(date, () => SETTINGS.game);
+// A school day earns its minutes (Settings) when the whole checklist (after school + bedtime, excused items count)
 // is done and both end-of-day checks are yes.
 export function gameDay(ctx, kid, date) {
   const ls = lists(ctx, kid, date);
@@ -241,7 +243,8 @@ export function gameDay(ctx, kid, date) {
   const c = dayChecks(ctx, kid, date);
   choresOwed(ctx, kid, date).forEach((o) => left.push('Finish ' + o.date.toLocaleDateString('en-US', { weekday: 'long' }) + '’s chore first'));
   (CHECKS[kid] || []).forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
-  return { earned: !left.length, left };
+  const worth = GAME.days.includes(dowOf(date)) ? gameMinOn(date) : 0;
+  return { earned: !left.length, left, worth, minutes: left.length ? 0 : worth };
 }
 // Game time used is logged in pieces: routines game/<kid>/<monday>/<timestamp> = minutes.
 export function gameUses(ctx, kid, monday) {
@@ -255,13 +258,13 @@ export function owedHeld(ctx, kid, date) {
   if (!owed.length) return 0;
   const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date))).map((o) => ymd(o.date)));
   if (GAME.days.includes(dowOf(date))) days.add(ymd(date));
-  return days.size * GAME.perDay;
+  return [...days].reduce((a, k) => a + gameMinOn(parseYmd(k)), 0);
 }
 export function gameWeek(ctx, kid, monday) {
   const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });
-  const minutes = days.filter((d) => d.earned).length * GAME.perDay;
+  const minutes = days.reduce((a, d) => a + d.minutes, 0);
   const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
-  return { days, minutes, max: GAME.days.length * GAME.perDay, uses, used, left: Math.max(0, minutes - used) };
+  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, left: Math.max(0, minutes - used) };
 }
 
 // ---- Parents' "Tonight" card: everything a parent signs off on for one evening ----

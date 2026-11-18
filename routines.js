@@ -1,4 +1,4 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1794987938';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1794988176';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -197,7 +197,7 @@ export function lightsOut(kid, dow) {
 }
 
 // Bedtime timer result for one night: { secs, onTime, steps } or null.
-export const GRACE_MIN = 5;
+export const GRACE_MIN = 5; // default; the setting is SETTINGS.grace
 export const STATUS_LABEL = { ontime: 'On time', grace: 'Grace', approved: 'Parent OK', late: 'Late' };
 
 export function timerResult(kid, dateObj, rec, checks) { return atDate(dateObj, () => timerResultOn(kid, dateObj, rec, checks)); }
@@ -212,9 +212,9 @@ function timerResultOn(kid, dateObj, rec, checks) {
   const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
   const steps = bedtime(kid, dow);
   const done = steps.filter((s) => checks && isDone(checks[s.key])).length;
-  // Up to 5 minutes past lights out still counts (grace); beyond that only with a parent's OK.
+  // Up to the grace minutes (Settings, 5 by default) past lights out still counts; beyond that only with a parent's OK.
   const lateBy = endMin - lo;
-  const status = lateBy <= 0 ? 'ontime' : lateBy <= GRACE_MIN ? 'grace' : checks && checks.bedOk ? 'approved' : 'late';
+  const status = lateBy <= 0 ? 'ontime' : lateBy <= (SETTINGS.grace ?? GRACE_MIN) ? 'grace' : checks && checks.bedOk ? 'approved' : 'late';
   return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: status !== 'late', status, lateBy, endMin, lo, done, total: steps.length };
 }
 

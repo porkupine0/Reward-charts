@@ -14,6 +14,26 @@ export const DEFAULTS = {
   showers: { eli: [0, 1, 3, 4, 5], rhett: [6, 1, 3], isaiah: [0, 3, 5] },
   // School-night lights out (Fri/Sat are later automatically)
   lights: { eli: '20:30', rhett: '20:00', isaiah: '20:00' },
+  // Weekend game time earned for each full school day (minutes), and minutes after lights out that still count
+  game: 30,
+  grace: 5,
+  // Evening checks, marked by Mom or Dad: the wording can change; the checks themselves are fixed
+  checks: {
+    eli: {
+      kind: { label: 'Kind to his brothers', sub: 'No hurting them, physically or with words' },
+      listen: { label: 'Listened to Mom and Dad', sub: 'Without arguing' }
+    },
+    rhett: {
+      noYell: { label: 'No yelling', sub: 'Didn’t yell or raise his voice with Mom and Dad' },
+      firstTime: { label: 'Listened the first time', sub: 'To Mom and Dad, the first time they asked' },
+      noLies: { label: 'No lies today', sub: '' }
+    },
+    isaiah: {
+      noYell: { label: 'No yelling', sub: 'Didn’t yell or raise his voice with Mom and Dad' },
+      firstTime: { label: 'Listened the first time', sub: 'To Mom and Dad, the first time they asked' },
+      noLies: { label: 'No lies today', sub: '' }
+    }
+  },
   // Weekly and monthly reward choices on Eli's and Rhett's charts
   rewards: {
     eli: {
@@ -46,9 +66,13 @@ const arr = (v) => (Array.isArray(v) ? v : v && typeof v === 'object' ? Object.k
 const clean = (list) => arr(list).map(String).map((s) => s.trim()).filter(Boolean);
 
 // The day-to-day schedule (chores, shower nights, lights out), read from saved settings over the defaults.
-export const DATED = ['chores', 'showers', 'lights'];
+export const DATED = ['chores', 'showers', 'lights', 'game', 'grace'];
+export const LIMITS = { game: [5, 120], grace: [0, 30] };
+const inRange = (v, [lo, hi], d) => { const n = Number(v); return Number.isInteger(n) && n >= lo && n <= hi ? n : d; };
 function schedule(c) {
-  const fresh = copy({ chores: DEFAULTS.chores, showers: DEFAULTS.showers, lights: DEFAULTS.lights });
+  const fresh = copy({ chores: DEFAULTS.chores, showers: DEFAULTS.showers, lights: DEFAULTS.lights, game: DEFAULTS.game, grace: DEFAULTS.grace });
+  if (c.game !== undefined) fresh.game = inRange(c.game, LIMITS.game, DEFAULTS.game);
+  if (c.grace !== undefined) fresh.grace = inRange(c.grace, LIMITS.grace, DEFAULTS.grace);
   ['eli', 'rhett', 'isaiah'].forEach((kid) => {
     const days = c.chores && c.chores[kid];
     if (days) fresh.chores[kid] = [0, 1, 2, 3, 4, 5, 6].map((d) => clean(arr(days)[d]));
@@ -86,7 +110,7 @@ export function snapshotToSave(cfg, today) {
   const k = ymdOf(today);
   if (cfg && cfg.history && cfg.history[k]) return null;
   const cur = CURRENT || SETTINGS;
-  const value = copy({ chores: cur.chores, showers: cur.showers, lights: cur.lights });
+  const value = copy(Object.fromEntries(DATED.map((key) => [key, cur[key]])));
   // Firebase drops empty lists: save them the way the Settings page does (cleaned up on load)
   Object.values(value.chores).forEach((days) => days.forEach((d, i) => { if (!d.length) days[i] = ['']; }));
   Object.keys(value.showers).forEach((kid) => { if (!value.showers[kid].length) value.showers[kid] = [-1]; });
@@ -98,6 +122,13 @@ export function applySettings(cfg) {
   const fresh = copy(DEFAULTS);
   CURRENT = schedule(c);
   Object.assign(fresh, copy(CURRENT));
+  // evening check wording (keys are fixed; blank wording keeps the default)
+  Object.keys(fresh.checks).forEach((kid) => Object.keys(fresh.checks[kid]).forEach((key) => {
+    const w = c.checks && c.checks[kid] && c.checks[kid][key];
+    if (!w) return;
+    const label = String(w.label || '').trim().slice(0, 60), sub = String(w.sub == null ? fresh.checks[kid][key].sub : w.sub).trim().slice(0, 100);
+    if (label) fresh.checks[kid][key] = { label, sub };
+  }));
   HISTORY = Object.entries(c.history || {}).filter(([k]) => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, schedule(v || {})]);
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => {
     const v = c.rewards && c.rewards[id] && clean(c.rewards[id][w]);

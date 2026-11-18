@@ -1,9 +1,9 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc, isLive } from './store.js?v=1794987938';
-import { SETTINGS, DEFAULTS, applySettings, snapshotToSave } from './settings.js?v=1794987938';
-import { KIDS } from './routines.js?v=1794987938';
-import { LEVELS } from './trials.js?v=1794987938';
-import { askParent } from './parent.js?v=1794987938';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1794988176';
+import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1794988176';
+import { KIDS } from './routines.js?v=1794988176';
+import { LEVELS } from './trials.js?v=1794988176';
+import { askParent } from './parent.js?v=1794988176';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -17,6 +17,10 @@ function readKid() {
   draft.lights[kid] = $('lights').value || draft.lights[kid];
   draft.showers[kid] = [0, 1, 2, 3, 4, 5, 6].filter((d) => $('sh' + d).checked);
   draft.chores[kid] = [0, 1, 2, 3, 4, 5, 6].map((d) => lines($('ch' + d).value));
+  Object.keys(draft.checks[kid]).forEach((key) => {
+    const label = $('ck-' + key + '-label').value.trim(), sub = $('ck-' + key + '-sub').value.trim();
+    if (label) draft.checks[kid][key] = { label: label.slice(0, 60), sub: sub.slice(0, 100) };
+  });
 }
 function renderKid() {
   const k = KIDS[kid];
@@ -25,15 +29,22 @@ function renderKid() {
   $('kidpanel').innerHTML = '<h2>' + esc(k.name) + '</h2>' +
     '<label class="field"><span class="flabel">School-night lights out (Fri &amp; Sat are later automatically)</span><input type="time" id="lights" value="' + draft.lights[kid] + '"></label>' +
     '<fieldset class="sdays"><legend class="flabel">Shower nights</legend>' + DAYS.map((d, i) => '<label><input type="checkbox" id="sh' + i + '"' + (draft.showers[kid].includes(i) ? ' checked' : '') + '> ' + d.slice(0, 3) + '</label>').join('') + '</fieldset>' +
-    '<div class="sgrid">' + DAYS.map((d, i) => '<label class="field"><span class="flabel">' + d + ' chores</span><textarea id="ch' + i + '" rows="2">' + esc((draft.chores[kid][i] || []).join('\n')) + '</textarea></label>').join('') + '</div>';
+    '<div class="sgrid">' + DAYS.map((d, i) => '<label class="field"><span class="flabel">' + d + ' chores</span><textarea id="ch' + i + '" rows="2">' + esc((draft.chores[kid][i] || []).join('\n')) + '</textarea></label>').join('') + '</div>' +
+    '<fieldset class="schecks"><legend class="flabel">Evening checks (Mom or Dad) · the wording shows on the checklist, Tonight and the chart</legend>' +
+    Object.entries(draft.checks[kid]).map(([key, w]) => '<div class="scheck"><label class="field"><span class="flabel">Check</span><input id="ck-' + key + '-label" maxlength="60" value="' + esc(w.label) + '"></label>' +
+      '<label class="field"><span class="flabel">Detail (optional)</span><input id="ck-' + key + '-sub" maxlength="100" value="' + esc(w.sub) + '"></label></div>').join('') + '</fieldset>';
 }
 function renderAll() {
+  $('gameMin').value = draft.game; $('grace').value = draft.grace;
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => { $('r-' + id + '-' + w).value = draft.rewards[id][w].join('\n'); }));
   $('levels').innerHTML = LEVELS.map((l) => '<label class="field"><span class="flabel">' + l + '</span><textarea id="lv-' + l + '" rows="4">' + esc(draft.prizeLevels[l].join('\n')) + '</textarea></label>').join('');
   renderKid();
 }
+const bounded = (v, [lo, hi], d) => { const n = Number(v); return v !== '' && Number.isInteger(n) && n >= lo && n <= hi ? n : d; };
 function readAll() {
   readKid();
+  draft.game = bounded($('gameMin').value, LIMITS.game, draft.game);
+  draft.grace = bounded($('grace').value, LIMITS.grace, draft.grace);
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => { draft.rewards[id][w] = lines($('r-' + id + '-' + w).value); }));
   LEVELS.forEach((l) => { draft.prizeLevels[l] = lines($('lv-' + l).value); });
 }
@@ -56,6 +67,9 @@ $('save').onclick = async () => {
   await save('config', 'chores', cfg.chores);
   await save('config', 'showers', cfg.showers);
   await save('config', 'lights', cfg.lights);
+  await save('config', 'game', cfg.game);
+  await save('config', 'grace', cfg.grace);
+  await save('config', 'checks', cfg.checks);
   await save('config', 'rewards', cfg.rewards);
   await save('config', 'prizeLevels', cfg.prizeLevels);
   dirty = false;
@@ -66,7 +80,7 @@ $('reset').onclick = async () => {
   if (!confirm('Go back to the original chores, bedtimes and prize lists?')) return;
   if (!(await askParent())) return;
   await keepPastDays();
-  ['chores', 'showers', 'lights', 'rewards', 'prizeLevels'].forEach((k) => save('config', k, null));
+  ['chores', 'showers', 'lights', 'game', 'grace', 'checks', 'rewards', 'prizeLevels'].forEach((k) => save('config', k, null));
   draft = copy(DEFAULTS); dirty = false; renderAll();
   $('msg').textContent = 'Back to the original settings.';
 };

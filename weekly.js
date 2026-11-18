@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794987938';
-import { askParent } from './parent.js?v=1794987938';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1794987938';
-import { applySettings } from './settings.js?v=1794987938';
-import { weekStreak, cheerIf } from './streaks.js?v=1794987938';
-import { gameWeek } from './lists.js?v=1794987938';
-import * as L from './lists.js?v=1794987938';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794987938';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1794988176';
+import { askParent } from './parent.js?v=1794988176';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1794988176';
+import { applySettings, SETTINGS } from './settings.js?v=1794988176';
+import { weekStreak, cheerIf } from './streaks.js?v=1794988176';
+import { gameWeek } from './lists.js?v=1794988176';
+import * as L from './lists.js?v=1794988176';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1794988176';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -22,7 +22,6 @@ const eff = (monday) => effectiveWeek(chart, monday, (data.weeks || {})[ymd(mond
 
 const $ = (id) => document.getElementById(id);
 $('eyebrow').textContent = chart.eyebrow;
-$('note').innerHTML = chart.note;
 // Game-time card (all three boys), above the perfect-week reward
 if (chart.gameTime) {
   $('weeklycard').insertAdjacentHTML('beforebegin', '<section id="gamecard" class="card reward"><h2>Weekend game time</h2><p id="gtstatus" class="status"></p><div id="gtbody"></div></section>');
@@ -41,23 +40,24 @@ function monthWeeks(monday) {
 }
 
 function renderGame() {
-  // Earned on school days (30 min each), used in pieces on the weekend
+  // Earned on school days (minutes per day from Settings), used in pieces on the weekend
   const g = gameWeek(ctx, kidId, week), now = new Date(), today = ymd(now);
   const n = (L.CHECKS[kidId] || []).length;
   $('gamecard').classList.toggle('unlocked', g.minutes > 0);
   $('gtstatus').innerHTML = '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
   const t = g.days.find((d) => ymd(d.date) === today);
-  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+30 min' : ymd(d.date) > today ? 'to come' : 'not yet') + '</span>' +
+  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+' + d.worth + ' min' : ymd(d.date) > today ? 'to come' : 'not yet') + '</span>' +
       (!d.earned && ymd(d.date) <= today ? '<small>' + esc(d.left.slice(0, 3).join(' · ') + (d.left.length > 3 ? ' · +' + (d.left.length - 3) + ' more' : '')) + '</small>' : '') + '</div>').join('') + '</div>' +
-    (t && !t.earned ? '<p class="gt-today"><b>Today, still to do:</b> ' + esc(t.left.join(' · ')) + '</p>' : t ? '<p class="gt-today"><b>Today: +30 min earned ✓</b></p>' : '') +
+    (t && !t.earned ? '<p class="gt-today"><b>Today, still to do:</b> ' + esc(t.left.join(' · ')) + '</p>' : t ? '<p class="gt-today"><b>Today: +' + t.worth + ' min earned ✓</b></p>' : '') +
     '<div class="gt-sum"><span>Earned <b>' + fmtMin(g.minutes) + '</b></span><span>Used <b>' + fmtMin(g.used) + '</b></span><span>Left <b>' + fmtMin(g.left) + '</b></span></div>' +
     (g.left > 0 ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
       '<button class="chip" data-gtuse="other">Other…</button></div>' : '') +
     (g.uses.length ? '<ul class="gt-log">' + g.uses.map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + fmtMin(u.minutes) + '</b></span><button class="linkbtn" data-gtundo="' + u.at + '">Undo</button></li>').join('') + '</ul>' : '') +
-    '<p class="note">Each school day with the whole checklist done and ' + (n === 3 ? 'all three' : 'both') + ' evening checks = 30 minutes, to use Saturday and Sunday. Log each time you play so you know what’s left.</p>';
+    '<p class="note">Each school day with the whole checklist done and ' + (n === 3 ? 'all three' : 'both') + ' evening checks = ' + (t ? t.worth : SETTINGS.game) + ' minutes, to use Saturday and Sunday. Log each time you play so you know what’s left.</p>';
 }
 
 function render() {
+  $('note').innerHTML = chart.note; // uses the current game-time setting
   const wk = ymd(week);
   const wd = (data.weeks && data.weeks[wk]) || {};
   const today = ymd(new Date());

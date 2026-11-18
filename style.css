@@ -638,3 +638,6 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .pinkeep { display: flex; gap: 8px; align-items: center; font-weight: 700; margin: 10px 0 2px; }
 .pinkeep input { width: 22px; height: 22px; }
 .pinkeep-note { margin: 0 0 6px; }
+.schecks { border: 0; padding: 0; margin: 14px 0 0; }
+.scheck { display: grid; grid-template-columns: 1fr; gap: 6px; border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
+@media (min-width: 560px) { .scheck { grid-template-columns: 1fr 1.4fr; } }

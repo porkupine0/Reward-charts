@@ -1,5 +1,5 @@
-import { planFor, planEndYmd } from './plan.js?v=1794987938';
-import { SETTINGS } from './settings.js?v=1794987938';
+import { planFor, planEndYmd } from './plan.js?v=1794988176';
+import { SETTINGS } from './settings.js?v=1794988176';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -26,13 +26,13 @@ export const CHARTS = {
       { key: 'kind', label: 'Kind to brothers', sub: 'No hurting, in actions or words', parent: true, cells: [X, X, X, X, X, X, X] },
       { key: 'listen', label: 'Listened', sub: 'To Mom and Dad, no arguing', parent: true, cells: [X, X, X, X, X, X, X] }
     ],
-    // Weekend game time: 30 min for each full school day (see lists.js GAME), up to 2.5 hours
+    // Weekend game time: minutes per full school day from Settings (see lists.js GAME)
     gameTime: true,
     gameOnly: true, // game time replaces the perfect-week reward
     kidId: 'eli',
     get weekly() { return SETTINGS.rewards[this.id].weekly; },
     get monthly() { return SETTINGS.rewards[this.id].monthly; },
-    note: '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and both evening checks = 30 minutes, up to 2.5 hours for the weekend. <b>Run or swim</b>: swim Monday, Thursday and Friday, run Tuesday, Wednesday and Saturday; each box fills when that day’s Training page is done (or Mom or Dad excused it). <b>Kind to brothers</b> and <b>Listened</b> are marked by Mom or Dad at the end of the day. Every box comes from his checklist: tap one to open that day.'
+    get note() { return '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and both evening checks = ' + gameText() + ' for the weekend. <b>Run or swim</b>: swim Monday, Thursday and Friday, run Tuesday, Wednesday and Saturday; each box fills when that day’s Training page is done (or Mom or Dad excused it). <b>Kind to brothers</b> and <b>Listened</b> are marked by Mom or Dad at the end of the day. Every box comes from his checklist: tap one to open that day.'; }
   },
   trombone: {
     id: 'trombone',
@@ -62,7 +62,7 @@ export const CHARTS = {
     kidId: 'rhett',
     get weekly() { return SETTINGS.rewards[this.id].weekly; },
     get monthly() { return SETTINGS.rewards[this.id].monthly; },
-    note: '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and all three evening checks = 30 minutes, up to 2.5 hours for the weekend. <b>Move your body</b> = 20 minutes of anything active: bike ride, shooting hoops, jump rope, a walk, a workout video. <b>Saturday racquetball</b> is optional and doesn’t count against the reward. From Nov 16 every box comes from his checklist: tap one to open that day.'
+    get note() { return '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and all three evening checks = ' + gameText() + ' for the weekend. <b>Move your body</b> = 20 minutes of anything active: bike ride, shooting hoops, jump rope, a walk, a workout video. <b>Saturday racquetball</b> is optional and doesn’t count against the reward. From Nov 16 every box comes from his checklist: tap one to open that day.'; }
   },
   zay: {
     id: 'zay',
@@ -81,16 +81,27 @@ export const CHARTS = {
     gameOnly: true,
     weekly: [],
     monthly: [],
-    note: '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and all three evening checks = 30 minutes, up to 2.5 hours for the weekend. <b>Soccer</b> fills from Ball Master (or when Mom or Dad excused it). The three evening checks are marked by Mom or Dad. Every box comes from his checklist: tap one to open that day.'
+    get note() { return '<b>Game time:</b> each school day with his whole checklist done (after school and bedtime) and all three evening checks = ' + gameText() + ' for the weekend. <b>Soccer</b> fills from Ball Master (or when Mom or Dad excused it). The three evening checks are marked by Mom or Dad. Every box comes from his checklist: tap one to open that day.'; }
   }
 };
+// "30 minutes, up to 2 hr 30 min" from the current setting
+function gameText() {
+  const m = SETTINGS.game, max = m * 5, h = Math.floor(max / 60), r = max % 60;
+  return m + ' minutes, up to ' + (h ? h + ' hr' + (r ? ' ' + r + ' min' : '') : max + ' min');
+}
 // Every box on a chart from this week on comes from the checklist (no hand ticks).
 export const TIED_FROM = '2026-11-16';
 
 // Shared scoring so the home page and chart pages agree.
 // The rows a chart uses for the week starting on this Monday (a chart can change from a date on).
 const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-export function rowsFor(chart, monday) {
+// Evening-check rows use the wording from Settings (the same words as the checklist and Tonight).
+const worded = (chart, rows) => rows.map((r) => {
+  const w = r.parent && ((SETTINGS.checks || {})[chart.kidId] || {})[r.key];
+  return w ? Object.assign({}, r, { label: w.label, sub: w.sub }) : r;
+});
+export function rowsFor(chart, monday) { return worded(chart, baseRows(chart, monday)); }
+function baseRows(chart, monday) {
   if (!chart.altFrom || !monday) return chart.rows;
   if (ymdOf(monday) < chart.altFrom) return chart.rows;
   if (chart.id !== 'eli') return chart.altRows;
