@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795029889';
-import { applyConfig } from './routines.js?v=1795029889';
-import { askParent } from './parent.js?v=1795029889';
-import * as L from './lists.js?v=1795029889';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795029889';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795029889';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795030584';
+import { applyConfig } from './routines.js?v=1795030584';
+import { askParent } from './parent.js?v=1795030584';
+import * as L from './lists.js?v=1795030584';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795030584';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795030584';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -47,7 +47,7 @@ function render() {
   // the baseline comes first: a lesson he hasn't begun waits until it's finished (so the baseline measures
   // what he knew before the course). A lesson already begun (watched or answered) carries on.
   const begun = (l) => !!(d.watched || {})[l.id] || Object.values(d.answers || {}).some((a) => a[l.id]);
-  if (st.status === 'ready' && !begun(st.lesson) && baselineOpen(d, key)) { $('today').innerHTML = '<h2>' + esc(st.lesson.title) + '</h2><p class="note">First, take the baseline knowledge test below. Today’s lesson opens as soon as it’s done.</p>'; return; }
+  if (st.status === 'ready' && !begun(st.lesson) && baselineOpen(d, key)) { $('today').innerHTML = '<h2>' + esc(st.lesson.title) + '</h2><p class="note">First, take the baseline knowledge test above. Today’s lesson opens as soon as it’s done.</p>'; return; }
   const lesson = st.lesson, watched = !!(d.watched || {})[lesson.id];
   // the quiz is built without today's answers, so it stays the same while he takes it
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);

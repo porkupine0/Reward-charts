@@ -14,7 +14,7 @@
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-18/eli/chore', true); });
   await visit('drive.html', 'test-start');
   check(!(await p.$('#tests .dq')), 'questions only after Start');
-  check(/First, take the baseline knowledge test/.test(await p.$eval('#today', (e) => e.textContent)) && !(await p.$('[data-watched]')), 'an approved lesson waits for the baseline');
+  check(/First, take the baseline knowledge test above/.test(await p.$eval('#today', (e) => e.textContent)) && !(await p.$('[data-watched]')), 'an approved lesson waits for the baseline');
   await p.click('[data-tstart="base"]'); await p.waitForTimeout(200);
   check((await p.$$('#tests .dq')).length === 25, '25 questions');
   // at phone width, answering (the longest choice) must not move anything below it
