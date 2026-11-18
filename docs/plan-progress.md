@@ -44,10 +44,11 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
 - [x] 4a. Wiring, no page: one lock helper (today's chores done and none owed), Open link hidden on locked rows, checklist row (today if a lesson is ready; past dates a lesson was finished; Mon–Fri; outside all scoring), database rules.
 - [x] 4b. Driving page and parent preview (course file ships empty; browser tests use a fixture course): checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
+- [ ] 4c. Streak: approval date stored; a lesson approved before a weekday is due that day (required for streak/full day, not game time).
 - [ ] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
 
 Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
-Unanswered (defaults in force): Eli's assignments and homework don't wait for chores (only typing and driving do); the driving lesson doesn't count toward his streak.
+Decided Nov 18: only Eli's typing and driving wait for today's chores (assignments and homework don't; homework still locks when an earlier day's chore is owed). The driving lesson counts toward his daily streak, not game time.
 
 ## Open for the family
 - Leftover game time: should it expire at the end of the weekend or carry over? (It stays on that week's chart now.)

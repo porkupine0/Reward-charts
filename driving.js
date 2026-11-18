@@ -80,8 +80,16 @@ export function checkCourse(lessons) {
     if (shouldReview !== !!l.review) out.push(l.id + ': lesson ' + (i + 1) + (shouldReview ? ' should be a review' : ' should not be a review'));
     if (l.review && (l.questions || []).length) out.push(l.id + ': a review has no questions of its own');
     if (!l.review && (l.questions || []).length < 5) out.push(l.id + ': needs at least 5 questions');
+    if (!/^[A-Za-z0-9]+$/.test(l.id || '')) out.push((l.id || '?') + ': lesson id must be letters and digits');
     if (!l.review && !(l.videos || []).length) out.push(l.id + ': needs a video');
+    (l.videos || []).forEach((v, vi) => {
+      if (!/^[A-Za-z0-9_-]{11}$/.test(v.yt || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs an 11-character YouTube id (yt)');
+      if (!v.title || !v.channel || !/^\d{1,2}:\d{2}$/.test(v.len || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs a title, channel and length (m:ss)');
+    });
+    const spots = new Set((l.questions || []).map((q) => q.answer));
+    if ((l.questions || []).length >= 3 && spots.size < 2) out.push(l.id + ': the right answer is in the same position every time');
     (l.questions || []).forEach((q) => {
+      if (!/^[A-Za-z0-9]+$/.test(q.id || '')) out.push((q.id || '?') + ': question id must be letters and digits');
       if (seen.has(q.id)) out.push(q.id + ': id used twice');
       seen.add(q.id);
       if (!Array.isArray(q.choices) || q.choices.length < 2) out.push(q.id + ': needs choices');

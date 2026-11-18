@@ -6,11 +6,12 @@ import { readFileSync } from 'node:fs';
 const V = JSON.parse(readFileSync(new URL('../version.json', import.meta.url))).v;
 const D = await import('../driving.js?v=' + V);
 
-const q = (id) => ({ id, q: 'Q ' + id, choices: ['a', 'b', 'c'], answer: 0, why: 'because', ref: "Iowa Driver's Manual p.1" });
+const q = (id) => ({ id, q: 'Q ' + id, choices: ['a', 'b', 'c'], answer: Number(id.slice(-1)) % 3, why: 'because', ref: "Iowa Driver's Manual p.1" });
+const vid = { yt: 'AAAAAAAAAAA', title: 'T', channel: 'C', len: '5:00' };
 // every 5th lesson is a review (no questions of its own)
 const course = (n) => Array.from({ length: n }, (_, i) => {
   const review = (i + 1) % 5 === 0, id = 'L' + (i + 1);
-  return { id, title: 'Lesson ' + (i + 1), review, videos: review ? [] : [{ id: 'v' }], questions: review ? [] : [1, 2, 3, 4, 5].map((k) => q(id + 'q' + k)) };
+  return { id, title: 'Lesson ' + (i + 1), review, videos: review ? [] : [vid], questions: review ? [] : [1, 2, 3, 4, 5].map((k) => q(id + 'q' + k)) };
 });
 const LESSONS = course(6);
 const day = (n) => '2026-12-' + String(n).padStart(2, '0');
@@ -103,8 +104,9 @@ test('driving: a review lesson is all earlier questions', () => {
 
 test('driving: grading', () => {
   const quiz = D.quizFor(LESSONS, 1, { done: { L1: day(1) }, answers: {} });
-  const g = D.grade(quiz, { L2q1: 0, L2q2: 1, L2q3: 0, L1q1: 0 });
-  assert.equal(g.total, 5); assert.equal(g.right, 3); assert.deepEqual(g.missed, ['L2q2', 'L1q2']);
+  const picks = Object.fromEntries(quiz.map((x, i) => [x.id, i === 1 || i === 4 ? (x.answer + 1) % 3 : x.answer]));
+  const g = D.grade(quiz, picks);
+  assert.equal(g.total, 5); assert.equal(g.right, 3); assert.deepEqual(g.missed, [quiz[1].id, quiz[4].id]);
 });
 
 test('driving: the content checker catches bad lessons and questions', () => {
@@ -119,9 +121,16 @@ test('driving: the content checker catches bad lessons and questions', () => {
   const problems = D.checkCourse(bad).join('\n');
   ['L1q1: id used twice', 'L2: needs at least 5 questions', 'not one of the choices', 'needs an explanation', 'needs a manual page', 'L4: lesson 4 should not be a review'].forEach((t) => assert.ok(problems.includes(t), t + '\n' + problems));
   const more = course(10);
-  more[4].review = false; more[4].questions = [1, 2, 3, 4, 5].map((k) => q('L5q' + k)); more[4].videos = [{ id: 'v' }]; // no review at position five
+  more[4].review = false; more[4].questions = [1, 2, 3, 4, 5].map((k) => q('L5q' + k)); more[4].videos = [vid]; // no review at position five
   more[5].videos = [];                  // a lesson with no video
   more[6].id = 'L6';                    // a repeated lesson id
   const p2 = D.checkCourse(more).join('\n');
   ['L5: lesson 5 should be a review', 'L6: needs a video', 'L6: lesson id used twice'].forEach((t) => assert.ok(p2.includes(t), t + '\n' + p2));
+  const shape = course(5);
+  shape[0].videos = [{ id: 'AAAAAAAAAAA', title: 'T', channel: 'C', len: '5:00' }];   // wrong key
+  shape[1].videos = [{ yt: 'AAAAAAAAAAA', title: 'T', len: '5 min' }];              // no channel, bad length
+  shape[2].id = 'L|3';                                                               // a | in an id
+  shape[3].questions.forEach((x) => { x.answer = 1; });                              // same position every time
+  const p3 = D.checkCourse(shape).join('\n');
+  ['L1: video 1 needs an 11-character YouTube id', 'L2: video 1 needs a title, channel and length', 'L|3: lesson id must be letters and digits', 'L4: the right answer is in the same position'].forEach((t) => assert.ok(p3.includes(t), t + '\n' + p3));
 });
