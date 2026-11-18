@@ -1,4 +1,5 @@
-import { SETTINGS } from './settings.js?v=1794983722';
+import { planFor, planEndYmd } from './plan.js?v=1794984035';
+import { SETTINGS } from './settings.js?v=1794984035';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -88,11 +89,23 @@ export const TIED_FROM = '2026-11-16';
 
 // Shared scoring so the home page and chart pages agree.
 // The rows a chart uses for the week starting on this Monday (a chart can change from a date on).
+const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 export function rowsFor(chart, monday) {
   if (!chart.altFrom || !monday) return chart.rows;
-  const p = (n) => String(n).padStart(2, '0');
-  const k = monday.getFullYear() + '-' + p(monday.getMonth() + 1) + '-' + p(monday.getDate());
-  return k >= chart.altFrom ? chart.altRows : chart.rows;
+  if (ymdOf(monday) < chart.altFrom) return chart.rows;
+  if (chart.id !== 'eli') return chart.altRows;
+  // Eli's run/swim boxes follow his plan, day by day: an optional plan day is an optional box,
+  // and after the plan ends the box is off (there's nothing on his checklist behind it).
+  const end = planEndYmd();
+  return chart.altRows.map((r) => r.key !== 'running' ? r : Object.assign({}, r, {
+    cells: r.cells.map((c, i) => {
+      if (c === O) return c;
+      const day = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      if (ymdOf(day) >= end) return O;
+      const p = planFor(day);
+      return p && p.optional ? opt(c.t || 'Opt.') : c;
+    })
+  }));
 }
 
 export function weekProgress(chart, weekData) {

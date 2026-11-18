@@ -1,5 +1,7 @@
 // Eli's 13-week off-season plan (starts Mon Oct 26, 2026). Text is straight from the plan.
 export const PLAN_START = '2026-10-26';
+// The day after the last plan day ('YYYY-MM-DD'), from the length of W.
+export function planEndYmd() { const d = parse(PLAN_START); d.setDate(d.getDate() + W.length * 7); const p = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 
 const SAT = 'Cross-training: class with Mom, or 25 min easy + 4 strides + Core B (optional)';
 const SUN = 'Rest';
@@ -210,7 +212,7 @@ function parse(s) { const [y, m, d] = s.split('-').map(Number); return new Date(
 export function dayDone(p, checks) {
   const req = p.items.filter((i) => !i.opt);
   if (req.length) return req.every((i) => checks[i.key]);
-  return !!(checks.run || checks.cross);
+  return !!(checks.run || checks.cross || checks.swim);
 }
 
 // 'mile' or '5k' when the plan has a time trial on this date, else null.

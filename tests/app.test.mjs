@@ -10,7 +10,7 @@ const { ymd, parseYmd, mondayOf, addDays } = await load('store.js');
 const { bedtime, timerResult, choreItems, lightsOut, afterSchool } = await load('routines.js');
 const { planFor, trialOn, dayDone } = await load('plan.js');
 const { score, nextMilestone, owed, planned, MILE, FIVE, mphFor } = await load('trials.js');
-const { CHARTS, weekProgress } = await load('charts.js');
+const { CHARTS, weekProgress, rowsFor } = await load('charts.js');
 const L = await load('lists.js');
 const { applySettings, SETTINGS, DEFAULTS } = await load('settings.js');
 
@@ -268,7 +268,6 @@ test('Isaiah: no Wake up on his morning list', () => {
 });
 
 test("charts: from Nov 16 every box on every chart comes from the checklist", () => {
-  const { rowsFor } = { rowsFor: (c, m) => (c.altFrom && ymd(m) >= c.altFrom ? c.altRows : c.rows) };
   const mon = d('2026-11-16'), ctx = { routines: {}, run: {}, isaiah: {} };
   Object.values(CHARTS).forEach((ch) => rowsFor(ch, mon).forEach((r) => r.cells.forEach((c, i) => {
     if (c === '-') return;
@@ -338,7 +337,6 @@ test("style.css: no colour variable is defined as itself (it would render as not
 // checklist (and Training / Ball Master), every required box fills; and a required box must
 // match a required checklist item (an optional or missing item can't back a required box).
 test("charts: every required box is backed by a required checklist item, Nov 16 to Feb 28", () => {
-  const { rowsFor } = { rowsFor: (c, m) => (c.altFrom && ymd(m) >= c.altFrom ? c.altRows : c.rows) };
   const SOURCE = { running: ['activity'], school: ['missing'], move: ['activity'], racquetball: ['activity'], typing: ['typing'], trombone: ['trombone'], duolingo: ['duolingo'], soccer: ['activity'] };
   const bad = [];
   for (let day = d('2026-11-16'); ymd(day) <= '2027-02-28'; day = addDays(day, 1)) {
@@ -363,6 +361,14 @@ test("charts: every required box is backed by a required checklist item, Nov 16 
         const keys = SOURCE[r.key];
         if (keys) keys.forEach((key) => { const it = all.find((x) => x.key === key); if (!it || it.opt) bad.push(where + ' (checklist item ' + (it ? 'optional' : 'missing') + ')'); });
       });
+    }
+    // with everything ticked (weekly items too), a school day earns its game time
+    for (const kid of ['eli', 'rhett', 'isaiah']) {
+      if (!L.GAME.days.includes(i)) continue;
+      const w = (ctx.routines.weekly = ctx.routines.weekly || {})[kid] = ctx.routines.weekly[kid] || {};
+      L.lists({ routines: {}, run: {}, isaiah: {} }, kid, day).day.filter((x) => x.weekly).forEach((x) => { (w[x.weekly] = w[x.weekly] || {})[L.cycleOf(day, L.weeklyDef(kid, x.weekly).start)] = k; });
+      const g = L.gameDay(ctx, kid, day);
+      if (g.left.length) bad.push(kid + ' game time ' + k + ' (left: ' + g.left.join(', ') + ')');
     }
   }
   assert.deepEqual(bad, []);

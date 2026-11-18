@@ -1,9 +1,9 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794983722';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794983722';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794983722';
-import { planFor, dayDone } from './plan.js?v=1794983722';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794984035';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED } from './routines.js?v=1794984035';
+import { rowsFor, TIED_FROM } from './charts.js?v=1794984035';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1794984035';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -56,6 +56,15 @@ export function lists(ctx, kid, date) {
   const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow);
   const day = [];
   raw.forEach((i) => (i.weekly === true ? day.push(...weeklyItems(ctx, kid, date)) : day.push(i)));
+  if (kid === 'eli') {
+    // Saturday run (on his chart from Nov 21, 2026): shown on the weekend list too
+    const p = planFor(date);
+    if (dow === 5 && p && ymd(date) >= '2026-11-21') {
+      day.push({ key: 'activity', label: p.swim ? 'Swim practice' : 'Running: ' + p.title, sub: (p.optional ? 'Optional today. ' : '') + 'Checks itself off when today’s Training is done. Tap to open it.', link: 'run.html', opt: !!p.optional });
+    }
+    // After the training plan ends there's nothing to check off, so no Running item
+    if (!p && ymd(date) >= planEndYmd()) { const at = day.findIndex((i) => i.key === 'activity'); if (at >= 0) day.splice(at, 1); }
+  }
   // Running (Eli) and 600 touches (Isaiah) are done on their own pages; the checklist shows their status.
   day.forEach((i) => {
     if (i.key === 'activity' && kid === 'eli') i.derived = 'run';
