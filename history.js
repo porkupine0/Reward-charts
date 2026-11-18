@@ -1,8 +1,8 @@
 // History: each kid's month at a glance.
-import { watch, ymd, addDays, mondayOf, esc, statusPill } from './store.js?v=1795007589';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795007589';
-import * as L from './lists.js?v=1795007589';
-import { dayFull } from './streaks.js?v=1795007589';
+import { watch, ymd, addDays, mondayOf, esc, statusPill } from './store.js?v=1795007993';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795007993';
+import * as L from './lists.js?v=1795007993';
+import { dayFull } from './streaks.js?v=1795007993';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {} };

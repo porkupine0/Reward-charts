@@ -1,11 +1,11 @@
 // Everything the kids have earned and not received yet (Parents page and the home Parents button).
 // row(who, accent, whatHtml, when, actionHtml) and tick(chart, path, label) decide how each item looks.
-import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1795007589';
-import { CHARTS, weekProgress } from './charts.js?v=1795007589';
-import { KIDS } from './routines.js?v=1795007589';
-import * as L from './lists.js?v=1795007589';
-import { owed } from './trials.js?v=1795007589';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007589';
+import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1795007993';
+import { CHARTS, weekProgress } from './charts.js?v=1795007993';
+import { KIDS } from './routines.js?v=1795007993';
+import * as L from './lists.js?v=1795007993';
+import { owed } from './trials.js?v=1795007993';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007993';
 
 export function owedItems(D, ctx, row, tick) {
   const out = [];
@@ -15,7 +15,7 @@ export function owedItems(D, ctx, row, tick) {
     const ch = CHARTS[k.chart];
     if (!ch || !ch.gameTime) return;
     const g = L.gameWeek(ctx, kidId, thisMon);
-    if (g.left > 0) out.push(row(k.name, k.accent, 'Game time left: ' + g.left + ' min', g.minutes + ' earned · ' + g.used + ' used · log it on his chart', ''));
+    if (g.left > 0) out.push(row(k.name, k.accent, 'Game time left: ' + g.left + ' min', g.minutes + ' earned' + (g.carriedIn ? ' + ' + g.carriedIn + ' carried over' : '') + ' · ' + g.used + ' used · log it on his chart', ''));
   });
   // Perfect weeks and months (last 10 weeks); Eli's and Isaiah's weeks are game time instead
   ['eli', 'trombone', 'zay'].forEach((id) => {

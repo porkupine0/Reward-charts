@@ -18,7 +18,7 @@
   await p.waitForSelector('.pindlg input', { timeout: 2000 });
   await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(400);
   const saved = (await db()).charts.routines.carry;
-  check(saved && saved.rhett && saved.rhett['2026-11-16'] === 20, 'saved 20 for the week of Nov 16: ' + JSON.stringify(saved));
+  check(saved && saved.rhett && saved.rhett['2026-11-16'] && saved.rhett['2026-11-16'].minutes === 20 && saved.rhett['2026-11-16'].add === true, 'saved 20 for the week of Nov 16: ' + JSON.stringify(saved));
   check(await p.$eval('#carrycard', (e) => getComputedStyle(e).display === 'none'), 'not asked again');
   await visit('trombone.html', 'carry-chart');
   const card = await p.$eval('#gtbody', (e) => e.textContent.replace(/\s+/g, ' '));

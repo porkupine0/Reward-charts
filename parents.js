@@ -1,15 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795007589';
-import { CHARTS, weekProgress } from './charts.js?v=1795007589';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795007589';
-import * as L from './lists.js?v=1795007589';
-import { owed, score, planned, fmt } from './trials.js?v=1795007589';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007589';
-import { askParent, setParent, changePin } from './parent.js?v=1795007589';
-import { dayFull } from './streaks.js?v=1795007589';
-import { owedItems } from './owed.js?v=1795007589';
-import { pruneList, pruneCutoff } from './prune.js?v=1795007589';
-import { nowHtml } from './nowview.js?v=1795007589';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795007993';
+import { CHARTS, weekProgress } from './charts.js?v=1795007993';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795007993';
+import * as L from './lists.js?v=1795007993';
+import { owed, score, planned, fmt } from './trials.js?v=1795007993';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007993';
+import { askParent, setParent, changePin } from './parent.js?v=1795007993';
+import { dayFull } from './streaks.js?v=1795007993';
+import { owedItems } from './owed.js?v=1795007993';
+import { pruneList, pruneCutoff } from './prune.js?v=1795007993';
+import { nowHtml } from './nowview.js?v=1795007993';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -52,7 +52,7 @@ function render() {
   const today = new Date(), mon = mondayOf(today);
   renderTonight(today);
   // Leftover game time from last week: add it to this week, or not (asked once per boy)
-  const carry = isLive('routines') ? L.carryPrompts(ctx, today, Object.keys(KIDS).filter((id) => CHARTS[KIDS[id].chart] && CHARTS[KIDS[id].chart].gameTime)) : [];
+  const carry = allLive() ? L.carryPrompts(ctx, today, Object.keys(KIDS).filter((id) => CHARTS[KIDS[id].chart] && CHARTS[KIDS[id].chart].gameTime)) : [];
   $('carrycard').hidden = !carry.length;
   $('carry').innerHTML = carry.map((c) => row(KIDS[c.kid].name, KIDS[c.kid].accent, c.minutes + ' min left from last week', 'Add to this week?',
     '<span class="exbtns"><button class="tbtn approve" data-carry="' + c.kid + '|yes">Add ' + c.minutes + ' min</button><button class="linkbtn" data-carry="' + c.kid + '|no">No</button></span>')).join('');
@@ -132,9 +132,9 @@ document.addEventListener('click', async (e) => {
   if (cb) {
     // the amount is worked out after the PIN, from the latest data, and fixed when saved
     const [kid, a] = cb.dataset.carry.split('|');
-    if (!isLive('routines') || !(await askParent())) return;
-    const c = L.carryPrompts(ctx, new Date(), [kid])[0];
-    if (c) save('routines', 'carry/' + kid + '/' + ymd(c.from), a === 'yes' ? c.minutes : 'no');
+    if (!allLive() || !(await askParent())) return;
+    const c = allLive() && L.carryPrompts(ctx, new Date(), [kid])[0];
+    if (c) save('routines', 'carry/' + kid + '/' + ymd(c.from), { minutes: c.minutes, add: a === 'yes' });
     return;
   }
   const tn = e.target.closest('[data-tn]');

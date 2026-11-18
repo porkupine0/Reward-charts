@@ -625,7 +625,7 @@ test("leftover game time: a parent moves it to the next week, once, with the amo
   assert.equal(L.gameWeek(ctx, 'rhett', last).left, 20);
   assert.deepEqual(L.carryPrompts(ctx, mon, ['eli', 'rhett', 'isaiah']).map((x) => [x.kid, x.minutes]), [['rhett', 20]]);
   // the parent says yes: 20 moves
-  ctx.routines.carry = { rhett: { '2026-11-16': 20 } };
+  ctx.routines.carry = { rhett: { '2026-11-16': { minutes: 20, add: true } } };
   assert.equal(L.gameWeek(ctx, 'rhett', last).left, 0, 'last week: nothing left to spend');
   assert.equal(L.gameWeek(ctx, 'rhett', last).minutes, 30, 'earned unchanged');
   assert.equal(L.gameWeek(ctx, 'rhett', thisW).left, 20, 'this week: 20 to use');
@@ -636,9 +636,12 @@ test("leftover game time: a parent moves it to the next week, once, with the amo
   assert.equal(L.gameWeek(ctx, 'rhett', thisW).carriedIn, 20);
   assert.equal(L.gameWeek(ctx, 'rhett', last).left, 30);
   assert.deepEqual(L.carryPrompts(ctx, mon, ['rhett']), [], 'still not asked again');
-  // "No" is remembered too
-  const ctx2 = { routines: { days: { '2026-11-16': { rhett: full } }, carry: { rhett: { '2026-11-16': 'no' } } }, run: {}, isaiah: {} };
+  // "No" lets the minutes go: gone from last week, not added to this week, asked once; a later backfill stays on last week
+  const ctx2 = { routines: { days: { '2026-11-16': { rhett: full } }, game: { rhett: { '2026-11-16': { 1: 10 } } }, carry: { rhett: { '2026-11-16': { minutes: 20, add: false } } } }, run: {}, isaiah: {} };
   assert.deepEqual(L.carryPrompts(ctx2, mon, ['rhett']), []);
-  assert.equal(L.gameWeek(ctx2, 'rhett', thisW).left, 0);
-  assert.equal(L.gameWeek(ctx2, 'rhett', last).left, 30, '"no" leaves it on last week');
+  assert.equal(L.gameWeek(ctx2, 'rhett', last).left, 0, '"no" lets them go');
+  assert.equal(L.gameWeek(ctx2, 'rhett', last).letGo, 20);
+  assert.equal(L.gameWeek(ctx2, 'rhett', thisW).left, 0, 'nothing added to this week');
+  ctx2.routines.days['2026-11-17'] = { rhett: fullOn('2026-11-17') };
+  assert.equal(L.gameWeek(ctx2, 'rhett', last).left, 30, 'a later backfill stays on last week');
 });
