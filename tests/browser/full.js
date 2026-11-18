@@ -55,6 +55,8 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   const B = 'http://localhost:' + (process.env.PORT || 8765) + '/';
   async function visit(u, shot, expectSync = true) {
     cur = u; await p.goto(B + u); await p.waitForTimeout(450);
+    const shown = await p.evaluate(() => [...document.querySelectorAll('[hidden]')].filter((e) => e.getClientRects().length).map((e) => e.id || e.className || e.tagName));
+    check(!shown.length, u + ' hidden but showing: ' + shown.join(', '));
     const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check(ov <= 1, u + ' OVERFLOW ' + ov + 'px');
     const sync = await p.$eval('#sync', e => e.textContent).catch(() => 'n/a');

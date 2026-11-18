@@ -1,0 +1,31 @@
+  // "Other…" for real: Rhett earned Monday, types 1:30 → 90 min isn't more than what's left, so it's capped;
+  // types 0:15 → a 15-minute entry, Left goes down. Plus screenshots of links inside sentences.
+  const V = JSON.parse(require('fs').readFileSync('version.json', 'utf8')).v;
+  const Lm = await import(require('url').pathToFileURL(process.cwd() + '/lists.js').href + '?v=' + V);
+  const mon = new Date(2026, 10, 16), done = {};
+  const ls = Lm.lists({ routines: {}, run: {}, isaiah: {} }, 'rhett', mon);
+  [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => { if (it.parts) it.parts.forEach((x) => { done[Lm.partKey(it.key, x)] = true; }); else done[it.key] = it.choices ? it.choices[0] : true; });
+  Lm.CHECKS.rhett.forEach((x) => { done[x.key] = true; });
+  await p.goto(B + 'index.html');
+  await p.evaluate((dn) => { localStorage.clear(); localStorage.setItem('rc:unlock', JSON.stringify({ always: true })); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-16': { rhett: dn } } } } })); }, done);
+  await visit('trombone.html', 'gc2');
+  const sum = async () => p.$eval('.gt-sum', (e) => e.textContent.replace(/\s+/g, ' '));
+  notes.push('before: ' + await sum());
+  check(/Earned 30 min/.test(await sum()), 'Monday earned 30 min');
+  p.removeAllListeners('dialog'); p.once('dialog', (d) => d.accept('0:15'));
+  await p.click('[data-gtuse="other"]'); await p.waitForTimeout(400);
+  notes.push('after 0:15: ' + await sum());
+  check(/Used 15 min/.test(await sum()) && /Left 15 min/.test(await sum()), '0:15 logged as 15 minutes');
+  p.once('dialog', (d) => d.accept('1:30'));
+  await p.click('[data-gtuse="other"]'); await p.waitForTimeout(400);
+  notes.push('after 1:30: ' + await sum());
+  check(/Used 30 min/.test(await sum()) && /Left 0 min/.test(await sum()), '1:30 is capped at what is left');
+  p.on('dialog', (d) => d.accept());
+  // links inside sentences (now 44px tall): Home's lock line, the PIN box
+  await visit('index.html', 'link-home');
+  await p.locator('#parentline').screenshot({ path: OUT + 'link-home.png' });
+  await p.evaluate(() => localStorage.removeItem('rc:unlock'));
+  await p.evaluate(() => { const db = JSON.parse(sessionStorage.getItem('mockdb')); db.charts.settings = { pinHash: 'x' }; sessionStorage.setItem('mockdb', JSON.stringify(db)); });
+  await visit('parents.html', 'link-pin');
+  await p.click('#pin'); await p.waitForTimeout(300);
+  await p.screenshot({ path: OUT + 'link-pin.png' });

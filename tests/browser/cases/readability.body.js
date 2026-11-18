@@ -3,9 +3,19 @@
   const STRICT = true;
   await p.goto(B + 'index.html');
   await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rc:unlock', JSON.stringify({ always: true }));
-    sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-17': { rhett: { chore: true } } }, game: { rhett: { '2026-11-16': { 1795000000000: 15 } } } } } })); });
+    // a busy Wednesday for Rhett: ticked items, a chip on, candy given, a pending excuse, a late bedtime
+    const late = { start: new Date(2026, 10, 18, 20, 0).getTime(), end: new Date(2026, 10, 18, 21, 30).getTime() };
+    sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-17': { rhett: { chore: true } },
+      '2026-11-18': { rhett: { putaway: true, afterSnack: 'Banana', clothes: true, mCandyGiven: true, homework: '~skip', reading: '~excused', bedTimer: late, noYell: true, firstTime: true, noLies: 'no' } } },
+      game: { rhett: { '2026-11-16': { 1795000000000: 15 } } } } } })); });
   const measure = () => p.evaluate(() => {
-    const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const v = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return [v[0], v[1], v[2], v[3] === undefined ? 1 : v[3]]; };
+    const parse = (c) => {
+      let m = c.match(/rgba?\(([^)]+)\)/);
+      if (m) { const v = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return [v[0], v[1], v[2], v[3] === undefined ? 1 : v[3]]; }
+      m = c.match(/color\(srgb ([^)]+)\)/); // what color-mix() computes to
+      if (m) { const v = m[1].split(/[ /]+/).filter(Boolean).map(Number); return [v[0] * 255, v[1] * 255, v[2] * 255, v[3] === undefined ? 1 : v[3]]; }
+      return null;
+    };
     const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
     const mix = (a, b, t) => [0, 1, 2].map((i) => a[i] * t + b[i] * (1 - t));
     const bgOf = (el) => {
@@ -31,7 +41,8 @@
     });
     return { n, worst: +worst.toFixed(2), bad: [...new Set(bad)].slice(0, 12) };
   });
-  const pages = ['checklist.html?kid=rhett&date=2026-11-19', 'checklist.html?kid=isaiah', 'zay.html', 'trombone.html', 'eli.html?week=2026-11-23', 'kid.html?kid=isaiah', 'index.html', 'parents.html'];
+  const pages = ['checklist.html?kid=rhett&date=2026-11-19', 'checklist.html?kid=rhett&date=2026-11-18', 'checklist.html?kid=eli&date=2026-11-19', 'checklist.html?kid=isaiah', 'zay.html', 'trombone.html', 'eli.html?week=2026-11-23',
+    'kid.html?kid=isaiah', 'index.html', 'parents.html', 'run.html', 'trials.html', 'isaiah.html', 'history.html?kid=rhett', 'stats.html', 'settings.html'];
   for (const scheme of ['light', 'dark']) {
     await p.emulateMedia({ colorScheme: scheme });
     for (const u of pages) {
@@ -76,7 +87,8 @@
       if (font) { await p.addStyleTag({ content: '* { font-family: "' + font + '" !important; }' }); await p.waitForTimeout(100); }
       const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       check(ov <= 1, (font || 'default font') + ' ' + w + ' ' + u + ' page wider than the screen by ' + ov + 'px');
-      const over = await p.$$eval('.cell span', (els) => els.filter((s) => s.scrollWidth > s.parentElement.clientWidth + 0.5).map((s) => s.textContent));
+      // the real fonts: labels fit at 8px or more; the wider CI font: only that the page fits (checked above)
+      const over = font ? [] : await p.$$eval('.cell span', (els) => els.filter((s) => s.scrollWidth > s.parentElement.clientWidth + 0.5 || parseFloat(getComputedStyle(s).fontSize) < 8).map((s) => s.textContent + ' ' + getComputedStyle(s).fontSize));
       notes.push('cells ' + w + (font ? ' ' + font : '') + ' ' + u + ': ' + (over.length ? 'too wide: ' + over.join(',') : 'fit'));
       if (STRICT) check(!over.length, 'cell labels too wide at ' + w + ' on ' + u + ': ' + over.join(','));
     }

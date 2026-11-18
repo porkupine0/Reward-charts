@@ -33,10 +33,12 @@ Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all
 
 ## Tier 4: upkeep and extras
 - [x] 17. Browser tests in CI (separate job; one fixed "now"; checked with the clock four months ahead).
-- [ ] 19 + 20. Readability, tap targets, game card wording, "Other…" minutes.
+- [x] 19 + 20. Readability (contrast measured on every page, light and dark), 44px tap areas, chart labels that fit, game card "not earned" with reasons, "Other…" minutes.
 - [ ] 18. Each chart row says where its data comes from.
 
 ## Open for the family
+- Leftover game time: should it expire at the end of the weekend or carry over? (It stays on that week's chart now.)
+- Chart boxes can't reach 44px at seven columns on a phone.
 - Eli's February weeks are a draft (existing sessions, volume kept flat): his coach should look them over.
 - His paces are still November's everywhere (trial start paces, the 14:08 split): update after the Jan 16 mile and Jan 23 5K.
 - Does swim stay Mon/Thu/Fri in February?
@@ -73,3 +75,4 @@ Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all
 - Nov 18: the missed-chore lock counts from Monday Nov 16 (decided); training text fixed: Plyometrics and Core A on Wednesday, Strength B lifts only on Thursday.
 - Nov 18: Eli's plan extended through Feb 28 (draft): recovery week, build week, then copies of the January weeks with a Feb 13 mile and Feb 27 final 5K.
 - Nov 18: item 17 done. GitHub runs the browser tests on every push as their own job (a deliberately broken check turned it red; reverted).
+- Nov 18: items 19 and 20 done. Every page passes contrast in light and dark; small links are 44px tall (Isaiah's checklist grew 90px); the game card says "not earned" with the reason.

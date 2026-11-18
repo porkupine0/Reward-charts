@@ -1,3 +1,5 @@
+/* Anything marked hidden stays hidden, whatever display a class gives it */
+[hidden] { display: none !important; }
 :root {
   --ink: #1B2A41;
   --muted: #4A5568;
@@ -663,8 +665,17 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .gt-msg { margin: 6px 0; font-size: 13.5px; font-weight: 700; color: var(--accent-ink); }
 /* Cells size from the grid, never from their text; labels scale to the cell (any font) */
 .grid > * { min-width: 0; }
-.cell { container-type: inline-size; overflow: hidden; }
-.cell span { font-size: clamp(6px, 28cqw, 9.5px); max-width: 100%; }
+.cell { overflow: hidden; }
 /* The top bar wraps on narrow phones instead of pushing the page wider */
 .top { flex-wrap: wrap; row-gap: 6px; }
 .navlinks { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; min-width: 0; }
+/* Contrast fixes found by the readability test */
+.ck.locked .cktext small { color: var(--ink); }
+.pacebox { background: color-mix(in srgb, var(--accent) 78%, #000); }
+.pacebox .flabel, .pacebox small { color: #fff; }
+.wk, .tt-now { color: color-mix(in srgb, var(--accent-ink) 85%, #000); }
+@media (prefers-color-scheme: dark) {
+  .wk, .tt-now { color: var(--accent-ink); }
+  .linkbtn.danger { color: #F4A67E; }
+  body.soccer .pillbtn, body.soccer .num, body.soccer .num.juggle { color: #0F1620; }
+}
