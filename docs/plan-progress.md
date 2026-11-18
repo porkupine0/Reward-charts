@@ -1,7 +1,7 @@
 # Reward Charts improvement plan: progress
 
 Work runs in scheduled sessions, one item at a time. Each item is tested, then reviewed and approved before the next one starts.
-Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the repo, then `node tests/browser/full.js`).
+Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all (GitHub runs them on every push too).
 
 ## Decisions
 - Late chores ("Finish first") can earn back that day's game time. No change.
@@ -31,6 +31,11 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 15. Offline saves: replay order and showing failed saves.
 - [x] 16. Settings changes don't rewrite past days.
 
+## Tier 4: upkeep and extras
+- [x] 17. Browser tests in CI (separate job; one fixed "now"; checked with the clock four months ahead).
+- [ ] 19 + 20. Readability, tap targets, game card wording, "Other…" minutes.
+- [ ] 18. Each chart row says where its data comes from.
+
 ## Open for the family
 - Eli's February weeks are a draft (existing sessions, volume kept flat): his coach should look them over.
 - His paces are still November's everywhere (trial start paces, the 14:08 split): update after the Jan 16 mile and Jan 23 5K.
@@ -38,7 +43,6 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - The "Eli's time trials" calendar file now includes Feb 13 and Feb 27: re-add it on any phone that added it before.
 - Apply the database rules (optional; steps in docs/database-safety.md).
 - Add the BACKUP_KEY secret to turn on the daily encrypted backup (optional; same guide).
-- Browser tests (tests/browser/) run by hand; they're not in CI yet. Tier 4 (code upkeep and extras) not started.
 - Eli's training plan now runs to Feb 28, 2027 (Feb weeks are a draft from reused sessions, for his coach to look over). After that his run/swim row turns off.
 
 
@@ -68,3 +72,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 13 built (not applied). Database rules allow only the app's own save paths (the browser tests enforce them), plus an encrypted daily backup that does nothing until a key is set.
 - Nov 18: the missed-chore lock counts from Monday Nov 16 (decided); training text fixed: Plyometrics and Core A on Wednesday, Strength B lifts only on Thursday.
 - Nov 18: Eli's plan extended through Feb 28 (draft): recovery week, build week, then copies of the January weeks with a Feb 13 mile and Feb 27 final 5K.
+- Nov 18: item 17 done. GitHub runs the browser tests on every push as their own job (a deliberately broken check turned it red; reverted).

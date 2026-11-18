@@ -1,7 +1,7 @@
 // Full browser test of the Reward Charts app against an in-memory stand-in for Firebase.
 const { chromium } = require('playwright');
 const OUT = (process.env.SHOTS || require('os').tmpdir()) + '/'; // screenshots go here
-// Run: python3 -m http.server 8765 (from the repo), then node tests/browser/full.js
+// Run every browser test (from the repo folder): node tests/browser/run.mjs
 const RULES_JSON = require('fs').readFileSync(process.cwd() + '/database.rules.json', 'utf8'); // run from the repo folder
 const MOCK_DB = `
 const store = JSON.parse(sessionStorage.getItem('mockdb') || '{}');

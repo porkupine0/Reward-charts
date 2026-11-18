@@ -1,5 +1,5 @@
 # Builds a browser test from full.js's setup (mock Firebase, page helpers) plus a body file.
-# Usage: python3 tests/browser/mkcase.py tests/browser/cases/eli-days.body.js > /tmp/x.js && node /tmp/x.js
+# Used by tests/browser/run.mjs (run that: node tests/browser/run.mjs [case-name ...]).
 import sys, os
 here = os.path.dirname(os.path.abspath(__file__))
 s = open(os.path.join(here, 'full.js')).read()
