@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795026189';
-import { applyConfig } from './routines.js?v=1795026189';
-import { askParent } from './parent.js?v=1795026189';
-import * as L from './lists.js?v=1795026189';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795026189';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795026189';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795028240';
+import { applyConfig } from './routines.js?v=1795028240';
+import { askParent } from './parent.js?v=1795028240';
+import * as L from './lists.js?v=1795028240';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795028240';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795028240';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -96,7 +96,8 @@ function renderTests() {
     }
     h += '<p class="dt-count">' + sc.answered + ' of ' + sc.total + ' answered</p><div class="dquiz">' + form.map((q, i) => {
       const a = answerOf(q.id, s.id), head = '<p class="dq-q">' + (i + 1) + '. ' + esc(q.q) + '</p>';
-      if (a) return '<div class="dq answered">' + head + '<p class="dq-result">Your answer: <b>' + esc(q.choices[a.pick] || '') + '</b></p></div>';
+      // answered: the choices stay where they were (so nothing slides under his finger), his pick marked
+      if (a) return '<div class="dq answered">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice' + (ci === a.pick ? ' picked' : '') + '" type="button" disabled aria-pressed="' + (ci === a.pick) + '">' + (ci === a.pick ? 'Your answer: ' : '') + esc(c) + '</button>').join('') + '</div></div>';
       return '<div class="dq">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice" type="button" data-tpick="' + esc(q.id) + '|' + esc(s.id) + '|' + ci + '">' + esc(c) + '</button>').join('') + '</div></div>';
     }).join('') + '</div>';
   });

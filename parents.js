@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795026189';
-import { CHARTS, weekProgress } from './charts.js?v=1795026189';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795026189';
-import * as L from './lists.js?v=1795026189';
-import { owed, score, planned, fmt } from './trials.js?v=1795026189';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795026189';
-import { askParent, setParent, changePin } from './parent.js?v=1795026189';
-import { dayFull } from './streaks.js?v=1795026189';
-import { owedItems } from './owed.js?v=1795026189';
-import { pruneList, pruneCutoff } from './prune.js?v=1795026189';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795026189';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795026189';
-import { nowHtml } from './nowview.js?v=1795026189';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795028240';
+import { CHARTS, weekProgress } from './charts.js?v=1795028240';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795028240';
+import * as L from './lists.js?v=1795028240';
+import { owed, score, planned, fmt } from './trials.js?v=1795028240';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795028240';
+import { askParent, setParent, changePin } from './parent.js?v=1795028240';
+import { dayFull } from './streaks.js?v=1795028240';
+import { owedItems } from './owed.js?v=1795028240';
+import { pruneList, pruneCutoff } from './prune.js?v=1795028240';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795028240';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795028240';
+import { nowHtml } from './nowview.js?v=1795028240';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -102,7 +102,7 @@ function render() {
   const sat = openSittings(SITTINGS, dv, ymd(today)).map((st) => ({ st, sc: testScore(FORMS[st.form] || [], dv, st.id, PASS), on: testDoneOn(FORMS[st.form] || [], dv, st.id) }));
   $('testcard').hidden = !sat.length;
   $('testscores').innerHTML = sat.map(({ st, sc, on }) => row('Eli', KIDS.eli.accent, '<b>' + esc(st.title) + '</b>: ' + (sc.done ? sc.right + ' of ' + sc.total + ' (' + sc.pct + '%), ' + (sc.passed ? 'passing' : 'below the ' + Math.round(PASS * 100) + '% pass mark') +
-    '<br>Weakest: ' + esc(sc.byTopic.filter((t) => t.right < t.total).sort((a, b) => a.right / a.total - b.right / b.total).slice(0, 3).map((t) => t.topic + ' ' + t.right + '/' + t.total).join(', ') || 'none') : sc.answered ? 'in progress, ' + sc.answered + ' of ' + sc.total + ' answered' : 'not started' + (st.id === 'base' ? ' (best taken before his first lesson)' : '')),
+    '<br>Weakest: ' + esc(sc.byTopic.filter((t) => t.total > 1 && t.right < t.total).sort((a, b) => (b.total - b.right) - (a.total - a.right)).slice(0, 3).map((t) => t.topic + ' ' + t.right + '/' + t.total).join(', ') || 'none') : sc.answered ? 'in progress, ' + sc.answered + ' of ' + sc.total + ' answered' : 'not started' + (st.id === 'base' ? ' (best taken before his first lesson)' : '')),
     on ? shortDate(parseYmd(on)) : '')).join('');
 
   // Reading: this week and the 3 before, per kid

@@ -1,0 +1,1102 @@
+{
+ "units": [
+  {
+   "unit": 1,
+   "title": "Seeing the road",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Scanning the road",
+     "sections": [
+      "4.11"
+     ],
+     "videos": [
+      {
+       "yt": "nVWq4P1WMZQ",
+       "title": "Vision in Driving - How to Scan Your Surroundings Correctly",
+       "channel": "Zutobi Drivers Ed",
+       "len": "10:18",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Following distance",
+     "sections": [
+      "4.12"
+     ],
+     "videos": [
+      {
+       "yt": "ksxfBi7Z-Vk",
+       "title": "How To Set & Maintain A Safe Following Distance When Driving - The 3 Second Rule Saves Lives",
+       "channel": "Stan Cravens",
+       "len": "3:32",
+       "notes": ""
+      },
+      {
+       "yt": "ye-zGn9agys",
+       "title": "Intermediate Roads: Space Cushion",
+       "channel": "TeenDrivingPlan",
+       "len": "2:45",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Blind spots, mirrors, head checks",
+     "sections": [
+      "3.2",
+      "3.4"
+     ],
+     "videos": [
+      {
+       "yt": "uJ4w63wZyFQ",
+       "title": "How to Shoulder (Head) Check When Turning & Changing Lanes",
+       "channel": "Smart Drive Test",
+       "len": "5:45",
+       "notes": "CA"
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Intersections",
+     "sections": [
+      "5.1",
+      "2.22"
+     ],
+     "videos": [
+      {
+       "yt": "v0Soc-kicOQ",
+       "title": "Scanning And Moving Through Intersections Safely",
+       "channel": "Smart Drive Test",
+       "len": "7:27",
+       "notes": "CA"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 2,
+   "title": "Signs and signals",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Sign colors and shapes",
+     "sections": [
+      "2.1"
+     ],
+     "videos": [
+      {
+       "yt": "oEXDKnD756k",
+       "title": "Beginner Driving Lesson: Common Road Signs & Meanings Explained!",
+       "channel": "Zutobi Drivers Ed",
+       "len": "7:52",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Regulatory signs: stop vs yield",
+     "sections": [
+      "2.2"
+     ],
+     "videos": [
+      {
+       "yt": "oAEXSBJJqc4",
+       "title": "Stop vs Yield: The Mistake That Fails Your Driving Test",
+       "channel": "Zutobi Drivers Ed",
+       "len": "7:26",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Warning, guide, service and route signs; slow-moving vehicles",
+     "sections": [
+      "2.3",
+      "2.5",
+      "2.6",
+      "2.7",
+      "2.8"
+     ],
+     "videos": [
+      {
+       "yt": "jBZH_XA4FUE",
+       "title": "TRAFFIC SIGNS! What Do They Mean?",
+       "channel": "Zutobi Drivers Ed",
+       "len": "8:32",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Signals, flashing arrows, pedestrian beacons",
+     "sections": [
+      "2.9",
+      "2.20"
+     ],
+     "videos": [
+      {
+       "yt": "fBncqaoT3_4",
+       "title": "What Do Those Flashing Arrow Traffic Signals Mean?",
+       "channel": "Stan Cravens",
+       "len": "4:41",
+       "notes": ""
+      },
+      {
+       "yt": "5nlBLyUBjVM",
+       "title": "Rectangular Rapid Flashing Beacons",
+       "channel": "Iowa DOT Answers",
+       "len": "1:17",
+       "notes": "IA"
+      },
+      {
+       "yt": "kum6w2BH1zc",
+       "title": "Pedestrian Hybrid Beacons",
+       "channel": "Iowa DOT Answers",
+       "len": "1:15",
+       "notes": "IA"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 3,
+   "title": "Markings and lanes",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Pavement markings, yield lines, crosswalks",
+     "sections": [
+      "2.12",
+      "2.13",
+      "2.14"
+     ],
+     "videos": [
+      {
+       "yt": "JNK2037-WCk",
+       "title": "Every Road Line Explained (Solid, Broken, Yellow, White) | Driving Rules You Must Know",
+       "channel": "Street Explainer",
+       "len": "5:49",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Reversible, shared left-turn and reserved lanes",
+     "sections": [
+      "2.15",
+      "2.16",
+      "2.17",
+      "2.18"
+     ],
+     "videos": [
+      {
+       "yt": "l-GeRRVvT14",
+       "title": "4 to 3 Lane Conversion   Roadway Safety in Iowa",
+       "channel": "Iowa DOT Answers",
+       "len": "6:33",
+       "notes": "IA, check: may be about road design; spare ZRDw6RmQ-y4"
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Pedestrians, bicycles, sight-impaired walkers",
+     "sections": [
+      "2.4",
+      "2.19",
+      "2.21",
+      "5.11"
+     ],
+     "videos": [
+      {
+       "yt": "9KHhHqb9_E0",
+       "title": "TDS Talks, Pedestrian and Bicycle Safety",
+       "channel": "teensinthedriverseat",
+       "len": "9:40",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Changing lanes",
+     "sections": [
+      "4.9"
+     ],
+     "videos": [
+      {
+       "yt": "JaUZJsEyRV4",
+       "title": "How to Know When It’s Safe to Change Lanes (Basic Road Test Skill)",
+       "channel": "Zutobi Drivers Ed",
+       "len": "7:57",
+       "notes": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 4,
+   "title": "Right of way and Iowa intersections",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Two-way and all-way stops",
+     "sections": [
+      "2.22"
+     ],
+     "videos": [
+      {
+       "yt": "7MODqVaQVuY",
+       "title": "Who Goes First? 2-Way Stop Right of Way Rules Explained!",
+       "channel": "Stan Cravens",
+       "len": "4:48",
+       "notes": ""
+      },
+      {
+       "yt": "3bYMB7q6khs",
+       "title": "Right of Way Rules: Who Goes First at a 4-Way Stop? (2026)",
+       "channel": "Master Road Signs",
+       "len": "4:05",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Left turns",
+     "sections": [
+      "2.22",
+      "5.1"
+     ],
+     "videos": [
+      {
+       "yt": "ZdSCgNm4atQ",
+       "title": "How to Turn Left at Intersections - Unprotected Left Turns",
+       "channel": "Zutobi Drivers Ed",
+       "len": "12:05",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Roundabouts",
+     "sections": [
+      "5.5"
+     ],
+     "videos": [
+      {
+       "yt": "cvdkJnA3QgY",
+       "title": "Roundabouts in Iowa",
+       "channel": "Iowa DOT Answers",
+       "len": "3:08",
+       "notes": "IA"
+      },
+      {
+       "yt": "peUf2NRdWxs",
+       "title": "Rules of the Roundabout",
+       "channel": "Federal Highway Administration USDOTFHWA",
+       "len": "2:16",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Reduced-conflict intersections and the diverging diamond",
+     "sections": [
+      "5.3",
+      "5.4"
+     ],
+     "videos": [
+      {
+       "yt": "xOqMwNLKKto",
+       "title": "Reduced Conflict Intersections",
+       "channel": "Iowa DOT Answers",
+       "len": "3:44",
+       "notes": "IA"
+      },
+      {
+       "yt": "bxkur5Wl4Ok",
+       "title": "Navigating the Diverging Diamond Interchange",
+       "channel": "Iowa DOT Answers",
+       "len": "4:30",
+       "notes": "IA"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 5,
+   "title": "Speed, stopping and turning",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Speed",
+     "sections": [
+      "4.5"
+     ],
+     "videos": [
+      {
+       "yt": "SP29Xuu-GL4",
+       "title": "TDS Talks, Speeding",
+       "channel": "teensinthedriverseat",
+       "len": "12:18",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Accelerating, steering, curves",
+     "sections": [
+      "4.3",
+      "4.6"
+     ],
+     "videos": [
+      {
+       "yt": "QasVsrpssn0",
+       "title": "How to Drive on Curvy Roads (Driving Instructor Explains)",
+       "channel": "Zutobi Drivers Ed",
+       "len": "8:52",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Turning and signaling",
+     "sections": [
+      "4.8",
+      "4.13"
+     ],
+     "videos": [
+      {
+       "yt": "mIrcBU-OXIk",
+       "title": "How To Turn Left & Right Correctly (Avoid These Mistakes!)",
+       "channel": "Zutobi Drivers Ed",
+       "len": "11:28",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Braking, stopping distance, tailgating",
+     "sections": [
+      "4.4",
+      "4.12"
+     ],
+     "videos": [
+      {
+       "yt": "QhGMm4aKWxc",
+       "title": "NRSF Tailgating and The 3-Second Rule",
+       "channel": "nationalroadsafety",
+       "len": "3:25",
+       "notes": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 6,
+   "title": "Highways and passing",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Merging onto a freeway",
+     "sections": [
+      "5.2"
+     ],
+     "videos": [
+      {
+       "yt": "dYUxQPrpCsY",
+       "title": "How to Merge onto a Freeway, Motorway, or Interstate",
+       "channel": "Smart Drive Test",
+       "len": "9:07",
+       "notes": "CA"
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Interstate driving, zipper merge",
+     "sections": [
+      "5.2"
+     ],
+     "videos": [
+      {
+       "yt": "vLVMW8KnfBE",
+       "title": "MnDOT | Zipper Merge Instructional PSA",
+       "channel": "Minnesota Department of Transportation (MnDOT)",
+       "len": "3:01",
+       "notes": "Minnesota"
+      },
+      {
+       "yt": "enBI_nJ8xqE",
+       "title": "How To Merge Onto A Freeway Without Fear",
+       "channel": "Smart Drive Test",
+       "len": "4:49",
+       "notes": "CA"
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Two-lane highways",
+     "sections": [
+      "4.11"
+     ],
+     "videos": [
+      {
+       "yt": "jUmB7aQ3S10",
+       "title": "5 Tips for Safer Driving on 2-Lane Highways",
+       "channel": "Smart Drive Test",
+       "len": "9:32",
+       "notes": "CA"
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Passing",
+     "sections": [
+      "4.10"
+     ],
+     "videos": [
+      {
+       "yt": "QRQhb6Nlqnw",
+       "title": "How to Pass Another Vehicle and Overtake Safely",
+       "channel": "Smart Drive Test",
+       "len": "13:32",
+       "notes": "CA"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 7,
+   "title": "Sharing the road",
+   "days": [
+    {
+     "day": 1,
+     "topic": "School buses",
+     "sections": [
+      "2.24"
+     ],
+     "videos": [
+      {
+       "yt": "06ertMlQ8Ig",
+       "title": "When to stop for school buses in Iowa",
+       "channel": "KWQC News",
+       "len": "1:53",
+       "notes": "IA (Quad Cities news)"
+      },
+      {
+       "yt": "dOjXX0dZx3s",
+       "title": "School Bus Stop Laws Explained: When Do You Have to Stop?",
+       "channel": "Driving Explained",
+       "len": "4:48",
+       "notes": "check: general US, Iowa rules may differ"
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Emergency vehicles and Move Over",
+     "sections": [
+      "2.23",
+      "2.27"
+     ],
+     "videos": [
+      {
+       "yt": "r2MYCsumOnI",
+       "title": "Move Over or Slow Down",
+       "channel": "Iowa DOT Answers",
+       "len": "2:51",
+       "notes": "IA"
+      },
+      {
+       "yt": "CdDBJoxHLGE",
+       "title": "What To Do When An Emergency Vehicle Approaches",
+       "channel": "Smart Drive Test",
+       "len": "4:38",
+       "notes": "CA"
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Large trucks and farm equipment",
+     "sections": [
+      "5.9"
+     ],
+     "videos": [
+      {
+       "yt": "rHNUZn4e1ps",
+       "title": "Sharing the Road with Trucks: Episode 2",
+       "channel": "VTTI's Sharing the Road Video Series",
+       "len": "4:19",
+       "notes": ""
+      },
+      {
+       "yt": "j_FfI8TDOD0",
+       "title": "Our Roads, Our Safety Overview Video",
+       "channel": "FMCSA",
+       "len": "1:54",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Motorcycles, bicycles, hot cars",
+     "sections": [
+      "5.10",
+      "5.12"
+     ],
+     "videos": [
+      {
+       "yt": "2gDCHSsOxmM",
+       "title": "A Second Look: Sharing the Road with Motorcycles",
+       "channel": "Notion Pictures",
+       "len": "8:14",
+       "notes": "check"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 8,
+   "title": "Railroad, work zones, parking",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Railroad crossings",
+     "sections": [
+      "2.10"
+     ],
+     "videos": [
+      {
+       "yt": "Q33u7SSAPbk",
+       "title": "Ryan's Brain - How to Drive Near Trains",
+       "channel": "Operation Lifesaver",
+       "len": "10:53",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Work zones",
+     "sections": [
+      "2.11"
+     ],
+     "videos": [
+      {
+       "yt": "6aOHMHipXXk",
+       "title": "Just Drive - Work Zone Smart",
+       "channel": "Pennsylvania Department of Transportation",
+       "len": "7:32",
+       "notes": "Pennsylvania"
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Parking, no-parking distances, backing",
+     "sections": [
+      "2.25",
+      "2.26",
+      "4.7"
+     ],
+     "videos": [
+      {
+       "yt": "wBibYMNMatI",
+       "title": "HOW TO REVERSE PARK - Easy Basic Steps For How To Back Safely Into A Stall Or Bay Parking Spot",
+       "channel": "Stan Cravens",
+       "len": "5:49",
+       "notes": ""
+      },
+      {
+       "yt": "2W-5VvXcwT0",
+       "title": "How to Parallel Park (Perfect Parallel Parking in 3 Easy Steps)",
+       "channel": "Zutobi Drivers Ed",
+       "len": "4:32",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "After a crash; Steer It-Clear It",
+     "sections": [
+      "2.28",
+      "5.15"
+     ],
+     "videos": [
+      {
+       "yt": "_4DApIKjEI0",
+       "title": "What to Do After a Collision Video",
+       "channel": "AAA",
+       "len": "1:38",
+       "notes": ""
+      },
+      {
+       "yt": "ljjGN6xST_A",
+       "title": "What to do after a car accident - GEICO",
+       "channel": "GEICO Insurance",
+       "len": "1:14",
+       "notes": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 9,
+   "title": "Night, weather, rural Iowa",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Headlights and night driving",
+     "sections": [
+      "5.7"
+     ],
+     "videos": [
+      {
+       "yt": "_SSInig5Fxc",
+       "title": "How to Use High Beams - Car Lights Explained",
+       "channel": "Zutobi Drivers Ed",
+       "len": "3:21",
+       "notes": ""
+      },
+      {
+       "yt": "VkHxit723uM",
+       "title": "How to Use Low Beam Headlights - Car Lights Explained",
+       "channel": "Zutobi Drivers Ed",
+       "len": "3:06",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Rain and hydroplaning",
+     "sections": [
+      "5.13"
+     ],
+     "videos": [
+      {
+       "yt": "k6kxcZkE7DY",
+       "title": "Driving in Severe Weather",
+       "channel": "Iowa DOT Answers",
+       "len": "4:32",
+       "notes": "IA"
+      },
+      {
+       "yt": "TdwuftIUwYY",
+       "title": "What to do If you hydroplane",
+       "channel": "Defensive Driving",
+       "len": "4:39",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Snow, ice, skids, snowplows",
+     "sections": [
+      "5.13"
+     ],
+     "videos": [
+      {
+       "yt": "7t_sYFBYCKs",
+       "title": "Everything You Need To Know About Driving In The Snow",
+       "channel": "Engineering Explained",
+       "len": "5:14",
+       "notes": ""
+      },
+      {
+       "yt": "a3PQD_tv-bk",
+       "title": "How To Correct A Skid - GEICO",
+       "channel": "GEICO Insurance",
+       "len": "1:12",
+       "notes": ""
+      },
+      {
+       "yt": "6RTam4qXIus",
+       "title": "Iowa DOT - Tandem Plowing What Is It?",
+       "channel": "IowaDOT",
+       "len": "1:12",
+       "notes": "IA"
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Gravel roads, deer, leaving the road",
+     "sections": [
+      "5.6",
+      "5.8"
+     ],
+     "videos": [
+      {
+       "yt": "Ty9pHFD8TWU",
+       "title": "Roadway Departures",
+       "channel": "Iowa DOT Answers",
+       "len": "3:57",
+       "notes": "IA, check: may be about road design; spare bBoOslis3lk"
+      },
+      {
+       "yt": "xJBfYBtqkZE",
+       "title": "How to avoid hitting a deer",
+       "channel": "IIHS",
+       "len": "1:01",
+       "notes": ""
+      },
+      {
+       "yt": "uMS1PClnAJQ",
+       "title": "8 Tips For Avoiding a Deer-Vehicle Collision",
+       "channel": "National Deer Association",
+       "len": "3:09",
+       "notes": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 10,
+   "title": "The driver",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Phones and distractions",
+     "sections": [
+      "3.7"
+     ],
+     "videos": [
+      {
+       "yt": "-gB4m2LN9TU",
+       "title": "Brain on Distractions | Classroom Video",
+       "channel": "ImpactTeenDrivers",
+       "len": "6:25",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Alcohol and drugs",
+     "sections": [
+      "3.8"
+     ],
+     "videos": [
+      {
+       "yt": "UgaT6n1N9mA",
+       "title": "TDS Talks, Impaired Driving",
+       "channel": "teensinthedriverseat",
+       "len": "10:13",
+       "notes": ""
+      },
+      {
+       "yt": "6zl4dmpy0WQ",
+       "title": "NDDOT - Teen Educational Video on how Alcohol and Drugs Impair Driving",
+       "channel": "North Dakota Department of Transportation",
+       "len": "3:09",
+       "notes": "North Dakota"
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Drowsy driving, seat belts, loose objects",
+     "sections": [
+      "3.5",
+      "3.6",
+      "3.9"
+     ],
+     "videos": [
+      {
+       "yt": "KdN-gySbNlw",
+       "title": "TDS Talks, Drowsy & Nighttime Driving",
+       "channel": "teensinthedriverseat",
+       "len": "9:47",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Iowa licensing rules, passengers, Iowa 511",
+     "sections": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "3.10"
+     ],
+     "videos": [
+      {
+       "yt": "tbRC0BXi108",
+       "title": "Teen Driving Restrictions: Passengers",
+       "channel": "Partners for Safe Teen Driving (PFSTD)",
+       "len": "1:26",
+       "notes": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 11,
+   "title": "The car and emergencies",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Car checks and tires",
+     "sections": [
+      "3.1"
+     ],
+     "videos": [
+      {
+       "yt": "Y3jcQCdeJAs",
+       "title": "How To Make Your Car Last A Long Time - Simple Checks",
+       "channel": "Engineering Explained",
+       "len": "6:28",
+       "notes": ""
+      },
+      {
+       "yt": "SzBO1CkIP8M",
+       "title": "TireWise: Life of a Tire",
+       "channel": "SaferCarTV",
+       "len": "1:40",
+       "notes": ""
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Starting, shifting, dashboard lights, driver-assist",
+     "sections": [
+      "4.1",
+      "4.2",
+      "3.3"
+     ],
+     "videos": [
+      {
+       "yt": "DswOF-reMRo",
+       "title": "Dashboard Warning Lights Explained | Quick Tip",
+       "channel": "Don Wheaton Chevrolet Buick GMC Cadillac Ltd",
+       "len": "2:08",
+       "notes": "CA"
+      }
+     ]
+    },
+    {
+     "day": 3,
+     "topic": "Brake failure and blowouts",
+     "sections": [
+      "5.14"
+     ],
+     "videos": [
+      {
+       "yt": "6LrbFAvX4cA",
+       "title": "What To Do If Your Car Brakes Fail",
+       "channel": "Young Drivers",
+       "len": "1:55",
+       "notes": "CA"
+      },
+      {
+       "yt": "LOPkiGCFo_Y",
+       "title": "How to Survive a Tire Blowout",
+       "channel": "How to Survive Show",
+       "len": "4:34",
+       "notes": "check: survival-show style; spare Cz08eArGuvc"
+      }
+     ]
+    },
+    {
+     "day": 4,
+     "topic": "Pulled over by police",
+     "sections": [
+      "5.16"
+     ],
+     "videos": [
+      {
+       "yt": "C_t-AOUrm0w",
+       "title": "Here's what to do when you get pulled over",
+       "channel": "KCCI",
+       "len": "1:55",
+       "notes": "IA (Des Moines news)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "unit": 12,
+   "title": "Practice",
+   "days": [
+    {
+     "day": 1,
+     "topic": "Iowa practice questions",
+     "sections": [],
+     "videos": [
+      {
+       "yt": "yrIxUbBuB7Q",
+       "title": "Iowa DOT Learner Permit Test Questions 2026 – Complete Written Test",
+       "channel": "MyTestMyPrep",
+       "len": "13:50",
+       "notes": "check: third-party quiz, answers may be wrong or not Iowa"
+      }
+     ]
+    },
+    {
+     "day": 2,
+     "topic": "Iowa road signs",
+     "sections": [],
+     "videos": [
+      {
+       "yt": "owwsk636beU",
+       "title": "22 Iowa Road Signs You Need To Pass Your 2025 DOT Learner's Permit Test",
+       "channel": "Pass My DMV Test",
+       "len": "11:48",
+       "notes": "check: third-party quiz, answers may be wrong or not Iowa"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "spares": [
+  {
+   "yt": "ZRDw6RmQ-y4",
+   "title": "How To Use The Center Left Turn Lane Correctly - Do's & Don'ts That Can Make You A Safer Driver!",
+   "channel": "Stan Cravens",
+   "len": "6:05",
+   "notes": ""
+  },
+  {
+   "yt": "bBoOslis3lk",
+   "title": "How to Drive Safer on Rough Gravel Roads",
+   "channel": "Smart Drive Test",
+   "len": "8:06",
+   "notes": "CA"
+  },
+  {
+   "yt": "Cz08eArGuvc",
+   "title": "How to Handle Tire Blowouts | Defensive Driving Tips",
+   "channel": "Trubicars",
+   "len": "0:51",
+   "notes": ""
+  },
+  {
+   "yt": "Q0-7rwnnJQs",
+   "title": "Sharing the Road Around Trucks - For Teens",
+   "channel": "Michigan Center for Truck Safety",
+   "len": "14:06",
+   "notes": "Michigan"
+  },
+  {
+   "yt": "fba8OgJpWGI",
+   "title": "Ryan's Brain - Drive Safe Near Trains: What to do at a Crossing",
+   "channel": "Operation Lifesaver",
+   "len": "3:55",
+   "notes": ""
+  },
+  {
+   "yt": "ym4VOPoda4w",
+   "title": "In the Zone - Driving Safely in Work Zones",
+   "channel": "NCDOTcommunications",
+   "len": "6:20",
+   "notes": "North Carolina"
+  },
+  {
+   "yt": "lWMg2IEtQT8",
+   "title": "Every Traffic Signal Explained (Flashing Yellow Arrow, Doghouse, HAWK & More)",
+   "channel": "Street Explainer",
+   "len": "8:01",
+   "notes": ""
+  },
+  {
+   "yt": "uIkanxT72KI",
+   "title": "MDOT explains flashing yellow left-turn signal",
+   "channel": "MichiganDOT",
+   "len": "1:43",
+   "notes": "Michigan"
+  },
+  {
+   "yt": "lPPJ7S-ZLQE",
+   "title": "The Diverging Diamond - Iowa DOT",
+   "channel": "IowaDOT",
+   "len": "1:49",
+   "notes": "IA"
+  },
+  {
+   "yt": "cTtEbLoJHyY",
+   "title": "Understanding Road Markings - Driving Tips",
+   "channel": "Zutobi Drivers Ed",
+   "len": "11:58",
+   "notes": ""
+  },
+  {
+   "yt": "kxQHoBmjp4U",
+   "title": "TDS Talks, Distracted Driving",
+   "channel": "teensinthedriverseat",
+   "len": "13:01",
+   "notes": ""
+  },
+  {
+   "yt": "dWKsDvFBo6M",
+   "title": "Driving at Night - Rules & Tips for Beginners",
+   "channel": "Zutobi Drivers Ed",
+   "len": "12:34",
+   "notes": ""
+  },
+  {
+   "yt": "EJQQxcpQWE0",
+   "title": "Move Over Slow Down near misses",
+   "channel": "IowaDOT",
+   "len": "0:31",
+   "notes": "IA"
+  },
+  {
+   "yt": "xMutekpY0cs",
+   "title": "Residential: Scanning and Hazard Detection",
+   "channel": "TeenDrivingPlan",
+   "len": "2:43",
+   "notes": "hazard-spotting"
+  },
+  {
+   "yt": "oXh0uS9BHUo",
+   "title": "Residential: Hazard Detection",
+   "channel": "TeenDrivingPlan",
+   "len": "2:43",
+   "notes": "hazard-spotting"
+  },
+  {
+   "yt": "-dQoLfMd-SI",
+   "title": "Additional Challenges: Potential Hazards in Each Environment",
+   "channel": "TeenDrivingPlan",
+   "len": "2:16",
+   "notes": "hazard-spotting"
+  }
+ ]
+}

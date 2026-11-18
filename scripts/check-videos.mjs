@@ -1,5 +1,5 @@
 // Confirms every video in the driving course with YouTube (oEmbed): it exists, and its title and channel
-// match what the course says. Run before each new unit:  node scripts/check-videos.mjs
+// match what the course (and the plan, docs/driving-videos.json) says. Run before each new unit:  node scripts/check-videos.mjs
 // oEmbed answers 401 when a video's owner turned off embedding (the page then shows the link only) and
 // 404 (or 400) when the video is gone. Lengths aren't available from oEmbed; the course shows them as approximate.
 import { readFileSync } from 'node:fs';
@@ -9,8 +9,14 @@ const get = (url) => { const out = execFileSync('curl', ['-s', '--max-time', '20
 const V = JSON.parse(readFileSync(new URL('../version.json', import.meta.url))).v;
 const { LESSONS } = await import('../driving-course.js?v=' + V);
 const norm = (s) => String(s || '').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+// the course's videos, then the planned ones and spares (docs/driving-videos.json) not in the course yet
+const plan = JSON.parse(readFileSync(new URL('../docs/driving-videos.json', import.meta.url), 'utf8'));
+const inCourse = new Set(LESSONS.flatMap((l) => (l.videos || []).map((v) => v.yt)));
+const rows = [...LESSONS.map((l) => ({ id: l.id, videos: l.videos || [] })),
+  ...plan.units.flatMap((u) => u.days.map((d) => ({ id: 'plan u' + u.unit + 'd' + d.day, videos: d.videos.filter((v) => !inCourse.has(v.yt)) }))),
+  { id: 'spare', videos: plan.spares }];
 let bad = 0;
-for (const l of LESSONS) for (const v of l.videos || []) {
+for (const l of rows) for (const v of l.videos) {
   const url = 'https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + v.yt);
   let line;
   try {
