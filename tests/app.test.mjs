@@ -613,3 +613,32 @@ test("'Other…' game minutes: what a parent or kid might type", () => {
   assert.equal(L.leftSummary(['a', 'b', 'c', 'd', 'e']), '5 still to do: a · b · c · +2 more');
   assert.equal(L.leftSummary(['a']), '1 still to do: a');
 });
+
+test("leftover game time: a parent moves it to the next week, once, with the amount fixed", () => {
+  // Rhett earned Monday Nov 16 (30 min) and used 10; on Mon Nov 23 a parent is asked about the 20 left
+  const fullOn = (k) => { const f = {}, ls = L.lists({ routines: {}, run: {}, isaiah: {} }, 'rhett', d(k));
+    [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => { if (it.parts) it.parts.forEach((p) => { f[L.partKey(it.key, p)] = true; }); else f[it.key] = it.choices ? it.choices[0] : true; });
+    L.CHECKS.rhett.forEach((x) => { f[x.key] = true; }); return f; };
+  const full = fullOn('2026-11-16');
+  const ctx = { routines: { days: { '2026-11-16': { rhett: full } }, game: { rhett: { '2026-11-16': { 1: 10 } } } }, run: {}, isaiah: {} };
+  const last = d('2026-11-16'), thisW = d('2026-11-23'), mon = new Date(2026, 10, 23, 18);
+  assert.equal(L.gameWeek(ctx, 'rhett', last).left, 20);
+  assert.deepEqual(L.carryPrompts(ctx, mon, ['eli', 'rhett', 'isaiah']).map((x) => [x.kid, x.minutes]), [['rhett', 20]]);
+  // the parent says yes: 20 moves
+  ctx.routines.carry = { rhett: { '2026-11-16': 20 } };
+  assert.equal(L.gameWeek(ctx, 'rhett', last).left, 0, 'last week: nothing left to spend');
+  assert.equal(L.gameWeek(ctx, 'rhett', last).minutes, 30, 'earned unchanged');
+  assert.equal(L.gameWeek(ctx, 'rhett', thisW).left, 20, 'this week: 20 to use');
+  assert.equal(L.gameWeek(ctx, 'rhett', thisW).max, 150, 'the week\'s "of 150" unchanged');
+  assert.deepEqual(L.carryPrompts(ctx, mon, ['rhett']), [], 'not asked again');
+  // a later backfill of last week stays on last week; the carried amount doesn't change
+  ctx.routines.days['2026-11-17'] = { rhett: fullOn('2026-11-17') };
+  assert.equal(L.gameWeek(ctx, 'rhett', thisW).carriedIn, 20);
+  assert.equal(L.gameWeek(ctx, 'rhett', last).left, 30);
+  assert.deepEqual(L.carryPrompts(ctx, mon, ['rhett']), [], 'still not asked again');
+  // "No" is remembered too
+  const ctx2 = { routines: { days: { '2026-11-16': { rhett: full } }, carry: { rhett: { '2026-11-16': 'no' } } }, run: {}, isaiah: {} };
+  assert.deepEqual(L.carryPrompts(ctx2, mon, ['rhett']), []);
+  assert.equal(L.gameWeek(ctx2, 'rhett', thisW).left, 0);
+  assert.equal(L.gameWeek(ctx2, 'rhett', last).left, 30, '"no" leaves it on last week');
+});

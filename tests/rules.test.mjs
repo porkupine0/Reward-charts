@@ -26,7 +26,7 @@ const WRITES = [
   'charts/routines/days/2026-11-18/eli/teeth', 'charts/routines/days/2026-11-18/eli/bedTimer', 'charts/routines/days/2026-11-18/eli/bedTimer/end',
   'charts/routines/days/2026-11-18/isaiah/clothes_shirt', 'charts/routines/days/2026-11-18/rhett/noLies', 'charts/routines/days/2026-11-18/rhett/bedOk',
   'charts/routines/days/2026-11-18/eli/mCandyGiven', 'charts/routines/days/2026-11-18/eli/wokeAt', 'charts/routines/days/2024-01-01',
-  'charts/routines/weekly/eli/aelp/2026-11-12', 'charts/routines/game/rhett/2026-11-16/1795000000000',
+  'charts/routines/weekly/eli/aelp/2026-11-12', 'charts/routines/game/rhett/2026-11-16/1795000000000', 'charts/routines/carry/rhett/2026-11-16',
   // Eli's Training
   'charts/eli-run/days/2026-11-18/items/swim', 'charts/eli-run/days/2026-11-18/effort', 'charts/eli-run/days/2026-11-18/time',
   'charts/eli-run/days/2026-11-18/miles', 'charts/eli-run/days/2026-11-18/note',
@@ -44,7 +44,7 @@ const WRITES = [
 ];
 
 const PROTECTED = [
-  '', 'charts', 'charts/routines', 'charts/routines/days', 'charts/routines/weekly', 'charts/routines/game', 'charts/routines/game/eli',
+  '', 'charts', 'charts/routines', 'charts/routines/days', 'charts/routines/weekly', 'charts/routines/game', 'charts/routines/game/eli', 'charts/routines/carry', 'charts/routines/carry/eli',
   'charts/eli-run', 'charts/eli-run/days', 'charts/eli-run/days/2026-11-18',
   'charts/isaiah', 'charts/isaiah/touchDays', 'charts/isaiah/juggle',
   'charts/eli', 'charts/trombone', 'charts/zay', 'charts/eli/weeks', 'charts/trombone/months', 'charts/zay/weeks/2026-11-16',

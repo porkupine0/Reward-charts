@@ -21,6 +21,11 @@
               "$at": { ".write": true }
             }
           }
+        },
+        "carry": {
+          "$kid": {
+            "$week": { ".write": true }
+          }
         }
       },
       "eli-run": {

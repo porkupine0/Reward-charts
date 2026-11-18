@@ -1,10 +1,10 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795007223';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795007223';
-import { SETTINGS, onSettings } from './settings.js?v=1795007223';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795007223';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795007223';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795007589';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795007589';
+import { SETTINGS, onSettings } from './settings.js?v=1795007589';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795007589';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795007589';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -282,11 +282,21 @@ export function leftSummary(left, n = 3) {
   if (!left.length) return '';
   return left.length + ' still to do: ' + left.slice(0, n).join(' · ') + (left.length > n ? ' · +' + (left.length - n) + ' more' : '');
 }
+// Leftover game time a parent moved to the next week: routines carry/<kid>/<from monday> = minutes, or 'no'.
+// The amount is fixed when a parent answers; later changes to that week stay on that week.
+export function carryFrom(ctx, kid, monday) { return ((((ctx.routines || {}).carry || {})[kid] || {})[ymd(monday)]); }
+const carried = (v) => (typeof v === 'number' && v > 0 ? v : 0);
 export function gameWeek(ctx, kid, monday) {
   const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });
   const minutes = days.reduce((a, d) => a + d.minutes, 0);
   const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
-  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, left: Math.max(0, minutes - used) };
+  const carriedIn = carried(carryFrom(ctx, kid, addDays(monday, -7))), carriedOut = carried(carryFrom(ctx, kid, monday));
+  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, left: Math.max(0, minutes + carriedIn - used - carriedOut) };
+}
+// Parents page: boys with game time left from last week and no answer yet. [{ kid, from, minutes }]
+export function carryPrompts(ctx, today, kids) {
+  const from = addDays(mondayOf(today), -7);
+  return kids.filter((kid) => carryFrom(ctx, kid, from) === undefined).map((kid) => ({ kid, from, minutes: gameWeek(ctx, kid, from).left })).filter((x) => x.minutes > 0);
 }
 
 // ---- Parents' "Tonight" card: everything a parent signs off on for one evening ----

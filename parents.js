@@ -1,15 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795007223';
-import { CHARTS, weekProgress } from './charts.js?v=1795007223';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795007223';
-import * as L from './lists.js?v=1795007223';
-import { owed, score, planned, fmt } from './trials.js?v=1795007223';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007223';
-import { askParent, setParent, changePin } from './parent.js?v=1795007223';
-import { dayFull } from './streaks.js?v=1795007223';
-import { owedItems } from './owed.js?v=1795007223';
-import { pruneList, pruneCutoff } from './prune.js?v=1795007223';
-import { nowHtml } from './nowview.js?v=1795007223';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795007589';
+import { CHARTS, weekProgress } from './charts.js?v=1795007589';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795007589';
+import * as L from './lists.js?v=1795007589';
+import { owed, score, planned, fmt } from './trials.js?v=1795007589';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795007589';
+import { askParent, setParent, changePin } from './parent.js?v=1795007589';
+import { dayFull } from './streaks.js?v=1795007589';
+import { owedItems } from './owed.js?v=1795007589';
+import { pruneList, pruneCutoff } from './prune.js?v=1795007589';
+import { nowHtml } from './nowview.js?v=1795007589';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -51,6 +51,11 @@ function renderTonight(today) {
 function render() {
   const today = new Date(), mon = mondayOf(today);
   renderTonight(today);
+  // Leftover game time from last week: add it to this week, or not (asked once per boy)
+  const carry = isLive('routines') ? L.carryPrompts(ctx, today, Object.keys(KIDS).filter((id) => CHARTS[KIDS[id].chart] && CHARTS[KIDS[id].chart].gameTime)) : [];
+  $('carrycard').hidden = !carry.length;
+  $('carry').innerHTML = carry.map((c) => row(KIDS[c.kid].name, KIDS[c.kid].accent, c.minutes + ' min left from last week', 'Add to this week?',
+    '<span class="exbtns"><button class="tbtn approve" data-carry="' + c.kid + '|yes">Add ' + c.minutes + ' min</button><button class="linkbtn" data-carry="' + c.kid + '|no">No</button></span>')).join('');
   // Right now: where each kid is, given the time of day
   $('nowhead').textContent = 'Right now · ' + today.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   $('nowall').innerHTML = Object.entries(KIDS).map(([id, k]) => '<div class="nowkid" style="--accent:' + k.accent + '"><div class="nowkid-top"><a class="nowname" href="kid.html?kid=' + id + '">' + esc(k.name) + '</a>' +
@@ -123,6 +128,15 @@ document.addEventListener('click', async (e) => {
   if (t) { if (await askParent()) save(t.dataset.chart, t.dataset.path, t.dataset.chart === 'eli' || t.dataset.chart === 'trombone' ? true : ymd(new Date())); return; }
   const xb = e.target.closest('[data-ex]');
   if (xb) { const [d, kid, key, a] = xb.dataset.ex.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/' + key, a === 'ok' ? EXCUSED : null); return; }
+  const cb = e.target.closest('[data-carry]');
+  if (cb) {
+    // the amount is worked out after the PIN, from the latest data, and fixed when saved
+    const [kid, a] = cb.dataset.carry.split('|');
+    if (!isLive('routines') || !(await askParent())) return;
+    const c = L.carryPrompts(ctx, new Date(), [kid])[0];
+    if (c) save('routines', 'carry/' + kid + '/' + ymd(c.from), a === 'yes' ? c.minutes : 'no');
+    return;
+  }
   const tn = e.target.closest('[data-tn]');
   if (tn) {
     // Same storage and meaning as the checklist's End of day: true = yes, 'no' = not today; tap again to clear
