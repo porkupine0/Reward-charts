@@ -1,4 +1,4 @@
-// Eli's 13-week off-season plan (starts Mon Oct 26, 2026). Text is straight from the plan.
+// Eli's off-season plan, Oct 26, 2026 to Feb 28, 2027 (18 weeks). Text is straight from the plan.
 export const PLAN_START = '2026-10-26';
 // The day after the last plan day ('YYYY-MM-DD'), from the length of W.
 export function planEndYmd() { const d = parse(PLAN_START); d.setDate(d.getDate() + W.length * 7); const p = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
@@ -120,15 +120,40 @@ const NEW_WEEKS = [
     swimEasy(),
     satMile("3×5' (90 sec jog)"),
     rest()]],
-  ['Jan 18–24', 'Down week + final 5K time trial', 12, [
+  ['Jan 18–24', 'Down week + 5K time trial', 12, [
     swim(),
     easy(30, { strides: 6, strA: '2 sets, light' }),
     { title: 'Sharpener', s: "25' easy with 4×30 sec at interval pace, 90 sec easy between", in: "Treadmill: 25' easy with 4×30 sec at 7.8–8.0 mph. Gym track: 4×200 in 56–57 sec.", out: '25 min easy with 4×30 sec quick (by effort)', core: 'A' },
     swim({ s: 'Swim practice. No strength this week.' }),
     swimEasy(),
-    sat5k({ note: 'Final test: track preferred; take a split at 2 miles to compare with his 14:08.', core: false }),
+    sat5k({ note: 'Track preferred; take a split at 2 miles to compare with his 14:08.', core: false }),
     rest()]]
 ];
+
+// Extended through February (draft, Nov 18, 2026): built only from sessions already in the plan,
+// volume no higher than January, swim still Mon/Thu/Fri. For his coach to look over.
+const weekDays = (label) => NEW_WEEKS.find((w) => w[0] === label)[3].map((d) => JSON.parse(JSON.stringify(d)));
+NEW_WEEKS.push(
+  ['Jan 25–31', 'Recovery', 11, [
+    swim(),
+    easy(30, { strides: 4, strA: true, note: 'Paces are from November: update them once the Jan 16 mile and Jan 23 5K are logged.' }),
+    longRun(45, { core: 'A' }),
+    swimLift(),
+    swim(),
+    easy(35, { strides: 6, core: 'B' }),
+    rest()]],
+  ['Feb 1–7', 'Build', 14, [
+    swim(),
+    thr("3×8'", '90 sec', { strA: true }),
+    longRun(55, { plyo: 2, core: 'A' }),
+    swimLift(),
+    swim(),
+    rFart({ s: "15' easy, 6×30 sec fast and relaxed, 10' easy", core: 'B' }),
+    rest()]],
+  ['Feb 8–14', 'Peak + mile time trial', 16.5, weekDays('Jan 11–17')],
+  ['Feb 15–21', 'Peak build', 16, weekDays('Jan 4–10')],
+  ['Feb 22–28', 'Down week + final 5K time trial', 12, weekDays('Jan 18–24').map((d) => (d.trial === '5k' ? Object.assign(d, { note: 'Final test: track preferred; take a split at 2 miles to compare with his 14:08.' }) : d))]
+);
 
 // Each week: [label, focus, miles, Mon, Tue, Wed, Thu, Fri, (Sat), (Sun)]
 const W = [
@@ -222,7 +247,7 @@ export function trialOn(date) {
   return /mile/i.test(p.title) ? 'mile' : '5k';
 }
 
-// Returns the plan for a date, or null if it's outside the 13 weeks.
+// Returns the plan for a date, or null if it's outside the plan's weeks.
 export function planFor(date) {
   const start = parse(PLAN_START);
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -280,7 +305,7 @@ export const TERMS = [
   ['Strides', '15–20 seconds of quick, relaxed running at 9.0–9.5 mph once the belt reaches speed, then 60 seconds walking. Fast but not a sprint. Change speed with the buttons, not the rails. Outside, only on dry pavement.'],
   ['Long run', 'Your longest easy run of the week (45–65 minutes). Some weeks finish with 10 minutes steady (6.5–6.7 mph, short sentences).'],
   ['Warm-up / cool-down', 'Quality days start with 10–15 minutes easy (5.7–6.0 mph) and end with 10 minutes easy. “10 easy” means exactly that.'],
-  ['Time trial', 'An all-out mile or 5K on a Saturday at the gym track (Weeks 4, 5, 7, 10, 12 and 13; the Thanksgiving 5K can be Thursday’s Turkey Trot). Run even laps and race only the last 400. After a mile, jog 8–10 minutes, then a short threshold block. After a 5K, only a few relaxed strides. Stop if pain changes your stride. Log every time on the Trials tab.'],
+  ['Time trial', 'An all-out mile or 5K on a Saturday at the gym track (Weeks 4, 5, 7, 10, 12, 13, 16 and 18; the Thanksgiving 5K can be Thursday’s Turkey Trot). Run even laps and race only the last 400. After a mile, jog 8–10 minutes, then a short threshold block. After a 5K, only a few relaxed strides. Stop if pain changes your stride. Log every time on the Trials tab.'],
   ['Inside or outside', 'Every run has a treadmill/track version and an outside version. Outside: layers, gloves and a hat, a light after dark. Ice, or wind chill below about 0–10°F: go inside. Never run fast on snow or ice.'],
   ['Down week', 'A lighter week (Weeks 6, 9, 13) so your body absorbs the training. No plyometrics.'],
   ['Plyometrics (plyos)', 'Quick jumping exercises with soft, quiet landings, done fresh before the run. They make you more efficient and faster at top speed. Stop a set when jumps get sloppy.'],

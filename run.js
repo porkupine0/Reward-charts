@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795002147';
-import { planFor, ZONES, LAPS, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1795002147';
-import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1795002147';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795002227';
+import { planFor, ZONES, LAPS, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1795002227';
+import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1795002227';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
@@ -39,7 +39,7 @@ function render() {
   history.replaceState(null, '', (key === ymd(new Date()) ? location.pathname : '?date=' + key) + location.hash);
 
   if (!p) {
-    $('workout').innerHTML = '<div class="wo-card"><p class="wo-meta">' + esc(longDate(date)) + '</p><h2 class="wo-title">No plan for this day</h2><p class="wo-detail">The 13-week plan runs Oct 26, 2026 to Jan 24, 2027. You can still log a run below.</p></div>';
+    $('workout').innerHTML = '<div class="wo-card"><p class="wo-meta">' + esc(longDate(date)) + '</p><h2 class="wo-title">No plan for this day</h2><p class="wo-detail">The plan runs Oct 26, 2026 to Feb 28, 2027. You can still log a run below.</p></div>';
     $('checklist').innerHTML = '';
   } else {
     $('workout').innerHTML =

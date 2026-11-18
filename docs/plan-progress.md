@@ -35,7 +35,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Apply the database rules (optional; steps in docs/database-safety.md).
 - Add the BACKUP_KEY secret to turn on the daily encrypted backup (optional; same guide).
 - Browser tests (tests/browser/) run by hand; they're not in CI yet. Tier 4 (code upkeep and extras) not started.
-- Eli's training plan ends Jan 24, 2027. After that his run/swim row is off and there's no Running item, so a new plan is needed.
+- Eli's training plan now runs to Feb 28, 2027 (Feb weeks are a draft from reused sessions, for his coach to look over). After that his run/swim row turns off.
 
 
 - Missed-chore lock now: homework and screen tasks lock (Rhett's computer tasks; Eli's assignments and homework). For Isaiah, and for Eli on weekends, it's the Finish-first box plus held game time. One missed chore holds the game time of every school day from then until it's done or excused. A missed Saturday chore has no consequence on Sunday for Eli or Isaiah.

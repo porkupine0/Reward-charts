@@ -69,12 +69,12 @@ test('plan: swim Mon/Thu/Fri, run Tue/Wed/Sat, trials on Saturdays (re-set Nov 1
   assert.equal(trialOn(d('2026-12-12')), 'mile');
   assert.equal(trialOn(d('2027-01-02')), '5k');
   assert.equal(trialOn(d('2027-01-16')), 'mile');
-  assert.equal(trialOn(d('2027-01-23')), '5k');   // final test
-  assert.equal(planFor(d('2027-02-01')), null);
+  assert.equal(trialOn(d('2027-01-23')), '5k');   // 5K (the final one is now Feb 27)
+  assert.equal(planFor(d('2027-03-01')), null);
   const p = planFor(d('2026-11-11'));
   assert.equal(dayDone(p, {}), false);
   assert.equal(dayDone(p, Object.fromEntries(p.items.filter((i) => !i.opt).map((i) => [i.key, true]))), true);
-  for (let i = 0; i < 69; i++) {
+  for (let i = 0; i < 104; i++) { // through Feb 28
     const day = addDays(d('2026-11-17'), i), q = planFor(day), dow = (day.getDay() + 6) % 7;
     if (q.title === 'Rest' || q.title === 'Off') continue;
     if ([0, 3, 4].includes(dow) && /Turkey Trot/.test(q.detail)) continue; // Thanksgiving race, the one exception
@@ -353,10 +353,10 @@ test("style.css: no colour variable is defined as itself (it would render as not
 // Every chart box must have a checklist item behind it: when a kid does everything on that day's
 // checklist (and Training / Ball Master), every required box fills; and a required box must
 // match a required checklist item (an optional or missing item can't back a required box).
-test("charts: every required box is backed by a required checklist item, Nov 16 to Feb 28", () => {
+test("charts: every required box is backed by a required checklist item, Nov 16 to Mar 14", () => {
   const SOURCE = { running: ['activity'], school: ['missing'], move: ['activity'], racquetball: ['activity'], typing: ['typing'], trombone: ['trombone'], duolingo: ['duolingo'], soccer: ['activity'] };
   const bad = [], routines = { days: {} }, run = { days: {} }, isaiah = { touchDays: {} };
-  for (let day = d('2026-11-16'); ymd(day) <= '2027-02-28'; day = addDays(day, 1)) {
+  for (let day = d('2026-11-16'); ymd(day) <= '2027-03-14'; day = addDays(day, 1)) {
     const k = ymd(day), mon = mondayOf(day), i = L.dowOf(day);
     routines.days[k] = {}; isaiah.touchDays[k] = true; // earlier days stay done too
     for (const kid of ['eli', 'rhett', 'isaiah']) {
@@ -571,4 +571,22 @@ test("evening check wording comes from Settings; the checks themselves stay fixe
   assert.equal(rowsFor(CHARTS.trombone, d('2026-11-16')).find((r) => r.key === 'noLies').label, 'Told the truth all day', 'the chart row uses the same words');
   applySettings({});
   assert.equal(L.CHECKS.rhett[2].label, 'No lies today');
+});
+
+test("Eli's plan runs through Feb 28; trial days match the trial schedule on every plan day", () => {
+  const T = { planned: null };
+  assert.notEqual(planFor(d('2027-02-28')), null);
+  assert.equal(planFor(d('2027-03-01')), null);
+  assert.equal(trialOn(d('2027-02-13')), 'mile');
+  assert.equal(trialOn(d('2027-02-27')), '5k');
+  // every plan day: trialOn says a trial exactly where the schedule has one (Thanksgiving's 5K may be Thu or Sat)
+  const start = d('2026-10-26'), sched = planned(score({})).map((x) => [x.k, ymd(x.date)]);
+  for (let day = start; ymd(day) <= '2027-02-28'; day = addDays(day, 1)) {
+    const k = trialOn(day);
+    if (!k) continue;
+    const wk = ymd(mondayOf(day));
+    assert.ok(sched.some(([kind, date]) => kind === k && ymd(mondayOf(d(date))) === wk), 'trial ' + k + ' on ' + ymd(day) + ' is in the schedule');
+  }
+  sched.forEach(([kind, date]) => assert.equal(trialOn(d(date)), kind, kind + ' scheduled ' + date));
+  assert.ok(T);
 });
