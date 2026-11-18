@@ -40,10 +40,14 @@ Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all
 Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31 pm Central resume from here.
 - [x] 0. Iowa driver's manual: fetch and read it; every age, rule and quiz answer comes from its text.
 - [x] 1. Eli's computer work (typing, and the driving lesson) locked until today's chores are done.
-- [ ] 2. Leftover game time: a parent check on the Parents page each week ("Add N min to this week?").
-- [ ] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
-- [ ] 4. Driving page and wiring: checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
+- [x] 2. Leftover game time: a parent check on the Parents page each week ("Add N min to this week?").
+- [x] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
+- [ ] 4a. Wiring, no page: one lock helper (today's chores done and none owed), Open link hidden on locked rows, checklist row (today if a lesson is ready; past dates a lesson was finished; Mon–Fri; outside all scoring), database rules.
+- [ ] 4b. Driving page and parent preview (course file ships empty; browser tests use a fixture course): checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
 - [ ] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
+
+Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
+Unanswered (defaults in force): Eli's assignments and homework don't wait for chores (only typing and driving do); the driving lesson doesn't count toward his streak.
 
 ## Open for the family
 - Leftover game time: should it expire at the end of the weekend or carry over? (It stays on that week's chart now.)
@@ -86,3 +90,4 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - Nov 18: item 17 done. GitHub runs the browser tests on every push as their own job (a deliberately broken check turned it red; reverted).
 - Nov 18: items 19 and 20 done. Every page passes contrast in light and dark; small links are 44px tall (Isaiah's checklist grew 90px); the game card says "not earned" with the reason.
 - Nov 18: driving steps 0 and 1 done. Iowa manual saved (docs/iowa/); Eli's typing waits for today's chores.
+- Nov 18: driving steps 2 and 3 done. Leftover game time asks once per boy (No lets it go); course rules tested with fixtures.

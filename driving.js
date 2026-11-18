@@ -16,6 +16,8 @@ export function lessonFor(lessons, progress, dayKey) {
   for (let i = 0; i < lessons.length; i++) {
     const l = lessons[i];
     if (done[l.id] || approved[l.id] === 'skip') continue;
+    // a review has no video to approve: it's ready once any lesson before it is finished (else passed over)
+    if (l.review) { if (lessons.slice(0, i).some((x) => done[x.id])) return { lesson: l, index: i, status: 'ready' }; continue; }
     return { lesson: l, index: i, status: approved[l.id] === true ? 'ready' : 'waiting' };
   }
   return { lesson: null, index: lessons.length, status: 'finished' };
@@ -36,8 +38,9 @@ function priority(h) {
 }
 
 // Today's 5 questions: 3 from this lesson and 2 from lessons already finished (a review lesson: all 5 from
-// finished lessons). Earlier questions: wrong last time, then not yet right twice since a miss, then least
-// recently asked (never asked first), then course order.
+// finished lessons). Earlier questions, in this order: missed ones (wrong last time, then not yet right twice
+// since a miss); the newest never-asked question; the least recently asked from two or more lessons back;
+// then the rest by least recently asked and course order.
 export function quizFor(lessons, index, progress, size = 5) {
   const lesson = lessons[index];
   if (!lesson) return [];
@@ -48,8 +51,14 @@ export function quizFor(lessons, index, progress, size = 5) {
     if (l.id === lesson.id || !done[l.id]) return;
     (l.questions || []).forEach((q, qi) => { const h = history(progress, q.id, lesson.id); pool.push({ q, li, qi, pr: priority(h), last: h.length ? h[h.length - 1].on : '' }); });
   });
-  pool.sort((a, b) => a.pr - b.pr || (a.last < b.last ? -1 : a.last > b.last ? 1 : 0) || a.li - b.li || a.qi - b.qi);
-  const fromBefore = pool.slice(0, size - fromToday.length).map((x) => x.q);
+  const byAge = (a, b) => (a.last < b.last ? -1 : a.last > b.last ? 1 : 0) || a.li - b.li || a.qi - b.qi;
+  const room = size - fromToday.length, picked = [];
+  const take = (x) => { if (x && picked.length < room && !picked.includes(x)) picked.push(x); };
+  pool.filter((x) => x.pr < 2).sort((a, b) => a.pr - b.pr || byAge(a, b)).forEach(take);
+  take(pool.filter((x) => !x.last && !picked.includes(x)).sort((a, b) => b.li - a.li || a.qi - b.qi)[0]);
+  take(pool.filter((x) => x.li <= index - 2 && !picked.includes(x)).sort(byAge)[0]);
+  pool.slice().sort(byAge).forEach(take);
+  const fromBefore = picked.map((x) => x.q);
   // too few finished lessons (the first days): fill from this lesson
   const more = (lesson.questions || []).slice(fromToday.length);
   return [...fromToday, ...fromBefore, ...more].slice(0, size);
@@ -63,8 +72,10 @@ export function grade(quiz, picks) {
 
 // Check course content before it ships: a list of problems (empty = fine).
 export function checkCourse(lessons) {
-  const out = [], seen = new Set();
+  const out = [], seen = new Set(), lessonIds = new Set();
   lessons.forEach((l, i) => {
+    if (lessonIds.has(l.id)) out.push(l.id + ': lesson id used twice');
+    lessonIds.add(l.id);
     const shouldReview = (i + 1) % 5 === 0;
     if (shouldReview !== !!l.review) out.push(l.id + ': lesson ' + (i + 1) + (shouldReview ? ' should be a review' : ' should not be a review'));
     if (l.review && (l.questions || []).length) out.push(l.id + ': a review has no questions of its own');

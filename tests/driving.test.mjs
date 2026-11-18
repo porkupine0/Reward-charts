@@ -33,6 +33,15 @@ test('driving: lessons go in order, one new a day, only once a parent approves',
   assert.equal(D.lessonFor(LESSONS, all, day(20)).status, 'finished');
 });
 
+test('driving: a review needs no approval; it is passed over when nothing before it is finished', () => {
+  const L = course(6), all = Object.fromEntries(L.map((l) => [l.id, true]));
+  const p = { approved: { L1: true, L2: true, L3: true, L4: true }, done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4) } };
+  assert.deepEqual([D.lessonFor(L, p, day(5)).lesson.id, D.lessonFor(L, p, day(5)).status], ['L5', 'ready'], 'review ready without approval');
+  const skipped = { approved: { L1: 'skip', L2: 'skip', L3: 'skip', L4: 'skip', L6: true }, done: {} };
+  assert.equal(D.lessonFor(L, skipped, day(5)).lesson.id, 'L6', 'nothing finished before it: the review is passed over');
+  assert.ok(all);
+});
+
 test('driving: the quiz does not change while he takes it', () => {
   const p = { done: { L1: day(1), L2: day(2) }, answers: {} };
   ['L1q1', 'L1q2', 'L1q3', 'L2q1', 'L2q2', 'L2q3'].forEach((id, i) => answer(p, id, id.slice(0, 2), true, day(id[1] === '1' ? 1 : 2)));
@@ -57,8 +66,9 @@ test('driving: a missed question comes back twice, then rotates out; review slot
     const review = quiz.filter((id) => !id.startsWith(lesson.id + 'q'));
     review.forEach((id) => asked.push([i, id]));
     // a review question already asked before, while a finished lesson still has a never-asked one, is too early
-    const pool = L.filter((l) => p.done[l.id]).flatMap((l) => l.questions.map((x) => x.id));
-    review.forEach((id) => { if (ever.has(id) && id !== missedId && pool.some((x) => !ever.has(x) && !review.includes(x))) early.push(lesson.id + ':' + id); });
+    // (the "two or more lessons back" slot may repeat, but only once that older range has all been asked)
+    const older = L.filter((l, k) => p.done[l.id] && k <= i - 2).flatMap((l) => l.questions.map((x) => x.id));
+    review.forEach((id) => { if (ever.has(id) && id !== missedId && older.some((x) => !ever.has(x) && !review.includes(x))) early.push(lesson.id + ':' + id); });
     quiz.forEach((id) => ever.add(id));
     quiz.forEach((id) => {
       // one early miss: the first review question asked, the first time
@@ -75,6 +85,12 @@ test('driving: a missed question comes back twice, then rotates out; review slot
   assert.deepEqual(times.slice(1, 3), [firstMiss + 1, firstMiss + 2], 'right away, twice');
   // apart from those two returns, nothing repeats while a finished lesson still has a question never asked
   assert.deepEqual(early, []);
+  // spacing: from lesson 4 on, every regular day reaches two or more lessons back
+  L.forEach((lesson, i) => {
+    if (i < 3 || lesson.review) return;
+    const old = asked.filter(([k, id]) => k === i && Number(id.slice(1, id.indexOf('q'))) <= i - 1);
+    assert.ok(old.length >= 1, lesson.id + ' reaches back: ' + asked.filter(([k]) => k === i).map(([, id]) => id));
+  });
   assert.ok(asked.length > 20);
 });
 
@@ -101,5 +117,11 @@ test('driving: the content checker catches bad lessons and questions', () => {
   bad[2].questions[2].ref = 'the video';                    // no manual page
   bad[3].review = true;                                     // review in the wrong place
   const problems = D.checkCourse(bad).join('\n');
-  ['id used twice', 'at least 5 questions', 'not one of the choices', 'explanation', 'manual page', 'should not be a review', 'L6: lesson 6 should not'].forEach((t) => assert.ok(problems.includes(t) || t.startsWith('L6'), t + '\n' + problems));
+  ['L1q1: id used twice', 'L2: needs at least 5 questions', 'not one of the choices', 'needs an explanation', 'needs a manual page', 'L4: lesson 4 should not be a review'].forEach((t) => assert.ok(problems.includes(t), t + '\n' + problems));
+  const more = course(10);
+  more[4].review = false; more[4].questions = [1, 2, 3, 4, 5].map((k) => q('L5q' + k)); more[4].videos = [{ id: 'v' }]; // no review at position five
+  more[5].videos = [];                  // a lesson with no video
+  more[6].id = 'L6';                    // a repeated lesson id
+  const p2 = D.checkCourse(more).join('\n');
+  ['L5: lesson 5 should be a review', 'L6: needs a video', 'L6: lesson id used twice'].forEach((t) => assert.ok(p2.includes(t), t + '\n' + p2));
 });

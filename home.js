@@ -1,11 +1,11 @@
 // Home: one button per person, each with a one-line "right now".
-import { watch, statusPill } from './store.js?v=1795008252';
-import { KIDS, applyConfig, timerResult } from './routines.js?v=1795008252';
-import * as L from './lists.js?v=1795008252';
-import { nowLine } from './nowview.js?v=1795008252';
-import { owedItems } from './owed.js?v=1795008252';
-import { isParent, isParentPhone, legacyUnlocked, setParent } from './parent.js?v=1795008252';
-import { addDays } from './store.js?v=1795008252';
+import { watch, statusPill } from './store.js?v=1795008523';
+import { KIDS, applyConfig, timerResult } from './routines.js?v=1795008523';
+import * as L from './lists.js?v=1795008523';
+import { nowLine } from './nowview.js?v=1795008523';
+import { owedItems } from './owed.js?v=1795008523';
+import { isParent, isParentPhone, legacyUnlocked, setParent } from './parent.js?v=1795008523';
+import { addDays } from './store.js?v=1795008523';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
