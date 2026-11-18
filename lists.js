@@ -1,10 +1,10 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1794989260';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1794989260';
-import { SETTINGS, onSettings } from './settings.js?v=1794989260';
-import { rowsFor, TIED_FROM } from './charts.js?v=1794989260';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1794989260';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795001708';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795001708';
+import { SETTINGS, onSettings } from './settings.js?v=1795001708';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795001708';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795001708';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -90,9 +90,9 @@ export function lockedBy(ctx, kid, date, it, list) {
   return (list || []).filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c)) ? 'chores' : false;
 }
 
-// Chores left undone on an earlier day this week (from Nov 18, 2026). Until they're done (or excused
+// Chores left undone on an earlier day this week (from Nov 16, 2026). Until they're done (or excused
 // by Mom or Dad), screen and school tasks are locked and today earns no game time. [{ date, item }]
-export const OWED_FROM = '2026-11-18';
+export const OWED_FROM = '2026-11-16';
 export function choresOwed(ctx, kid, date) {
   const out = [], mon = mondayOf(date);
   for (let d = mon; ymd(d) < ymd(date); d = addDays(d, 1)) {

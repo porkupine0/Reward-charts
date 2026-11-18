@@ -1,7 +1,7 @@
   // Game time for all three, Isaiah's chart, Rhett's chart rows, the missed-chore box (moved from newfeat.js)
 
   await p.goto(B + 'index.html'); await p.waitForTimeout(300);
-  await p.evaluate(() => sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-17': { isaiah: { chore: true } } } } } })));
+  await p.evaluate(() => sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-16': { isaiah: { chore: true, chore2: true } }, '2026-11-17': { isaiah: { chore: true } } } } } })));
   await visit('checklist.html?kid=isaiah&date=2026-11-19', 'n-owed');
   const owedTxt = await p.$eval('.owed', e => e.textContent).catch(() => '');
   check(/Finish first/.test(owedTxt), 'owed block missing: ' + owedTxt);

@@ -290,7 +290,7 @@ export const TERMS = [
 
 export const ROUTINES = {
   plyo: {
-    title: 'Plyometrics', when: 'Tuesday · at home · about 8 min',
+    title: 'Plyometrics', when: 'Wednesday · at home · about 8 min',
     note: 'After your warm-up, before the run, while fresh. 2 sets in Weeks 4–8 and trial weeks, 3 sets in Weeks 11–12. Soft, quiet landings; none in down weeks (6, 9, 13).',
     list: [
       ['Pogo hops', '20', 'Bounce on the balls of your feet with stiff ankles and almost-straight knees. Short, fast contacts, like the floor is hot.'],
@@ -315,7 +315,7 @@ export const ROUTINES = {
   },
   strB: {
     title: 'Strength B', when: 'Thursday · at the gym · about 20 min',
-    note: 'Thursday at the gym. Pick a weight you could lift about 12 times and do 8. The jumps after each lift are only for interval Thursdays; after a mile trial they’re optional, after a 5K trial or in a down week skip them. Have a coach or gym staff check your squat and deadlift form before adding weight. Can’t make the gym? Do Home Strength instead.',
+    note: 'Thursday at the gym. Pick a weight you could lift about 12 times and do 8. Thursday is a swim day now, so do the lifts only and skip the jumps after each one. Have a coach or gym staff check your squat and deadlift form before adding weight. Can’t make the gym? Do Home Strength instead.',
     list: [
       ['Goblet squat, 3 × 8 → 5 squat jumps', 'Pair 1', 'Hold a dumbbell at your chest, elbows down, and squat. Then 5 squat jumps right away.'],
       ['Dumbbell RDL, 3 × 8 → 5 broad jumps', 'Pair 2', 'Dumbbells in front of thighs, push hips back and slide them down to mid-shin, flat back. Then 5 broad jumps forward, landing softly.'],
@@ -340,7 +340,7 @@ export const ROUTINES = {
     ]
   },
   coreA: {
-    title: 'Core A', when: 'Mon, Wed (+ optional Fri) · 10 min',
+    title: 'Core A', when: 'Wednesday · 10 min',
     note: '2 rounds, minimal rest. Add 5–10 seconds or 2 reps once a round feels easy.',
     list: [
       ['Front plank', '45 sec', 'Forearms down, straight line head to heels, squeeze glutes. No sagging hips.'],

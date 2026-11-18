@@ -36,9 +36,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Add the BACKUP_KEY secret to turn on the daily encrypted backup (optional; same guide).
 - Browser tests (tests/browser/) run by hand; they're not in CI yet. Tier 4 (code upkeep and extras) not started.
 - Eli's training plan ends Jan 24, 2027. After that his run/swim row is off and there's no Running item, so a new plan is needed.
-- Should the missed-chore lock also count Monday and Tuesday of the week of Nov 16? (It currently starts Nov 18.)
 
-- Training text still names old days (needs a coach's call, not changed): Plyometrics says Tuesday (now Wednesday), Core A says "Mon, Wed (+ optional Fri)" (Monday is swim now), and the Strength B note mentions jumps on "interval Thursdays" (Thursday is lifts only now).
 
 - Missed-chore lock now: homework and screen tasks lock (Rhett's computer tasks; Eli's assignments and homework). For Isaiah, and for Eli on weekends, it's the Finish-first box plus held game time. One missed chore holds the game time of every school day from then until it's done or excused. A missed Saturday chore has no consequence on Sunday for Eli or Isaiah.
 - Isaiah's weekend evening checks will show in the Tonight card (one "All good" tap).
@@ -64,3 +62,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 16 done. A settings change (chores, shower nights, lights out) applies from the day it's saved, today included; earlier days keep what they had. Save waits for the latest settings.
 - Nov 18: item 12 done. Settings has game-time minutes per school day and bedtime grace (both apply from the day they're saved) and the wording of each boy's evening checks.
 - Nov 18: item 13 built (not applied). Database rules allow only the app's own save paths (the browser tests enforce them), plus an encrypted daily backup that does nothing until a key is set.
+- Nov 18: the missed-chore lock counts from Monday Nov 16 (decided); training text fixed: Plyometrics and Core A on Wednesday, Strength B lifts only on Thursday.
