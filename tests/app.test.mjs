@@ -12,7 +12,7 @@ const { planFor, trialOn, dayDone } = await load('plan.js');
 const { score, nextMilestone, owed, planned, MILE, FIVE, mphFor } = await load('trials.js');
 const { CHARTS, weekProgress, rowsFor } = await load('charts.js');
 const L = await load('lists.js');
-const { applySettings, SETTINGS, DEFAULTS, snapshotToSave } = await load('settings.js');
+const { applySettings, SETTINGS, DEFAULTS, snapshotToSave, atDate } = await load('settings.js');
 
 const d = (s) => parseYmd(s);
 
@@ -515,4 +515,24 @@ test("settings changes apply from the day they're saved; earlier days keep what 
   assert.ok(SM);
   applySettings({}); // back to the defaults for the other tests
   assert.deepEqual(JSON.parse(JSON.stringify(SETTINGS)), before);
+});
+
+test("settings by date: nested lookups and empty lists in a snapshot", () => {
+  const snap = (applySettings({}), JSON.parse(JSON.stringify({ chores: SETTINGS.chores, showers: SETTINGS.showers, lights: SETTINGS.lights })));
+  const cfg = { chores: { rhett: SETTINGS.chores.rhett.map((x, i) => (i === 1 ? ['Garage sweep'] : x)) }, history: { '2026-12-01': snap } };
+  applySettings(cfg);
+  // the checklist page for Nov 20 works out a streak from today (Dec 8): Dec 8 uses the current settings
+  const inner = atDate(d('2026-11-20'), () => L.lists({ routines: {}, run: {}, isaiah: {} }, 'rhett', d('2026-12-08')).day.filter((i) => i.chore).map((i) => i.label));
+  assert.deepEqual(inner, ['Chore: Garage sweep']);
+  // empty lists survive a snapshot (Firebase drops them; they're encoded and read back as empty)
+  applySettings({ showers: { isaiah: [-1] }, chores: { isaiah: [[''], ['Kitchen'], [], [], [], [], []] } });
+  const s2 = snapshotToSave({}, new Date(2026, 11, 10)).value;
+  const viaFirebase = JSON.parse(JSON.stringify(s2)); // what comes back
+  applySettings({ history: { '2026-12-10': viaFirebase } });
+  atDate(d('2026-12-09'), () => {
+    assert.deepEqual(SETTINGS.showers.isaiah, [], 'no shower nights stays empty');
+    assert.deepEqual(SETTINGS.chores.isaiah[0], [], 'an empty chore day stays empty');
+    assert.deepEqual(SETTINGS.chores.isaiah[1], ['Kitchen']);
+  });
+  applySettings({});
 });

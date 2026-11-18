@@ -1,9 +1,9 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc } from './store.js?v=1794987571';
-import { SETTINGS, DEFAULTS, applySettings, snapshotToSave } from './settings.js?v=1794987571';
-import { KIDS } from './routines.js?v=1794987571';
-import { LEVELS } from './trials.js?v=1794987571';
-import { askParent } from './parent.js?v=1794987571';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1794987938';
+import { SETTINGS, DEFAULTS, applySettings, snapshotToSave } from './settings.js?v=1794987938';
+import { KIDS } from './routines.js?v=1794987938';
+import { LEVELS } from './trials.js?v=1794987938';
+import { askParent } from './parent.js?v=1794987938';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -43,7 +43,9 @@ document.addEventListener('click', (e) => {
   if (t) { readKid(); kid = t.dataset.kid; renderKid(); }
 });
 document.addEventListener('input', () => { dirty = true; $('msg').textContent = 'Unsaved changes.'; });
+const notLive = () => { $('msg').textContent = 'Still connecting. Save once this phone has the latest settings, so earlier days keep the right ones.'; };
 $('save').onclick = async () => {
+  if (!isLive('config')) return notLive();
   readAll();
   if (!(await askParent())) return;
   // Firebase drops empty lists, so an empty chore day is saved as a blank line and cleaned up on load.
@@ -60,6 +62,7 @@ $('save').onclick = async () => {
   $('msg').textContent = 'Saved. Every phone uses the new settings from today; earlier days keep what they had.';
 };
 $('reset').onclick = async () => {
+  if (!isLive('config')) return notLive();
   if (!confirm('Go back to the original chores, bedtimes and prize lists?')) return;
   if (!(await askParent())) return;
   await keepPastDays();

@@ -29,7 +29,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [ ] 13. Database safety rules and a daily backup.
 - [x] 14. Clearing old logs keeps training history and what charts and streaks need.
 - [x] 15. Offline saves: replay order and showing failed saves.
-- [ ] 16. Settings changes don't rewrite past days.
+- [x] 16. Settings changes don't rewrite past days.
 
 ## Open for the family
 - Eli's training plan ends Jan 24, 2027. After that his run/swim row is off and there's no Running item, so a new plan is needed.
@@ -56,3 +56,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 11 done. A parent's phone stays unlocked (tick box); other devices unlock for 15 minutes; old unlocks last until Nov 23.
 - Nov 18: item 15 done. Clearing drops queued writes beneath it; a quick correction is sent; pages share one queue. When the app is reopened after being offline, a change another phone made meanwhile wins and a notice shows (a page left open through an outage isn't covered). The pill can say "Saving…" or "Not saved, retrying".
 - Nov 18: item 14 done. Cleanup keeps 2 years of checklist days (the streak look-back), never clears Eli's Training log, and backup and cleanup wait for fresh data.
+- Nov 18: item 16 done. A settings change (chores, shower nights, lights out) applies from the day it's saved, today included; earlier days keep what they had. Save waits for the latest settings.

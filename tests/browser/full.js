@@ -146,7 +146,9 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await p.click('#save'); await p.waitForTimeout(400);
   check((await db()).charts?.config?.lights?.eli === '21:00', 'settings not saved');
   // a change applies from the day it's saved: a later school night follows it, an earlier one keeps 8:30
-  await visit('checklist.html?kid=eli&date=2027-03-09');
+  const nt = new Date(); nt.setDate(nt.getDate() + 7 + ((2 - nt.getDay() + 7) % 7)); // a Tuesday at least a week from today
+  const nextTue = nt.getFullYear() + '-' + String(nt.getMonth() + 1).padStart(2, '0') + '-' + String(nt.getDate()).padStart(2, '0');
+  await visit('checklist.html?kid=eli&date=' + nextTue);
   const lo = await p.$$eval('#bed .rtime', e => e[e.length - 1].textContent);
   check(lo === '9:00', 'lights out did not follow settings: ' + lo);
   await visit('checklist.html?kid=eli&date=2026-11-10');

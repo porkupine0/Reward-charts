@@ -63,6 +63,7 @@ function schedule(c) {
 // that day). A day uses the earliest snapshot dated after it, else the current settings. No snapshots =
 // everything uses the current settings, exactly as before.
 let HISTORY = []; // [[date, schedule]] sorted by date
+let CURRENT = null; // the schedule saved now (set by applySettings)
 const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 export function scheduleFor(date) {
   const k = typeof date === 'string' ? date : ymdOf(date);
@@ -70,18 +71,22 @@ export function scheduleFor(date) {
   return hit ? hit[1] : null;
 }
 // Run fn with the schedule that applied on this date (synchronous callers only).
+// Always swaps to that day's snapshot or to the current schedule, so a lookup nested inside another
+// date's (a streak counted from today on a past day's page) still gets the right one.
 export function atDate(date, fn) {
-  const snap = date && scheduleFor(date);
-  if (!snap) return fn();
+  if (!date) return fn();
+  const use = scheduleFor(date) || CURRENT;
+  if (!use) return fn();
   const saved = {};
-  DATED.forEach((k) => { saved[k] = SETTINGS[k]; SETTINGS[k] = snap[k]; });
+  DATED.forEach((k) => { saved[k] = SETTINGS[k]; SETTINGS[k] = use[k]; });
   try { return fn(); } finally { DATED.forEach((k) => { SETTINGS[k] = saved[k]; }); }
 }
 // What to save before changing the schedule today: the current schedule, unless today already has one.
 export function snapshotToSave(cfg, today) {
   const k = ymdOf(today);
   if (cfg && cfg.history && cfg.history[k]) return null;
-  const value = copy({ chores: SETTINGS.chores, showers: SETTINGS.showers, lights: SETTINGS.lights });
+  const cur = CURRENT || SETTINGS;
+  const value = copy({ chores: cur.chores, showers: cur.showers, lights: cur.lights });
   // Firebase drops empty lists: save them the way the Settings page does (cleaned up on load)
   Object.values(value.chores).forEach((days) => days.forEach((d, i) => { if (!d.length) days[i] = ['']; }));
   Object.keys(value.showers).forEach((kid) => { if (!value.showers[kid].length) value.showers[kid] = [-1]; });
@@ -91,7 +96,8 @@ export function snapshotToSave(cfg, today) {
 export function applySettings(cfg) {
   const c = cfg || {};
   const fresh = copy(DEFAULTS);
-  Object.assign(fresh, schedule(c));
+  CURRENT = schedule(c);
+  Object.assign(fresh, copy(CURRENT));
   HISTORY = Object.entries(c.history || {}).filter(([k]) => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, schedule(v || {})]);
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => {
     const v = c.rewards && c.rewards[id] && clean(c.rewards[id][w]);
