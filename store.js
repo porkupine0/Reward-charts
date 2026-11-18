@@ -3,8 +3,8 @@
 // - Every tap is saved on the phone first and stays queued until Firebase confirms it,
 //   so nothing is lost if the app is closed while offline.
 // - If Firebase can't be reached, it keeps retrying and a banner says changes aren't synced yet.
-import { firebaseConfig } from './config.js?v=1794986465';
-import { fromStored, enqueue, confirm, acked, has, decide, getAt } from './queue.js?v=1794986465';
+import { firebaseConfig } from './config.js?v=1794986899';
+import { fromStored, enqueue, confirm, acked, has, decide, getAt } from './queue.js?v=1794986899';
 
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const LS = (() => { try { const k = 'rc:t'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return localStorage; } catch (e) { return null; } })();
@@ -104,11 +104,12 @@ async function attach(chartId) {
   attached[chartId] = true;
   const { api, db } = conn;
   api.onValue(api.ref(db, 'charts/' + chartId), (snap) => {
+    const first = !live[chartId];
     cache[chartId] = snap.val() || {};
     live[chartId] = true;
     lsSet('rc:cache:' + chartId, cache[chartId]);
     emit(chartId);
-    flush(); // queued changes for this chart can go now that its fresh data is here
+    if (first) flush(); // queued changes for this chart can go once its fresh data is here (once, so two tabs don't race)
   });
   if (!attached['.info']) {
     attached['.info'] = true;
@@ -133,7 +134,8 @@ export async function save(chartId, path, value) {
   const v = value === false || value === undefined ? null : value;
   const full = chartId + '/' + path;
   // remember what the server had here, so a stale offline change can't overwrite another phone's newer one
-  setQ(enqueue(q(), full, v, getAt(cache[chartId] || {}, path) ?? null));
+  // (no base when this page has no copy of the chart: it's sent as before)
+  setQ(enqueue(q(), full, v, chartId in cache ? (getAt(cache[chartId], path) ?? null) : undefined));
   emit(chartId);
   if (!storageOk) notify();
   await flush();

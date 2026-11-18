@@ -99,3 +99,24 @@ test('store: the old rc:pending is moved over before it is removed', async () =>
   assert.equal(m.has('rc:pending'), false);
   assert.deepEqual(Q.fromStored(JSON.parse(m.get('rc:queue'))).map((e) => e.path), ['routines/days/2026-11-18/eli/teeth']);
 });
+
+test('store: a save to a chart this page has no copy of carries no base (sent as before)', async () => {
+  const m = new Map();
+  globalThis.localStorage = { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
+  const s = await import('../store.js?v=' + V + '&t=unwatched');
+  await s.save('trombone', 'weeks/2026-11-16/given', true);
+  const e = Q.fromStored(JSON.parse(m.get('rc:queue')))[0];
+  assert.equal(e.path, 'trombone/weeks/2026-11-16/given');
+  assert.equal('base' in e, false);
+});
+
+test('store: phone storage full: the tap still shows, and the problem is reported', async () => {
+  const m = new Map();
+  globalThis.localStorage = { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { if (k === 'rc:queue') throw new Error('QuotaExceededError'); m.set(k, String(v)); }, removeItem: (k) => m.delete(k) };
+  const s = await import('../store.js?v=' + V + '&t=full');
+  let last; s.watch('routines', (d) => { last = d; });
+  await s.save('routines', 'days/2026-11-18/eli/teeth', true);
+  assert.equal(Q.getAt(last, 'days/2026-11-18/eli/teeth'), true, 'shows on this phone');
+  assert.equal(s.syncProblems().storage, true);
+  assert.equal(s.syncProblems().queued, 1, 'kept in memory to send');
+});

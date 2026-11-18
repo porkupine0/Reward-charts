@@ -8,6 +8,9 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Monday and Tuesday of the week of Nov 16 count. Charts stay tied from Nov 16, and parents fill in those days on the checklists.
 - Isaiah's prizes stay as they are: game time only.
 
+## Remaining order
+14, 16, 12, 13 (16 before 12: editable settings would rewrite past weeks without it).
+
 ## Tier 1: bugs
 - [x] 3. Light-mode highlight colours restored (they pointed at themselves).
 - [x] 1. Optional swim days (Nov 27, Dec 24, Jan 1) and Thanksgiving Thursday can't fill Eli's box.
@@ -25,7 +28,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 ## Tier 3: data safety
 - [ ] 13. Database safety rules and a daily backup.
 - [ ] 14. Clearing old logs keeps training history and what charts and streaks need.
-- [ ] 15. Offline saves: replay order and showing failed saves.
+- [x] 15. Offline saves: replay order and showing failed saves.
 - [ ] 16. Settings changes don't rewrite past days.
 
 ## Open for the family
@@ -48,3 +51,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 6 done. The lock is narrowed, the held game time is shown, and chores can be excused from the Finish-first box.
 - Nov 18: items 9 and 10 done. The Parents page has a Tonight card (All good per boy, never overrides Not today, back six nights).
 - Nov 18: item 11 done. A parent's phone stays unlocked (tick box); other devices unlock for 15 minutes; old unlocks last until Nov 23.
+- Nov 18: item 15 done. Clearing drops queued writes beneath it; a quick correction is sent; pages share one queue. When the app is reopened after being offline, a change another phone made meanwhile wins and a notice shows (a page left open through an outage isn't covered). The pill can say "Saving…" or "Not saved, retrying".
