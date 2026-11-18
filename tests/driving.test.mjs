@@ -150,6 +150,9 @@ test('driving: grading', () => {
 test('driving: the content checker catches bad lessons and questions', () => {
   assert.deepEqual(D.checkCourse(course(10)), []);
   const bad = course(6);
+  const signed = course(2); signed[0].questions[0].sign = { shape: 'octagon', color: 'red' }; signed[0].questions[1].sign = { shape: 'hexagon', color: 'red' }; signed[1].questions[0].sign = { shape: 'diamond', color: 'purple' };
+  assert.match(D.checkCourse(signed).join(' | '), /L1q2: unknown sign shape hexagon.*L2q1: unknown sign color purple/);
+  assert.ok(!D.checkCourse(signed).join(' ').includes('L1q1'), 'a good sign passes');
   const nokey = course(2); nokey[0].key = [nokey[0].key[0]]; nokey[1].key[0] = { t: 'C' };
   assert.match(D.checkCourse(nokey).join(' | '), /L1: needs at least 2 key points.*L2: key point 1 needs a manual page and quote/);
   bad[0].questions[1].id = bad[0].questions[0].id;        // duplicate id

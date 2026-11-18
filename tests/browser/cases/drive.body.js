@@ -7,7 +7,8 @@ export const LESSONS = [
   { id: 'F1', title: 'Fixture lesson one', videos: [{ yt: 'AAAAAAAAAAA', title: 'Fixture video', channel: 'Fixture channel', len: '5:00', iowa: 'Iowa note.' }], questions: [1, 2, 3, 4, 5].map((k) => q('F1', k, 0)) },
   { id: 'F2', title: 'Fixture lesson two', videos: [{ yt: 'BBBBBBBBBBB', title: 'Fixture video 2', channel: 'Fixture channel', len: '6:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F2', k, 1)) },
   { id: 'F3', title: 'Fixture lesson three', key: [{ t: 'Fixture point one.', ref: "Iowa Driver's Manual p.1", quote: 'x' }, { t: 'Fixture family rule.', family: true }], videos: [{ yt: 'CCCCCCCCCCC', title: 'Fixture video 3', channel: 'Fixture channel', len: '7:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F3', k, 2)) }
-];`;
+];
+LESSONS[0].questions[0].sign = { shape: 'octagon', color: 'red' };`;
   const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
   await ctx.route(/driving-course\.js/, course);
   // no knowledge tests in this case (the baseline would hold the lessons; drive-test covers it)
@@ -46,6 +47,10 @@ export const LESSONS = [
   check(/In Iowa:/.test(await p.$eval('#today', (e) => e.textContent)), 'the Iowa note shows');
   await p.click('[data-watched="F1"]'); await p.waitForTimeout(200);
   const qs = await p.$$eval('.dq-q', (els) => els.map((e) => e.textContent));
+  const sign = await p.$eval('#today .dq:nth-of-type(1)', (e) => { const g = e.querySelector('svg.dsign'); return g && g.getAttribute('aria-label'); });
+  check(/red eight-sided/.test(sign || '') && !/stop/i.test(sign), 'a question with a sign shows the blank shape, labelled by what it looks like (' + sign + ')');
+  await p.screenshot({ path: OUT + 'drive-sign-light.png' });
+  await p.emulateMedia({ colorScheme: 'dark' }); await p.screenshot({ path: OUT + 'drive-sign-dark.png' }); await p.emulateMedia({ colorScheme: 'light' });
   check(qs.length === 5, '5 questions');
   await p.click('.dq:nth-of-type(1) [data-pick$="|0"]'); await p.waitForTimeout(150);   // right
   await p.click('.dq:nth-of-type(2) [data-pick$="|1"]'); await p.waitForTimeout(150);   // wrong

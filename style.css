@@ -704,6 +704,10 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .dq-why { margin: 0; font-size: 14px; color: var(--muted); }
 .dq-why small { color: var(--muted); }
 .dt-score { font-size: 18px; margin: 4px 0 10px; }
+.dq-sign { margin: 0 0 8px; height: 96px; }
+.dsign { display: block; width: 96px; height: 96px; }
+@media (prefers-color-scheme: dark) { .dsign { filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, .75)); } }
+.dprev-q .dsign { display: inline-block; width: 40px; height: 40px; vertical-align: middle; }
 .dkey { border-left: 4px solid var(--accent); padding: 4px 12px; margin: 8px 0 12px; background: var(--surface); }
 .dkey h3 { margin: 4px 0; }
 .dkey ul { margin: 4px 0 6px; padding-left: 18px; }

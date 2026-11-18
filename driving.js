@@ -1,3 +1,4 @@
+import { checkSign } from './signs.js?v=1795043028';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -156,6 +157,7 @@ export function checkCourse(lessons) {
       else if (!(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < q.choices.length)) out.push(q.id + ': answer is not one of the choices');
       if (!q.why) out.push(q.id + ': needs an explanation');
       if (!/^Iowa Driver.s Manual p\.\s?\d+/.test(q.ref || '')) out.push(q.id + ': needs a manual page (Iowa Driver\'s Manual p.N)');
+      out.push(...checkSign(q.id, q.sign));
     });
   });
   return out;
@@ -214,6 +216,7 @@ export function checkTests(forms, sittings, topics, lessons, blueprint) {
       else if (!(Number.isInteger(x.answer) && x.answer >= 0 && x.answer < x.choices.length)) out.push(x.id + ': answer is not one of the choices');
       if (!x.why) out.push(x.id + ': needs an explanation');
       if (!/^Iowa Driver.s Manual p\.\s?\d+/.test(x.ref || '')) out.push(x.id + ': needs a manual page');
+      out.push(...checkSign(x.id, x.sign));
     });
   });
   const ids = new Set((lessons || []).map((l) => l.id));

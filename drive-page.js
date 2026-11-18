@@ -1,12 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795041811';
-import { applyConfig } from './routines.js?v=1795041811';
-import { askParent } from './parent.js?v=1795041811';
-import * as L from './lists.js?v=1795041811';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795041811';
-import * as COURSE from './driving-course.js?v=1795041811';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795041811';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795043028';
+import { applyConfig } from './routines.js?v=1795043028';
+import { askParent } from './parent.js?v=1795043028';
+import * as L from './lists.js?v=1795043028';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795043028';
+import { signSvg } from './signs.js?v=1795043028';
+import * as COURSE from './driving-course.js?v=1795043028';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795043028';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -27,8 +28,10 @@ const video = (v) => '<div class="dv">' +
 // One question. Unanswered: the choices. Answered: the choices stay where they were (nothing moves under his
 // finger), his pick marked; then, unless `hide` (a unit test still in progress), the right answer, why, and
 // the manual page below them.
+// The question (and its sign, if it has one): shared by lessons, unit tests and knowledge tests.
+const qHead = (q, num) => '<p class="dq-q">' + (num ? num + '. ' : '') + esc(q.q) + '</p>' + (q.sign ? '<div class="dq-sign">' + signSvg(q.sign) + '</div>' : '');
 function questionHtml(q, a, lessonId, hide) {
-  const head = '<p class="dq-q">' + esc(q.q) + '</p>';
+  const head = qHead(q);
   if (!a) return '<div class="dq">' + head + '<div class="dq-choices">' + q.choices.map((c, i) =>
     '<button class="dq-choice" type="button" data-pick="' + esc(q.id) + '|' + esc(lessonId) + '|' + i + '">' + esc(c) + '</button>').join('') + '</div></div>';
   const show = !hide && a.pick !== undefined;
@@ -121,7 +124,7 @@ function renderTests() {
       return;
     }
     h += '<p class="dt-count">' + sc.answered + ' of ' + sc.total + ' answered</p><div class="dquiz">' + form.map((q, i) => {
-      const a = answerOf(q.id, s.id), head = '<p class="dq-q">' + (i + 1) + '. ' + esc(q.q) + '</p>';
+      const a = answerOf(q.id, s.id), head = qHead(q, i + 1);
       // answered: the choices stay where they were (so nothing slides under his finger), his pick marked
       if (a) return '<div class="dq answered">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice' + (ci === a.pick ? ' picked' : '') + '" type="button" disabled aria-pressed="' + (ci === a.pick) + '"' + (ci === a.pick ? ' aria-label="Your answer: ' + esc(c) + '"' : '') + '>' + esc(c) + '</button>').join('') + '</div></div>';
       return '<div class="dq">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice" type="button" data-tpick="' + esc(q.id) + '|' + esc(s.id) + '|' + ci + '">' + esc(c) + '</button>').join('') + '</div></div>';
@@ -137,7 +140,7 @@ function renderPreview() {
   const upcoming = course.filter((l) => !l.review && !(d.done || {})[l.id]).slice(0, 10);
   $('preview').innerHTML = upcoming.length ? upcoming.map((l) => '<div class="dprev"><h3>' + esc(l.title) + ' <span class="rcount">' + (isApproved(ap[l.id]) ? 'Approved ✓' : isSkipped(ap[l.id]) ? 'Video skipped' : 'Not reviewed') + '</span></h3>' +
     keyCard(l) + (l.videos || []).map(video).join('') +
-    '<ol class="dprev-q">' + (l.questions || []).map((q) => '<li>' + esc(q.q) + ' <b>' + esc(q.choices[q.answer]) + '</b> <small>(' + esc(q.ref) + ')</small></li>').join('') + '</ol>' +
+    '<ol class="dprev-q">' + (l.questions || []).map((q) => '<li>' + (q.sign ? signSvg(q.sign) + ' ' : '') + esc(q.q) + ' <b>' + esc(q.choices[q.answer]) + '</b> <small>(' + esc(q.ref) + ')</small></li>').join('') + '</ol>' +
     '<span class="exbtns"><button class="tbtn approve" data-approve="' + esc(l.id) + '|yes">Approve</button><button class="linkbtn" data-approve="' + esc(l.id) + '|skip">Skip the video</button>' +
     (ap[l.id] !== undefined ? '<button class="linkbtn" data-approve="' + esc(l.id) + '|undo">Undo</button>' : '') + '</span></div>').join('') : '<p class="muted">No upcoming lessons.</p>';
 }
