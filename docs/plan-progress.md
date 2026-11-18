@@ -36,6 +36,15 @@ Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all
 - [x] 19 + 20. Readability (contrast measured on every page, light and dark), 44px tap areas, chart labels that fit, game card "not earned" with reasons, "Other…" minutes.
 - [ ] 18. Each chart row says where its data comes from.
 
+## Driving course build (asked Nov 18; Iowa; parent previews videos; lessons outside game time)
+Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31 pm Central resume from here.
+- [ ] 0. Iowa driver's manual: fetch and read it; every age, rule and quiz answer comes from its text.
+- [ ] 1. Eli's computer work (typing, and the driving lesson) locked until today's chores are done.
+- [ ] 2. Leftover game time: a parent check on the Parents page each week ("Add N min to this week?").
+- [ ] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
+- [ ] 4. Driving page and wiring: checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
+- [ ] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
+
 ## Open for the family
 - Leftover game time: should it expire at the end of the weekend or carry over? (It stays on that week's chart now.)
 - Chart boxes can't reach 44px at seven columns on a phone.
