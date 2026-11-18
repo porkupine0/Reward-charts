@@ -163,3 +163,18 @@ test('driving: a later skip does not rewrite the days he was waiting', () => {
   // older skips without a date are passed over as before
   assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L2:required');
 });
+
+test('driving course content: passes the checker, and every quote is on its cited page of the Iowa manual', async () => {
+  const { LESSONS } = await import('../driving-course.js?v=' + V);
+  assert.deepEqual(D.checkCourse(LESSONS), []);
+  const manual = readFileSync(new URL('../docs/iowa/drivers-manual.txt', import.meta.url), 'utf8');
+  const pages = {};
+  manual.split(/\n===== PDF page (\d+) =====\n/).forEach((t, i, arr) => { if (i % 2) pages[arr[i]] = arr[i + 1]; });
+  const norm = (x) => x.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
+  const missing = [];
+  LESSONS.forEach((l) => (l.questions || []).forEach((q) => {
+    const page = q.ref.match(/p\.\s?(\d+)/)[1];
+    if (!q.quote || !norm(pages[page] || '').includes(norm(q.quote))) missing.push(q.id + ' (p.' + page + '): ' + q.quote);
+  }));
+  assert.deepEqual(missing, []);
+});

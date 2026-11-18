@@ -1,10 +1,10 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795020230';
-import { applyConfig } from './routines.js?v=1795020230';
-import { askParent } from './parent.js?v=1795020230';
-import * as L from './lists.js?v=1795020230';
-import { lessonFor, quizFor, isApproved, isSkipped } from './driving.js?v=1795020230';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795020574';
+import { applyConfig } from './routines.js?v=1795020574';
+import { askParent } from './parent.js?v=1795020574';
+import * as L from './lists.js?v=1795020574';
+import { lessonFor, quizFor, isApproved, isSkipped } from './driving.js?v=1795020574';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -15,7 +15,7 @@ let previewOpen = false;
 
 const video = (v) => '<div class="dv">' +
   (v.yt ? '<div class="dv-frame"><iframe src="https://www.youtube-nocookie.com/embed/' + esc(v.yt) + '" title="' + esc(v.title) + '" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' : '') +
-  '<p class="dv-meta"><b>' + esc(v.title) + '</b> · ' + esc(v.channel || '') + (v.len ? ' · ' + esc(v.len) : '') + '</p>' +
+  '<p class="dv-meta"><b>' + esc(v.title) + '</b> · ' + esc(v.channel || '') + (v.len ? ' · about ' + esc(v.len) : '') + '</p>' +
   (v.iowa ? '<p class="dv-iowa"><b>In Iowa:</b> ' + esc(v.iowa) + '</p>' : '') +
   (v.yt ? '<a class="cklink dv-open" href="https://www.youtube.com/watch?v=' + esc(v.yt) + '" target="_blank" rel="noopener">Open on YouTube &rarr;</a>' : '') + '</div>';
 
