@@ -579,6 +579,8 @@ test("Eli's plan runs through Feb 28; trial days match the trial schedule on eve
   assert.equal(planFor(d('2027-03-01')), null);
   assert.equal(trialOn(d('2027-02-13')), 'mile');
   assert.equal(trialOn(d('2027-02-27')), '5k');
+  assert.doesNotMatch(planFor(d('2027-01-23')).note, /Final test/, 'editing the February copy left January alone');
+  assert.match(planFor(d('2027-02-27')).note, /Final test/);
   // every plan day: trialOn says a trial exactly where the schedule has one (Thanksgiving's 5K may be Thu or Sat)
   const start = d('2026-10-26'), sched = planned(score({})).map((x) => [x.k, ymd(x.date)]);
   for (let day = start; ymd(day) <= '2027-02-28'; day = addDays(day, 1)) {

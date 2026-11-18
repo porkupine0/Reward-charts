@@ -216,7 +216,7 @@ function items(text, dow) {
   return out;
 }
 
-// Checklist for a Weeks 4–13 day.
+// Checklist for a day from Week 4 on.
 function objItems(t) {
   if (t.off) return [];
   const opt = !!t.opt, out = [];

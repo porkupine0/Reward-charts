@@ -32,6 +32,10 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 16. Settings changes don't rewrite past days.
 
 ## Open for the family
+- Eli's February weeks are a draft (existing sessions, volume kept flat): his coach should look them over.
+- His paces are still November's everywhere (trial start paces, the 14:08 split): update after the Jan 16 mile and Jan 23 5K.
+- Does swim stay Mon/Thu/Fri in February?
+- The "Eli's time trials" calendar file now includes Feb 13 and Feb 27: re-add it on any phone that added it before.
 - Apply the database rules (optional; steps in docs/database-safety.md).
 - Add the BACKUP_KEY secret to turn on the daily encrypted backup (optional; same guide).
 - Browser tests (tests/browser/) run by hand; they're not in CI yet. Tier 4 (code upkeep and extras) not started.
@@ -63,3 +67,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 12 done. Settings has game-time minutes per school day and bedtime grace (both apply from the day they're saved) and the wording of each boy's evening checks.
 - Nov 18: item 13 built (not applied). Database rules allow only the app's own save paths (the browser tests enforce them), plus an encrypted daily backup that does nothing until a key is set.
 - Nov 18: the missed-chore lock counts from Monday Nov 16 (decided); training text fixed: Plyometrics and Core A on Wednesday, Strength B lifts only on Thursday.
+- Nov 18: Eli's plan extended through Feb 28 (draft): recovery week, build week, then copies of the January weeks with a Feb 13 mile and Feb 27 final 5K.
