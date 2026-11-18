@@ -315,11 +315,11 @@ export const ROUTINES = {
   },
   strB: {
     title: 'Strength B', when: 'Thursday · at the gym · about 20 min',
-    note: 'Thursday at the gym. Pick a weight you could lift about 12 times and do 8. Thursday is a swim day now, so do the lifts only and skip the jumps after each one. Have a coach or gym staff check your squat and deadlift form before adding weight. Can’t make the gym? Do Home Strength instead.',
+    note: 'Thursday at the gym. Pick a weight you could lift about 12 times and do 8. Thursday is a swim day now, so it’s lifts only (no jumps). Have a coach or gym staff check your squat and deadlift form before adding weight. Can’t make the gym? Do Home Strength instead.',
     list: [
-      ['Goblet squat, 3 × 8 → 5 squat jumps', 'Pair 1', 'Hold a dumbbell at your chest, elbows down, and squat. Then 5 squat jumps right away.'],
-      ['Dumbbell RDL, 3 × 8 → 5 broad jumps', 'Pair 2', 'Dumbbells in front of thighs, push hips back and slide them down to mid-shin, flat back. Then 5 broad jumps forward, landing softly.'],
-      ['Dumbbell step-ups, 3 × 8 each leg → 10 pogo hops', 'Pair 3', 'Dumbbells at your sides, step onto a knee-high box, drive through the top foot, don’t push off the bottom one.'],
+      ['Goblet squat, 3 × 8', 'Pair 1', 'Hold a dumbbell at your chest, elbows down, and squat.'],
+      ['Dumbbell RDL, 3 × 8', 'Pair 2', 'Dumbbells in front of thighs, push hips back and slide them down to mid-shin, flat back.'],
+      ['Dumbbell step-ups, 3 × 8 each leg', 'Pair 3', 'Dumbbells at your sides, step onto a knee-high box, drive through the top foot, don’t push off the bottom one.'],
       ['Lat pulldown, 3 × 10', 'Pair 4', 'Hands a bit wider than shoulders, pull the bar to your upper chest, squeeze shoulder blades down. Control it back up.'],
       ['Calf raises on a step, 3 × 12 each leg', 'Pair 5', 'One foot on a step, dumbbell in the same-side hand, other hand on a rail. Full rise, slow lower.'],
       ['Nordic lowers, 2 × 4', 'Hamstrings', 'Kneel with feet held or anchored, lower your body forward as slowly as you can, catch with your hands. Or a hamstring curl machine 2 × 10, slow on the way down.'],
