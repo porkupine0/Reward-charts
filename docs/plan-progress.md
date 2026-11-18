@@ -51,6 +51,7 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 7b. Recut the plan to 55 lesson days (merge units 10 and 11; one final week).
 - [ ] 8. Unit test as a lesson type (w1d5 changes in place, keeps its id; on main before about Nov 25; add 2 more questions to each unit 1 lesson at the END of its list): every 5th lesson is a unit test (~15 questions, scored). Answered questions stay in place (as in the knowledge test: first tap is final).
 - [ ] 8b. "Not able to do it?" for driving lessons (approved by the family Nov 18): a parent-excused weekday keeps his streak (like run/swim). Needed before Thanksgiving, Nov 26.
+- [ ] 9b. Weekly hazard ride (approved Nov 18): once a week, a 10-minute ride with Eli as passenger calling out hazards; a parent ticks it on the Driving page (outside game time). Put it on the plan's quietest lesson day each week.
 - [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
 - [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).
 - [ ] 11. Week 2 content (unit 2: signs and signals), questions ~6 per lesson. Re-run scripts/check-videos.mjs first.
@@ -108,3 +109,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 18: driving step 5 done. Week 1 (scanning, following distance, blind spots and mirrors, intersections, review): 20 questions, each quoting its Iowa manual page (tested); 5 videos confirmed by title and channel. Next: week 2, signs and markings (manual pp. 6-17), as its own step.
 - Nov 18: driving steps 6 and 7. Baseline knowledge test live (take it before lesson 1); 13-week plan with 67 videos (13 Iowa DOT or Iowa). Next: steps 8-10 (code) before week 2, since the course file is append-only.
 - Nov 18: a lesson he hasn't begun waits until the baseline is done (lesson 2's first question is close to a baseline question).
+- Nov 18: family answers: weekly hazard ride yes; a weekly check-in writes the next unit and lists the videos to preview (Saturdays); permit knowledge test probably at home (parent-proctored: apply 7-14 days ahead, computer not phone/tablet, link expires 72 h, then a DMV appointment for the permit).
