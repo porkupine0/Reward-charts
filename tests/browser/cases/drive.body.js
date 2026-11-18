@@ -10,6 +10,9 @@ export const LESSONS = [
 ];`;
   const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
   await ctx.route(/driving-course\.js/, course);
+  // no knowledge tests in this case (the baseline would hold the lessons; drive-test covers it)
+  const noTests = (r) => r.fulfill({ contentType: 'text/javascript', body: "export const FORMS = {}; export const SITTINGS = []; export const PASS = 0.8; export const TOPICS = []; export const BLUEPRINT = {};" });
+  await ctx.route(/driving-tests\.js/, noTests);
   await p.goto(B + 'index.html');
   await p.evaluate((h) => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { settings: { pinHash: h },
     routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } } } })); }, PINHASH);
@@ -72,3 +75,4 @@ export const LESSONS = [
   check(thu.length === 5 && thu.slice(0, 3).every((t) => /F2-/.test(t)) && thu.slice(3).every((t) => /F1-/.test(t)), '3 from F2, 2 from F1');
   check(thu.slice(3).some((t) => /F1-2\?/.test(t)), 'the missed F1 question comes back');
   await ctx.unroute(/driving-course\.js/, course);
+  await ctx.unroute(/driving-tests\.js/, noTests);

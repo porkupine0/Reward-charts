@@ -1,11 +1,11 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795028743';
-import { applyConfig } from './routines.js?v=1795028743';
-import { askParent } from './parent.js?v=1795028743';
-import * as L from './lists.js?v=1795028743';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795028743';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795028743';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795029889';
+import { applyConfig } from './routines.js?v=1795029889';
+import { askParent } from './parent.js?v=1795029889';
+import * as L from './lists.js?v=1795029889';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795029889';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795029889';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -44,6 +44,10 @@ function render() {
   if (st.status !== 'done' && dow > 4) { $('today').innerHTML = '<h2>See you Monday</h2><p class="note">Driving lessons are Monday to Friday.</p>'; return; }
   const lock = st.status === 'done' ? false : L.computerLock(ctx, 'eli', now);
   if (lock) { $('today').innerHTML = '<h2>' + esc(st.lesson.title) + '</h2><p class="lockmsg">' + (lock === 'owed' ? 'Finish the chore you missed earlier this week first (it’s at the top of your checklist).' : 'Do today’s chores first, then come back.') + '</p><a class="cklink" href="checklist.html?kid=eli">Open my checklist &rarr;</a>'; return; }
+  // the baseline comes first: a lesson he hasn't begun waits until it's finished (so the baseline measures
+  // what he knew before the course). A lesson already begun (watched or answered) carries on.
+  const begun = (l) => !!(d.watched || {})[l.id] || Object.values(d.answers || {}).some((a) => a[l.id]);
+  if (st.status === 'ready' && !begun(st.lesson) && baselineOpen(d, key)) { $('today').innerHTML = '<h2>' + esc(st.lesson.title) + '</h2><p class="note">First, take the baseline knowledge test below. Today’s lesson opens as soon as it’s done.</p>'; return; }
   const lesson = st.lesson, watched = !!(d.watched || {})[lesson.id];
   // the quiz is built without today's answers, so it stays the same while he takes it
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);
@@ -64,6 +68,12 @@ function renderPast(course, d) {
   if (!lesson) { $('today').innerHTML = '<h2>No lesson finished on ' + esc(pastDay) + '</h2>'; return; }
   $('today').innerHTML = '<p class="eyebrow">Finished ' + esc(pastDay) + '</p><h2>' + esc(lesson.title) + '</h2>' + (lesson.videos || []).map(video).join('') +
     '<div class="dquiz">' + storedQuiz(course, lesson.id).map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id)).join('') + '</div>';
+}
+
+// The baseline (first sitting) is open and not finished yet.
+function baselineOpen(d, key) {
+  const s = openSittings(SITTINGS, d, key).find((x) => x.id === 'base');
+  return !!s && !testScore(FORMS[s.form] || [], d, s.id, PASS).done;
 }
 
 // ---- knowledge tests: practice for the written permit test (outside the streak and game time) ----

@@ -3,7 +3,8 @@
   // under the sitting (not as a lesson, so the checklist row and streak don't change); Parents page score.
   await p.goto(B + 'index.html');
   await p.evaluate(() => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
-    routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } } } })); });
+    routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } },
+    'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' } } } })); });
   await visit('parents.html', 'test-parents-none');
   check(/Baseline knowledge test: not started \(best taken before his first lesson\)/.test(await p.$eval('#testscores', (e) => e.textContent)), 'Parents page: not started yet');
   await visit('drive.html', 'test-locked');
@@ -13,6 +14,7 @@
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-18/eli/chore', true); });
   await visit('drive.html', 'test-start');
   check(!(await p.$('#tests .dq')), 'questions only after Start');
+  check(/First, take the baseline knowledge test/.test(await p.$eval('#today', (e) => e.textContent)) && !(await p.$('[data-watched]')), 'an approved lesson waits for the baseline');
   await p.click('[data-tstart="base"]'); await p.waitForTimeout(200);
   check((await p.$$('#tests .dq')).length === 25, '25 questions');
   // at phone width, answering (the longest choice) must not move anything below it
@@ -36,6 +38,7 @@
   check(/of 25/.test(t) && /pass mark/.test(t) && (await p.$$('#tests .dt-topics tr')).length === 8, 'score and 8 topics at the end');
   check(!(await p.$('#tests .dq')), 'no questions or answers shown after finishing');
   check(await p.$eval('#tests', (e) => e.previousElementSibling.id === 'today'), 'a finished test moves below the lesson');
+  check(!!(await p.$('#today [data-watched="w1d1"]')), 'baseline done: lesson 1 opens');
   const dv = (await db()).charts['eli-drive'];
   check(Object.values(dv.answers).every((a) => a.base) && Object.keys(dv.answers).length === 25, 'answers stored under the sitting');
   check(!dv.done, 'not stored as a finished lesson');
