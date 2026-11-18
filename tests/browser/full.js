@@ -168,12 +168,12 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   check(await p.$eval('.ckbtn[aria-pressed="true"]', () => true).catch(() => false), 'offline tap not shown');
   await p.waitForTimeout(3000);
   check(await p.$('#netbanner') !== null, 'offline banner missing');
-  const queued = await p.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('rc:pending') || '{}')).length);
+  const queued = await p.evaluate(() => { const q = JSON.parse(localStorage.getItem('rc:queue') || localStorage.getItem('rc:pending') || '[]'); return Array.isArray(q) ? q.length : Object.keys(q).length; });
   check(queued >= 1, 'offline tap not queued');
   offline = false;
   await visit('checklist.html?kid=rhett&date=2026-11-11');
   await p.waitForTimeout(800);
-  const left = await p.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('rc:pending') || '{}')).length);
+  const left = await p.evaluate(() => JSON.parse(localStorage.getItem('rc:queue') || '[]').length + Object.keys(JSON.parse(localStorage.getItem('rc:pending') || '{}')).length);
   check(left === 0, 'queued tap not sent after reconnect: ' + left);
   check((await db()).charts?.routines?.days?.['2026-11-11']?.rhett, 'queued tap not in database');
 

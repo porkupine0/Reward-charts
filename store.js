@@ -3,12 +3,13 @@
 // - Every tap is saved on the phone first and stays queued until Firebase confirms it,
 //   so nothing is lost if the app is closed while offline.
 // - If Firebase can't be reached, it keeps retrying and a banner says changes aren't synced yet.
-import { firebaseConfig } from './config.js?v=1794985737';
+import { firebaseConfig } from './config.js?v=1794986130';
+import { fromStored, enqueue, confirm, decide, getAt } from './queue.js?v=1794986130';
 
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const LS = (() => { try { const k = 'rc:t'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return localStorage; } catch (e) { return null; } })();
 const lsGet = (k, d) => { try { const v = LS && LS.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
-const lsSet = (k, v) => { try { LS && LS.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const lsSet = (k, v) => { try { if (!LS) return false; LS.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
 
 // ---- connection with retry ----
 let dbPromise = null, retryMs = 3000;
@@ -59,12 +60,26 @@ function setIn(obj, parts, value) {
   if (Object.keys(obj[key]).length === 0) delete obj[key];
   return obj;
 }
-function pending() { return lsGet('rc:pending', {}); }
+// The save queue lives in memory and is mirrored to the phone (rc:queue). Older versions used rc:pending.
+let queue = null, storageOk = true;
+const failed = new Set();  // paths Firebase refused; they stay queued and are retried
+let skipped = 0;           // changes not sent because another phone changed the same thing first
+function q() {
+  if (!queue) {
+    queue = fromStored(lsGet('rc:queue', null) || lsGet('rc:pending', {}));
+    try { LS && LS.removeItem('rc:pending'); } catch (e) {}
+  }
+  return queue;
+}
+function setQ(next) {
+  queue = next;
+  storageOk = lsSet('rc:queue', queue) || !LS;
+}
 function withPending(chartId, data) {
   const out = clone(data) || {};
-  Object.entries(pending()).forEach(([full, v]) => {
-    const [c, ...rest] = full.split('/');
-    if (c === chartId) setIn(out, rest, v);
+  q().forEach((e) => {
+    const [c, ...rest] = e.path.split('/');
+    if (c === chartId) setIn(out, rest, e.v);
   });
   return out;
 }
@@ -88,6 +103,7 @@ async function attach(chartId) {
     live[chartId] = true;
     lsSet('rc:cache:' + chartId, cache[chartId]);
     emit(chartId);
+    flush(); // queued changes for this chart can go now that its fresh data is here
   });
   if (!attached['.info']) {
     attached['.info'] = true;
@@ -111,28 +127,48 @@ export function watch(chartId, onData, onStatusFn) {
 export async function save(chartId, path, value) {
   const v = value === false || value === undefined ? null : value;
   const full = chartId + '/' + path;
-  const p = pending(); p[full] = v; lsSet('rc:pending', p);
+  // remember what the server had here, so a stale offline change can't overwrite another phone's newer one
+  setQ(enqueue(q(), full, v, getAt(cache[chartId] || {}, path) ?? null));
   emit(chartId);
-  await send(full, v);
+  if (!storageOk) notify();
+  await flush();
 }
-async function send(full, v) {
+async function send(e) {
   let conn;
-  try { conn = await getDb(); } catch (e) { return; }
+  try { conn = await getDb(); } catch (err) { return; }
   if (!conn) return;
   const { api, db } = conn;
   try {
-    await api.set(api.ref(db, 'charts/' + full), v);
-    const p = pending();
-    if (full in p && JSON.stringify(p[full]) === JSON.stringify(v)) { delete p[full]; lsSet('rc:pending', p); }
-    banner();
-  } catch (e) { /* stays queued; retried on reconnect */ }
+    await api.set(api.ref(db, 'charts/' + e.path), e.v);
+    failed.delete(e.path);
+    setQ(confirm(q(), e.path, e.v));
+  } catch (err) {
+    failed.add(e.path); // stays queued; retried later
+    setTimeout(flush, 30000);
+  }
+  notify();
 }
-let flushing = false;
+let flushing = false, again = false;
 async function flush() {
-  if (flushing) return;
+  if (flushing) { again = true; return; }
   flushing = true;
-  try { for (const [full, v] of Object.entries(pending())) await send(full, v); } finally { flushing = false; }
+  try {
+    do {
+      again = false;
+      for (const e of q().slice()) {
+        const c = e.path.split('/')[0];
+        if (!live[c]) { if (status === 'live') attach(c); continue; } // wait for this chart's fresh data first
+        const what = decide(e, getAt(cache[c] || {}, e.path.slice(c.length + 1)) ?? null);
+        if (what === 'done') { setQ(confirm(q(), e.path, e.v)); failed.delete(e.path); continue; }
+        if (what === 'conflict') { setQ(q().filter((x) => x !== e)); skipped++; emit(c); continue; }
+        await send(e);
+      }
+    } while (again);
+  } finally { flushing = false; notify(); }
 }
+// Refresh the pill and banner after a save, a failure or a skipped change.
+function notify() { statusFns.forEach((fn) => fn(status)); banner(); }
+export function syncProblems() { return { failed: failed.size, skipped, storage: !storageOk, queued: q().length }; }
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => { retryMs = 3000; connectAll(); });
   window.addEventListener('focus', () => { if (status !== 'live') connectAll(); });
@@ -140,14 +176,23 @@ if (typeof window !== 'undefined') {
 
 // ---- "not synced" banner ----
 let bannerTimer = null;
+let bannerBad = false;
 function banner() {
   if (typeof document === 'undefined') return;
-  const queued = Object.keys(pending()).length;
   const bad = status === 'offline' || status === 'nolink';
+  // While offline, wait 2.5 s before showing (brief blips stay quiet); don't restart that wait on every retry.
+  if (bad && bannerBad && bannerTimer) return;
+  bannerBad = bad;
   clearTimeout(bannerTimer);
   bannerTimer = setTimeout(() => {
+    bannerTimer = null;
+    const nowBad = status === 'offline' || status === 'nolink', queued = q().length, msgs = [];
+    if (nowBad) msgs.push('Not connected. ' + (queued ? queued + ' change' + (queued > 1 ? 's are' : ' is') + ' saved on this phone and will sync when you’re back online.' : 'Changes are saved on this phone and will sync when you’re back online.'));
+    if (failed.size) msgs.push(failed.size + ' change' + (failed.size > 1 ? 's' : '') + ' couldn’t be saved yet. This phone will keep trying.');
+    if (skipped) msgs.push((skipped > 1 ? skipped + ' changes from this phone weren’t' : 'A change from this phone wasn’t') + ' sent because someone changed the same thing on another phone first.');
+    if (!storageOk) msgs.push('This phone’s storage is full: changes are still sent, but close the app only once it says Synced.');
     let el = document.getElementById('netbanner');
-    if (!bad) { if (el) el.remove(); return; }
+    if (!msgs.length) { if (el) el.remove(); return; }
     if (!el) {
       el = document.createElement('div');
       el.id = 'netbanner';
@@ -155,7 +200,8 @@ function banner() {
       el.setAttribute('role', 'status');
       document.body.appendChild(el);
     }
-    el.textContent = 'Not connected. ' + (queued ? queued + ' change' + (queued > 1 ? 's are' : ' is') + ' saved on this phone and will sync when you’re back online.' : 'Changes are saved on this phone and will sync when you’re back online.');
+    el.textContent = msgs.join(' ');
+    if (skipped && !nowBad && !failed.size) setTimeout(() => { skipped = 0; banner(); }, 10000); // a notice, not a state
   }, bad ? 2500 : 0);
 }
 
@@ -196,6 +242,9 @@ export function dateParam(name) {
 export function statusPill(el) {
   return (st) => {
     el.dataset.state = st;
+    const pr = syncProblems();
+    if (st === 'live' && pr.failed) { el.dataset.state = 'nolink'; el.textContent = 'Not saved, retrying'; return; }
+    if (st === 'live' && pr.queued) { el.textContent = 'Saving…'; return; }
     el.textContent = st === 'live' ? 'Synced' : st === 'offline' ? 'Offline, will sync' : st === 'nolink' ? 'Can’t connect, retrying' : 'Connecting…';
   };
 }
