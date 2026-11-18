@@ -30,6 +30,8 @@ const WRITES = [
   // Eli's Training
   'charts/eli-run/days/2026-11-18/items/swim', 'charts/eli-run/days/2026-11-18/effort', 'charts/eli-run/days/2026-11-18/time',
   'charts/eli-run/days/2026-11-18/miles', 'charts/eli-run/days/2026-11-18/note',
+  // Eli's driving course
+  'charts/eli-drive/approved/w1d1', 'charts/eli-drive/done/w1d1', 'charts/eli-drive/watched/w1d1', 'charts/eli-drive/answers/w1d1q1/w1d1',
   // Ball Master
   'charts/isaiah/start', 'charts/isaiah/touchDays/2026-11-18', 'charts/isaiah/touches', 'charts/isaiah/juggle/5',
   'charts/isaiah/weekPrize/2', 'charts/isaiah/weekPrize', 'charts/isaiah/champion', 'charts/isaiah/cashed', 'charts/isaiah/cashed/weekPrize_1',
@@ -46,6 +48,7 @@ const WRITES = [
 const PROTECTED = [
   '', 'charts', 'charts/routines', 'charts/routines/days', 'charts/routines/weekly', 'charts/routines/game', 'charts/routines/game/eli', 'charts/routines/carry', 'charts/routines/carry/eli',
   'charts/eli-run', 'charts/eli-run/days', 'charts/eli-run/days/2026-11-18',
+  'charts/eli-drive', 'charts/eli-drive/answers', 'charts/eli-drive/answers/w1d1q1', 'charts/eli-drive/done', 'charts/eli-drive/approved',
   'charts/isaiah', 'charts/isaiah/touchDays', 'charts/isaiah/juggle',
   'charts/eli', 'charts/trombone', 'charts/zay', 'charts/eli/weeks', 'charts/trombone/months', 'charts/zay/weeks/2026-11-16',
   'charts/eli-trials', 'charts/eli-trials/trials', 'charts/eli-trials/paid',

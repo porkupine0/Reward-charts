@@ -1,10 +1,12 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795008523';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795008523';
-import { SETTINGS, onSettings } from './settings.js?v=1795008523';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795008523';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795008523';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795008818';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795008818';
+import { SETTINGS, onSettings } from './settings.js?v=1795008818';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795008818';
+import { LESSONS } from './driving-course.js?v=1795008818';
+import { lessonFor } from './driving.js?v=1795008818';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795008818';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -73,6 +75,13 @@ function listsOn(ctx, kid, date) {
       const at = day.findIndex((i) => i.key === 'activity');
       at >= 0 ? day.splice(at, 0, typing) : day.push(typing);
     }
+    // Driving lesson (Mon–Fri): shown today when a lesson is ready (or finished today), and on past days a
+    // lesson was finished. Computer work (waits for chores). Not scored: no game time, streak or "all done".
+    if (dow <= 4) {
+      const d = ctx.drive || {}, key = ymd(date), finished = Object.values(d.done || {}).includes(key);
+      const today = key === ymd(new Date()) && ['ready', 'done'].includes(lessonFor(driveCourse, d, key).status);
+      if (finished || today) day.push({ key: 'drive', label: 'Driving lesson', sub: 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, unscored: true });
+    }
     // After the training plan ends there's nothing to check off, so no Running item
     if (!p && ymd(date) >= planEndYmd()) { const at = day.findIndex((i) => i.key === 'activity'); if (at >= 0) day.splice(at, 1); }
   }
@@ -89,6 +98,16 @@ function listsOn(ctx, kid, date) {
 // Screen and school tasks: Rhett's computer items, Eli's assignments and homework. Run, swim, soccer,
 // snack, put-away, clothes and today's chores never lock.
 export const lockable = (kid, it) => !it.derived && it.key !== 'activity' && (!!it.computer || (kid === 'eli' && ['due', 'missing', 'homework'].includes(it.key)));
+// The driving course (tests can swap in a fixture course).
+let driveCourse = LESSONS;
+export function useCourse(lessons) { driveCourse = lessons; }
+export const course = () => driveCourse;
+// Computer work's lock for a day: 'owed' (a chore from earlier this week), 'chores' (today's chores not all
+// done) or false. The checklist rows and the Driving page both use it.
+export function computerLock(ctx, kid, date) {
+  if (choresOwed(ctx, kid, date).length) return 'owed';
+  return lists(ctx, kid, date).day.filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c)) ? 'chores' : false;
+}
 export function lockedBy(ctx, kid, date, it, list) {
   if (isOn(ctx, kid, date, it)) return false;
   if (lockable(kid, it) && lists(ctx, kid, date).day.some((i) => i.key === it.key) && choresOwed(ctx, kid, date).length) return 'owed'; // an earlier day's chore comes first
@@ -113,6 +132,7 @@ export function isOn(ctx, kid, date, it) {
   if (it.weekly) return !!weeklyDoneOn(ctx, kid, weeklyDef(kid, it.weekly), date);
   if (it.derived && checks[it.key] === EXCUSED) return true; // a parent excused the run, swim or soccer
   if (it.derived === 'run') return eliRunDone(ctx.run, date);
+  if (it.derived === 'drive') return Object.values(((ctx.drive || {}).done) || {}).includes(ymd(date));
   if (it.derived === 'touches') return touchedOn(ctx.isaiah, ymd(date));
   if (it.parts) return it.parts.every((p) => checks[partKey(it.key, p)]);
   return isDone(checks[it.key]);
@@ -120,7 +140,7 @@ export function isOn(ctx, kid, date, it) {
 
 // Required (not optional) items and how many are done.
 export function progress(ctx, kid, date, list) {
-  const req = list.filter((i) => !i.opt);
+  const req = list.filter((i) => !i.opt && !i.unscored);
   const left = req.filter((i) => !isOn(ctx, kid, date, i));
   return { req, left, done: req.length - left.length };
 }

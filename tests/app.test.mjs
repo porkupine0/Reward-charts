@@ -645,3 +645,50 @@ test("leftover game time: a parent moves it to the next week, once, with the amo
   ctx2.routines.days['2026-11-17'] = { rhett: fullOn('2026-11-17') };
   assert.equal(L.gameWeek(ctx2, 'rhett', last).left, 30, 'a later backfill stays on last week');
 });
+
+test("driving row: Mon–Fri, today when a lesson is ready, past days a lesson was finished; never scored; locked like computer work", async () => {
+  const S = await load('streaks.js');
+  const fx = (n) => ({ id: 'F' + n, title: 'Fixture ' + n, videos: [{ id: 'v' }], questions: [1, 2, 3, 4, 5].map((k) => ({ id: 'F' + n + 'q' + k, q: 'q', choices: ['a', 'b'], answer: 0, why: 'w', ref: "Iowa Driver's Manual p.1" })) });
+  L.useCourse(Array.from({ length: 80 }, (_, i) => fx(i + 1)));
+  try {
+    // finished lessons on many weekdays; the record of Eli's scores must not change
+    const doneDays = {}; let n = 0;
+    const todayKey = ymd(new Date());
+    for (let x = d('2026-11-16'); ymd(x) <= '2027-03-14'; x = addDays(x, 1)) if (L.dowOf(x) <= 4 && x.getDate() % 3 === 0 && ymd(x) !== todayKey) doneDays['F' + (++n)] = ymd(x);
+    const routines = { days: {} };
+    for (let x = d('2026-11-16'); ymd(x) <= '2027-03-14'; x = addDays(x, 1)) {
+      const k = ymd(x), ls = L.lists({ routines: {}, run: {}, isaiah: {} }, 'eli', x), c = {};
+      if (x.getDate() % 2) [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => { if (it.parts) it.parts.forEach((p) => { c[L.partKey(it.key, p)] = true; }); else c[it.key] = it.choices ? it.choices[0] : true; });
+      L.CHECKS.eli.forEach((x2) => { c[x2.key] = true; });
+      routines.days[k] = { eli: c };
+    }
+    const record = (ctx) => {
+      const out = [];
+      for (let x = d('2026-11-16'); ymd(x) <= '2027-03-14'; x = addDays(x, 1)) {
+        const mon = mondayOf(x);
+        out.push([ymd(x), L.gameDay(ctx, 'eli', x).earned, S.dayFull(ctx, 'eli', x), JSON.stringify(weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, mon, {}, ctx)))].join('|'));
+      }
+      // today, with a lesson ready and not done yet (the case where scoring it would matter)
+      const now = new Date();
+      out.push(['today', L.gameDay(ctx, 'eli', now).earned, L.gameDay(ctx, 'eli', now).left.join(','), S.dayFull(ctx, 'eli', now)].join('|'));
+      return out;
+    };
+    const without = record({ routines, run: {}, isaiah: {} });
+    const withDrive = { routines, run: {}, isaiah: {}, drive: { done: doneDays, approved: Object.fromEntries(Array.from({ length: 80 }, (_, i) => ['F' + (i + 1), true])) } };
+    if (L.dowOf(new Date()) <= 4) assert.ok(L.lists(withDrive, 'eli', new Date()).day.some((i) => i.key === 'drive' && !L.isOn(withDrive, 'eli', new Date(), i)), 'a lesson is ready today and not done');
+    assert.deepEqual(record(withDrive), without, 'scores identical with the driving row');
+    // the row is on the days a lesson was finished, and not on a Saturday
+    const someDay = Object.values(doneDays)[0];
+    assert.ok(L.lists(withDrive, 'eli', d(someDay)).day.some((i) => i.key === 'drive'));
+    assert.ok(!L.lists(withDrive, 'eli', d('2026-11-21')).day.some((i) => i.key === 'drive'), 'not Saturday');
+    assert.ok(!L.lists({ routines, run: {}, isaiah: {}, drive: {} }, 'rhett', d(someDay)).day.some((i) => i.key === 'drive'), 'Eli only');
+    // the lock helper: today's chores and none owed
+    const wed = d('2026-11-18'), lockCtx = { routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } }, run: {}, isaiah: {} };
+    assert.equal(L.computerLock(lockCtx, 'eli', wed), 'chores');
+    lockCtx.routines.days['2026-11-18'] = { eli: { chore: true } };
+    assert.equal(L.computerLock(lockCtx, 'eli', wed), false);
+    assert.equal(L.computerLock(lockCtx, 'eli', d('2026-11-19')), 'chores');
+    delete lockCtx.routines.days['2026-11-17'];
+    assert.equal(L.computerLock(lockCtx, 'eli', wed), 'owed');
+  } finally { L.useCourse([]); }
+});

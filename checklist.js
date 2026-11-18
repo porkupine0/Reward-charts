@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795008523';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795008523';
-import { SETTINGS } from './settings.js?v=1795008523';
-import { askParent } from './parent.js?v=1795008523';
-import * as L from './lists.js?v=1795008523';
-import { dayStreak, cheerIf } from './streaks.js?v=1795008523';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795008818';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795008818';
+import { SETTINGS } from './settings.js?v=1795008818';
+import { askParent } from './parent.js?v=1795008818';
+import * as L from './lists.js?v=1795008818';
+import { dayStreak, cheerIf } from './streaks.js?v=1795008818';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -51,7 +51,7 @@ function itemHtml(it, checks, extra) {
       return '<button class="chip part' + (pOn ? ' on' : '') + '" data-key="' + it.key + '" data-part="' + esc(p) + '" data-parts="' + esc(it.parts.join('|')) + '" aria-pressed="' + pOn + '">' + (pOn ? '✓ ' : '') + esc(p) + '</button>';
     }).join('') + '</div>';
   }
-  if (it.link) h += '<a class="cklink" href="' + it.link + '">Open &rarr;</a>';
+  if (it.link && !locked) h += '<a class="cklink" href="' + it.link + '">Open &rarr;</a>';
   if (canExcuse) {
     if (pending) h += '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-excuse="approve" data-key="' + it.key + '">Approve</button><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
     else if (excused) h += '<div class="excuse"><span>Excused tonight · counts, but not done</span><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
@@ -68,8 +68,8 @@ function nextSection() {
 }
 function section(title, sub, items, checks, timed, phase) {
   if (!items.length) return '';
-  const done = items.filter((i) => isOn(i) || i.opt).length;
-  const req = items.filter((i) => !i.opt);
+  const done = items.filter((i) => isOn(i) || i.opt || i.unscored).length;
+  const req = items.filter((i) => !i.opt && !i.unscored);
   const doneReq = req.filter((i) => isOn(i)).length;
   const isToday = ymd(date) === ymd(new Date());
   let nextMarked = false;
@@ -262,6 +262,7 @@ document.addEventListener('click', (e) => {
   }
   // Eli's Running is done on Training; Isaiah's 600 touches is shared with Ball Master.
   const item = L.lists(ctx, kid, date).day.find((i) => i.key === key);
+  if (item && item.derived === 'drive') { location.href = 'drive.html'; return; }
   if (item && item.derived === 'run') { location.href = 'run.html' + (ymd(date) === ymd(new Date()) ? '' : '?date=' + ymd(date)); return; }
   if (item && item.derived === 'touches') { save('isaiah', 'touchDays/' + ymd(date), isOn(item) ? null : true); return; }
   if (key.startsWith('w:')) {
@@ -431,3 +432,4 @@ watch(ID, (d) => { data = d; ctx.routines = d; render(); }, statusPill($('sync')
 watch('config', (d) => { applyConfig(d); render(); });
 watch('eli-run', (d) => { ctx.run = d; render(); });
 watch('isaiah', (d) => { ctx.isaiah = d; render(); });
+watch('eli-drive', (d) => { ctx.drive = d; render(); });

@@ -41,6 +41,12 @@
           }
         }
       },
+      "eli-drive": {
+        "approved": { "$lesson": { ".write": true } },
+        "done": { "$lesson": { ".write": true } },
+        "watched": { "$lesson": { ".write": true } },
+        "answers": { "$question": { "$lesson": { ".write": true } } }
+      },
       "isaiah": {
         "start": { ".write": true },
         "touchDays": {
