@@ -20,9 +20,9 @@
   await visit('checklist.html?kid=rhett', 'tonight-rhett-check');
   const yes = await p.$$eval('[data-daycheck$="|yes"]', (els) => els.map((e) => e.getAttribute('aria-pressed')));
   check(yes.length === 3 && yes.every((x) => x === 'true'), 'checklist End of day agrees ' + yes);
-  // stepper: back to Monday, then no further
+  // stepper: back past Monday
   await visit('parents.html', 'tonight-step');
   await tap('#tnprev'); await tap('#tnprev');
   notes.push('after two steps back: ' + await p.$eval('#tnhead', (e) => e.textContent));
-  check(await p.$eval('#tnprev', (e) => e.disabled), 'stops at Monday');
+  check(!(await p.$eval('#tnprev', (e) => e.disabled)), 'can keep going back past Monday (to Sunday)');
   check(!!(await p.$('[data-allgood^="2026-11-16|"]')), 'Monday can be filled in from here');

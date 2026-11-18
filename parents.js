@@ -1,14 +1,14 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794984872';
-import { CHARTS, weekProgress } from './charts.js?v=1794984872';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794984872';
-import * as L from './lists.js?v=1794984872';
-import { owed, score, planned, fmt } from './trials.js?v=1794984872';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794984872';
-import { askParent, setParent, changePin } from './parent.js?v=1794984872';
-import { dayFull } from './streaks.js?v=1794984872';
-import { owedItems } from './owed.js?v=1794984872';
-import { nowHtml } from './nowview.js?v=1794984872';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1794985052';
+import { CHARTS, weekProgress } from './charts.js?v=1794985052';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED } from './routines.js?v=1794985052';
+import * as L from './lists.js?v=1794985052';
+import { owed, score, planned, fmt } from './trials.js?v=1794985052';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1794985052';
+import { askParent, setParent, changePin } from './parent.js?v=1794985052';
+import { dayFull } from './streaks.js?v=1794985052';
+import { owedItems } from './owed.js?v=1794985052';
+import { nowHtml } from './nowview.js?v=1794985052';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -29,17 +29,17 @@ const PAGES = { eli: [['Checklist', 'checklist.html?kid=eli'], ['Chart', 'eli.ht
 let tnBack = 0;
 const exBtns = (d, id, key) => '<span class="exbtns"><button class="tbtn approve" data-ex="' + d + '|' + id + '|' + key + '|ok">Approve</button><button class="linkbtn" data-ex="' + d + '|' + id + '|' + key + '|no">Not OK</button></span>';
 function renderTonight(today) {
-  const base = L.tonightDate(today), mon = mondayOf(base);
-  tnBack = Math.max(0, Math.min(tnBack, Math.round((base - mon) / 864e5)));
+  const base = L.tonightDate(today);
+  tnBack = Math.max(0, Math.min(tnBack, 6)); // back up to six nights (a Monday can still reach Sunday)
   const date = addDays(base, -tnBack), dk = ymd(date);
   $('tnhead').textContent = tnBack ? DAYS[(date.getDay() + 6) % 7] + ' ' + shortDate(date) : 'Tonight · ' + DAYS[(date.getDay() + 6) % 7];
-  $('tnprev').disabled = ymd(date) <= ymd(mon);
+  $('tnprev').disabled = tnBack >= 6;
   $('tnnext').disabled = tnBack === 0;
   $('tonight').innerHTML = L.tonight(ctx, date).map((t) => {
     const k = KIDS[t.kid];
     const chip = (c, v, txt) => '<button class="chip' + (c.value === v ? ' on' + (v === 'no' ? ' no' : '') : '') + '" data-tn="' + dk + '|' + t.kid + '|' + c.key + '|' + v + '" aria-pressed="' + (c.value === v) + '">' + txt + '</button>';
     return '<div class="tnkid" style="--accent:' + k.accent + '"><div class="tnkid-top"><strong>' + esc(k.name) + '</strong>' +
-      (t.open ? '<button class="tbtn approve" data-allgood="' + dk + '|' + t.kid + '">All good</button>' : '<span class="rcount all">Done</span>') + '</div>' +
+      (t.open && isLive('routines') ? '<button class="tbtn approve" data-allgood="' + dk + '|' + t.kid + '">All good</button>' : '<span class="rcount all">Done</span>') + '</div>' +
       t.checks.map((c) => '<div class="tnrow"><span>' + esc(c.label) + '</span><span class="dchk-btns">' + chip(c, 'yes', 'Yes') + chip(c, 'no', 'Not today') + '</span></div>').join('') +
       t.excuses.map((x) => '<div class="tnrow"><span>Not able to: ' + esc(x.label) + '</span>' + exBtns(dk, t.kid, x.key) + '</div>').join('') +
       (t.late ? '<div class="tnrow"><span>In bed ' + t.late + ' min late</span><button class="tbtn approve" data-bedok="' + dk + '|' + t.kid + '">Parent OK</button></div>' : '') +
@@ -132,8 +132,10 @@ document.addEventListener('click', async (e) => {
   }
   const ag = e.target.closest('[data-allgood]');
   if (ag) {
-    const [d, kid] = ag.dataset.allgood.split('|'), keys = L.allGoodKeys(ctx, kid, parseYmd(d));
-    if (keys.length && await askParent()) keys.forEach((k) => save('routines', 'days/' + d + '/' + kid + '/' + k, true));
+    // Decide what to fill only after the PIN, from the latest data, so a "Not today" saved meanwhile survives
+    const [d, kid] = ag.dataset.allgood.split('|');
+    if (!isLive('routines') || !(await askParent())) return;
+    L.allGoodKeys(ctx, kid, parseYmd(d)).forEach((k) => save('routines', 'days/' + d + '/' + kid + '/' + k, true));
     return;
   }
   const b = e.target.closest('[data-bedok]');

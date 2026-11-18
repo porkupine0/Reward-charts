@@ -17,8 +17,8 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 6. The chore lock is too broad: lock only homework and screen tasks, show one message, and allow chores to be excused.
 
 ## Tier 2: parent workload
-- [ ] 9. A "Tonight" card on the Parents page: evening checks, today's excuses, tonight's late bedtime, and "All good" per boy.
-- [ ] 10. Isaiah's weekend checks: shown in Tonight (one tap).
+- [x] 9. A "Tonight" card on the Parents page: evening checks, today's excuses, tonight's late bedtime, and "All good" per boy.
+- [x] 10. Isaiah's weekend checks: shown in Tonight (one tap).
 - [ ] 11. Parent unlock: parent phones stay unlocked, other devices for a short time.
 - [ ] 12. Settings: evening checks, game-time minutes, bedtime grace.
 
@@ -37,8 +37,11 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Missed-chore lock now: homework and screen tasks lock (Rhett's computer tasks; Eli's assignments and homework). For Isaiah, and for Eli on weekends, it's the Finish-first box plus held game time. One missed chore holds the game time of every school day from then until it's done or excused. A missed Saturday chore has no consequence on Sunday for Eli or Isaiah.
 - Isaiah's weekend evening checks will show in the Tonight card (one "All good" tap).
 
+- Tonight's excuse requests show both in Tonight and in "Waiting for your OK" (harmless duplicate).
+
 ## Log
 - Nov 18: browser tests and this plan moved into the repo. Item 3 done.
 - Nov 18: items 1, 2 and 7 done. Eli's run/swim boxes follow his plan, his Saturday run is on his checklist, and a new test checks every chart box against the checklist.
 - Nov 18: item 8 done. The "next" ring follows the time of day, Parents "This week" counts Monday to today, trials say Saturday, and Eli's box labels follow his plan.
 - Nov 18: item 6 done. The lock is narrowed, the held game time is shown, and chores can be excused from the Finish-first box.
+- Nov 18: items 9 and 10 done. The Parents page has a Tonight card (All good per boy, never overrides Not today, back six nights).
