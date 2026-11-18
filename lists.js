@@ -1,12 +1,12 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795039593';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795039593';
-import { SETTINGS, onSettings } from './settings.js?v=1795039593';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795039593';
-import { LESSONS } from './driving-course.js?v=1795039593';
-import { dueOn } from './driving.js?v=1795039593';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795039593';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795040412';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795040412';
+import { SETTINGS, onSettings } from './settings.js?v=1795040412';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795040412';
+import { LESSONS } from './driving-course.js?v=1795040412';
+import { dueOn } from './driving.js?v=1795040412';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795040412';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
@@ -79,7 +79,7 @@ function listsOn(ctx, kid, date) {
     // game time. Approved that same day: optional. Computer work (waits for chores).
     if (dow <= 4) {
       const due = dueOn(driveCourse, ctx.drive || {}, ymd(date), dow);
-      if (due) day.push({ key: 'drive', label: due.lesson.review ? 'Driving: unit test' : 'Driving lesson', sub: due.lesson.review ? 'Questions on this week’s lessons. Tap to open it.' : 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' });
+      if (due) day.push({ key: 'drive', label: due.lesson.review ? 'Driving: unit test' : 'Driving lesson', sub: due.lesson.review ? 'Questions on this unit’s lessons. Tap to open it.' : 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' });
     }
     // After the training plan ends there's nothing to check off, so no Running item
     if (!p && ymd(date) >= planEndYmd()) { const at = day.findIndex((i) => i.key === 'activity'); if (at >= 0) day.splice(at, 1); }

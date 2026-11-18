@@ -3,6 +3,7 @@
   // score and every right answer; stored as done; the Parents page shows the score.
   const FIX = `const q = (l, k) => ({ id: l + 'q' + k, q: 'Fixture ' + l + '-' + k + '?', choices: ['Alpha', 'Bravo', 'Charlie'], answer: k % 3, why: 'Why ' + k + '.', ref: "Iowa Driver's Manual p.1" });
 const L = (id) => ({ id, title: 'Lesson ' + id, videos: [{ yt: 'AAAAAAAAAAA', title: 'V', channel: 'C', len: '5:00' }], questions: [1, 2, 3, 4, 5, 6, 7].map((k) => q(id, k)) });
+export const PLANNED = 10;
 export const LESSONS = [L('U1'), L('U2'), L('U3'), L('U4'), { id: 'U5', title: 'Unit 1 test', review: true, videos: [], questions: [] }];`;
   const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
   const noTests = (r) => r.fulfill({ contentType: 'text/javascript', body: 'export const FORMS = {}; export const SITTINGS = []; export const PASS = 0.8; export const TOPICS = []; export const BLUEPRINT = {};' });
@@ -30,5 +31,13 @@ export const LESSONS = [L('U1'), L('U2'), L('U3'), L('U4'), { id: 'U5', title: '
   check(((await db()).charts['eli-drive'].done || {}).U5 === '2026-11-18', 'stored as done today');
   await visit('parents.html', 'unit-parents');
   check(/Unit 1 test: \d+ of 16 right/.test(await p.$eval('#testscores', (e) => e.textContent)) && !(await p.$eval('#testcard', (e) => e.hidden)), 'Parents page shows the unit test score');
+  // the next day: every written lesson done, more planned -> "More lessons coming", and no driving row
+  await p.clock.setFixedTime(new Date(2026, 10, 19, 16, 0));
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-19/eli/chore', true); });
+  await visit('drive.html', 'unit-more');
+  check(/More lessons coming/.test(await p.$eval('#today', (e) => e.textContent)), 'caught up: More lessons coming');
+  await visit('checklist.html?kid=eli', 'unit-more-checklist');
+  check(!(await p.$('.ckbtn[data-key="drive"]')), 'caught up: no driving row (nothing is due)');
+  await p.clock.setFixedTime(new Date(2026, 10, 18, 16, 0));
   await ctx.unroute(/driving-tests\.js/, noTests);
   await ctx.unroute(/driving-course\.js/, course);

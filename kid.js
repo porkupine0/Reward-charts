@@ -1,14 +1,14 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795039593';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795039593';
-import { CHARTS, weekProgress } from './charts.js?v=1795039593';
-import { planFor } from './plan.js?v=1795039593';
-import * as L from './lists.js?v=1795039593';
-import { score, fmt, nextMilestone } from './trials.js?v=1795039593';
-import { dayStreak } from './streaks.js?v=1795039593';
-import { lessonFor } from './driving.js?v=1795039593';
-import { nowHtml } from './nowview.js?v=1795039593';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795040412';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795040412';
+import { CHARTS, weekProgress } from './charts.js?v=1795040412';
+import { planFor } from './plan.js?v=1795040412';
+import * as L from './lists.js?v=1795040412';
+import { score, fmt, nextMilestone } from './trials.js?v=1795040412';
+import { dayStreak } from './streaks.js?v=1795040412';
+import { lessonFor } from './driving.js?v=1795040412';
+import { nowHtml } from './nowview.js?v=1795040412';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {}, drive: {} };
@@ -48,7 +48,7 @@ function render() {
     // Driving: ready, done, waiting for approval, or locked until chores
     const course = L.course(), st = lessonFor(course, ctx.drive, ymd(now)), lock = L.computerLock(ctx, 'eli', now);
     const dtext = !course.length ? 'No lessons yet' : st.status === 'done' ? 'Today’s lesson done ✓' : st.status === 'finished' ? 'Course finished' : st.status === 'waiting' ? 'Next lesson waiting for Mom or Dad' : L.dowOf(now) > 4 ? 'Next lesson Monday' : lock ? 'Today’s lesson: chores first' : 'Today’s lesson is ready';
-    if (course.length) links.push(card('drive.html', 'run', 'Driving', 'Video lessons Mon–Thu, unit test Fri', dtext));
+    if (course.length) links.push(card('drive.html', 'run', 'Driving', 'A lesson a weekday; unit test every 5th', dtext));
     links.push(card('trials.html', 'trials', 'Time trials', 'Milestones · Prizes', (nx ? 'Next mile: under ' + fmt(nx[0]) : 'Mile done') + ' · ' + (n5 ? '5K: under ' + fmt(n5[0]) : '5K done')));
   }
   if (kid === 'rhett') {
