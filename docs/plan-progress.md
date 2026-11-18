@@ -48,7 +48,7 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
 - [x] 6. Baseline knowledge test (Form A, 25 questions, weighted like Iowa DOT's practice test; score and topics on the Driving and Parents pages; outside streak and game time).
 - [x] 7. 13-week plan with 67 videos picked (docs/driving-syllabus.md).
-- [ ] 7b. Recut the plan to 55 lesson days (merge units 10 and 11; one final week).
+- [x] 7b. Recut the plan to 55 lesson days (merge units 10 and 11; one final week).
 - [ ] 8. Unit test as a lesson type (w1d5 changes in place, keeps its id; on main before about Nov 25; add 2 more questions to each unit 1 lesson at the END of its list): every 5th lesson is a unit test (~15 questions, scored). Answered questions stay in place (as in the knowledge test: first tap is final). w1d5 changes only if Eli hasn't finished it (ask).
 - [ ] 9. Key points card above each video; Skip drops only the video (Key points + quiz still run).
 - [ ] 10. Sign shapes drawn in the quiz (needed for unit 2 and Form B).

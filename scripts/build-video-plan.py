@@ -52,21 +52,18 @@ PLAN = [
    ('Rain and hydroplaning', ['5.13'], [('k6kxcZkE7DY', '4:32', 'IA'), ('TdwuftIUwYY', '4:39', '')]),
    ('Snow, ice, skids, snowplows', ['5.13'], [('7t_sYFBYCKs', '5:14', ''), ('a3PQD_tv-bk', '1:12', ''), ('6RTam4qXIus', '1:12', 'IA')]),
    ('Gravel roads, deer, leaving the road', ['5.6', '5.8'], [('Ty9pHFD8TWU', '3:57', 'IA, check: may be about road design; spare bBoOslis3lk'), ('xJBfYBtqkZE', '1:01', ''), ('uMS1PClnAJQ', '3:09', '')])]),
- (10, 'The driver', [
+ (10, 'The driver and the car', [
    ('Phones and distractions', ['3.7'], [('-gB4m2LN9TU', '6:25', '')]),
    ('Alcohol and drugs', ['3.8'], [('UgaT6n1N9mA', '10:13', ''), ('6zl4dmpy0WQ', '3:09', 'North Dakota')]),
-   ('Drowsy driving, seat belts, loose objects', ['3.5', '3.6', '3.9'], [('KdN-gySbNlw', '9:47', '')]),
-   ('Iowa licensing rules, passengers, Iowa 511', ['1.1', '1.2', '1.3', '3.10'], [('tbRC0BXi108', '1:26', '')])]),
- (11, 'The car and emergencies', [
-   ('Car checks and tires', ['3.1'], [('Y3jcQCdeJAs', '6:28', ''), ('SzBO1CkIP8M', '1:40', '')]),
-   ('Starting, shifting, dashboard lights, driver-assist', ['4.1', '4.2', '3.3'], [('DswOF-reMRo', '2:08', 'CA')]),
-   ('Brake failure and blowouts', ['5.14'], [('6LrbFAvX4cA', '1:55', 'CA'), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style; spare Cz08eArGuvc')]),
-   ('Pulled over by police', ['5.16'], [('C_t-AOUrm0w', '1:55', 'IA (Des Moines news)')])]),
- (12, 'Practice', [
-   ('Iowa practice questions', [], [('yrIxUbBuB7Q', '13:50', 'check: third-party quiz, answers may be wrong or not Iowa')]),
-   ('Iowa road signs', [], [('owwsk636beU', '11:48', 'check: third-party quiz, answers may be wrong or not Iowa')])]),
+   ('Drowsy driving, seat belts, loose objects; Iowa licensing rules and 511', ['3.5', '3.6', '3.9', '1.1', '1.2', '1.3', '3.10'], [('KdN-gySbNlw', '9:47', ''), ('tbRC0BXi108', '1:26', '')]),
+   ('The car: checks, warning lights, driver-assist; brake failure; pulled over by police', ['3.1', '3.3', '4.1', '4.2', '5.14', '5.16'], [('SzBO1CkIP8M', '1:40', ''), ('DswOF-reMRo', '2:08', 'CA'), ('6LrbFAvX4cA', '1:55', 'CA'), ('C_t-AOUrm0w', '1:55', 'IA (Des Moines news)')])]),
+ (11, 'Final week', [
+   ('Iowa practice questions + 5 questions', [], [('yrIxUbBuB7Q', '13:50', 'check: third-party quiz, answers may be wrong or not Iowa')]),
+   ('Iowa DOT online practice test + 5 questions', [], []),
+   ('Iowa road signs + 5 questions', [], [('owwsk636beU', '11:48', 'check: third-party quiz, answers may be wrong or not Iowa')]),
+   ('Iowa DOT online practice test + 5 questions', [], [])]),
 ]
-SPARES = [('ZRDw6RmQ-y4', '6:05', ''), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
+SPARES = [('ZRDw6RmQ-y4', '6:05', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
   ('fba8OgJpWGI', '3:55', ''), ('ym4VOPoda4w', '6:20', 'North Carolina'), ('lWMg2IEtQT8', '8:01', ''), ('uIkanxT72KI', '1:43', 'Michigan'),
   ('lPPJ7S-ZLQE', '1:49', 'IA'), ('cTtEbLoJHyY', '11:58', ''), ('kxQHoBmjp4U', '13:01', ''), ('dWKsDvFBo6M', '12:34', ''),
   ('EJQQxcpQWE0', '0:31', 'IA'), ('xMutekpY0cs', '2:43', 'hazard-spotting'), ('oXh0uS9BHUo', '2:43', 'hazard-spotting'), ('-dQoLfMd-SI', '2:16', 'hazard-spotting')]
@@ -99,12 +96,11 @@ cell = lambda d: d['topic'] + (' (' + ', '.join(d['sections']) + ')' if d['secti
     v['yt'] + ' (' + v['len'] + (', ' + v['notes'] if v['notes'] else '') + ')' for v in d['videos'])
 rows = ['| Unit | Topic | Day 1 | Day 2 | Day 3 | Day 4 | Day 5 |', '|---|---|---|---|---|---|---|']
 for u in data['units']:
-    last = 'Unit test' + ('; **progress test** after it' if u['unit'] in (2, 4, 6, 8, 10) else '')
-    if u['unit'] == 1: last = 'Review now (unit test if he hasn’t started)'
-    if u['unit'] == 12: last = 'Iowa DOT practice test + 5 questions'
-    rows.append('| ' + str(u['unit']) + ' | ' + u['title'] + (' (**built**)' if u['unit'] == 1 else '') + ' | ' + ' | '.join(cell(d) for d in u['days']) +
-                (' | Iowa DOT practice test + 5 questions | Mixed review (5 questions)' if u['unit'] == 12 else '') + ' | ' + last + ' |')
-rows.append('| 13 | Final | Mixed review | Iowa DOT practice test + 5 questions | Mixed review | Iowa DOT practice test + 5 questions | **Final knowledge test** |')
+    last = 'Unit test' + ('; then **progress test** (new form)' if u['unit'] in (2, 4, 6, 8) else '')
+    if u['unit'] == 1: last = 'Unit 1 test'
+    if u['unit'] == 11: last = '**Final knowledge test** (new form)'
+    days = [(cell(d) if d['videos'] else d['topic']) for d in u['days']]
+    rows.append('| ' + str(u['unit']) + ' | ' + u['title'] + (' (**built**, days 1–4)' if u['unit'] == 1 else '') + ' | ' + ' | '.join(days) + ' | ' + last + ' |')
 doc = open('docs/driving-syllabus.md').read()
 a, b = doc.index('<!-- units -->'), doc.index('<!-- /units -->')
 doc = doc[:a] + '<!-- units -->\n' + '\n'.join(rows) + '\n' + doc[b:]

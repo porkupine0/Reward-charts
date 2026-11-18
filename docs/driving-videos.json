@@ -784,7 +784,7 @@
   },
   {
    "unit": 10,
-   "title": "The driver",
+   "title": "The driver and the car",
    "days": [
     {
      "day": 1,
@@ -827,11 +827,15 @@
     },
     {
      "day": 3,
-     "topic": "Drowsy driving, seat belts, loose objects",
+     "topic": "Drowsy driving, seat belts, loose objects; Iowa licensing rules and 511",
      "sections": [
       "3.5",
       "3.6",
-      "3.9"
+      "3.9",
+      "1.1",
+      "1.2",
+      "1.3",
+      "3.10"
      ],
      "videos": [
       {
@@ -840,19 +844,7 @@
        "channel": "teensinthedriverseat",
        "len": "9:47",
        "notes": ""
-      }
-     ]
-    },
-    {
-     "day": 4,
-     "topic": "Iowa licensing rules, passengers, Iowa 511",
-     "sections": [
-      "1.1",
-      "1.2",
-      "1.3",
-      "3.10"
-     ],
-     "videos": [
+      },
       {
        "yt": "tbRC0BXi108",
        "title": "Teen Driving Restrictions: Passengers",
@@ -861,61 +853,33 @@
        "notes": ""
       }
      ]
-    }
-   ]
-  },
-  {
-   "unit": 11,
-   "title": "The car and emergencies",
-   "days": [
+    },
     {
-     "day": 1,
-     "topic": "Car checks and tires",
+     "day": 4,
+     "topic": "The car: checks, warning lights, driver-assist; brake failure; pulled over by police",
      "sections": [
-      "3.1"
+      "3.1",
+      "3.3",
+      "4.1",
+      "4.2",
+      "5.14",
+      "5.16"
      ],
      "videos": [
-      {
-       "yt": "Y3jcQCdeJAs",
-       "title": "How To Make Your Car Last A Long Time - Simple Checks",
-       "channel": "Engineering Explained",
-       "len": "6:28",
-       "notes": ""
-      },
       {
        "yt": "SzBO1CkIP8M",
        "title": "TireWise: Life of a Tire",
        "channel": "SaferCarTV",
        "len": "1:40",
        "notes": ""
-      }
-     ]
-    },
-    {
-     "day": 2,
-     "topic": "Starting, shifting, dashboard lights, driver-assist",
-     "sections": [
-      "4.1",
-      "4.2",
-      "3.3"
-     ],
-     "videos": [
+      },
       {
        "yt": "DswOF-reMRo",
        "title": "Dashboard Warning Lights Explained | Quick Tip",
        "channel": "Don Wheaton Chevrolet Buick GMC Cadillac Ltd",
        "len": "2:08",
        "notes": "CA"
-      }
-     ]
-    },
-    {
-     "day": 3,
-     "topic": "Brake failure and blowouts",
-     "sections": [
-      "5.14"
-     ],
-     "videos": [
+      },
       {
        "yt": "6LrbFAvX4cA",
        "title": "What To Do If Your Car Brakes Fail",
@@ -923,22 +887,6 @@
        "len": "1:55",
        "notes": "CA"
       },
-      {
-       "yt": "LOPkiGCFo_Y",
-       "title": "How to Survive a Tire Blowout",
-       "channel": "How to Survive Show",
-       "len": "4:34",
-       "notes": "check: survival-show style; spare Cz08eArGuvc"
-      }
-     ]
-    },
-    {
-     "day": 4,
-     "topic": "Pulled over by police",
-     "sections": [
-      "5.16"
-     ],
-     "videos": [
       {
        "yt": "C_t-AOUrm0w",
        "title": "Here's what to do when you get pulled over",
@@ -951,12 +899,12 @@
    ]
   },
   {
-   "unit": 12,
-   "title": "Practice",
+   "unit": 11,
+   "title": "Final week",
    "days": [
     {
      "day": 1,
-     "topic": "Iowa practice questions",
+     "topic": "Iowa practice questions + 5 questions",
      "sections": [],
      "videos": [
       {
@@ -970,7 +918,13 @@
     },
     {
      "day": 2,
-     "topic": "Iowa road signs",
+     "topic": "Iowa DOT online practice test + 5 questions",
+     "sections": [],
+     "videos": []
+    },
+    {
+     "day": 3,
+     "topic": "Iowa road signs + 5 questions",
      "sections": [],
      "videos": [
       {
@@ -981,6 +935,12 @@
        "notes": "check: third-party quiz, answers may be wrong or not Iowa"
       }
      ]
+    },
+    {
+     "day": 4,
+     "topic": "Iowa DOT online practice test + 5 questions",
+     "sections": [],
+     "videos": []
     }
    ]
   }
@@ -992,6 +952,20 @@
    "channel": "Stan Cravens",
    "len": "6:05",
    "notes": ""
+  },
+  {
+   "yt": "Y3jcQCdeJAs",
+   "title": "How To Make Your Car Last A Long Time - Simple Checks",
+   "channel": "Engineering Explained",
+   "len": "6:28",
+   "notes": ""
+  },
+  {
+   "yt": "LOPkiGCFo_Y",
+   "title": "How to Survive a Tire Blowout",
+   "channel": "How to Survive Show",
+   "len": "4:34",
+   "notes": "check: survival-show style"
   },
   {
    "yt": "bBoOslis3lk",
