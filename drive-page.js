@@ -1,12 +1,12 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795040412';
-import { applyConfig } from './routines.js?v=1795040412';
-import { askParent } from './parent.js?v=1795040412';
-import * as L from './lists.js?v=1795040412';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795040412';
-import * as COURSE from './driving-course.js?v=1795040412';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795040412';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795040710';
+import { applyConfig } from './routines.js?v=1795040710';
+import { askParent } from './parent.js?v=1795040710';
+import * as L from './lists.js?v=1795040710';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795040710';
+import * as COURSE from './driving-course.js?v=1795040710';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795040710';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -55,7 +55,8 @@ function render() {
   // what he knew before the course). A lesson already begun (watched or answered) carries on.
   const begun = (l) => !!(d.watched || {})[l.id] || Object.values(d.answers || {}).some((a) => a[l.id]);
   if (st.status === 'ready' && !begun(st.lesson) && baselineOpen(d, key)) { $('today').innerHTML = '<h2>' + esc(st.lesson.title) + '</h2><p class="note">First, take the baseline knowledge test above. Today’s lesson opens as soon as it’s done.</p>'; return; }
-  const lesson = st.lesson, watched = !!(d.watched || {})[lesson.id];
+  // a skipped video: the lesson runs without it (straight to the questions)
+  const lesson = st.lesson, noVideo = isSkipped((d.approved || {})[lesson.id]), watched = noVideo || !!(d.watched || {})[lesson.id];
   // the quiz is built without today's answers, so it stays the same while he takes it
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);
   // a unit test: no right/wrong until every question is answered, then the score and every answer
@@ -63,6 +64,7 @@ function render() {
   let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>';
   if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
     : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
+  else if (noVideo) h += '<p class="note">No video for this one (Mom or Dad skipped it): just the questions.</p>';
   else h += (lesson.videos || []).map(video).join('') + (watched ? '<p class="dv-done">✓ Watched</p>' : '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>');
   if (watched || lesson.review) h += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
   if (st.status === 'done') h += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
@@ -129,10 +131,10 @@ function renderPreview() {
   if (!previewOpen) { $('preview').innerHTML = ''; return; }
   const course = L.course(), d = ctx.drive || {}, ap = d.approved || {};
   const upcoming = course.filter((l) => !l.review && !(d.done || {})[l.id]).slice(0, 10);
-  $('preview').innerHTML = upcoming.length ? upcoming.map((l) => '<div class="dprev"><h3>' + esc(l.title) + ' <span class="rcount">' + (isApproved(ap[l.id]) ? 'Approved ✓' : isSkipped(ap[l.id]) ? 'Skipped' : 'Not reviewed') + '</span></h3>' +
+  $('preview').innerHTML = upcoming.length ? upcoming.map((l) => '<div class="dprev"><h3>' + esc(l.title) + ' <span class="rcount">' + (isApproved(ap[l.id]) ? 'Approved ✓' : isSkipped(ap[l.id]) ? 'Video skipped' : 'Not reviewed') + '</span></h3>' +
     (l.videos || []).map(video).join('') +
     '<ol class="dprev-q">' + (l.questions || []).map((q) => '<li>' + esc(q.q) + ' <b>' + esc(q.choices[q.answer]) + '</b> <small>(' + esc(q.ref) + ')</small></li>').join('') + '</ol>' +
-    '<span class="exbtns"><button class="tbtn approve" data-approve="' + esc(l.id) + '|yes">Approve</button><button class="linkbtn" data-approve="' + esc(l.id) + '|skip">Skip</button>' +
+    '<span class="exbtns"><button class="tbtn approve" data-approve="' + esc(l.id) + '|yes">Approve</button><button class="linkbtn" data-approve="' + esc(l.id) + '|skip">Skip the video</button>' +
     (ap[l.id] !== undefined ? '<button class="linkbtn" data-approve="' + esc(l.id) + '|undo">Undo</button>' : '') + '</span></div>').join('') : '<p class="muted">No upcoming lessons.</p>';
 }
 
@@ -178,7 +180,7 @@ function finishIfDone(lessonId) {
   const course = L.course(), d = ctx.drive || {}, key = ymd(new Date()), st = lessonFor(course, d, key);
   if (!st.lesson || st.lesson.id !== lessonId || st.status !== 'ready') return;
   const quiz = quizFor(course, st.index, d);
-  const watched = st.lesson.review || (d.watched || {})[lessonId];
+  const watched = st.lesson.review || isSkipped((d.approved || {})[lessonId]) || (d.watched || {})[lessonId];
   if (watched && quiz.length && quiz.every((q) => answerOf(q.id, lessonId))) save(ID, 'done/' + lessonId, key);
 }
 
@@ -190,7 +192,7 @@ function finishLeftovers() {
   if (!live()) return;
   const d = ctx.drive || {}, course = L.course();
   course.forEach((l) => {
-    if ((d.done || {})[l.id] || !(l.review || (d.watched || {})[l.id])) return;
+    if ((d.done || {})[l.id] || !(l.review || isSkipped((d.approved || {})[l.id]) || (d.watched || {})[l.id])) return;
     const mine = Object.values(d.answers || {}).map((a) => a[l.id]).filter(Boolean);
     // a lesson needs its 5 answers; a unit test needs all of its questions answered
     const need = l.review ? quizFor(course, course.indexOf(l), d).length : 5;

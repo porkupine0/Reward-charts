@@ -8,7 +8,8 @@
 // Everything here is deterministic: the same progress always gives the same lesson and the same quiz.
 
 // The lesson for a day: the one finished that day, else the next one in order that a parent approved.
-// Skipped lessons are passed over. { lesson, index, status }: 'done' (finished today), 'ready',
+// A skip only skips the VIDEO: the lesson still runs (its quiz, and its questions come back later), so a
+// skip counts like an approval given that day. { lesson, index, status }: 'done' (finished today), 'ready',
 // 'waiting' (the next one isn't approved yet) or 'finished' (course over).
 export const isApproved = (v) => v === true || (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v));
 export const isSkipped = (v) => v === 'skip' || (typeof v === 'string' && v.startsWith('skip:'));
@@ -22,11 +23,11 @@ export function lessonFor(lessons, progress, dayKey) {
   if (today >= 0) return { lesson: lessons[today], index: today, status: 'done' };
   for (let i = 0; i < lessons.length; i++) {
     const l = lessons[i];
-    if (done[l.id] || isSkipped(approved[l.id])) continue;
+    if (done[l.id]) continue;
     // a unit test has no video to approve: it's ready once a lesson of its own unit is finished (else, e.g.
     // every lesson of the unit skipped, it's passed over: it would have no questions)
     if (l.review) { if (lessons.slice(unitStart(lessons, i), i).some((x) => done[x.id])) return { lesson: l, index: i, status: 'ready' }; continue; }
-    return { lesson: l, index: i, status: isApproved(approved[l.id]) ? 'ready' : 'waiting' };
+    return { lesson: l, index: i, status: isApproved(approved[l.id]) || isSkipped(approved[l.id]) ? 'ready' : 'waiting' };
   }
   return { lesson: null, index: lessons.length, status: 'finished' };
 }
@@ -39,17 +40,12 @@ export function lessonFor(lessons, progress, dayKey) {
 export function dueOn(lessons, progress, dayKey, dow) {
   if (dow > 4) return null;
   const p = progress || {}, done = p.done || {}, approved = p.approved || {};
-  let soft = false; // a lesson was skipped that same day: the next one is only optional that day
-  const due = (l, how) => ({ lesson: l, due: soft ? 'optional' : how });
+  const due = (l, how) => ({ lesson: l, due: how });
   for (let i = 0; i < lessons.length; i++) {
-    const l = lessons[i], a = approved[l.id];
+    const l = lessons[i];
+    // a skip (the video only) counts like an approval on its day; an old undated skip like an old approval
+    const a = isSkipped(approved[l.id]) ? (skipDay(approved[l.id]) || true) : approved[l.id];
     if (done[l.id] && done[l.id] < dayKey) continue;
-    if (isSkipped(a)) {
-      const sd = skipDay(a);
-      if (sd && dayKey < sd) return null; // before it was skipped, it still blocked (waiting)
-      if (sd === dayKey) soft = true;
-      continue;
-    }
     if (done[l.id] === dayKey) return { lesson: l, due: 'required' };
     if (l.review) {
       if (lessons.slice(unitStart(lessons, i), i).some((x) => done[x.id] && done[x.id] < dayKey)) return due(l, 'required');

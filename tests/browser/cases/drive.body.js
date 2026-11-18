@@ -66,7 +66,8 @@ export const LESSONS = [
   await p.click('#previewbtn'); await p.waitForTimeout(300);
   await p.click('[data-approve="F2|yes"]'); await p.waitForTimeout(300);
   await p.click('[data-approve="F3|skip"]'); await p.waitForTimeout(300);
-  check((await db()).charts['eli-drive'].approved.F3 === 'skip:2026-11-18', 'F3 skipped (with the day)');
+  check((await db()).charts['eli-drive'].approved.F3 === 'skip:2026-11-18', 'F3 video skipped (with the day)');
+  check(/Video skipped/.test(await p.$eval('#preview', (e) => e.textContent)) && /Skip the video/.test(await p.$eval('#preview', (e) => e.textContent)), 'preview says the video was skipped');
   await p.clock.setFixedTime(new Date(2026, 10, 19, 16, 0));
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-19/eli/chore', true); });
   await visit('drive.html', 'drive-thu');
@@ -75,5 +76,14 @@ export const LESSONS = [
   notes.push('Thursday quiz: ' + thu.join(' | '));
   check(thu.length === 5 && thu.slice(0, 3).every((t) => /F2-/.test(t)) && thu.slice(3).every((t) => /F1-/.test(t)), '3 from F2, 2 from F1');
   check(thu.slice(3).some((t) => /F1-2\?/.test(t)), 'the missed F1 question comes back');
+  // Friday: F3 (video skipped) still runs: no video, straight to its 5 questions
+  for (let k = 0; k < 5; k++) { await p.click('.dq-choice:not([disabled])'); await p.waitForTimeout(150); }
+  await p.clock.setFixedTime(new Date(2026, 10, 20, 16, 0));
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-20/eli/chore', true); });
+  await visit('drive.html', 'drive-fri-novideo');
+  const fri = await p.$eval('#today', (e) => e.textContent);
+  check(/Fixture lesson three/.test(fri) && /No video for this one/.test(fri) && !(await p.$('#today iframe')) && !(await p.$('[data-watched]')) && (await p.$$('#today .dq')).length === 5, 'F3 runs without its video: straight to 5 questions');
+  for (let k = 0; k < 5; k++) { await p.click('.dq-choice:not([disabled])'); await p.waitForTimeout(150); }
+  check(((await db()).charts['eli-drive'].done || {}).F3 === '2026-11-20', 'F3 finishes without a video');
   await ctx.unroute(/driving-course\.js/, course);
   await ctx.unroute(/driving-tests\.js/, noTests);

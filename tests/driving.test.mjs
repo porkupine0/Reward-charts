@@ -29,7 +29,7 @@ test('driving: lessons go in order, one new a day, only once a parent approves',
   p.done.L2 = day(2);
   assert.equal(D.lessonFor(LESSONS, p, day(3)).status, 'waiting', 'L3 not approved yet');
   p.approved.L3 = 'skip'; p.approved.L4 = true;
-  assert.equal(D.lessonFor(LESSONS, p, day(3)).lesson.id, 'L4', 'a skipped lesson is passed over');
+  assert.deepEqual([D.lessonFor(LESSONS, p, day(3)).lesson.id, D.lessonFor(LESSONS, p, day(3)).status], ['L3', 'ready'], 'a skip skips only the video: the lesson still runs');
   const all = { approved: {}, done: Object.fromEntries(LESSONS.map((l, i) => [l.id, day(i + 1)])) };
   assert.equal(D.lessonFor(LESSONS, all, day(20)).status, 'finished');
 });
@@ -39,7 +39,7 @@ test('driving: a review needs no approval; it is passed over when nothing before
   const p = { approved: { L1: true, L2: true, L3: true, L4: true }, done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4) } };
   assert.deepEqual([D.lessonFor(L, p, day(5)).lesson.id, D.lessonFor(L, p, day(5)).status], ['L5', 'ready'], 'review ready without approval');
   const skipped = { approved: { L1: 'skip', L2: 'skip', L3: 'skip', L4: 'skip', L6: true }, done: {} };
-  assert.equal(D.lessonFor(L, skipped, day(5)).lesson.id, 'L6', 'nothing finished before it: the review is passed over');
+  assert.equal(D.lessonFor(L, skipped, day(5)).lesson.id, 'L1', 'videos skipped: the lessons still run, in order');
   assert.ok(all);
 });
 
@@ -51,10 +51,12 @@ test('driving: the quiz does not change while he takes it', () => {
   before.forEach((id) => { answer(p, id, 'L3', id === before[3] ? false : true, day(3)); assert.deepEqual(D.quizFor(LESSONS, 2, p).map((x) => x.id), before, 'same after answering ' + id); });
 });
 
-test('driving: earlier questions come only from finished lessons (not skipped ones)', () => {
+test('driving: earlier questions come only from finished lessons (a lesson whose video was skipped counts once he finishes its quiz)', () => {
   const p = { done: { L1: day(1) }, approved: { L1: true, L2: 'skip', L3: true }, answers: {} };
   const quiz = D.quizFor(LESSONS, 2, p).map((x) => x.id);
-  assert.ok(!quiz.some((id) => id.startsWith('L2')), 'nothing from the skipped lesson: ' + quiz);
+  assert.ok(!quiz.some((id) => id.startsWith('L2')), 'nothing from L2 before he has done it: ' + quiz);
+  p.done.L2 = day(2);
+  assert.ok(D.quizFor(LESSONS, 2, p).some((x) => x.id.startsWith('L2')), 'once its quiz is done, the skipped-video lesson\'s questions come back');
   assert.ok(quiz.slice(3).every((id) => id.startsWith('L1')));
 });
 
@@ -113,14 +115,17 @@ test('driving: the unit test is 4 questions from each finished lesson of its uni
   assert.ok(D.quizFor(ten, 9, p2).every((x) => /^L[6-9]q/.test(x.id)));
 });
 
-test('driving: a unit test whose lessons were all skipped is passed over (it would have no questions)', () => {
+test('driving: a unit test looks only at its own unit (an empty one would be passed over)', () => {
+  // every video of unit 2 skipped: the lessons still run, so its test has their questions
   const ten = course(11), p = { approved: { L1: '2026-11-01', L2: '2026-11-01', L3: '2026-11-01', L4: '2026-11-01', L6: 'skip:2026-12-01', L7: 'skip:2026-12-01', L8: 'skip:2026-12-01', L9: 'skip:2026-12-01', L11: '2026-12-01' },
     done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4), L5: day(5) }, answers: {} };
-  assert.equal(D.lessonFor(ten, p, day(8)).lesson.id, 'L11', 'unit 2 skipped: its test is passed over, on to L11');
-  assert.equal(D.dueOn(ten, p, day(8), 1).lesson.id, 'L11');
-  p.done.L7 = day(7); delete p.approved.L7; p.approved.L7 = '2026-11-01';
-  assert.equal(D.lessonFor(ten, p, day(8)).lesson.id, 'L10', 'one lesson of the unit finished: its test is on');
-  assert.equal(D.quizFor(ten, 9, p).length, 4);
+  assert.equal(D.lessonFor(ten, p, day(8)).lesson.id, 'L6', 'videos skipped: the unit 2 lessons still run');
+  Object.assign(p.done, { L6: day(6), L7: day(7), L8: day(8), L9: '2026-12-09' });
+  assert.equal(D.lessonFor(ten, p, '2026-12-10').lesson.id, 'L10');
+  assert.equal(D.quizFor(ten, 9, p).length, 16, 'its test has all four lessons');
+  // the guard: a unit test with nothing finished in its own unit is passed over (unit 1's lessons don't count)
+  const odd = [...ten.slice(0, 5), { ...ten[9], id: 'T2' }, ...ten.slice(10)];
+  assert.equal(D.lessonFor(odd, { approved: { L11: '2026-12-01' }, done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4), L5: day(5) } }, day(8)).lesson.id, 'L11');
 });
 
 test('driving: the unit test stays the same while he takes it, and its misses come back afterwards', () => {
@@ -179,7 +184,7 @@ test('driving: when a lesson is due (for the streak): approved the day before or
   assert.equal(due(p, '2026-11-19'), null, 'L2 not approved: nothing due (waiting)');
   assert.equal(due({ approved: {}, done: {} }, '2026-11-18'), null, 'nothing approved: nothing due');
   assert.equal(due({ approved: { L1: true }, done: {} }, '2026-11-18'), 'L1:required', 'older approvals (true) count as before');
-  assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L2:required', 'a skipped lesson is passed over');
+  assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L1:required', 'an old undated skip counts like an old approval (the lesson runs, without its video)');
   const r = { approved: { L1: '2026-11-01', L2: '2026-11-01', L3: '2026-11-01', L4: '2026-11-01' }, done: { L1: '2026-11-16', L2: '2026-11-17', L3: '2026-11-18', L4: '2026-11-19' } };
   assert.equal(due(r, '2026-11-20'), 'L5:required', 'a review is due once an earlier lesson is finished');
   assert.ok(D.isApproved('2026-11-16') && D.isApproved(true) && !D.isApproved('skip') && !D.isApproved(undefined));
@@ -187,14 +192,14 @@ test('driving: when a lesson is due (for the streak): approved the day before or
 
 test('driving: a later skip does not rewrite the days he was waiting', () => {
   const L6 = course(6), dow = (k) => (new Date(k + 'T12:00').getDay() + 6) % 7, due = (p, k) => { const r = D.dueOn(L6, p, k, dow(k)); return r ? r.lesson.id + ':' + r.due : null; };
-  // L1 done Mon; L3 approved early; L2 not reviewed until Thursday, when a parent skips it
+  // L1 done Mon; L3 approved early; L2 not reviewed until Thursday, when a parent skips its video
   const p = { approved: { L1: '2026-11-01', L3: '2026-11-01', L2: 'skip:2026-11-19' }, done: { L1: '2026-11-16' } };
   assert.equal(due(p, '2026-11-17'), null, 'Tue: waiting on L2, nothing due');
   assert.equal(due(p, '2026-11-18'), null, 'Wed: still waiting');
-  assert.equal(due(p, '2026-11-19'), 'L3:optional', 'Thu: skipped today, so L3 is only optional');
-  assert.equal(due(p, '2026-11-20'), 'L3:required', 'Fri: L3 required');
-  // older skips without a date are passed over as before
-  assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L2:required');
+  assert.equal(due(p, '2026-11-19'), 'L2:optional', 'Thu: skipped (video) today, so L2 is only optional today, like an approval');
+  assert.equal(due(p, '2026-11-20'), 'L2:required', 'Fri: L2 (its video skipped) is required');
+  // older skips without a date count like an old approval
+  assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L1:required');
 });
 
 test('driving course and knowledge tests: pass the checkers, and every quote is on its cited page of the Iowa manual', async () => {
