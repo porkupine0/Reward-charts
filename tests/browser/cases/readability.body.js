@@ -88,7 +88,9 @@
 
   // chart cell labels fit at 375 and 320, all three charts, Thanksgiving week too
   // under this machine's font and under DejaVu Sans (the wider fallback CI machines use)
-  for (const [w, font] of [[375, ''], [320, ''], [375, 'DejaVu Sans'], [320, 'DejaVu Sans']]) {
+  // Strict check in Liberation Sans (Arial's widths, like a phone's own font; installed on every test machine).
+  // DejaVu Sans is wider than anything a phone shows: there only the page must fit.
+  for (const [w, font] of [[375, 'Liberation Sans'], [320, 'Liberation Sans'], [375, 'DejaVu Sans'], [320, 'DejaVu Sans']]) {
     await p.setViewportSize({ width: w, height: 800 });
     for (const u of ['eli.html?week=2026-11-23', 'eli.html', 'trombone.html', 'zay.html']) {
       await visit(u, 'cells');
@@ -96,7 +98,7 @@
       const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       check(ov <= 1, (font || 'default font') + ' ' + w + ' ' + u + ' page wider than the screen by ' + ov + 'px');
       // the real fonts: labels fit at 8px or more; the wider CI font: only that the page fits (checked above)
-      const over = font ? [] : await p.$$eval('.cell span', (els) => els.filter((s) => s.scrollWidth > s.parentElement.clientWidth + 0.5 || parseFloat(getComputedStyle(s).fontSize) < 8).map((s) => s.textContent + ' ' + getComputedStyle(s).fontSize));
+      const over = font === 'DejaVu Sans' ? [] : await p.$$eval('.cell span', (els) => els.filter((s) => s.scrollWidth > s.parentElement.clientWidth + 0.5 || parseFloat(getComputedStyle(s).fontSize) < 8).map((s) => s.textContent + ' ' + getComputedStyle(s).fontSize));
       notes.push('cells ' + w + (font ? ' ' + font : '') + ' ' + u + ': ' + (over.length ? 'too wide: ' + over.join(',') : 'fit'));
       if (STRICT) check(!over.length, 'cell labels too wide at ' + w + ' on ' + u + ': ' + over.join(','));
     }
