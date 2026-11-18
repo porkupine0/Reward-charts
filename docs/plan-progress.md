@@ -118,3 +118,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 18: step 10 done (sign shapes). Next: unit 2 content by Sat Nov 21.
 - Nov 18: unit 2 lesson 1 (w2d1, sign colors and shapes, 8 questions with sign shapes) written. Next: w2d2 (stop vs yield, regulatory signs, p. 8 from the page picture), w2d3, w2d4, then the unit 2 test entry (w2d5, review: true).
 - Nov 18: w2d2 (stop, yield, regulatory signs incl. Do Not Enter, Wrong Way, Keep Right; 9 questions) written. Next: w2d3 (warning, guide, service, route, slow-moving signs: pp. 9-11 from the page pictures; include Merging Traffic), w2d4, then w2d5 unit test entry.
+- Nov 18: w2d3 (warning, guide, slow-moving signs, pedestrian conveyances; 9 questions) written. Next: w2d4 (signals, flashing arrows, pedestrian beacons: p. 11 picture + p. 18), then w2d5 = Unit 2 test (review: true).

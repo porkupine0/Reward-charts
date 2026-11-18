@@ -170,5 +170,33 @@ export const LESSONS = [
       q('w2d2q9', 'A high-speed road has a minimum speed that is too fast for you. What should you do?', ['Drive slower with your flashers on', 'Use another route', 'Drive on the shoulder', 'Ignore the minimum'], 1,
         'Driving far below the flow of traffic is dangerous too.', 8, 'If this minimum speed is too fast for you, then you should use another route.')
     ]
+  },
+  {
+    id: 'w2d3', title: 'Warning signs, guide signs and slow vehicles',
+    key: [k('Warning signs are yellow, and most are diamond-shaped.', 9, 'Warning signs are yellow with black lettering or symbols and most are diamond-shaped.'),
+      k('An orange triangle on a vehicle means it goes 35 mph or less: slow down early.', 11, 'A reflective orange triangle on the rear of a vehicle means it is traveling 35 mph or less.'),
+      k('Yield to people walking and to anyone on a wheelchair, stroller, skateboard or scooter.', 10, 'vehicles must yield the right of way to pedestrians on foot and those using any human powered device')],
+    videos: [{ yt: 'jBZH_XA4FUE', title: 'TRAFFIC SIGNS! What Do They Mean?', channel: 'Zutobi Drivers Ed', len: '8:32',
+      iowa: 'Watch for Iowa’s farm-machinery and horse-drawn-vehicle signs on rural roads: slow down and pass slowly.' }],
+    questions: [
+      { ...q('w2d3q1', 'You’re on the main road and see a yellow diamond sign showing a lane joining yours. It means:', ['Your lane ends', 'Be ready for other vehicles to blend into your lane', 'Turn right ahead', 'No passing'], 1,
+        'That’s the Merging Traffic sign.', 9, 'If you are on the main road and see this sign, be prepared for other vehicles blending into your lane.'), sign: { shape: 'diamond', color: 'yellow' } },
+      q('w2d3q2', 'A LANE ENDS sign means two lanes will soon become one. Who must yield?', ['Nobody', 'Traffic merging into the remaining lane', 'Only trucks', 'Traffic already in the remaining lane must stop'], 1,
+        'Merge carefully, and be ready to let others merge too.', 9, 'Two lanes of traffic will soon become one lane of traffic. Traffic must yield when merging.'),
+      { ...q('w2d3q3', 'A triangle like this on the back of a vehicle means it travels:', ['35 mph or less', 'At the speed limit', 'With a wide load', 'Only on gravel roads'], 0,
+        'Farm equipment, road equipment and horse-drawn wagons use it.', 11, 'A reflective orange triangle on the rear of a vehicle means it is traveling 35 mph or less.'), sign: { shape: 'smv' } },
+      q('w2d3q4', 'A HILL warning sign (a truck going downhill) tells you to:', ['Speed up for the climb', 'Check your brakes before going down the hill', 'Pass slow vehicles', 'Turn on your hazard lights'], 1,
+        'The road ahead goes down a hill.', 9, 'You should check your brakes before going down the hill.'),
+      q('w2d3q5', 'A T-INTERSECTION AHEAD sign means:', ['The road you’re on doesn’t go straight ahead: get ready to turn right or left', 'A four-way stop ahead', 'A railroad crossing ahead', 'The road narrows'], 0,
+        'Slow down early: you’ll have to turn.', 9, 'The road you are on does not go straight ahead. Prepare to turn right or left.'),
+      q('w2d3q6', 'You pass a FARM MACHINERY warning sign. What should you do?', ['Honk to warn the farmer', 'Be alert for slow farm equipment: reduce your speed and pass slowly', 'Speed up to get past fields quickly', 'Nothing; it’s for tractors'], 1,
+        'Tractors can be wide and slow, and may turn into fields.', 9, 'Be alert for slow-moving, farm equipment on the roadways. Reduce your speed and pass slowly.'),
+      q('w2d3q7', 'You see a DEER CROSSING sign. What should you do?', ['Slow down and watch carefully', 'Honk your horn', 'Turn on your high beams and speed up', 'Nothing in the daytime'], 0,
+        'Deer often cross where these signs are posted.', 9, 'There may be deer trying to cross the roadway in the area. Slow down and watch carefully.'),
+      q('w2d3q8', 'Who must you yield to at a crosswalk under Iowa’s 2024 law?', ['Only people walking', 'Only people in wheelchairs', 'People on foot and people using a human-powered device like a stroller, skateboard or scooter', 'Nobody, if you have a green light'], 2,
+        'The law calls those devices pedestrian conveyances.', 10, 'vehicles must yield the right of way to pedestrians on foot and those using any human powered device'),
+      q('w2d3q9', 'What do mile markers on the interstate show?', ['Miles from where that interstate entered the state you’re in', 'Miles to the next city', 'The speed limit', 'Miles to the state line ahead'], 0,
+        'They help you know how far your exit is, and tell 911 exactly where you are in an emergency.', 11, 'Mile markers show the number of miles from where the Interstate route entered the state you are traveling in.')
+    ]
   }
 ];
