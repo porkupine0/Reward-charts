@@ -58,3 +58,44 @@ test('store: the timer reset case end to end (phone storage, no network)', async
   const stored = Q.fromStored(JSON.parse(m.get('rc:queue') || m.get('rc:pending') || '[]'));
   assert.deepEqual(stored.map((e) => [e.path, e.v]), [['routines/' + t, null]], 'and in what will be replayed');
 });
+
+test('queue: a quick correction (Yes, then Not today before Yes is confirmed) is sent, not dropped', () => {
+  const k = 'routines/days/2026-11-18/rhett/noLies';
+  let q = Q.enqueue([], k, true, null);   // Yes (server had nothing)
+  q = Q.enqueue(q, k, 'no', 'ignored');   // Not today, before Yes is confirmed: keeps base null
+  q = Q.acked(q, k, true);                // the server confirms Yes
+  assert.deepEqual(q, [{ path: k, v: 'no', base: true }]);
+  assert.equal(Q.decide(q[0], true), 'send', 'the server has Yes, which is what this phone last sent');
+  q = Q.acked(q, k, 'no');
+  assert.deepEqual(q, []);
+});
+
+test('queue: an entry dropped during a pass is not sent', () => {
+  const t = 'r/t';
+  let q = Q.enqueue([], t + '/end', 2);
+  const snapshot = q.slice();
+  q = Q.enqueue(q, t, null); // the parent was cleared while the pass was running
+  assert.equal(Q.has(q, snapshot[0]), false);
+});
+
+test('store: two pages on one phone keep each other’s queued taps', async () => {
+  const m = new Map();
+  globalThis.localStorage = { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
+  const A = await import('../store.js?v=' + V + '&t=pageA');
+  const B = await import('../store.js?v=' + V + '&t=pageB');
+  A.watch('routines', () => {}); B.watch('eli-run', () => {});
+  await B.save('eli-run', 'days/2026-11-18/items/swim', true);   // Training page, offline
+  await A.save('routines', 'days/2026-11-18/eli/reading', true); // back on the checklist
+  const stored = Q.fromStored(JSON.parse(m.get('rc:queue'))).map((e) => e.path);
+  assert.deepEqual(stored, ['eli-run/days/2026-11-18/items/swim', 'routines/days/2026-11-18/eli/reading']);
+});
+
+test('store: the old rc:pending is moved over before it is removed', async () => {
+  const m = new Map([['rc:pending', JSON.stringify({ 'routines/days/2026-11-18/eli/teeth': true })]]);
+  globalThis.localStorage = { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
+  const s = await import('../store.js?v=' + V + '&t=migrate');
+  let last; s.watch('routines', (d) => { last = d; });
+  assert.equal(Q.getAt(last, 'days/2026-11-18/eli/teeth'), true);
+  assert.equal(m.has('rc:pending'), false);
+  assert.deepEqual(Q.fromStored(JSON.parse(m.get('rc:queue'))).map((e) => e.path), ['routines/days/2026-11-18/eli/teeth']);
+});

@@ -25,11 +25,18 @@ export function enqueue(q, path, v, base) {
   return out;
 }
 
-// The server confirmed this exact value: the entry is done.
+// Remove the entry for this path with this exact value (it's done, or it was dropped).
 export function confirm(q, path, v) {
   const i = q.findIndex((e) => e.path === path && same(e.v, v));
   return i < 0 ? q : q.slice(0, i).concat(q.slice(i + 1));
 }
+// The server acknowledged writing v at path. That entry is done; and if the same path was changed
+// again meanwhile (Yes, then quickly Not today), the server now holds v, so that's the new base.
+export function acked(q, path, v) {
+  return confirm(q, path, v).map((e) => (e.path === path ? Object.assign({}, e, { base: v }) : e));
+}
+// Still queued exactly like this? (A pass skips entries that were dropped or replaced meanwhile.)
+export function has(q, e) { return q.some((x) => x.path === e.path && same(x.v, e.v)); }
 
 // On reconnect, with fresh server data: send it, it's already there, or another phone changed it.
 export function decide(e, serverValue) {

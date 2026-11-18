@@ -3,8 +3,8 @@
 // - Every tap is saved on the phone first and stays queued until Firebase confirms it,
 //   so nothing is lost if the app is closed while offline.
 // - If Firebase can't be reached, it keeps retrying and a banner says changes aren't synced yet.
-import { firebaseConfig } from './config.js?v=1794986130';
-import { fromStored, enqueue, confirm, decide, getAt } from './queue.js?v=1794986130';
+import { firebaseConfig } from './config.js?v=1794986465';
+import { fromStored, enqueue, confirm, acked, has, decide, getAt } from './queue.js?v=1794986465';
 
 const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const LS = (() => { try { const k = 'rc:t'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return localStorage; } catch (e) { return null; } })();
@@ -60,20 +60,25 @@ function setIn(obj, parts, value) {
   if (Object.keys(obj[key]).length === 0) delete obj[key];
   return obj;
 }
-// The save queue lives in memory and is mirrored to the phone (rc:queue). Older versions used rc:pending.
-let queue = null, storageOk = true;
+// The save queue is kept on the phone (rc:queue) and read fresh each time, so two pages (or a page
+// restored with Back) never write over each other's taps. Memory is only the fallback when phone
+// storage can't be written. Older versions used rc:pending: it's moved over once, then removed.
+let mem = [], storageOk = true;
 const failed = new Set();  // paths Firebase refused; they stay queued and are retried
 let skipped = 0;           // changes not sent because another phone changed the same thing first
 function q() {
-  if (!queue) {
-    queue = fromStored(lsGet('rc:queue', null) || lsGet('rc:pending', {}));
-    try { LS && LS.removeItem('rc:pending'); } catch (e) {}
-  }
-  return queue;
+  if (!LS || !storageOk) return mem;
+  const stored = lsGet('rc:queue', null);
+  if (stored) return fromStored(stored);
+  const old = lsGet('rc:pending', null);
+  if (!old) return [];
+  const moved = fromStored(old);
+  if (lsSet('rc:queue', moved)) { try { LS.removeItem('rc:pending'); } catch (e) {} }
+  return moved;
 }
 function setQ(next) {
-  queue = next;
-  storageOk = lsSet('rc:queue', queue) || !LS;
+  mem = next;
+  if (LS && storageOk) storageOk = lsSet('rc:queue', next);
 }
 function withPending(chartId, data) {
   const out = clone(data) || {};
@@ -141,7 +146,7 @@ async function send(e) {
   try {
     await api.set(api.ref(db, 'charts/' + e.path), e.v);
     failed.delete(e.path);
-    setQ(confirm(q(), e.path, e.v));
+    setQ(acked(q(), e.path, e.v));
   } catch (err) {
     failed.add(e.path); // stays queued; retried later
     setTimeout(flush, 30000);
@@ -156,11 +161,12 @@ async function flush() {
     do {
       again = false;
       for (const e of q().slice()) {
+        if (!has(q(), e)) continue; // dropped or replaced since this pass started
         const c = e.path.split('/')[0];
         if (!live[c]) { if (status === 'live') attach(c); continue; } // wait for this chart's fresh data first
         const what = decide(e, getAt(cache[c] || {}, e.path.slice(c.length + 1)) ?? null);
         if (what === 'done') { setQ(confirm(q(), e.path, e.v)); failed.delete(e.path); continue; }
-        if (what === 'conflict') { setQ(q().filter((x) => x !== e)); skipped++; emit(c); continue; }
+        if (what === 'conflict') { setQ(confirm(q(), e.path, e.v)); skipped++; emit(c); continue; }
         await send(e);
       }
     } while (again);
