@@ -1,0 +1,26 @@
+name: Daily backup
+# Saves an encrypted copy of the database once a day, kept 30 days. Does nothing until the repository
+# has a BACKUP_KEY secret (Settings > Secrets and variables > Actions). The repo is public, so only the
+# encrypted file is ever stored, and the data is never printed. Restore steps: docs/database-safety.md.
+on:
+  schedule:
+    - cron: '17 9 * * *' # 3:17 am Central
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Encrypted backup
+        env:
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+        run: bash scripts/backup.sh backup.json.gz.enc
+      - name: Keep it for 30 days
+        if: ${{ hashFiles('backup.json.gz.enc') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reward-charts-backup
+          path: backup.json.gz.enc
+          retention-days: 30

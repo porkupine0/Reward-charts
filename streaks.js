@@ -1,7 +1,7 @@
 // Streaks and celebrations.
-import { addDays, mondayOf, ymd } from './store.js?v=1794988571';
-import * as L from './lists.js?v=1794988571';
-import { weekProgress } from './charts.js?v=1794988571';
+import { addDays, mondayOf, ymd } from './store.js?v=1794988882';
+import * as L from './lists.js?v=1794988882';
+import { weekProgress } from './charts.js?v=1794988882';
 
 // A "full day": every required after-school/weekend and bedtime item done.
 export function dayFull(ctx, kid, date) {

@@ -26,7 +26,7 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 12. Settings: evening checks, game-time minutes, bedtime grace.
 
 ## Tier 3: data safety
-- [ ] 13. Database safety rules and a daily backup.
+- [ ] 13. Database safety rules and a daily backup. (Built and tested; not applied: see docs/database-safety.md.)
 - [x] 14. Clearing old logs keeps training history and what charts and streaks need.
 - [x] 15. Offline saves: replay order and showing failed saves.
 - [x] 16. Settings changes don't rewrite past days.

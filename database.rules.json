@@ -1,0 +1,101 @@
+{
+  "rules": {
+    ".read": true,
+    "charts": {
+      "routines": {
+        "days": {
+          "$day": {
+            ".write": true
+          }
+        },
+        "weekly": {
+          "$kid": {
+            "$item": {
+              "$cycle": { ".write": true }
+            }
+          }
+        },
+        "game": {
+          "$kid": {
+            "$week": {
+              "$at": { ".write": true }
+            }
+          }
+        }
+      },
+      "eli-run": {
+        "days": {
+          "$day": {
+            "items": {
+              "$item": { ".write": true }
+            },
+            "effort": { ".write": true },
+            "time": { ".write": true },
+            "miles": { ".write": true },
+            "note": { ".write": true }
+          }
+        }
+      },
+      "isaiah": {
+        "start": { ".write": true },
+        "touchDays": {
+          "$day": { ".write": true }
+        },
+        "touches": { ".write": true },
+        "juggle": {
+          "$level": { ".write": true }
+        },
+        "weekPrize": { ".write": true },
+        "champion": { ".write": true },
+        "cashed": { ".write": true }
+      },
+      "$chart": {
+        "weeks": {
+          "$week": {
+            "checks": {
+              "$row": {
+                "$day": { ".write": true }
+              }
+            },
+            "reward": { ".write": true },
+            "given": { ".write": true }
+          }
+        },
+        "months": {
+          "$month": {
+            "prize": { ".write": true },
+            "given": { ".write": true }
+          }
+        }
+      },
+      "eli-trials": {
+        "trials": {
+          "$trial": { ".write": true }
+        },
+        "paid": {
+          "$prize": { ".write": true }
+        },
+        "pick": {
+          "$prize": { ".write": true }
+        }
+      },
+      "config": {
+        "chores": { ".write": true },
+        "showers": { ".write": true },
+        "lights": { ".write": true },
+        "game": { ".write": true },
+        "grace": { ".write": true },
+        "checks": { ".write": true },
+        "rewards": { ".write": true },
+        "prizeLevels": { ".write": true },
+        "history": {
+          "$date": { ".write": true }
+        }
+      },
+      "settings": {
+        "pinHash": { ".write": true },
+        "pin": { ".write": true }
+      }
+    }
+  }
+}
