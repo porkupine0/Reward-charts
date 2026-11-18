@@ -1,7 +1,8 @@
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
-//   approved: { lessonId: 'YYYY-MM-DD' | 'skip' } the day a parent approved it (older entries: true)
+//   approved: { lessonId: 'YYYY-MM-DD' | 'skip:YYYY-MM-DD' } the day a parent approved or skipped it
+//             (older entries: true / 'skip')
 //   done:     { lessonId: 'YYYY-MM-DD' }          the day the lesson was finished
 //   answers:  { questionId: { lessonId: { ok, on } } }   one answer per question per lesson; the first counts
 // Everything here is deterministic: the same progress always gives the same lesson and the same quiz.
@@ -10,13 +11,15 @@
 // Skipped lessons are passed over. { lesson, index, status }: 'done' (finished today), 'ready',
 // 'waiting' (the next one isn't approved yet) or 'finished' (course over).
 export const isApproved = (v) => v === true || (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v));
+export const isSkipped = (v) => v === 'skip' || (typeof v === 'string' && v.startsWith('skip:'));
+const skipDay = (v) => (typeof v === 'string' && v.startsWith('skip:') ? v.slice(5) : '');
 export function lessonFor(lessons, progress, dayKey) {
   const p = progress || {}, done = p.done || {}, approved = p.approved || {};
   const today = lessons.findIndex((l) => done[l.id] === dayKey);
   if (today >= 0) return { lesson: lessons[today], index: today, status: 'done' };
   for (let i = 0; i < lessons.length; i++) {
     const l = lessons[i];
-    if (done[l.id] || approved[l.id] === 'skip') continue;
+    if (done[l.id] || isSkipped(approved[l.id])) continue;
     // a review has no video to approve: it's ready once any lesson before it is finished (else passed over)
     if (l.review) { if (lessons.slice(0, i).some((x) => done[x.id])) return { lesson: l, index: i, status: 'ready' }; continue; }
     return { lesson: l, index: i, status: isApproved(approved[l.id]) ? 'ready' : 'waiting' };
@@ -32,17 +35,23 @@ export function lessonFor(lessons, progress, dayKey) {
 export function dueOn(lessons, progress, dayKey, dow) {
   if (dow > 4) return null;
   const p = progress || {}, done = p.done || {}, approved = p.approved || {};
+  let soft = false; // a lesson was skipped that same day: the next one is only optional that day
+  const due = (l, how) => ({ lesson: l, due: soft ? 'optional' : how });
   for (let i = 0; i < lessons.length; i++) {
-    const l = lessons[i];
+    const l = lessons[i], a = approved[l.id];
     if (done[l.id] && done[l.id] < dayKey) continue;
-    if (approved[l.id] === 'skip') continue;
-    if (done[l.id] === dayKey) return { lesson: l, due: 'required' };
-    if (l.review) {
-      if (lessons.slice(0, i).some((x) => done[x.id] && done[x.id] < dayKey)) return { lesson: l, due: 'required' };
+    if (isSkipped(a)) {
+      const sd = skipDay(a);
+      if (sd && dayKey < sd) return null; // before it was skipped, it still blocked (waiting)
+      if (sd === dayKey) soft = true;
       continue;
     }
-    const a = approved[l.id];
-    if (a === true || (typeof a === 'string' && isApproved(a) && a < dayKey)) return { lesson: l, due: 'required' };
+    if (done[l.id] === dayKey) return { lesson: l, due: 'required' };
+    if (l.review) {
+      if (lessons.slice(0, i).some((x) => done[x.id] && done[x.id] < dayKey)) return due(l, 'required');
+      continue;
+    }
+    if (a === true || (typeof a === 'string' && isApproved(a) && a < dayKey)) return due(l, 'required');
     if (a === dayKey) return { lesson: l, due: 'optional' };
     return null;
   }

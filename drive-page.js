@@ -1,10 +1,10 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795019773';
-import { applyConfig } from './routines.js?v=1795019773';
-import { askParent } from './parent.js?v=1795019773';
-import * as L from './lists.js?v=1795019773';
-import { lessonFor, quizFor, isApproved } from './driving.js?v=1795019773';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795020230';
+import { applyConfig } from './routines.js?v=1795020230';
+import { askParent } from './parent.js?v=1795020230';
+import * as L from './lists.js?v=1795020230';
+import { lessonFor, quizFor, isApproved, isSkipped } from './driving.js?v=1795020230';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -69,7 +69,7 @@ function renderPreview() {
   if (!previewOpen) { $('preview').innerHTML = ''; return; }
   const course = L.course(), d = ctx.drive || {}, ap = d.approved || {};
   const upcoming = course.filter((l) => !l.review && !(d.done || {})[l.id]).slice(0, 10);
-  $('preview').innerHTML = upcoming.length ? upcoming.map((l) => '<div class="dprev"><h3>' + esc(l.title) + ' <span class="rcount">' + (isApproved(ap[l.id]) ? 'Approved ✓' : ap[l.id] === 'skip' ? 'Skipped' : 'Not reviewed') + '</span></h3>' +
+  $('preview').innerHTML = upcoming.length ? upcoming.map((l) => '<div class="dprev"><h3>' + esc(l.title) + ' <span class="rcount">' + (isApproved(ap[l.id]) ? 'Approved ✓' : isSkipped(ap[l.id]) ? 'Skipped' : 'Not reviewed') + '</span></h3>' +
     (l.videos || []).map(video).join('') +
     '<ol class="dprev-q">' + (l.questions || []).map((q) => '<li>' + esc(q.q) + ' <b>' + esc(q.choices[q.answer]) + '</b> <small>(' + esc(q.ref) + ')</small></li>').join('') + '</ol>' +
     '<span class="exbtns"><button class="tbtn approve" data-approve="' + esc(l.id) + '|yes">Approve</button><button class="linkbtn" data-approve="' + esc(l.id) + '|skip">Skip</button>' +
@@ -93,7 +93,12 @@ document.addEventListener('click', async (e) => {
   if (ap) {
     const [lid, a] = ap.dataset.approve.split('|');
     // approval is stored as the day it was given (a lesson approved today is optional today, due from tomorrow)
-    if (await askParent()) save(ID, 'approved/' + lid, a === 'yes' ? ymd(new Date()) : a === 'skip' ? 'skip' : null);
+    // approvals and skips are stored with the day they were given (past days are rebuilt from them);
+    // approving an already-approved lesson keeps its first date
+    if (!(await askParent())) return;
+    const cur = ((ctx.drive || {}).approved || {})[lid], today = ymd(new Date());
+    if (a === 'yes' && isApproved(cur)) return;
+    save(ID, 'approved/' + lid, a === 'yes' ? today : a === 'skip' ? 'skip:' + today : null);
   }
 });
 $('previewbtn').onclick = async () => { if (await askParent()) { previewOpen = true; renderPreview(); } };

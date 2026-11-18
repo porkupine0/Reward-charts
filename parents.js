@@ -1,20 +1,20 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795019773';
-import { CHARTS, weekProgress } from './charts.js?v=1795019773';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795019773';
-import * as L from './lists.js?v=1795019773';
-import { owed, score, planned, fmt } from './trials.js?v=1795019773';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795019773';
-import { askParent, setParent, changePin } from './parent.js?v=1795019773';
-import { dayFull } from './streaks.js?v=1795019773';
-import { owedItems } from './owed.js?v=1795019773';
-import { pruneList, pruneCutoff } from './prune.js?v=1795019773';
-import { nowHtml } from './nowview.js?v=1795019773';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795020230';
+import { CHARTS, weekProgress } from './charts.js?v=1795020230';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795020230';
+import * as L from './lists.js?v=1795020230';
+import { owed, score, planned, fmt } from './trials.js?v=1795020230';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795020230';
+import { askParent, setParent, changePin } from './parent.js?v=1795020230';
+import { dayFull } from './streaks.js?v=1795020230';
+import { owedItems } from './owed.js?v=1795020230';
+import { pruneList, pruneCutoff } from './prune.js?v=1795020230';
+import { nowHtml } from './nowview.js?v=1795020230';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
 const D = Object.fromEntries(IDS.map((id) => [id, {}]));
-const ctx = { get routines() { return D.routines; }, get run() { return D['eli-run']; }, get isaiah() { return D.isaiah; } };
+const ctx = { get routines() { return D.routines; }, get run() { return D['eli-run']; }, get isaiah() { return D.isaiah; }, get drive() { return D['eli-drive']; } };
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const tick = (chart, path, label) => '<button class="cash" data-chart="' + chart + '" data-path="' + esc(path) + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' + esc(label) + '</button>';
@@ -90,7 +90,7 @@ function render() {
   }
   // Eli's next driving lesson needs a parent's preview
   // ahead of time: fewer than two upcoming lessons approved
-  const dv = D['eli-drive'] || {}, upcoming = L.course().filter((l) => !l.review && !(dv.done || {})[l.id] && (dv.approved || {})[l.id] !== 'skip');
+  const dv = D['eli-drive'] || {}, upcoming = L.course().filter((l) => !l.review && !(dv.done || {})[l.id] && !/^skip/.test(String((dv.approved || {})[l.id])));
   const okOf = (l) => { const v = (dv.approved || {})[l.id]; return v === true || /^\d{4}-/.test(String(v)); };
   const okd = upcoming.slice(0, 2).filter(okOf).length;
   if (upcoming.length && okd < Math.min(2, upcoming.length)) ex.unshift(row('Eli', KIDS.eli.accent, 'Driving: ' + okd + ' of the next ' + Math.min(2, upcoming.length) + ' lessons approved. Next to preview: ' + esc(upcoming.find((l) => !okOf(l)).title), '', '<a class="tbtn approve" href="drive.html#preview">Preview</a>'));

@@ -62,7 +62,7 @@ export const LESSONS = [
   await p.click('#previewbtn'); await p.waitForTimeout(300);
   await p.click('[data-approve="F2|yes"]'); await p.waitForTimeout(300);
   await p.click('[data-approve="F3|skip"]'); await p.waitForTimeout(300);
-  check((await db()).charts['eli-drive'].approved.F3 === 'skip', 'F3 skipped');
+  check((await db()).charts['eli-drive'].approved.F3 === 'skip:2026-11-18', 'F3 skipped (with the day)');
   await p.clock.setFixedTime(new Date(2026, 10, 19, 16, 0));
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-19/eli/chore', true); });
   await visit('drive.html', 'drive-thu');

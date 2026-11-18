@@ -44,7 +44,7 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 - [x] 3. Course logic (no page yet): lessons in order, one new a day, quiz = 3 today + 2 earlier (missed first), every 5th lesson a review.
 - [x] 4a. Wiring, no page: one lock helper (today's chores done and none owed), Open link hidden on locked rows, checklist row (today if a lesson is ready; past dates a lesson was finished; Mon–Fri; outside all scoring), database rules.
 - [x] 4b. Driving page and parent preview (course file ships empty; browser tests use a fixture course): checklist row Mon–Fri outside all scoring, locks like computer work, video + Watched, parent Approve/Skip per lesson.
-- [ ] 4c. Streak: approval date stored; a lesson approved before a weekday is due that day (required for streak/full day, not game time).
+- [x] 4c. Streak: approval date stored; a lesson approved before a weekday is due that day (required for streak/full day, not game time).
 - [ ] 5. Week 1 content: verified videos, questions from the Iowa manual with page references.
 
 Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
@@ -94,3 +94,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 18: driving steps 2 and 3 done. Leftover game time asks once per boy (No lets it go); course rules tested with fixtures.
 - Nov 18: driving step 4a done. Checklist row wired (empty course, so nothing shows yet); computer work, including the driving row, goes through one lock.
 - Nov 18: driving step 4b done. The Driving page, parent preview (Approve/Skip after the PIN), hub card (hidden while the course is empty) and the Parents "N of the next 2 lessons approved" line. A lesson is finished once he has watched and answered five; no pass mark.
+- Nov 18: driving step 4c done. The lesson counts toward Eli's full day and streak (not game time) on days it was due; approvals and skips carry their date so past days don't change; Parents, Home and History all agree.

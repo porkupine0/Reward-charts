@@ -151,3 +151,15 @@ test('driving: when a lesson is due (for the streak): approved the day before or
   assert.equal(due(r, '2026-11-20'), 'L5:required', 'a review is due once an earlier lesson is finished');
   assert.ok(D.isApproved('2026-11-16') && D.isApproved(true) && !D.isApproved('skip') && !D.isApproved(undefined));
 });
+
+test('driving: a later skip does not rewrite the days he was waiting', () => {
+  const L6 = course(6), dow = (k) => (new Date(k + 'T12:00').getDay() + 6) % 7, due = (p, k) => { const r = D.dueOn(L6, p, k, dow(k)); return r ? r.lesson.id + ':' + r.due : null; };
+  // L1 done Mon; L3 approved early; L2 not reviewed until Thursday, when a parent skips it
+  const p = { approved: { L1: '2026-11-01', L3: '2026-11-01', L2: 'skip:2026-11-19' }, done: { L1: '2026-11-16' } };
+  assert.equal(due(p, '2026-11-17'), null, 'Tue: waiting on L2, nothing due');
+  assert.equal(due(p, '2026-11-18'), null, 'Wed: still waiting');
+  assert.equal(due(p, '2026-11-19'), 'L3:optional', 'Thu: skipped today, so L3 is only optional');
+  assert.equal(due(p, '2026-11-20'), 'L3:required', 'Fri: L3 required');
+  // older skips without a date are passed over as before
+  assert.equal(due({ approved: { L1: 'skip', L2: '2026-11-01' }, done: {} }, '2026-11-18'), 'L2:required');
+});
