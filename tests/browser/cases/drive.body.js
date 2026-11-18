@@ -5,7 +5,8 @@
   const FIX = `const q = (l, k, ans) => ({ id: l + 'q' + k, q: 'Fixture question ' + l + '-' + k + '?', choices: ['Alpha', 'Bravo', 'Charlie'], answer: ans, why: 'Because ' + k + '.', ref: "Iowa Driver's Manual p.1" });
 export const LESSONS = [
   { id: 'F1', title: 'Fixture lesson one', videos: [{ yt: 'AAAAAAAAAAA', title: 'Fixture video', channel: 'Fixture channel', len: '5:00', iowa: 'Iowa note.' }], questions: [1, 2, 3, 4, 5].map((k) => q('F1', k, 0)) },
-  { id: 'F2', title: 'Fixture lesson two', videos: [{ yt: 'BBBBBBBBBBB', title: 'Fixture video 2', channel: 'Fixture channel', len: '6:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F2', k, 1)) }
+  { id: 'F2', title: 'Fixture lesson two', videos: [{ yt: 'BBBBBBBBBBB', title: 'Fixture video 2', channel: 'Fixture channel', len: '6:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F2', k, 1)) },
+  { id: 'F3', title: 'Fixture lesson three', videos: [{ yt: 'CCCCCCCCCCC', title: 'Fixture video 3', channel: 'Fixture channel', len: '7:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F3', k, 2)) }
 ];`;
   const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
   await ctx.route(/driving-course\.js/, course);
@@ -16,14 +17,14 @@ export const LESSONS = [
   await visit('drive.html', 'drive-waiting');
   check(/Waiting for Mom or Dad/.test(await p.$eval('#today', (e) => e.textContent)), 'waiting for approval');
   await visit('parents.html', 'drive-parents');
-  check(/Driving lesson waiting for your preview: Fixture lesson one/.test(await p.$eval('#excuses', (e) => e.textContent)), 'Parents page: waiting line');
+  check(/Driving: 0 of the next 2 lessons approved\. Next to preview: Fixture lesson one/.test(await p.$eval('#excuses', (e) => e.textContent)), 'Parents page: ahead-of-time line');
   // parent preview: answers only after the PIN; approve F1 with the real PIN box
   await visit('drive.html', 'drive-preview');
   check(!(await p.$('.dprev')), 'no answers before the PIN');
   await p.click('#previewbtn');
   await p.waitForSelector('.pindlg input', { timeout: 2000 });
   await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
-  check((await p.$$('.dprev')).length === 2, 'preview lists both lessons');
+  check((await p.$$('.dprev')).length === 3, 'preview lists the lessons');
   await p.click('[data-approve="F1|yes"]'); await p.waitForTimeout(300);
   check((await db()).charts['eli-drive'].approved.F1 === true, 'F1 approved');
   // Wednesday's chore not done: locked, on the page and on the checklist
@@ -56,9 +57,18 @@ export const LESSONS = [
   // the next day: the stored answers for Nov 18
   await visit('drive.html?date=2026-11-18', 'drive-past');
   check((await p.$$('.dq.answered')).length === 5 && !(await p.$('.dq-choice')), 'past lesson shows the stored answers');
-  // skip
-  await visit('drive.html', 'drive-skip');
+  // approve F2 and skip F3; then Thursday: 3 questions from F2 and 2 from F1, including the one he missed
+  await visit('drive.html', 'drive-approve2');
   await p.click('#previewbtn'); await p.waitForTimeout(300);
-  await p.click('[data-approve="F2|skip"]'); await p.waitForTimeout(300);
-  check((await db()).charts['eli-drive'].approved.F2 === 'skip', 'F2 skipped');
+  await p.click('[data-approve="F2|yes"]'); await p.waitForTimeout(300);
+  await p.click('[data-approve="F3|skip"]'); await p.waitForTimeout(300);
+  check((await db()).charts['eli-drive'].approved.F3 === 'skip', 'F3 skipped');
+  await p.clock.setFixedTime(new Date(2026, 10, 19, 16, 0));
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-19/eli/chore', true); });
+  await visit('drive.html', 'drive-thu');
+  await p.click('[data-watched="F2"]'); await p.waitForTimeout(200);
+  const thu = await p.$$eval('.dq-q', (els) => els.map((e) => e.textContent));
+  notes.push('Thursday quiz: ' + thu.join(' | '));
+  check(thu.length === 5 && thu.slice(0, 3).every((t) => /F2-/.test(t)) && thu.slice(3).every((t) => /F1-/.test(t)), '3 from F2, 2 from F1');
+  check(thu.slice(3).some((t) => /F1-2\?/.test(t)), 'the missed F1 question comes back');
   await ctx.unroute(/driving-course\.js/, course);

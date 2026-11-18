@@ -104,3 +104,31 @@
     }
   }
   await p.setViewportSize({ width: 375, height: 812 });
+
+  // the Driving page in its real states (fixture course): locked, mid-quiz (one right, one wrong), finished
+  const DFIX = `const q = (l, k) => ({ id: l + 'q' + k, q: 'Fixture question ' + k + ': what should you do here?', choices: ['Slow down and cover the brake', 'Speed up', 'Honk'], answer: 0, why: 'Because it gives you time to react.', ref: "Iowa Driver's Manual p.30" });
+export const LESSONS = [{ id: 'F1', title: 'Seeing the road', videos: [{ yt: 'AAAAAAAAAAA', title: 'Fixture video', channel: 'Fixture channel', len: '5:00', iowa: 'Iowa note.' }], questions: [1, 2, 3, 4, 5].map((k) => q('F1', k)) }];`;
+  const dcourse = (r) => r.fulfill({ contentType: 'text/javascript', body: DFIX });
+  await ctx.route(/driving-course\.js/, dcourse);
+  await p.setViewportSize({ width: 375, height: 812 });
+  const states = {
+    locked: { routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } }, 'eli-drive': { approved: { F1: true } } },
+    midquiz: { routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } },
+      'eli-drive': { approved: { F1: true }, watched: { F1: '2026-11-18' }, answers: { F1q1: { F1: { ok: true, pick: 0, on: '2026-11-18', n: 1 } }, F1q2: { F1: { ok: false, pick: 1, on: '2026-11-18', n: 2 } } } } },
+    finished: { routines: { days: { '2026-11-18': { eli: { chore: true } } } }, 'eli-drive': { approved: { F1: true }, watched: { F1: '2026-11-18' }, done: { F1: '2026-11-18' },
+      answers: Object.fromEntries([1, 2, 3, 4, 5].map((k) => ['F1q' + k, { F1: { ok: k !== 2, pick: k === 2 ? 1 : 0, on: '2026-11-18', n: k } }])) } }
+  };
+  for (const [name, charts] of Object.entries(states)) {
+    for (const scheme of ['light', 'dark']) {
+      await p.emulateMedia({ colorScheme: scheme });
+      await p.evaluate((c) => sessionStorage.setItem('mockdb', JSON.stringify({ charts: c })), charts);
+      await visit('drive.html', 'drive-' + name + '-' + scheme);
+      const m = await measure();
+      notes.push('drive ' + name + ' ' + scheme + ': worst ' + m.worst + (m.bad.length ? ' · below: ' + m.bad.join(' | ') : ''));
+      check(!m.bad.length, 'drive ' + name + ' ' + scheme + ' text below contrast: ' + m.bad.join(' | '));
+      if (name === 'midquiz' && scheme === 'dark') await p.screenshot({ path: OUT + 'drive-midquiz-dark-375.png', fullPage: true });
+    }
+  }
+  check(/Do today’s chores first/.test(await (async () => { await p.evaluate((c) => sessionStorage.setItem('mockdb', JSON.stringify({ charts: c })), states.locked); await visit('drive.html', 'drive-locked-check'); return p.$eval('#today', (e) => e.textContent); })()), 'locked state is what was measured');
+  await p.emulateMedia({ colorScheme: 'light' });
+  await ctx.unroute(/driving-course\.js/, dcourse);

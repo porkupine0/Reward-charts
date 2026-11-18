@@ -1,10 +1,10 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795009740';
-import { applyConfig } from './routines.js?v=1795009740';
-import { askParent } from './parent.js?v=1795009740';
-import * as L from './lists.js?v=1795009740';
-import { lessonFor, quizFor } from './driving.js?v=1795009740';
+import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795010089';
+import { applyConfig } from './routines.js?v=1795010089';
+import { askParent } from './parent.js?v=1795010089';
+import * as L from './lists.js?v=1795010089';
+import { lessonFor, quizFor } from './driving.js?v=1795010089';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -32,7 +32,7 @@ const answerOf = (qid, lessonId) => (((ctx.drive.answers || {})[qid] || {})[less
 
 function render() {
   const course = L.course(), d = ctx.drive || {};
-  if (!(isLive('routines') && isLive(ID))) { $('today').innerHTML = '<p class="muted">Loading…</p>'; return; }
+  if (!live()) { $('today').innerHTML = '<p class="muted">Loading…</p>'; return; }
   if (pastDay) return renderPast(course, d);
   const now = new Date(), key = ymd(now), dow = (now.getDay() + 6) % 7;
   const st = lessonFor(course, d, key);
@@ -84,7 +84,8 @@ document.addEventListener('click', async (e) => {
     const [qid, lessonId, pick] = pk.dataset.pick.split('|'), q = L.course().flatMap((l) => l.questions || []).find((x) => x.id === qid);
     if (!q || answerOf(qid, lessonId)) return; // the first answer counts
     const n = Object.values(ctx.drive.answers || {}).filter((a) => a[lessonId]).length + 1;
-    await save(ID, 'answers/' + qid + '/' + lessonId, { ok: Number(pick) === q.answer, pick: Number(pick), on: ymd(new Date()), n });
+    // don't wait for the server: this page's copy already has the answer
+    save(ID, 'answers/' + qid + '/' + lessonId, { ok: Number(pick) === q.answer, pick: Number(pick), on: ymd(new Date()), n });
     finishIfDone(lessonId);
     return;
   }
@@ -105,7 +106,20 @@ function finishIfDone(lessonId) {
   if (watched && quiz.length && quiz.every((q) => answerOf(q.id, lessonId))) save(ID, 'done/' + lessonId, key);
 }
 
-const draw = () => { render(); renderPreview(); };
+// The lock needs the chores (routines), the chore list (config) and the course progress.
+const live = () => isLive('routines') && isLive(ID) && isLive('config');
+// A lesson with every answer in but no "done" (the page closed right after the last tap): finish it,
+// dated with its last answer's day.
+function finishLeftovers() {
+  if (!live()) return;
+  const d = ctx.drive || {}, course = L.course();
+  course.forEach((l) => {
+    if ((d.done || {})[l.id] || !(l.review || (d.watched || {})[l.id])) return;
+    const mine = Object.values(d.answers || {}).map((a) => a[l.id]).filter(Boolean);
+    if (mine.length >= 5) save(ID, 'done/' + l.id, mine.map((a) => a.on).sort().pop());
+  });
+}
+const draw = () => { finishLeftovers(); render(); renderPreview(); };
 watch(ID, (v) => { ctx.drive = v || {}; draw(); }, statusPill($('sync')));
 watch('routines', (v) => { ctx.routines = v || {}; draw(); });
 watch('config', (v) => { applyConfig(v); draw(); });

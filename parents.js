@@ -1,16 +1,15 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795009740';
-import { CHARTS, weekProgress } from './charts.js?v=1795009740';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795009740';
-import * as L from './lists.js?v=1795009740';
-import { owed, score, planned, fmt } from './trials.js?v=1795009740';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795009740';
-import { askParent, setParent, changePin } from './parent.js?v=1795009740';
-import { dayFull } from './streaks.js?v=1795009740';
-import { owedItems } from './owed.js?v=1795009740';
-import { pruneList, pruneCutoff } from './prune.js?v=1795009740';
-import { lessonFor } from './driving.js?v=1795009740';
-import { nowHtml } from './nowview.js?v=1795009740';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795010089';
+import { CHARTS, weekProgress } from './charts.js?v=1795010089';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795010089';
+import * as L from './lists.js?v=1795010089';
+import { owed, score, planned, fmt } from './trials.js?v=1795010089';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795010089';
+import { askParent, setParent, changePin } from './parent.js?v=1795010089';
+import { dayFull } from './streaks.js?v=1795010089';
+import { owedItems } from './owed.js?v=1795010089';
+import { pruneList, pruneCutoff } from './prune.js?v=1795010089';
+import { nowHtml } from './nowview.js?v=1795010089';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -90,8 +89,10 @@ function render() {
     });
   }
   // Eli's next driving lesson needs a parent's preview
-  const ds = L.course().length ? lessonFor(L.course(), D['eli-drive'], ymd(today)) : null;
-  if (ds && ds.status === 'waiting') ex.unshift(row('Eli', KIDS.eli.accent, 'Driving lesson waiting for your preview: ' + esc(ds.lesson.title), '', '<a class="tbtn approve" href="drive.html#preview">Preview</a>'));
+  // ahead of time: fewer than two upcoming lessons approved
+  const dv = D['eli-drive'] || {}, upcoming = L.course().filter((l) => !l.review && !(dv.done || {})[l.id] && (dv.approved || {})[l.id] !== 'skip');
+  const okd = upcoming.slice(0, 2).filter((l) => (dv.approved || {})[l.id] === true).length;
+  if (upcoming.length && okd < Math.min(2, upcoming.length)) ex.unshift(row('Eli', KIDS.eli.accent, 'Driving: ' + okd + ' of the next ' + Math.min(2, upcoming.length) + ' lessons approved. Next to preview: ' + esc(upcoming.find((l) => (dv.approved || {})[l.id] !== true).title), '', '<a class="tbtn approve" href="drive.html#preview">Preview</a>'));
   $('excuses').innerHTML = ex.join('') || '<p class="muted">Nothing waiting.</p>';
 
   // Reading: this week and the 3 before, per kid
