@@ -68,12 +68,16 @@
   notes.push('Isaiah checklist page height: ' + await p.evaluate(() => document.documentElement.scrollHeight));
 
   // chart cell labels fit at 375 and 320, all three charts, Thanksgiving week too
-  for (const w of [375, 320]) {
+  // under this machine's font and under DejaVu Sans (the wider fallback CI machines use)
+  for (const [w, font] of [[375, ''], [320, ''], [375, 'DejaVu Sans'], [320, 'DejaVu Sans']]) {
     await p.setViewportSize({ width: w, height: 800 });
     for (const u of ['eli.html?week=2026-11-23', 'eli.html', 'trombone.html', 'zay.html']) {
       await visit(u, 'cells');
+      if (font) { await p.addStyleTag({ content: '* { font-family: "' + font + '" !important; }' }); await p.waitForTimeout(100); }
+      const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      check(ov <= 1, (font || 'default font') + ' ' + w + ' ' + u + ' page wider than the screen by ' + ov + 'px');
       const over = await p.$$eval('.cell span', (els) => els.filter((s) => s.scrollWidth > s.parentElement.clientWidth + 0.5).map((s) => s.textContent));
-      notes.push('cells ' + w + ' ' + u + ': ' + (over.length ? 'too wide: ' + over.join(',') : 'fit'));
+      notes.push('cells ' + w + (font ? ' ' + font : '') + ' ' + u + ': ' + (over.length ? 'too wide: ' + over.join(',') : 'fit'));
       if (STRICT) check(!over.length, 'cell labels too wide at ' + w + ' on ' + u + ': ' + over.join(','));
     }
   }
