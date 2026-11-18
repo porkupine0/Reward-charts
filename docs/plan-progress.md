@@ -26,12 +26,15 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - [x] 12. Settings: evening checks, game-time minutes, bedtime grace.
 
 ## Tier 3: data safety
-- [ ] 13. Database safety rules and a daily backup. (Built and tested; not applied: see docs/database-safety.md.)
+- [x] 13. Database safety rules and a daily backup. Built and tested, **not applied** (see docs/database-safety.md).
 - [x] 14. Clearing old logs keeps training history and what charts and streaks need.
 - [x] 15. Offline saves: replay order and showing failed saves.
 - [x] 16. Settings changes don't rewrite past days.
 
 ## Open for the family
+- Apply the database rules (optional; steps in docs/database-safety.md).
+- Add the BACKUP_KEY secret to turn on the daily encrypted backup (optional; same guide).
+- Browser tests (tests/browser/) run by hand; they're not in CI yet. Tier 4 (code upkeep and extras) not started.
 - Eli's training plan ends Jan 24, 2027. After that his run/swim row is off and there's no Running item, so a new plan is needed.
 - Should the missed-chore lock also count Monday and Tuesday of the week of Nov 16? (It currently starts Nov 18.)
 
@@ -60,3 +63,4 @@ Browser tests live in tests/browser/ (run `python3 -m http.server 8765` from the
 - Nov 18: item 14 done. Cleanup keeps 2 years of checklist days (the streak look-back), never clears Eli's Training log, and backup and cleanup wait for fresh data.
 - Nov 18: item 16 done. A settings change (chores, shower nights, lights out) applies from the day it's saved, today included; earlier days keep what they had. Save waits for the latest settings.
 - Nov 18: item 12 done. Settings has game-time minutes per school day and bedtime grace (both apply from the day they're saved) and the wording of each boy's evening checks.
+- Nov 18: item 13 built (not applied). Database rules allow only the app's own save paths (the browser tests enforce them), plus an encrypted daily backup that does nothing until a key is set.

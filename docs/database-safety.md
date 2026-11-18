@@ -4,7 +4,7 @@
 
 ## 1. Safety rules (database.rules.json)
 
-**What they do:** the app keeps working exactly as now (no sign-in). They only allow writing at the exact places the app saves to, so one request can't replace or delete:
+**What they do:** the app keeps working exactly as now (no sign-in). They only allow writing at the exact places the app saves to, so a delete aimed at any of these as a whole is refused:
 - the whole database;
 - a whole chart;
 - all the daily checklists;
@@ -14,7 +14,7 @@
 - the time trials;
 - Ball Master's days.
 
-**What they don't do:** someone with the address could still change or delete things one at a time. The rules stop one request wiping a whole chart; they aren't a lock. The daily backup covers the rest.
+**What they don't do:** they aren't a lock. Someone with the address could still change or delete items, even many in one request that names each item. The rules stop a delete aimed at a whole chart or collection; **the daily backup is the real protection.**
 
 **Apply them (about 5 minutes):**
 1. Open the Firebase console, then the project, then **Realtime Database**, then the **Rules** tab.
@@ -47,7 +47,14 @@ openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in backup.json.gz.enc | gunzip
 ```
 It asks for the passphrase. `backup.json` is the whole database, with everything under `charts`.
 
-**Restore:**
+**Restore** (these steps were written from Firebase's documentation, not tried on this database):
 - Firebase console, then Realtime Database, then **Data**, then select the `charts` node, then the ⋮ menu, then **Import JSON**.
 - Pick a file that contains only what's inside `charts`: open `backup.json` and keep the part inside `"charts": { … }`.
-- Restoring replaces what's there now. The app's own **Download a backup** button (Parents page) makes the same kind of file, unencrypted.
+- Restoring replaces what's there now.
+- The app's own **Download a backup** button (Parents page) makes a different file:
+  - It's unencrypted.
+  - Its layout is `{ "exported": …, "charts": { … } }`.
+  - It leaves out the parent PIN (`settings`).
+  - Restoring from it removes the PIN, so the next parent tap asks to set a new one.
+
+**If the backups stop:** GitHub pauses scheduled workflows in a public repo after 60 days with no activity in the repo (see GitHub's Actions documentation: *Disabling and enabling a workflow*). To turn it back on: the repo, then **Actions**, then **Daily backup**, then **Enable workflow**. A commit to the repo also resets the clock.

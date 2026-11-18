@@ -2,6 +2,7 @@
 const { chromium } = require('playwright');
 const OUT = (process.env.SHOTS || require('os').tmpdir()) + '/'; // screenshots go here
 // Run: python3 -m http.server 8765 (from the repo), then node tests/browser/full.js
+const RULES_JSON = require('fs').readFileSync(process.cwd() + '/database.rules.json', 'utf8'); // run from the repo folder
 const MOCK_DB = `
 const store = JSON.parse(sessionStorage.getItem('mockdb') || '{}');
 const subs = [];
@@ -19,7 +20,18 @@ export function onValue(p, fn) {
   if (p === 'charts/settings' && window.__slowSettings) return;
   subs.push([p, fn]); setTimeout(() => fn({ val: () => JSON.parse(JSON.stringify(get(p) ?? null)) }), 10);
 }
-export async function set(p, v) { setPath(p, v); subs.forEach(([sp, fn]) => { if (p.startsWith(sp)) fn({ val: () => JSON.parse(JSON.stringify(get(sp) ?? null)) }); }); }
+// The database rules (database.rules.json) are enforced here too: a refused path is recorded and the save fails.
+const RULES = ${RULES_JSON};
+function canWrite(path) {
+  let node = RULES.rules;
+  for (const key of path.split('/').filter(Boolean)) {
+    if (node['.write'] === true) return true;
+    node = node[key] || node[Object.keys(node).find((k) => k.startsWith('$'))];
+    if (!node) return false;
+  }
+  return node['.write'] === true;
+}
+export async function set(p, v) { if (!canWrite(p)) { const r = JSON.parse(sessionStorage.getItem('refused') || '[]'); r.push(p); sessionStorage.setItem('refused', JSON.stringify(r)); throw new Error('PERMISSION_DENIED: ' + p); } setPath(p, v); subs.forEach(([sp, fn]) => { if (p.startsWith(sp)) fn({ val: () => JSON.parse(JSON.stringify(get(sp) ?? null)) }); }); }
 `;
 const errors = [], notes = [];
 const _t = new Date(); const TODAY = _t.getFullYear() + '-' + String(_t.getMonth() + 1).padStart(2, '0') + '-' + String(_t.getDate()).padStart(2, '0');
@@ -192,6 +204,8 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   await p.setViewportSize({ width: 1024, height: 800 });
   for (const u of ['index.html', 'parents.html', 'settings.html', 'history.html', 'trials.html']) await visit(u);
 
+  const refused = await p.evaluate(() => JSON.parse(sessionStorage.getItem('refused') || '[]'));
+  check(!refused.length, 'saves the database rules would refuse: ' + refused.join(', '));
   console.log(notes.join('\n'));
   console.log(errors.length ? 'ISSUES:\n' + errors.join('\n') : 'NO ISSUES');
   await b.close();
