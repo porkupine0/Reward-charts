@@ -238,5 +238,54 @@ export const LESSONS = [
         'Proceed with caution and go when it’s safe.', 11, 'Proceed with caution. Yield to vehicles and pedestrians and proceed when it is safe.')
     ]
   },
-  { id: 'w2d5', title: 'Unit 2 test', review: true, videos: [], questions: [] }
+  { id: 'w2d5', title: 'Unit 2 test', review: true, videos: [], questions: [] },
+  // ---- Unit 3: markings and lanes (manual 2.12-2.19, 4.9, 5.11). Facts read off the page pictures (pp. 15-17, 44, 58).
+  {
+    id: 'w3d1', title: 'Pavement markings, yield lines and crosswalks',
+    key: [k('White lines separate traffic going the same way.', 15, 'White lines separate traffic moving in the same direction.'),
+      k('Solid yellow line on your side: no passing.', 15, 'Passing is not allowed on the side with the solid yellow line.'),
+      k('Stop before the stop line, or before the crosswalk if there is one.', 15, 'you must stop before your vehicle reaches the stop line, or a crosswalk if there is one.')],
+    videos: [{ yt: 'JNK2037-WCk', title: 'Every Road Line Explained (Solid, Broken, Yellow, White) | Driving Rules You Must Know', channel: 'Street Explainer', len: '5:49', iowa: 'Iowa’s manual: white lines separate traffic going the same way; yellow lines separate traffic going opposite ways.' }],
+    questions: [
+      q('w3d1q1', 'White lane lines on the road separate:', ['Traffic going opposite ways on a two-way road', 'Parking spaces from the travel lanes', 'Traffic moving in the same direction', 'Bike lanes from the sidewalk'], 2,
+        'Yellow lines are for traffic going opposite ways.', 15, 'White lines separate traffic moving in the same direction.'),
+      q('w3d1q2', 'On a two-way road, a dashed yellow line runs beside a solid one. Who may pass?', ['Drivers on the side with the dashed line, when safe', 'Drivers on the side with the solid line, if it’s clear', 'Nobody, on any road with yellow lines', 'Anyone, as long as they signal first'], 0,
+        'Solid yellow on your side means no passing.', 15, 'Vehicles on the side with the dashed line may pass when safe to do so.'),
+      q('w3d1q3', 'A row of white triangles across your lane, pointing at you, marks:', ['A school zone starting, so slow to 25 mph', 'Speed bumps just ahead of you', 'The end of your lane', 'Where you yield, as the yield sign says'], 3,
+        'They’re called yield lines.', 15, 'Yield lines consist of a row of solid white triangles pointing toward approaching vehicles.'),
+      q('w3d1q4', 'You must stop for a red light. There’s a crosswalk but no stop line. Where do you stop?', ['In the crosswalk, so you can see both ways', 'Before the crosswalk', 'Past the crosswalk, at the corner', 'Anywhere, as long as you stop'], 1,
+        'Leave the crosswalk clear for people crossing.', 15, 'you must stop before your vehicle reaches the stop line, or a crosswalk if there is one.'),
+      q('w3d1q5', 'Is every crosswalk painted on the road?', ['No: watch for walkers even where there’s no paint', 'Yes, by law every crosswalk is painted', 'Only the ones near schools and parks', 'Only the ones at traffic lights'], 0,
+        'Corners without painted lines can still be crosswalks.', 15, 'Not all crosswalks are marked.'),
+      q('w3d1q6', 'Arrows painted in your lane show:', ['Which way the next lane’s traffic is going', 'Where bicycles are allowed to ride', 'What you may or must do from that lane', 'Where you may park for a short time'], 2,
+        'A left arrow alone means that lane must turn left.', 15, 'show the movements that are allowed or required when driving in that lane.'),
+      q('w3d1q7', 'Who must you yield to at a crosswalk?', ['Only people already halfway across', 'Only children and people in wheelchairs', 'Only people who wave at you first', 'Anyone in it or about to enter it'], 3,
+        'Watch the corners as you approach.', 15, 'You must yield to anyone in or about to enter a crosswalk.')
+    ]
+  },
+  {
+    id: 'w3d2', title: 'Special lanes: center turn, reversible and HOV',
+    key: [k('A center left-turn lane is for left turns only, never for passing.', 16, 'the lane cannot be used for passing.'),
+      k('Never drive or pass on the shoulder.', 16, 'Never pass on the shoulder, whether it is paved or not.'),
+      k('Three or more lanes your way: stay right or center except to pass.', 16, 'On a road with three or more lanes stay in the right or center lane except to pass.')],
+    videos: [{ yt: 'ZRDw6RmQ-y4', title: 'How To Use The Center Left Turn Lane Correctly - Do\'s & Don\'ts That Can Make You A Safer Driver!', channel: 'Stan Cravens', len: '6:05', iowa: 'Iowa’s manual: you may enter and stop in a shared center left-turn lane before turning left, but never use it to pass.' }],
+    questions: [
+      q('w3d2q1', 'What is a shared center left-turn lane for?', ['Passing slow cars on a two-lane road', 'Emergency vehicles and buses only', 'Left turns, by traffic from either direction', 'Waiting while you read a map or phone'], 2,
+        'It’s marked with solid and dashed yellow lines on each side.', 16, 'Shared left-turn lanes are reserved for vehicles making left turns from either direction.'),
+      q('w3d2q2', 'May you use a shared center left-turn lane to pass a slow car?', ['No, never', 'Yes, if no one is turning ahead', 'Yes, at night when traffic is light', 'Only on roads with four or more lanes'], 0,
+        'You may only enter it to stop and turn left.', 16, 'Vehicles may enter and stop in the lane before making a left turn, but the lane cannot be used for passing.'),
+      q('w3d2q3', 'Over a reversible lane, a green arrow means:', ['The lane is about to change direction, so get ready to leave it', 'The lane is for left turns only', 'Speed up to clear the lane', 'You may use the lane beneath it'], 3,
+        'These lanes change direction at different times of day.', 15, 'A green arrow means you can use the lane beneath it'),
+      q('w3d2q4', 'A steady yellow X shows over your lane. What should you do?', ['Keep going; it only warns trucks', 'Move out of the lane as soon as it’s safe', 'Stop in the lane and wait for the light to change', 'Use the lane only to turn right'], 1,
+        'The lane’s direction is changing.', 15, 'A steady yellow “X” means that the use of the lane is changing and you should move out of it as soon as it is safe to do so.'),
+      q('w3d2q5', 'A lane has a white diamond and an HOV 2+ sign. Who may use it?', ['Vehicles carrying two or more people', 'Any car during rush hour', 'Trucks and buses only', 'Anyone driving under the speed limit'], 0,
+        'Don’t drive in a reserved lane unless you qualify.', 16, 'the lane is reserved for high-occupancy vehicles (HOV) carrying two or more people.'),
+      q('w3d2q6', 'Three or more lanes go your way. Where should you usually drive?', ['In the left lane, since it moves fastest', 'Any lane; it makes no difference', 'In the right or center lane, except to pass', 'On the shoulder when traffic is heavy'], 2,
+        'If a lot of traffic is entering, the center lane is best.', 16, 'On a road with three or more lanes stay in the right or center lane except to pass.'),
+      q('w3d2q7', 'You turn where there are no lane markings. Which lane do you turn into?', ['The far lane, so you have plenty of room to finish', 'Any lane that looks open', 'Always the right lane', 'The one closest to the lane you came from'], 3,
+        'Change lanes after the turn if you need to.', 16, 'turn into the lane closest to the one you came from.'),
+      q('w3d2q8', 'May you pass on the shoulder if it’s paved?', ['Yes, if traffic ahead has stopped', 'No: never pass on the shoulder, paved or not', 'Yes, on the right side only', 'Only to reach an exit you’d miss'], 1,
+        'Other drivers won’t expect you there and may pull off without looking.', 16, 'Never pass on the shoulder, whether it is paved or not.')
+    ]
+  }
 ];

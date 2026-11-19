@@ -15,12 +15,12 @@ PLAN = [
  (2, 'Signs and signals', [
    ('Sign colors and shapes', ['2.1'], [('oEXDKnD756k', '7:52', '')]),
    ('Regulatory signs: stop vs yield', ['2.2'], [('oAEXSBJJqc4', '7:26', '')]),
-   ('Warning, guide, service and route signs; slow-moving vehicles', ['2.3', '2.5', '2.6', '2.7', '2.8'], [('jBZH_XA4FUE', '8:32', '')]),
-   ('Signals, flashing arrows, pedestrian beacons', ['2.9', '2.20'], [('fBncqaoT3_4', '4:41', ''), ('5nlBLyUBjVM', '1:17', 'IA'), ('kum6w2BH1zc', '1:15', 'IA')])]),
+   ('Warning, guide, service and route signs; slow-moving vehicles; pedestrian conveyances', ['2.3', '2.4', '2.5', '2.6', '2.7', '2.8'], [('jBZH_XA4FUE', '8:32', '')]),
+   ('Signals, flashing arrows, pedestrian beacons; sight-impaired walkers', ['2.9', '2.20', '2.21'], [('fBncqaoT3_4', '4:41', ''), ('5nlBLyUBjVM', '1:17', 'IA'), ('kum6w2BH1zc', '1:15', 'IA')])]),
  (3, 'Markings and lanes', [
    ('Pavement markings, yield lines, crosswalks', ['2.12', '2.13', '2.14'], [('JNK2037-WCk', '5:49', '')]),
-   ('Reversible, shared left-turn and reserved lanes', ['2.15', '2.16', '2.17', '2.18'], [('l-GeRRVvT14', '6:33', 'IA, check: may be about road design; spare ZRDw6RmQ-y4')]),
-   ('Pedestrians, bicycles, sight-impaired walkers', ['2.4', '2.19', '2.21', '5.11'], [('9KHhHqb9_E0', '9:40', '')]),
+   ('Reversible, shared left-turn and reserved lanes', ['2.15', '2.16', '2.17', '2.18'], [('ZRDw6RmQ-y4', '6:05', '')]),
+   ('Bike lanes and sharing the road with bicyclists', ['2.19', '5.11'], [('9KHhHqb9_E0', '9:40', '')]),
    ('Changing lanes', ['4.9'], [('JaUZJsEyRV4', '7:57', '')])]),
  (4, 'Right of way and Iowa intersections', [
    ('Two-way and all-way stops', ['2.22'], [('7MODqVaQVuY', '4:48', ''), ('3bYMB7q6khs', '4:05', '')]),
@@ -63,7 +63,7 @@ PLAN = [
    ('Iowa road signs + 5 questions', [], [('owwsk636beU', '11:48', 'check: third-party quiz, answers may be wrong or not Iowa')]),
    ('Iowa DOT online practice test + 5 questions', [], [])]),
 ]
-SPARES = [('ZRDw6RmQ-y4', '6:05', ''), ('CdDBJoxHLGE', '4:38', 'CA'), ('tpykT-JU7PM', '6:47', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
+SPARES = [('l-GeRRVvT14', '6:33', 'IA, check: may be about road design'), ('CdDBJoxHLGE', '4:38', 'CA'), ('tpykT-JU7PM', '6:47', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
   ('fba8OgJpWGI', '3:55', ''), ('ym4VOPoda4w', '6:20', 'North Carolina'), ('lWMg2IEtQT8', '8:01', ''), ('uIkanxT72KI', '1:43', 'Michigan'),
   ('lPPJ7S-ZLQE', '1:49', 'IA'), ('cTtEbLoJHyY', '11:58', ''), ('kxQHoBmjp4U', '13:01', ''), ('dWKsDvFBo6M', '12:34', ''),
   ('EJQQxcpQWE0', '0:31', 'IA'), ('xMutekpY0cs', '2:43', 'hazard-spotting'), ('oXh0uS9BHUo', '2:43', 'hazard-spotting'), ('-dQoLfMd-SI', '2:16', 'hazard-spotting')]

@@ -138,3 +138,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 19: 11b done. Next: Form B (due ~first week of Dec), hazard ride tick (9b), unit 3 via Saturday check-in.
 - Nov 19: 9b done (hazard ride). Next: Form B.
 - Nov 19: Form B done (progress test 1). Next: unit 3 by Sat Nov 28 (Saturday check-in).
+- Nov 19: unit 3 lessons 1-2 (w3d1 markings, yield lines, crosswalks; w3d2 center turn, reversible, HOV lanes, shoulders) written. Lesson 2 video is now Stan Cravens center-turn-lane (Iowa DOT 4-to-3 clip moved to spares). Next: w3d3 bike lanes (2.19, 5.11), w3d4 changing lanes (4.9 minus the shoulder check), w3d5 Unit 3 test, route-sign question on w2d3.
