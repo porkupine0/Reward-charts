@@ -68,11 +68,12 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 3. Each lesson: 2-3 key points (one fact each, quoted from the manual: k(text, page, quote); family rules: fam(text)); an Iowa note on the video if it differs from Iowa; about 7-9 questions, each quoted from its page (Iowa permit rules: quote docs/iowa/gdl-*.txt). Sign questions: add sign: { shape, color } (signs.js; blank shapes only, never words).
 4. Choices: 4 each; spread the right answer over all 4 positions; make wrong choices as long and plausible as the right one (checkCourse enforces: no bunched positions, right answer rarely the longest, no single length rank over 60%).
 5. APPEND ONLY: new lessons at the end of driving-course.js; new questions at the END of a lesson (its first 3 are the day's quiz); never reorder choices of a lesson he may have seen (stored picks are positions). Every 5th lesson is the unit test: { id, title: 'Unit N test', review: true, videos: [], questions: [] }.
+5b. If the checker says a lesson question repeats a test-form question, change the LESSON's stem, never the form's (forms are frozen once a sitting has used them). Before Form C: count the distinct manual rules per topic and add a shared-quote report to checkTests.
 6. Test (node --test tests/*.test.mjs; node tests/browser/run.mjs), commit one lesson at a time, push to main and the session branch, update this file.
 
 ## Dates (if Eli starts Nov 19 and misses no day)
 - Unit 1 test: about Tue Nov 24. Unit 2 test: about Wed Dec 2.
-- By Sat Nov 21: Form B (opens after the Unit 2 test; same blueprint and number-question count as Form A, no lesson wording, drawn sign shapes) and the hazard-ride tick (9b).
+- Done Nov 19: Form B and the hazard-ride tick. Saturday Nov 21 check-in: start unit 3.
 - By Sat Nov 28: unit 3 (markings and lanes) on main, so a parent can preview it.
 
 ## Open for the family
