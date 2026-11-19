@@ -4,6 +4,7 @@ Work runs in scheduled sessions, one item at a time. Each item is tested, then r
 Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all (GitHub runs them on every push too).
 
 ## Decisions
+- Nov 19: the advisor sets the order of work (the parent said so). Don't ask the parent about order; the check-ins follow "Next steps" below.
 - Late chores ("Finish first") can earn back that day's game time. No change.
 - Monday and Tuesday of the week of Nov 16 count. Charts stay tied from Nov 16, and parents fill in those days on the checklists.
 - Isaiah's prizes stay as they are: game time only.
@@ -61,6 +62,17 @@ Each step needs advisor approval before the next. Check-ins at 10:31 am and 3:31
 Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/<lesson>` = date, `watched/<lesson>` = date, `answers/<question>/<lesson>` = { ok, on } (first answer counts). Leftover game time: routines `carry/<kid>/<from monday>` = { minutes, add }.
 Decided Nov 18 (afternoon): lessons 1 and 2 approved, Eli hasn't started; a DIFFERENT knowledge test every sitting (baseline, progress tests, final: Forms A-F, all new questions, rules may come back in new situations); permit test in about 3 months (mid-February 2027), so the course is cut to 55 lesson days (66 weekdays from Nov 19 to Feb 18). w1d5 becomes unit 1's test (nothing finished yet). A lesson he hasn't begun waits on the Driving page until the baseline is done.
 Decided Nov 18: only Eli's typing and driving wait for today's chores (assignments and homework don't; homework still locks when an earlier day's chore is owed). The driving lesson counts toward his daily streak, not game time.
+
+## Next steps (the weekly check-ins work this list in order: one dated item per check-in, unless something is overdue)
+- **Sat Nov 21: Form C groundwork.**
+  - Demand for Forms C-F (4 forms x blueprint): signs 16, signals and markings 8, right of way 4, school buses and emergency vehicles 16, railroad and work zones 8, alcohol and phones 4, general rules (speed, turns, passing, lights) 28, highways/weather/road types 16.
+  - Count NUMBER facts first: each form needs 8-10 number questions; Forms A and B used about 18. Number facts may be tighter than school buses.
+  - Detailed inventory only where supply is under about 1.5x demand; a rough count elsewhere.
+  - Output (in docs/driving-syllabus.md): a table reserving facts for Forms C-F, showing which rules repeat and in what new situation.
+  - Add a shared-QUOTE report to checkTests (report, don't reject: later forms must reuse rules).
+- **Sat Nov 28: unit 5** (speed, stopping, turning). Must be on main by Dec 12.
+- **Sat Dec 5: Form C** (opens after the Unit 4 test, about Dec 16).
+- **Sat Dec 12: unit 6, plus a place to record Iowa DOT practice-test scores** (the parent enters his score and date on the Parents page). His first Iowa DOT online practice test is after the Unit 5 test, about Dec 23.
 
 ## How to write a driving unit (for the weekly check-ins)
 1. Run node scripts/check-videos.mjs; take the unit's videos (titles, channels, lengths) from docs/driving-videos.json; swap in a spare if one is gone (find more with scripts/youtube-search.py).
