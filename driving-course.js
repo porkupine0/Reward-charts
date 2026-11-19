@@ -198,5 +198,37 @@ export const LESSONS = [
       q('w2d3q9', 'What do mile markers on the interstate show?', ['Miles from where that interstate entered the state you’re in', 'Miles to the next city', 'The speed limit', 'Miles to the state line ahead'], 0,
         'They help you know how far your exit is, and tell 911 exactly where you are in an emergency.', 11, 'Mile markers show the number of miles from where the Interstate route entered the state you are traveling in.')
     ]
-  }
+  },
+  {
+    id: 'w2d4', title: 'Traffic signals and pedestrian beacons',
+    key: [k('Flashing red: treat it like a stop sign.', 11, 'Flashing red Treat it the same as a stop sign.'),
+      k('Flashing yellow arrow: you may turn left after yielding to oncoming traffic and pedestrians.', 11, 'Yield to oncoming traffic and pedestrians; then turn left proceeding with caution.'),
+      k('Rapid-flashing amber beacons at a crosswalk: stop for anyone in it.', 18, 'Motorists must stop for anyone within the crosswalk')],
+    videos: [
+      { yt: 'fBncqaoT3_4', title: 'What Do Those Flashing Arrow Traffic Signals Mean?', channel: 'Stan Cravens', len: '4:41',
+        iowa: 'Iowa’s manual: a flashing yellow arrow means yield to oncoming traffic and pedestrians, then turn left with caution; oncoming traffic has a green light.' },
+      { yt: '5nlBLyUBjVM', title: 'Rectangular Rapid Flashing Beacons', channel: 'Iowa DOT Answers', len: '1:17' },
+      { yt: 'kum6w2BH1zc', title: 'Pedestrian Hybrid Beacons', channel: 'Iowa DOT Answers', len: '1:15' }],
+    questions: [
+      q('w2d4q1', 'A steady yellow light comes on as you approach. What should you do?', ['Speed up to beat the red', 'Don’t enter the intersection if you can stop safely', 'Stop suddenly no matter what', 'Treat it like a stop sign'], 1,
+        'If you can’t stop safely, go through with caution.', 11, 'Do not enter the intersection if you can stop safely. If you cannot stop safely, proceed through the intersection with caution.'),
+      q('w2d4q2', 'You want to turn left and see a flashing yellow arrow. What does it mean?', ['Oncoming traffic must stop for you', 'Yield to oncoming traffic and pedestrians, then turn left with caution', 'Don’t turn left', 'Go straight only'], 1,
+        'Oncoming traffic has a green light, so wait for a safe gap.', 11, 'Yield to oncoming traffic and pedestrians; then turn left proceeding with caution. Oncoming traffic has a green light.'),
+      q('w2d4q3', 'Your light is solid green. Can you just go?', ['Yes, always', 'Yes, but only when the intersection is clear: yield to vehicles and pedestrians in it', 'Only if you honk first', 'Only to turn right'], 1,
+        'Traffic may be caught in the intersection when the light changes; give it time to clear.', 11, 'Go, but only when the intersection is clear. Yield to vehicles and pedestrians in the intersection.'),
+      q('w2d4q4', 'A steady green arrow points left. What does it mean?', ['Turn left; oncoming traffic must stop', 'Yield, then turn left', 'Go straight or turn left', 'Stop, then turn'], 0,
+        'Go only the way the arrow points, and yield to anyone already in the intersection.', 11, 'Drivers can proceed with the left or right turn. Oncoming traffic must stop.'),
+      q('w2d4q5', 'A steady red arrow points right. What must you do?', ['Turn right without stopping', 'Stop: drivers turning that way must stop', 'Slow down and turn', 'Go straight'], 1,
+        'A red arrow means stop for that turn.', 11, 'Steady red arrow Drivers turning left or right must stop.'),
+      q('w2d4q6', 'A school crossing guard signals you to stop, but your light is green. What do you do?', ['Follow the light', 'Follow the crossing guard', 'Honk and go', 'Stop only if children are in the road'], 1,
+        'Directions from police, highway workers and crossing guards come first.', 11, 'You must follow directions from these persons.'),
+      q('w2d4q7', 'At a crosswalk, rectangular amber lights are flashing rapidly. What must you do?', ['Stop for anyone in the crosswalk and watch for anyone about to enter it', 'Slow down a little', 'Nothing; they’re for bikes', 'Honk and go'], 0,
+        'A walker pushed the button to cross.', 18, 'Motorists must stop for anyone within the crosswalk and be alert for anyone about to enter the crosswalk when the beacon is flashing.'),
+      q('w2d4q8', 'A pedestrian hybrid beacon’s two top red lights are solid. What do you do?', ['Slow down', 'Proceed with caution', 'Stop for pedestrians', 'Turn right only'], 2,
+        'When they start flashing, stop first; then you may go with caution if the crosswalk is clear.', 18, 'Then the top two red lights become solid, and motorists must stop for pedestrians.'),
+      q('w2d4q9', 'A person crossing is using a white cane with a red tip. What does that tell you?', ['They’re likely visually impaired: use extra caution', 'They’re a crossing guard', 'They have the light', 'Nothing special'], 0,
+        'Also watch for a person led by a harnessed service animal.', 18, 'the person is likely visually impaired. Use extra caution to prevent injury to that person.')
+    ]
+  },
+  { id: 'w2d5', title: 'Unit 2 test', review: true, videos: [], questions: [] }
 ];
