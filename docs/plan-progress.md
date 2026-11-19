@@ -74,7 +74,7 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 ## Dates (if Eli starts Nov 19 and misses no day)
 - Unit 1 test: about Tue Nov 24. Unit 2 test: about Wed Dec 2.
 - Done Nov 19: Form B and the hazard-ride tick. Saturday Nov 21 check-in: start unit 3.
-- Done Nov 19: unit 3 (markings and lanes). Next: unit 4 (right of way, roundabouts, Iowa intersections) by about Dec 5.
+- Done Nov 19: units 3 and 4. Next dated item: Form C (opens after the Unit 4 test, about Dec 16). Before writing it: (1) count the distinct manual rules per topic; (2) add a shared-quote report to checkTests. Unit 5 (speed, stopping, turning) by about Dec 12.
 
 ## Open for the family
 - Leftover game time: should it expire at the end of the weekend or carry over? (It stays on that week's chart now.)
@@ -140,3 +140,4 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 - Nov 19: Form B done (progress test 1). Next: unit 3 by Sat Nov 28 (Saturday check-in).
 - Nov 19: unit 3 lessons 1-2 (w3d1 markings, yield lines, crosswalks; w3d2 center turn, reversible, HOV lanes, shoulders) written. Lesson 2 video is now Stan Cravens center-turn-lane (Iowa DOT 4-to-3 clip moved to spares). Next: w3d3 bike lanes (2.19, 5.11), w3d4 changing lanes (4.9 minus the shoulder check), w3d5 Unit 3 test, route-sign question on w2d3.
 - Nov 19: unit 3 complete (w3d3 bike lanes and bicyclists, w3d4 changing lanes, w3d5 Unit 3 test; 31 questions). Route-sign question added to w2d3 (closes 2.8). Next: unit 4 via the Saturday check-in.
+- Nov 19: unit 4 complete (w4d1 stops and uncontrolled intersections; w4d2 turns, pedestrians, motorcycles, driveways; w4d3 roundabouts; w4d4 reduced-conflict and diverging diamond; w4d5 Unit 4 test; 32 questions). DOT stems: uncontrolled intersection w4d1q3, right on red w4d1q6, left turn vs motorcycle w4d2q1.

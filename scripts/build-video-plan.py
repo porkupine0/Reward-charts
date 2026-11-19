@@ -63,7 +63,7 @@ PLAN = [
    ('Iowa road signs + 5 questions', [], [('owwsk636beU', '11:48', 'check: third-party quiz, answers may be wrong or not Iowa')]),
    ('Iowa DOT online practice test + 5 questions', [], [])]),
 ]
-SPARES = [('l-GeRRVvT14', '6:33', 'IA, check: may be about road design'), ('CdDBJoxHLGE', '4:38', 'CA'), ('tpykT-JU7PM', '6:47', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
+SPARES = [('-olqiG42Ud4', '9:47', 'Washington'), ('XnOjL1ZDJqk', '6:35', 'CA'), ('l-GeRRVvT14', '6:33', 'IA, check: may be about road design'), ('CdDBJoxHLGE', '4:38', 'CA'), ('tpykT-JU7PM', '6:47', ''), ('Y3jcQCdeJAs', '6:28', ''), ('LOPkiGCFo_Y', '4:34', 'check: survival-show style'), ('bBoOslis3lk', '8:06', 'CA'), ('Cz08eArGuvc', '0:51', ''), ('Q0-7rwnnJQs', '14:06', 'Michigan'),
   ('fba8OgJpWGI', '3:55', ''), ('ym4VOPoda4w', '6:20', 'North Carolina'), ('lWMg2IEtQT8', '8:01', ''), ('uIkanxT72KI', '1:43', 'Michigan'),
   ('lPPJ7S-ZLQE', '1:49', 'IA'), ('cTtEbLoJHyY', '11:58', ''), ('kxQHoBmjp4U', '13:01', ''), ('dWKsDvFBo6M', '12:34', ''),
   ('EJQQxcpQWE0', '0:31', 'IA'), ('xMutekpY0cs', '2:43', 'hazard-spotting'), ('oXh0uS9BHUo', '2:43', 'hazard-spotting'), ('-dQoLfMd-SI', '2:16', 'hazard-spotting')]
