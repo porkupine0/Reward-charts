@@ -197,9 +197,9 @@ export const LESSONS = [
         'Tractors can be wide and slow, and may turn into fields.', 9, 'Be alert for slow-moving, farm equipment on the roadways. Reduce your speed and pass slowly.'),
       q('w2d3q7', 'You see a DEER CROSSING sign. What should you do?', ['Slow down and watch carefully', 'Honk your horn', 'Turn on your high beams and speed up', 'Nothing in the daytime'], 0,
         'Deer often cross where these signs are posted.', 9, 'There may be deer trying to cross the roadway in the area. Slow down and watch carefully.'),
-      q('w2d3q8', 'Who must you yield to at a crosswalk under Iowa’s 2024 law?', ['Only people walking, because devices must use the street like cars', 'Only people in wheelchairs', 'Walkers and anyone on a stroller, skateboard or scooter', 'Nobody, if you have a green light'], 2,
+      q('w2d3q8', 'Who must you yield to at a crosswalk under Iowa’s 2024 law?', ['Only people walking, because devices must use the street like cars', 'Only people in wheelchairs', 'Walkers, and anyone in a wheelchair or on a stroller, skateboard or scooter', 'Nobody, if you have a green light'], 2,
         'The law calls those devices pedestrian conveyances.', 10, 'vehicles must yield the right of way to pedestrians on foot and those using any human powered device'),
-      q('w2d3q9', 'What do mile markers on the interstate show?', ['Miles to the next city', 'Miles from where that interstate entered your state', 'The speed limit', 'Miles left to the state line ahead of you, counting down'], 1,
+      q('w2d3q9', 'What do mile markers on the interstate show?', ['Miles to the next city', 'Miles from where that interstate entered the state you’re in', 'The speed limit', 'Miles left to the state line ahead of you, counting down'], 1,
         'They help you know how far your exit is, and tell 911 exactly where you are in an emergency.', 11, 'Mile markers show the number of miles from where the Interstate route entered the state you are traveling in.')
     ]
   },

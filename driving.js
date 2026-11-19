@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795056456';
+import { checkSign } from './signs.js?v=1795056891';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -221,6 +221,9 @@ export function checkTests(forms, sittings, topics, lessons, blueprint) {
     form.forEach((x, i) => { run = i && x.answer === form[i - 1].answer ? run + 1 : 1; if (run === 4) out.push('form ' + name + ': 4 right answers in a row in the same position (' + x.id + ')'); });
     const longest = form.filter((x) => (x.choices || []).length && (x.choices[x.answer] || '').length > Math.max(...x.choices.filter((_, i) => i !== x.answer).map((c) => c.length))).length;
     if (longest > Math.ceil(form.length / 4)) out.push('form ' + name + ': the right answer is the longest choice ' + longest + ' times');
+    const ranks = [0, 0, 0, 0];
+    form.forEach((x) => { if ((x.choices || []).length === 4) ranks[x.choices.filter((c) => c.length > (x.choices[x.answer] || '').length).length]++; });
+    if (name !== 'A' && Math.max(...ranks) > Math.ceil(form.length * 0.6)) out.push('form ' + name + ': the right answer is usually the same length rank (' + ranks.join('/') + ')'); // Form A was taken before this rule
     form.forEach((x) => {
       if (!/^[A-Za-z0-9]+$/.test(x.id || '')) out.push((x.id || '?') + ': question id must be letters and digits');
       if (seen.has(x.id)) out.push(x.id + ': id used twice');

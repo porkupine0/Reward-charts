@@ -62,6 +62,19 @@ Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/
 Decided Nov 18 (afternoon): lessons 1 and 2 approved, Eli hasn't started; a DIFFERENT knowledge test every sitting (baseline, progress tests, final: Forms A-F, all new questions, rules may come back in new situations); permit test in about 3 months (mid-February 2027), so the course is cut to 55 lesson days (66 weekdays from Nov 19 to Feb 18). w1d5 becomes unit 1's test (nothing finished yet). A lesson he hasn't begun waits on the Driving page until the baseline is done.
 Decided Nov 18: only Eli's typing and driving wait for today's chores (assignments and homework don't; homework still locks when an earlier day's chore is owed). The driving lesson counts toward his daily streak, not game time.
 
+## How to write a driving unit (for the weekly check-ins)
+1. Run node scripts/check-videos.mjs; take the unit's videos (titles, channels, lengths) from docs/driving-videos.json; swap in a spare if one is gone (find more with scripts/youtube-search.py).
+2. Read the facts off the manual's PAGE PICTURES, not just the text: the saved text mixes the two columns on many pages. Download the PDF (link in docs/iowa/README.md) and render pages with: pdftoppm -f N -l N -r 60 -png manual.pdf p
+3. Each lesson: 2-3 key points (one fact each, quoted from the manual: k(text, page, quote); family rules: fam(text)); an Iowa note on the video if it differs from Iowa; about 7-9 questions, each quoted from its page (Iowa permit rules: quote docs/iowa/gdl-*.txt). Sign questions: add sign: { shape, color } (signs.js; blank shapes only, never words).
+4. Choices: 4 each; spread the right answer over all 4 positions; make wrong choices as long and plausible as the right one (checkCourse enforces: no bunched positions, right answer rarely the longest, no single length rank over 60%).
+5. APPEND ONLY: new lessons at the end of driving-course.js; new questions at the END of a lesson (its first 3 are the day's quiz); never reorder choices of a lesson he may have seen (stored picks are positions). Every 5th lesson is the unit test: { id, title: 'Unit N test', review: true, videos: [], questions: [] }.
+6. Test (node --test tests/*.test.mjs; node tests/browser/run.mjs), commit one lesson at a time, push to main and the session branch, update this file.
+
+## Dates (if Eli starts Nov 19 and misses no day)
+- Unit 1 test: about Tue Nov 24. Unit 2 test: about Wed Dec 2.
+- By Sat Nov 21: Form B (opens after the Unit 2 test; same blueprint and number-question count as Form A, no lesson wording, drawn sign shapes) and the hazard-ride tick (9b).
+- By Sat Nov 28: unit 3 (markings and lanes) on main, so a parent can preview it.
+
 ## Open for the family
 - Leftover game time: should it expire at the end of the weekend or carry over? (It stays on that week's chart now.)
 - Chart boxes can't reach 44px at seven columns on a phone.
