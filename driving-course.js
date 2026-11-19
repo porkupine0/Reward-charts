@@ -200,7 +200,9 @@ export const LESSONS = [
       q('w2d3q8', 'Who must you yield to at a crosswalk under Iowa’s 2024 law?', ['Only people walking, because devices must use the street like cars', 'Only people in wheelchairs', 'Walkers, and anyone in a wheelchair or on a stroller, skateboard or scooter', 'Nobody, if you have a green light'], 2,
         'The law calls those devices pedestrian conveyances.', 10, 'vehicles must yield the right of way to pedestrians on foot and those using any human powered device'),
       q('w2d3q9', 'What do mile markers on the interstate show?', ['Miles to the next city', 'Miles from where that interstate entered the state you’re in', 'The speed limit', 'Miles left to the state line ahead of you, counting down'], 1,
-        'They help you know how far your exit is, and tell 911 exactly where you are in an emergency.', 11, 'Mile markers show the number of miles from where the Interstate route entered the state you are traveling in.')
+        'They help you know how far your exit is, and tell 911 exactly where you are in an emergency.', 11, 'Mile markers show the number of miles from where the Interstate route entered the state you are traveling in.'),
+      q('w2d3q10', 'What does the shape of a route sign tell you?', ['The speed limit on that road', 'How far it is to the next town', 'The type of road: interstate, U.S. highway, Iowa route or county road', 'Which exit is coming up next'], 2,
+        'Follow route signs to stay on your route.', 11, 'The shape of a route sign indicates the type of roadway it is')
     ]
   },
   {
@@ -287,5 +289,56 @@ export const LESSONS = [
       q('w3d2q8', 'May you pass on the shoulder if it’s paved?', ['Yes, if traffic ahead has stopped', 'No: never pass on the shoulder, paved or not', 'Yes, on the right side only', 'Only to reach an exit you’d miss'], 1,
         'Other drivers won’t expect you there and may pull off without looking.', 16, 'Never pass on the shoulder, whether it is paved or not.')
     ]
-  }
+  },
+  {
+    id: 'w3d3', title: 'Bike lanes and sharing the road with bicyclists',
+    key: [k('Don’t stop on green bike-lane paint.', 17, 'Motorists should not stop on green pavement.'),
+      k('Passing a bicyclist: change lanes completely, as you would for a car.', 58, 'When passing bicyclists, you must completely change lanes'),
+      k('Check for bikes coming up behind you before you turn right.', 58, 'Watch for bicyclists coming from behind, especially before turning right.')],
+    videos: [{ yt: '9KHhHqb9_E0', title: 'TDS Talks, Pedestrian and Bicycle Safety', channel: 'teensinthedriverseat', len: '9:40', iowa: 'Iowa’s manual: when passing a bicyclist, move completely into the next lane, and don’t move back until you can see the bicyclist in your rearview mirror.' }],
+    questions: [
+      q('w3d3q1', 'When may you drive in a bike lane?', ['Never, for any reason at all', 'Only to turn, after checking for bikes', 'Whenever no bikes are in sight ahead of you', 'To pass a slow car on the right side'], 1,
+        'Look beside and behind you first, and cross with care.', 17, 'Motorists may only drive in bicycle lanes when making turning movements'),
+      q('w3d3q2', 'You’re passing a bicyclist on the road. How much room do you give?', ['About two feet of room, if you slow way down', 'Enough to squeeze past after you honk', 'None; stay behind them the whole way', 'The whole lane: change lanes completely'], 3,
+        'Pass a bicyclist the way you’d pass a car.', 58, 'When passing bicyclists, you must completely change lanes, giving the bicyclist the entire lane like you would with any other vehicle.'),
+      q('w3d3q3', 'After passing a bicyclist, when may you move back to the right?', ['When you see them in your rearview mirror', 'Right away, once your front bumper is past', 'After you count to two', 'When the bicyclist waves you over'], 0,
+        'Cutting back in too soon can clip them.', 58, 'Do not return to the right until you can see the bicyclist(s) in your rearview mirror.'),
+      q('w3d3q4', 'A lane ahead is painted green with a bicycle on it. What should you do?', ['Use it as an extra turn lane when it’s busy', 'Park in it for a minute if no bikes come', 'Check for bikes; don’t stop on it', 'Speed up so you cross it quickly'], 2,
+        'Green paint marks a bike lane or crossing.', 17, 'Motorists should not stop on green pavement.'),
+      q('w3d3q5', '“Sharrows” (a bike with arrows painted in a regular lane) mean:', ['The lane is only for bicycles, never for cars', 'Cars may not use that lane at all', 'A separate bike lane starts just ahead', 'Bikes may use it too: share and pass safely'], 3,
+        'Unlike a bike lane, the space isn’t only for bikes.', 17, 'Unlike bike lanes, sharrows do not designate a particular portion of the roadway for the exclusive use of bicycles.'),
+      q('w3d3q6', 'The car in the next lane stops for a pedestrian. May you pass it?', ['Yes, if you go slowly and carefully', 'No: never pass a car stopped for a pedestrian', 'Yes, after a short tap of the horn', 'Only if the walker is almost across'], 1,
+        'The stopped car can hide the person crossing.', 58, 'Never pass another vehicle that has stopped or is slowing down for a pedestrian.'),
+      q('w3d3q7', 'May bicyclists ride on the road?', ['Yes: they have the right to be on the road', 'No, they belong on the sidewalk', 'Only on marked bike paths', 'Only in daylight hours'], 0,
+        'They’re often not allowed on sidewalks, so respect their place on the road.', 58, 'People riding bicycles have the right to be on the road'),
+      q('w3d3q8', 'A green box with a bicycle is painted at an intersection, just past the stop line. It is:', ['A spot where bikes may be parked', 'Where cars wait to turn right on a red light', 'A bike box, for bikes to wait and turn', 'A stop for city buses'], 2,
+        'Stop behind it on red.', 17, 'Bicycle boxes are pavement markings that are installed to allow bicyclists a safe way to turn at a signalized intersection.')
+    ]
+  },
+  {
+    id: 'w3d4', title: 'Changing lanes safely',
+    key: [k('Change lanes one lane at a time.', 44, 'Only change lanes one lane at a time.'),
+      k('Signal first, so other drivers know your plan.', 44, 'Inform other drivers of your plans by proper signaling.'),
+      k('Check the far lane too: someone there may be moving into the same lane.', 44, 'someone in that lane may be planning to move into the same lane you want to enter.')],
+    videos: [{ yt: 'JaUZJsEyRV4', title: 'How to Know When It’s Safe to Change Lanes (Basic Road Test Skill)', channel: 'Zutobi Drivers Ed', len: '7:57', iowa: 'Iowa’s manual: signal, check your mirrors and blind spot, keep your speed, and move one lane at a time.' }],
+    questions: [
+      q('w3d4q1', 'You need to move two lanes to the left. How do you do it?', ['Cross both lanes in one smooth move', 'One lane at a time', 'Only with your hazard lights on', 'Slow down to let both lanes clear'], 1,
+        'Signal and check again before each lane.', 44, 'Only change lanes one lane at a time.'),
+      q('w3d4q2', 'What should your speed do while you change lanes?', ['Drop a lot, so you have extra time to look all around you', 'Jump up quickly, to get ahead of traffic', 'Come almost to a stop first', 'Stay the same, unless you’re moving into a slower lane'], 3,
+        'Slowing down suddenly can cause a crash behind you.', 44, 'do it carefully but without slowing down unless you are moving into a slower lane of traffic.'),
+      q('w3d4q3', 'Three lanes go your way and you’re moving into the middle one. Why look at the far lane too?', ['A car there may be moving into the same lane', 'The far lane is only for trucks and buses', 'To read the signs above that lane', 'It doesn’t matter; only the lane you’re moving into does'], 0,
+        'Two cars merging into one lane at the same time is a common crash.', 44, 'someone in that lane may be planning to move into the same lane you want to enter.'),
+      q('w3d4q4', 'Which of these counts as a lane change?', ['Turning into a driveway on your right', 'Stopping at a red light', 'Pulling away from the curb into traffic', 'Backing out of your garage'], 2,
+        'So does merging from an entrance ramp.', 44, 'Entering the roadway from the curb or shoulder.'),
+      q('w3d4q5', 'Before you move into the next lane, who goes first?', ['You do, once your signal is on', 'Whoever is driving faster', 'Only trucks, because they’re bigger', 'Vehicles already in that lane'], 3,
+        'Make sure there’s room before you move.', 44, 'yield to any vehicles already in that lane'),
+      q('w3d4q6', 'Your mirror shows a car about to pass you on the side you want to move to. What do you do?', ['Move over quickly before it reaches you', 'Wait: make sure nobody is about to pass you', 'Speed up and move in ahead of it', 'Signal and move over; it will slow down for you'], 1,
+        'Let it pass, then check again.', 44, 'Make sure that nobody is about to pass you.'),
+      q('w3d4q7', 'What should you keep doing during the lane change itself?', ['Keep checking the traffic around you', 'Look only at the road straight ahead', 'Watch the GPS on your phone', 'Look down at the dashboard'], 0,
+        'Someone can come up on you unexpectedly.', 44, 'While you are changing lanes, constantly check traffic so you will see anyone coming up on you unexpectedly.'),
+      q('w3d4q8', 'On a road with two lanes going your way, the left lane is generally for:', ['Slow trucks and farm equipment', 'Parking during off-peak hours', 'Passing', 'Turning right at the next corner'], 2,
+        'Move back right after you pass.', 16, 'the left lane is generally used for passing.')
+    ]
+  },
+  { id: 'w3d5', title: 'Unit 3 test', review: true, videos: [], questions: [] }
 ];
