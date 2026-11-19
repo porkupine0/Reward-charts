@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795055548';
+import { checkSign } from './signs.js?v=1795056456';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -126,6 +126,7 @@ export function grade(quiz, picks) {
   return { right: quiz.length - missed.length, total: quiz.length, missed };
 }
 
+const LIVE_BEFORE_RULE = ['w1d1', 'w1d2'];
 // Check course content before it ships: a list of problems (empty = fine).
 export function checkCourse(lessons) {
   const out = [], seen = new Set(), lessonIds = new Set();
@@ -147,6 +148,19 @@ export function checkCourse(lessons) {
       if (!/^[A-Za-z0-9_-]{11}$/.test(v.yt || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs an 11-character YouTube id (yt)');
       if (!v.title || !v.channel || !/^\d{1,2}:\d{2}$/.test(v.len || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs a title, channel and length (m:ss)');
     });
+    // answers must not be guessable: spread over the positions, and the right one not usually the longest.
+    // (w1d1 and w1d2 went live before this rule; their positions can't change, since stored picks are positions.)
+    const qs = l.questions || [];
+    if (qs.length >= 5) {
+      const per = [0, 1, 2, 3].map((i) => qs.filter((q) => q.answer === i).length);
+      if (Math.max(...per) > Math.ceil(qs.length / 2) || (!LIVE_BEFORE_RULE.includes(l.id) && per.filter(Boolean).length < 3)) out.push(l.id + ': right answers bunched in a few positions (' + per.join('/') + ')');
+      const longest = qs.filter((q) => (q.choices || []).length > 1 && (q.choices[q.answer] || '').length > Math.max(...q.choices.filter((_, i) => i !== q.answer).map((c) => c.length))).length;
+      if (longest > Math.ceil(qs.length / 3)) out.push(l.id + ': the right answer is the longest choice in ' + longest + ' of ' + qs.length + ' questions');
+      // nor usually the same length rank (e.g. always the second-longest)
+      const ranks = [0, 0, 0, 0];
+      qs.forEach((q) => { if ((q.choices || []).length === 4) ranks[q.choices.filter((c) => c.length > (q.choices[q.answer] || '').length).length]++; });
+      if (Math.max(...ranks) > Math.ceil(qs.length * 0.6)) out.push(l.id + ': the right answer is usually the same length rank (' + ranks.join('/') + ', longest to shortest)');
+    }
     const spots = new Set((l.questions || []).map((q) => q.answer));
     if ((l.questions || []).length >= 3 && spots.size < 2) out.push(l.id + ': the right answer is in the same position every time');
     (l.questions || []).forEach((q) => {

@@ -153,6 +153,14 @@ test('driving: the content checker catches bad lessons and questions', () => {
   const signed = course(2); signed[0].questions[0].sign = { shape: 'octagon', color: 'red' }; signed[0].questions[1].sign = { shape: 'hexagon', color: 'red' }; signed[1].questions[0].sign = { shape: 'diamond', color: 'purple' };
   assert.match(D.checkCourse(signed).join(' | '), /L1q2: unknown sign shape hexagon.*L2q1: unknown sign color purple/);
   assert.ok(!D.checkCourse(signed).join(' ').includes('L1q1'), 'a good sign passes');
+  // guessable answers: bunched in one position, usually the longest choice, usually the same length rank
+  const four = (id, ans, long) => ({ id, q: 'Q', choices: [0, 1, 2, 3].map((i) => (i === ans ? (long ? 'a much longer right answer' : 'ok') : 'wrong ' + i)), answer: ans, why: 'w', ref: "Iowa Driver's Manual p.1" });
+  const g = course(2);
+  g[0].questions = [1, 2, 3, 4, 5, 6].map((k) => four('L1q' + k, 1, true));
+  g[1].questions = [0, 1, 2, 3, 0, 1].map((a, k) => four('L2q' + k, a, false));
+  const gout = D.checkCourse(g).join(' | ');
+  assert.match(gout, /L1: right answers bunched/); assert.match(gout, /L1: the right answer is the longest choice in 6 of 6/);
+  assert.match(gout, /L2: the right answer is usually the same length rank/); assert.ok(!/L2: right answers bunched|L2: the right answer is the longest/.test(gout));
   const nokey = course(2); nokey[0].key = [nokey[0].key[0]]; nokey[1].key[0] = { t: 'C' };
   assert.match(D.checkCourse(nokey).join(' | '), /L1: needs at least 2 key points.*L2: key point 1 needs a manual page and quote/);
   bad[0].questions[1].id = bad[0].questions[0].id;        // duplicate id
