@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795058046';
-import { applyConfig } from './routines.js?v=1795058046';
-import { askParent } from './parent.js?v=1795058046';
-import * as L from './lists.js?v=1795058046';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795058046';
-import { signSvg } from './signs.js?v=1795058046';
-import * as COURSE from './driving-course.js?v=1795058046';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795058046';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795058447';
+import { applyConfig } from './routines.js?v=1795058447';
+import { askParent } from './parent.js?v=1795058447';
+import * as L from './lists.js?v=1795058447';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795058447';
+import { signSvg } from './signs.js?v=1795058447';
+import * as COURSE from './driving-course.js?v=1795058447';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795058447';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -105,7 +105,8 @@ function scoreHtml(s, sc) {
 function renderTests() {
   const el = $('tests');
   if (!live() || pastDay) { el.innerHTML = ''; el.hidden = true; return; }
-  const d = ctx.drive || {}, now = new Date(), open = openSittings(SITTINGS, d, ymd(now));
+  const d = ctx.drive || {}, now = new Date(), done = (st) => testScore(FORMS[st.form] || [], d, st.id, PASS).done;
+  const open = openSittings(SITTINGS, d, ymd(now)).sort((a, b) => done(a) - done(b)); // an unfinished sitting first
   if (!open.length) { el.innerHTML = ''; el.hidden = true; return; }
   el.hidden = false;
   // an unfinished test comes first (the baseline is meant to be taken before the first lesson)

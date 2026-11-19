@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795058046';
+import { checkSign } from './signs.js?v=1795058447';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -211,7 +211,11 @@ export function openSittings(sittings, progress, dayKey) {
 // four positions (never more than 3 in a row), and the right answer not often the longest choice.
 export function checkTests(forms, sittings, topics, lessons, blueprint) {
   const out = [], seen = new Set((lessons || []).flatMap((l) => (l.questions || []).map((x) => x.id)));
+  const stem = (x) => String(x.q || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const stems = new Map((lessons || []).flatMap((l) => (l.questions || []).map((x) => [stem(x), x.id])));
   Object.entries(forms || {}).forEach(([name, form]) => {
+    form.forEach((x) => { const k = stem(x); if (stems.has(k)) out.push(x.id + ': same question as ' + stems.get(k)); stems.set(k, x.id); });
+    if (name !== 'A' && Math.abs(form.filter((x) => x.num).length - 9) > 1) out.push('form ' + name + ': ' + form.filter((x) => x.num).length + ' number questions (Form A has 9)');
     if (form.length !== 25) out.push('form ' + name + ': ' + form.length + ' questions (should be 25)');
     if (blueprint) Object.entries(blueprint).forEach(([t, n]) => { const c = form.filter((x) => x.topic === t).length; if (c !== n) out.push('form ' + name + ': ' + c + ' ' + t + ' questions (blueprint says ' + n + ')'); });
     if (form.some((x) => (x.choices || []).length !== 4)) out.push('form ' + name + ': every question needs 4 choices');

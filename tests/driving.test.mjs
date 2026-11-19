@@ -257,11 +257,15 @@ test('knowledge tests: a sitting opens on its date, and after its lesson is fini
 });
 
 test('knowledge tests: the checker catches bad forms and sittings', () => {
-  const good = Array.from({ length: 25 }, (_, i) => ({ id: 't' + i, topic: 'Signs', q: 'Q', choices: ['a', 'b', 'c', 'd'], answer: i % 4, why: 'w', ref: "Iowa Driver's Manual p.6" }));
+  const good = Array.from({ length: 25 }, (_, i) => ({ id: 't' + i, topic: 'Signs', q: 'Question ' + i, choices: ['a', 'b', 'c', 'd'], answer: i % 4, why: 'w', ref: "Iowa Driver's Manual p.6" }));
   assert.deepEqual(D.checkTests({ A: good }, [{ id: 'base', form: 'A' }], ['Signs'], LESSONS), []);
   const bad = good.slice(0, 24).concat([{ ...good[0], id: 'L1q1', topic: 'Nope', answer: 9, why: '' }]);
   const out = D.checkTests({ A: bad }, [{ id: 'L1', form: 'B', after: 'nope' }], ['Signs'], LESSONS, { Signs: 25 }).join(' | ');
   for (const m of ['L1q1: id used twice', 'unknown topic', 'answer is not one of the choices', 'needs an explanation', 'sitting id is also a lesson id', 'unknown form B', 'after names no lesson', '24 Signs questions (blueprint says 25)']) assert.ok(out.includes(m), m + ' in ' + out);
+  // a new form: no question the same as a lesson's or another form's; number questions within one of 9
+  const formB = good.map((x, i) => ({ ...x, id: 'b' + i, q: i === 0 ? 'Q ' + LESSONS[0].questions[0].id : i === 1 ? 'Question 2' : 'Other ' + i, num: i < 3 }));
+  const bout = D.checkTests({ A: good, B: formB }, [], ['Signs'], LESSONS).join(' | ');
+  assert.match(bout, /b0: same question as L1q1/); assert.match(bout, /b1: same question as t2/); assert.match(bout, /form B: 3 number questions \(Form A has 9\)/);
   // answers bunched in one position, a run of four, the right answer always the longest, 3 choices
   const bunched = good.map((x, i) => ({ ...x, answer: i < 12 ? 1 : i % 4 }));
   assert.match(D.checkTests({ A: bunched }, [], ['Signs'], []).join(' | '), /not spread evenly.*4 right answers in a row/);
