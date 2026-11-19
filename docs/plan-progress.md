@@ -72,7 +72,7 @@ Decided Nov 18: only Eli's typing and driving wait for today's chores (assignmen
 6. Test (node --test tests/*.test.mjs; node tests/browser/run.mjs), commit one lesson at a time, push to main and the session branch, update this file.
 
 ## Dates (if Eli starts Nov 19 and misses no day)
-- Unit 1 test: about Tue Nov 24. Unit 2 test: about Wed Dec 2.
+- Unit 1 test: about Wed Nov 25. Unit 2 test: about Wed Dec 2. Unit 3: about Dec 3-9. Unit 4: about Dec 10-16.
 - Done Nov 19: Form B and the hazard-ride tick. Saturday Nov 21 check-in: start unit 3.
 - Done Nov 19: units 3 and 4. Next dated item: Form C (opens after the Unit 4 test, about Dec 16). Before writing it: (1) count the distinct manual rules per topic; (2) add a shared-quote report to checkTests. Unit 5 (speed, stopping, turning) by about Dec 12.
 
