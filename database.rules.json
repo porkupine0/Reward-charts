@@ -45,6 +45,7 @@
         "approved": { "$lesson": { ".write": true } },
         "done": { "$lesson": { ".write": true } },
         "watched": { "$lesson": { ".write": true } },
+        "rides": { "$week": { ".write": true } },
         "answers": { "$question": { "$lesson": { ".write": true } } }
       },
       "isaiah": {

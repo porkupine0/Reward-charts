@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, esc, statusPill } from './store.js?v=1795056891';
-import { applyConfig } from './routines.js?v=1795056891';
-import { askParent } from './parent.js?v=1795056891';
-import * as L from './lists.js?v=1795056891';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795056891';
-import { signSvg } from './signs.js?v=1795056891';
-import * as COURSE from './driving-course.js?v=1795056891';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795056891';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795058046';
+import { applyConfig } from './routines.js?v=1795058046';
+import { askParent } from './parent.js?v=1795058046';
+import * as L from './lists.js?v=1795058046';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795058046';
+import { signSvg } from './signs.js?v=1795058046';
+import * as COURSE from './driving-course.js?v=1795058046';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795058046';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -133,6 +133,16 @@ function renderTests() {
   el.innerHTML = h;
 }
 
+// ---- the weekly hazard ride (a family activity, not scored: no streak, no game time). A parent ticks it.
+// Stored as rides/<the week's Monday> = the day it happened.
+function renderRide() {
+  if (!live()) { $('ride').innerHTML = ''; return; }
+  const wk = ymd(mondayOf(new Date())), on = ((ctx.drive || {}).rides || {})[wk];
+  $('ride').innerHTML = '<div class="rhead"><h2>Hazard ride</h2><span class="rcount">' + (on ? 'Done this week ✓' : 'Not yet this week') + '</span></div>' +
+    '<p class="note">Family activity, once a week: a 10-minute ride with Eli in the passenger seat. He calls out every hazard he spots, out loud: a car backing out, a kid near the curb, brake lights ahead, a light about to change, a car waiting to pull out. Mom or Dad ticks it here.</p>' +
+    (on ? '<p class="dv-done">✓ Done ' + esc(on) + '</p><button class="linkbtn" type="button" data-ride="undo">Undo</button>' : '<button class="tbtn approve" type="button" data-ride="done">Ride done (parent)</button>');
+}
+
 // ---- parent preview: upcoming lessons with their videos and answers (after the PIN) ----
 function renderPreview() {
   if (!previewOpen) { $('preview').innerHTML = ''; return; }
@@ -148,6 +158,12 @@ function renderPreview() {
 document.addEventListener('click', async (e) => {
   const w = e.target.closest('[data-watched]');
   if (w) { save(ID, 'watched/' + w.dataset.watched, ymd(new Date())); return; }
+  const rb = e.target.closest('[data-ride]');
+  if (rb) {
+    if (!(await askParent())) return;
+    save(ID, 'rides/' + ymd(mondayOf(new Date())), rb.dataset.ride === 'done' ? ymd(new Date()) : null);
+    return;
+  }
   const tp = e.target.closest('[data-tpick]');
   if (tp) {
     const [qid, sid, pick] = tp.dataset.tpick.split('|'), s = SITTINGS.find((x) => x.id === sid), q = s && (FORMS[s.form] || []).find((x) => x.id === qid);
@@ -209,7 +225,7 @@ function finishLeftovers() {
     if (need && mine.length >= need) save(ID, 'done/' + l.id, mine.map((a) => a.on).sort().pop());
   });
 }
-const draw = () => { finishLeftovers(); render(); renderTests(); renderPreview(); };
+const draw = () => { finishLeftovers(); render(); renderTests(); renderRide(); renderPreview(); };
 watch(ID, (v) => { ctx.drive = v || {}; draw(); }, statusPill($('sync')));
 watch('routines', (v) => { ctx.routines = v || {}; draw(); });
 watch('config', (v) => { applyConfig(v); draw(); });
