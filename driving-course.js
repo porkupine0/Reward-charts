@@ -349,7 +349,7 @@ export const LESSONS = [
     key: [k('All-way stop: the first to stop goes first.', 19, 'At an all-way stop, the driver reaching the intersection first gets to go first'),
       k('Arrive at the same time: the car on the right goes first.', 19, 'For vehicles arriving at the same time, the vehicle to the right gets to go first.'),
       k('No signs or signals: every driver slows down and approaches carefully.', 19, 'it’s the responsibility of all drivers to slow down and approach carefully.')],
-    videos: [{ yt: '7MODqVaQVuY', title: 'Who Goes First? 2-Way Stop Right of Way Rules Explained!', channel: 'Stan Cravens', len: '4:48', iowa: 'Iowa’s manual: at a two-way stop, cross traffic doesn’t stop; a driver turning left from the stop must yield to cars going straight.' },
+    videos: [{ yt: '7MODqVaQVuY', title: 'Who Goes First? 2-Way Stop Right of Way Rules Explained!', channel: 'Stan Cravens', len: '4:48', iowa: 'Iowa’s manual: at a two-way stop, cross traffic doesn’t stop; from the stop sign, wait until crossing traffic and the crosswalk are clear.' },
       { yt: '3bYMB7q6khs', title: 'Right of Way Rules: Who Goes First at a 4-Way Stop? (2026)', channel: 'Master Road Signs', len: '4:05', iowa: 'Iowa’s manual: at an all-way stop, the first to arrive (after a full stop) goes first; arriving together, the car on the right goes first.' }],
     questions: [
       q('w4d1q1', 'At an all-way stop, which driver goes first?', ['The one going straight, ahead of anyone turning', 'The first one to reach it, after a full stop', 'The bigger vehicle, since it needs more room', 'Whoever waves the others through'], 1,
@@ -367,7 +367,7 @@ export const LESSONS = [
       q('w4d1q7', 'Turning right on red after stopping, what must you also do?', ['Honk, so others know you’re turning', 'Turn quickly before the light changes', 'Yield to traffic and people crossing', 'Nothing else; the stop was enough'], 2,
         'The cars and walkers with the green go first.', 19, 'You must yield when you want to make a right turn after stopping at a red light.'),
       q('w4d1q8', 'At a two-way stop (cross traffic doesn’t stop), you want to turn left from the stop sign. Who goes first?', ['You, since you stopped first', 'Cross traffic going straight', 'Whoever is closest to the middle', 'Cars turning right from across'], 1,
-        'You’re turning into their path, so you wait for a gap.', 19, 'Because the red car is turning left into traffic, the red car must yield to the green car going straight.')
+        'At a stop sign, you wait until crossing traffic is clear.', 8, 'wait until crossing vehicles and the cross-walk are clear before proceeding.')
     ]
   },
   {
@@ -419,7 +419,7 @@ export const LESSONS = [
         'Choose before you enter; you can’t change inside.', 54, 'select the appropriate lane according to the lane control signs and pavement markings.'),
       q('w4d3q8', 'Should you stop inside a roundabout to let someone enter?', ['Yes, to be polite', 'No: keep moving and avoid stopping', 'Yes, if they honk', 'Only for trucks and buses'], 1,
         'Stopping inside can cause a crash behind you.', 54, 'Avoid stopping in the roundabout.'),
-      q('w4d3q9', 'What is the raised ring around a roundabout’s center island (the truck apron) for?', ['The rear wheels of long vehicles like semis', 'A place for cars to pass a slow truck safely', 'Parking for a quick stop', 'People walking across'], 0,
+      q('w4d3q9', 'What is the truck apron around a roundabout’s center island for?', ['The rear wheels of long vehicles like semis', 'A place for cars to pass a slow truck safely', 'Parking for a quick stop', 'People walking across'], 0,
         'Never walk across the circle to the center island.', 55, 'Truck apron: designed to accommodate the rear wheels of long vehicles')
     ]
   },

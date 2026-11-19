@@ -252,7 +252,7 @@
    "days": [
     {
      "day": 1,
-     "topic": "Two-way and all-way stops",
+     "topic": "Who goes first: stops and intersections without signs",
      "sections": [
       "2.22"
      ],
@@ -275,10 +275,12 @@
     },
     {
      "day": 2,
-     "topic": "Left turns",
+     "topic": "Turns, pedestrians, motorcycles and driveways",
      "sections": [
       "2.22",
-      "5.1"
+      "5.1",
+      "5.10",
+      "5.11"
      ],
      "videos": [
       {
