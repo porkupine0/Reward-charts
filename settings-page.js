@@ -1,9 +1,9 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc, isLive } from './store.js?v=1795064701';
-import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795064701';
-import { KIDS } from './routines.js?v=1795064701';
-import { LEVELS } from './trials.js?v=1795064701';
-import { askParent } from './parent.js?v=1795064701';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1795065101';
+import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795065101';
+import { KIDS } from './routines.js?v=1795065101';
+import { LEVELS } from './trials.js?v=1795065101';
+import { askParent } from './parent.js?v=1795065101';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
