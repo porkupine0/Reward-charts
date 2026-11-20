@@ -11,13 +11,13 @@ export const CHORE_LISTS = [
     'Back in place: bean bag in its corner, desk chair pushed in, remotes by the TV.',
     'Tables: clear and straighten the little table and the table by the mirror.',
     'Dust: dust the shelves and mantel and set the pictures straight.',
-    'Dry cloth: wipe the TV screen and the big mirror with a dry cloth.',
+    'Glass: wipe the big mirror with the blue glass cleaner; dust the TV screen with a dry cloth only.',
     'Vacuum: the whole carpet, along the walls and under the front of the couches.'
   ] },
   { name: 'Sunroom', steps: [
     'Pick up: take anything that doesn’t belong in here back where it goes. Trash and recycling out.',
     'Games: paddles, balls and puzzle pieces back where they’re kept. Leave a puzzle someone is still working on.',
-    'Bar counter: clear it, then wipe the counter and the little sink with a disinfecting wipe.',
+    'Bar counter: clear it, then wipe the counter and the little sink with a disinfectant wipe.',
     'Scarlett’s corner: dog toys put away, crate cover straight, spills wiped up.',
     'Chairs: push in the table chairs and bar stools and straighten the cushions.',
     'Sweep: the whole tile floor, corners and under the table and stools too.'
@@ -27,16 +27,16 @@ export const CHORE_LISTS = [
     'Unload: if the dishwasher is clean, empty it first.',
     'Load: rinse the dishes and load the dishwasher. Run it if it’s full.',
     'Hand-wash: wash, dry and put away pans, knives and cutting boards that don’t go in the dishwasher. Cast iron: no soaking, dry it right away.',
-    'Counters: clear the counters and island, then wipe them and the stovetop once it’s cool.',
+    'Counters: clear the counters and island, then wipe them with the food-safe sanitizer, and the stovetop once it’s cool.',
     'Sink: scrub the sink and faucet, shake out the drying mat, hang up the dish towels.',
     'Trash: empty the kitchen trash, put in a new bag, flatten boxes for recycling.',
     'Floor: sweep the whole floor, under the island and table too, and wipe up sticky spots.'
   ] },
   { name: 'Bathrooms', steps: [
     'Pick up: in all three bathrooms, clothes and towels on the floor or counter go to the laundry; anything else back where it goes.',
-    'Counters: in all three, things back in their spots, then wipe the counters and sinks.',
-    'Mirrors: wipe all three mirrors.',
-    'Toilets: in all three, scrub inside with the brush, then wipe the seat, lid and outside with a fresh wipe (not the counter cloth).',
+    'Counters: in all three, things back in their spots, then wipe the counters and sinks with a disinfectant wipe.',
+    'Mirrors: clean all three mirrors with the blue glass cleaner.',
+    'Toilets: in all three, squirt toilet bowl cleaner inside and scrub with the brush; wipe the seat, lid and outside with a fresh disinfectant wipe.',
     'Towels: in all three, hang the towels straight on the bars and hooks.',
     'Toilet paper: in all three, a roll on each holder and a spare within reach.',
     'Trash: empty all three trash cans and put in new bags.',
@@ -70,18 +70,22 @@ export const CHORE_LISTS = [
     'Curb: take the Red Monster to the curb.'
   ] },
   { name: 'Laundry + clean your room (30 min)', steps: [
+    'Collect: dirty clothes from your room’s laundry basket, your floor and the bathroom.',
+    'Wash: start the washer.',
     'Dishes and trash: cups, bottles, plates and wrappers out of your room.',
-    'Dirty clothes: every dirty piece in the hamper.',
-    'Clean clothes: folded in drawers or bins, drawers shut.',
     'Closet: clothes on hangers or folded in bins; closet floor clear.',
     'Bed: make your bed. Sheet straight, blankets pulled up, pillows and stuffed animals at the top.',
     'Tops: dresser, nightstand, shelves and window seat neat; things you keep where they belong.',
-    'Floor: clear, including under the beds. Sharing a room? Clear the whole floor together.'
+    'Floor: clear, including under the beds. Sharing a room? Clear the whole floor together.',
+    'Dry: move the wet clothes to the dryer and start it.',
+    'Fold: fold everything once it’s dry.',
+    'Put away: in drawers, bins or on hangers; drawers shut.',
+    'Baskets: empty laundry baskets back in your room and the bathroom.'
   ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: hung up or put where they’re kept.',
-    'Dining table: cleared and wiped, chairs pushed in.',
+    'Dining table: cleared and wiped with the food-safe sanitizer, chairs pushed in.',
     'Couch and games: pillows up, blanket folded, games back on the shelf.',
     'Desks: floor around them clear and chairs pushed in. Leave what’s on the desks alone.',
     'Vacuum: both rooms, under the table too.'
