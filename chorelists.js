@@ -83,7 +83,7 @@ export function choreSteps(lists, name) {
   const l = (lists || []).find((x) => norm(x.name) === norm(name));
   if (!l || !l.steps.length) return null;
   return l.steps.map((line) => {
-    const i = line.indexOf(':');
+    const i = line.indexOf(': '); // "Start by 4:30" has no bold part
     const lead = i > 0 && i <= 40 ? line.slice(0, i).trim() : line, text = i > 0 && i <= 40 ? line.slice(i + 1).trim() : '';
     return { key: stepKey(name, line), label: lead, sub: text ? text.charAt(0).toUpperCase() + text.slice(1) : '' };
   });

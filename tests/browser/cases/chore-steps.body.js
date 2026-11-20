@@ -70,3 +70,15 @@
   check(/2 steps/.test(await p.$eval('[data-steps="2026-11-19|chore"]', (e) => e.textContent)), 'Rhett sees the 2-step Living Room');
   await visit('checklist.html?kid=rhett&date=2026-11-16', 'steps-blanked');
   check(!(await p.$('[data-steps="2026-11-16|chore2"]')) && !!(await p.$('.ckbtn[data-key="chore2"]')), 'blanked Sunroom is a single box');
+  // A step removed after the others were ticked: tapping the row ticks the chore
+  await visit('checklist.html?kid=rhett', 'steps-stuck');
+  await tap('[data-steps="2026-11-19|chore"]');
+  await tap('.stepbtn');
+  await visit('settings.html', 'steps-settings2');
+  await p.click('.slist:has(' + lr + ') summary');
+  await p.fill(lr, 'Pick up: everything'); await p.dispatchEvent(lr, 'input');
+  await p.click('#save'); await p.waitForTimeout(500);
+  check(/1 step\b/.test(await p.$eval('.slist:has(' + lr + ') summary', (e) => e.textContent)), 'step count redraws after Save');
+  await visit('checklist.html?kid=rhett', 'steps-stuck2');
+  await tap('[data-steps="2026-11-19|chore"]');
+  check(await p.$eval('[data-steps="2026-11-19|chore"]', (e) => e.closest('.ck').classList.contains('on')), 'row tap ticks a chore whose steps are all ticked');

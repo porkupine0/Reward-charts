@@ -22,6 +22,7 @@ test('saved lists from Firebase: number-keyed objects, blank lists and new names
   assert.equal(choreSteps(l, 'Sunroom'), null, 'a blanked list is a single box');
   assert.equal(choreSteps(l, 'Bathrooms').length, 1);
   assert.equal(choreSteps(l, 'Kitchen')[1].sub, '', 'no colon: no detail line');
+  assert.equal(choreSteps([{ name: 'X', steps: ['Start by 4:30'] }], 'X')[0].label, 'Start by 4:30', 'a time is not a bold part');
 });
 
 test('step ids follow the words, not the position', () => {

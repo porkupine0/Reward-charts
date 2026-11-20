@@ -1,10 +1,10 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc, isLive } from './store.js?v=1795211660';
-import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795211660';
-import { KIDS } from './routines.js?v=1795211660';
-import { LEVELS } from './trials.js?v=1795211660';
-import { listsToSave, norm, MAX_STEPS } from './chorelists.js?v=1795211660';
-import { askParent } from './parent.js?v=1795211660';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1795212151';
+import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795212151';
+import { KIDS } from './routines.js?v=1795212151';
+import { LEVELS } from './trials.js?v=1795212151';
+import { listsToSave, norm, MAX_STEPS } from './chorelists.js?v=1795212151';
+import { askParent } from './parent.js?v=1795212151';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -81,6 +81,8 @@ document.addEventListener('click', (e) => {
   if (t) { readKid(); readLists(); kid = t.dataset.kid; renderKid(); renderLists(); }
 });
 document.addEventListener('input', () => { dirty = true; $('msg').textContent = 'Unsaved changes.'; });
+// a chore typed into a day box gets its checklist box as soon as the box is left
+document.addEventListener('focusout', (e) => { if (/^ch\d$/.test(e.target.id || '')) { readKid(); readLists(); renderLists(); } });
 const notLive = () => { $('msg').textContent = 'Still connecting. Save once this phone has the latest settings, so earlier days keep the right ones.'; };
 $('save').onclick = async () => {
   if (!isLive('config')) return notLive();
@@ -106,11 +108,12 @@ $('save').onclick = async () => {
   const lists = listsToSave(cfg.choreSteps);
   await save('config', 'choreSteps', lists.length ? lists : null);
   dirty = false;
+  renderLists();
   $('msg').textContent = 'Saved. Every phone uses the new settings from today; earlier days keep what they had.';
 };
 $('reset').onclick = async () => {
   if (!isLive('config')) return notLive();
-  if (!confirm('Go back to the original chores, bedtimes and prize lists?')) return;
+  if (!confirm('Go back to the original chores, chore checklists, bedtimes and prize lists?')) return;
   if (!(await askParent())) return;
   await keepPastDays();
   ['chores', 'showers', 'lights', 'game', 'grace', 'checks', 'rewards', 'prizeLevels', 'choreSteps'].forEach((k) => save('config', k, null));
