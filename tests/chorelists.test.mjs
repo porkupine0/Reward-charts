@@ -1,6 +1,7 @@
 // Chore step lists: built-ins, saved lists from Firebase (odd shapes included), ids and what gets saved.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { DEFAULTS } from '../settings.js';
 import { CHORE_LISTS, mergeLists, listsToSave, choreSteps, stepKey, cleanSteps } from '../chorelists.js';
 
 test('built-in lists are used when nothing is saved', () => {
@@ -40,4 +41,9 @@ test('only lists that differ from the built-in ones are saved', () => {
   l.push({ name: 'Bathrooms', steps: ['Sink'] }, { name: 'Laundry', steps: [] });
   assert.deepEqual(listsToSave(l), [{ name: 'Sunroom', steps: [''] }, { name: 'Bathrooms', steps: ['Sink'] }]);
   assert.equal(cleanSteps(Array(30).fill(0).map((_, i) => 'step ' + i)).length, 15);
+});
+
+test('every built-in list matches a chore name exactly', () => {
+  const names = new Set(Object.values(DEFAULTS.chores).flat(2).map((n) => n.trim().toLowerCase()));
+  CHORE_LISTS.forEach((l) => assert.ok(names.has(l.name.trim().toLowerCase()), 'no chore named ' + l.name));
 });

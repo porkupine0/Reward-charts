@@ -82,3 +82,6 @@
   await visit('checklist.html?kid=rhett', 'steps-stuck2');
   await tap('[data-steps="2026-11-19|chore"]');
   check(await p.$eval('[data-steps="2026-11-19|chore"]', (e) => e.closest('.ck').classList.contains('on')), 'row tap ticks a chore whose steps are all ticked');
+  // Isaiah's Tuesday closet chore opens to its list
+  await visit('checklist.html?kid=isaiah&date=2026-11-17', 'steps-closet');
+  check(!!(await p.$('[data-steps="2026-11-17|chore"]')), 'Isaiah’s closet chore has a steps row');
