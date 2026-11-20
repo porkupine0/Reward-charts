@@ -66,7 +66,7 @@ export const CHORE_LISTS = [
     'Railings: nothing hanging on the railings or posts.',
     'Hallway: anything on the hallway floor goes where it belongs.',
     'Laundry baskets: clothes inside, none on the floor around them.',
-    'Vacuum: every stair, the landing and the whole hallway.'
+    'Vacuum: every stair, the landing and the whole hallway, then put the vacuum back in the front room.'
   ] },
   { name: 'Trash: empty every trash can in the house', steps: [
     'Kitchen: empty the trash and put in a new bag.',
@@ -85,7 +85,7 @@ export const CHORE_LISTS = [
     'Closet: clothes on hangers or folded in bins; closet floor clear.',
     'Bed: make your bed. Sheet straight, blankets pulled up, pillows and stuffed animals at the top.',
     'Tops: dresser, nightstand, shelves and window seat neat; things you keep where they belong.',
-    'Floor: clear, including under the beds. Sharing a room? Clear the whole floor together.',
+    'Floor: clear, including under the beds. Sharing a room? The whole floor, not just your side.',
     'Vacuum: your whole bedroom floor, then put the vacuum back in the front room.',
     'Dry: move the wet clothes to the dryer and start it.',
     'Fold: fold everything once it’s dry.',

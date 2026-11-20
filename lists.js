@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795217718';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795217718';
-import { SETTINGS, onSettings } from './settings.js?v=1795217718';
-import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795217718';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795217718';
-import { LESSONS } from './driving-course.js?v=1795217718';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795217718';
-import * as TESTS from './driving-tests.js?v=1795217718';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795217718';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795218323';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795218323';
+import { SETTINGS, onSettings } from './settings.js?v=1795218323';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795218323';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795218323';
+import { LESSONS } from './driving-course.js?v=1795218323';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795218323';
+import * as TESTS from './driving-tests.js?v=1795218323';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795218323';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -91,7 +91,8 @@ function listsOn(ctx, kid, date) {
   day.forEach((it, n) => {
     if (!it.chore || !it.steps || !it.steps.some((s) => s.when)) return;
     const days = choreDays(it.name, date);
-    day[n] = Object.assign({}, it, { steps: it.steps.filter((s) => stepShows(s, ymd(date), days)) });
+    const steps = it.steps.filter((s) => stepShows(s, ymd(date), days));
+    day[n] = Object.assign({}, it, { steps: steps.length ? steps : undefined }); // nothing due today: a single box
   });
   if (kid === 'eli') {
     // Saturday run (on his chart from Nov 21, 2026): shown on the weekend list too

@@ -1,6 +1,6 @@
 // Things parents can change on the Settings page without a code change.
 // Defaults live here; anything saved in Firebase (chart "config") replaces them on every phone.
-import { CHORE_LISTS, mergeLists } from './chorelists.js?v=1795217718';
+import { CHORE_LISTS, mergeLists } from './chorelists.js?v=1795218323';
 const FAMILY_KITCHEN = 'Kitchen + dining room with the family';
 const LAUNDRY = 'Laundry + clean your room (30 min)';
 
