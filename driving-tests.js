@@ -26,7 +26,7 @@ export const FORMS = {
       'A circle warns of a railroad crossing; a triangle means yield.', 7, 'CIRCLE Yield the right of way. Railroad crossing ahead.'), sign: { shape: 'circle', color: 'yellow' } },
     { ...q('tA04', 'Signs', 'An orange triangle on the back of a vehicle means the vehicle:', ['Is carrying a wide load', 'Travels 35 mph or less', 'Is going to an emergency', 'Has hazardous materials'], 1,
       'It’s a slow-moving vehicle sign: farm equipment, road equipment or a horse-drawn wagon.', 11, 'A reflective orange triangle on the rear of a vehicle means it is traveling 35 mph or less.'), sign: { shape: 'smv' } },
-    q('tA05', 'Signals and markings', 'A flashing red traffic light means:', ['Treat it the same as a stop sign', 'Slow down and go on with caution', 'Yield, the same as a flashing yellow', 'Stop only when turning, not going straight'], 0,
+    q('tA05', 'Signals and markings', 'A flashing red traffic light means:', ['Treat it the same as a stop sign', 'Slow down and go on with caution', 'Slow down and go through if no one is near', 'Stop only when turning, not going straight'], 0,
       'Come to a full stop, then go when it’s clear.', 11, 'Flashing red Treat it the same as a stop sign.'),
     q('tA06', 'Signals and markings', 'A flashing yellow traffic light means:', ['Stop and wait for the green light', 'Treat it the same as a stop sign', 'Go with caution, yielding first', 'The lane ahead is closed to traffic'], 2,
       'Yield to vehicles and pedestrians, then go carefully.', 11, 'Flashing yellow Proceed with caution.'),

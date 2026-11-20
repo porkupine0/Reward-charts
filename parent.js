@@ -3,7 +3,7 @@
 // unlocks for 15 minutes. The PIN is stored as a hash, never as digits.
 // A new PIN can only be created once the saved settings have loaded and there truly isn't one,
 // so a slow connection can never replace the real PIN.
-import { watch, save, isLive } from './store.js?v=1795185533';
+import { watch, save, isLive } from './store.js?v=1795186079';
 
 let rec = {};
 watch('settings', (d) => { rec = d || {}; });
