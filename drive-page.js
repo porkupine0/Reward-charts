@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795094899';
-import { applyConfig } from './routines.js?v=1795094899';
-import { askParent } from './parent.js?v=1795094899';
-import * as L from './lists.js?v=1795094899';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795094899';
-import { signSvg } from './signs.js?v=1795094899';
-import * as COURSE from './driving-course.js?v=1795094899';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795094899';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795184608';
+import { applyConfig } from './routines.js?v=1795184608';
+import { askParent } from './parent.js?v=1795184608';
+import * as L from './lists.js?v=1795184608';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795184608';
+import { signSvg } from './signs.js?v=1795184608';
+import * as COURSE from './driving-course.js?v=1795184608';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795184608';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -18,7 +18,7 @@ let previewOpen = false;
 let testOpen = null; // the sitting he's taking (questions shown)
 
 // The lesson's key points (above the video): each from the manual (page shown) or marked as a family rule.
-const keyCard = (l) => (l.key || []).length ? '<div class="dkey"><h3>Key points</h3><ul>' + l.key.map((x) => '<li>' + esc(x.t) + ' <small>(' + (x.family ? 'Family rule' : esc(x.ref).replace(/^Iowa Driver.s Manual /, 'Manual ')) + ')</small></li>').join('') + '</ul></div>' : '';
+const keyCard = (l) => (l.key || []).length ? '<div class="dkey"><h3>Key points</h3><ul>' + l.key.map((x) => '<li>' + esc(x.t) + ' <small>(' + (x.family ? 'Family rule' : esc(x.ref.replace(/^Iowa Driver.s Manual /, 'Manual '))) + ')</small></li>').join('') + '</ul></div>' : '';
 const video = (v) => '<div class="dv">' +
   (v.yt ? '<div class="dv-frame"><iframe src="https://www.youtube-nocookie.com/embed/' + esc(v.yt) + '" title="' + esc(v.title) + '" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' : '') +
   '<p class="dv-meta"><b>' + esc(v.title) + '</b> · ' + esc(v.channel || '') + (v.len ? ' · about ' + esc(v.len) : '') + '</p>' +

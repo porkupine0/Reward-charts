@@ -5,6 +5,8 @@
 export const LESSONS = [1, 2, 3].map((n) => ({ id: 'F' + n, title: 'Fixture lesson ' + n, videos: [{ yt: 'AAAAAAAAAAA', title: 'V', channel: 'C', len: '5:00' }], questions: [1, 2, 3, 4, 5].map((k) => q('F' + n, k)) }));`;
   const course = (r) => r.fulfill({ contentType: 'text/javascript', body: FIX });
   await ctx.route(/driving-course\.js/, course);
+  const noTests = (r) => r.fulfill({ contentType: 'text/javascript', body: 'export const FORMS = {}; export const SITTINGS = []; export const PASS = 0.8; export const TOPICS = []; export const BLUEPRINT = {};' });
+  await ctx.route(/driving-tests\.js/, noTests);
   const V = JSON.parse(require('fs').readFileSync('version.json', 'utf8')).v;
   const Lm = await import(require('url').pathToFileURL(process.cwd() + '/lists.js').href + '?v=' + V);
   // Eli's Tuesday fully done except the driving lesson (built from the app's own list, without the lesson)
@@ -36,3 +38,4 @@ export const LESSONS = [1, 2, 3].map((n) => ({ id: 'F' + n, title: 'Fixture less
   await visit('parents.html', 'dp-parents-now');
   check(/Driving lesson/.test(await p.$eval('#nowall', (e) => e.textContent)), 'Parents "Right now" shows the lesson due today');
   await ctx.unroute(/driving-course\.js/, course);
+  await ctx.unroute(/driving-tests\.js/, noTests);

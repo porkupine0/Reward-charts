@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795094899';
-import { CHARTS, weekProgress } from './charts.js?v=1795094899';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795094899';
-import * as L from './lists.js?v=1795094899';
-import { owed, score, planned, fmt } from './trials.js?v=1795094899';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795094899';
-import { askParent, setParent, changePin } from './parent.js?v=1795094899';
-import { dayFull } from './streaks.js?v=1795094899';
-import { owedItems } from './owed.js?v=1795094899';
-import { pruneList, pruneCutoff } from './prune.js?v=1795094899';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795094899';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795094899';
-import { nowHtml } from './nowview.js?v=1795094899';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795184608';
+import { CHARTS, weekProgress } from './charts.js?v=1795184608';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795184608';
+import * as L from './lists.js?v=1795184608';
+import { owed, score, planned, fmt } from './trials.js?v=1795184608';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795184608';
+import { askParent, setParent, changePin } from './parent.js?v=1795184608';
+import { dayFull } from './streaks.js?v=1795184608';
+import { owedItems } from './owed.js?v=1795184608';
+import { pruneList, pruneCutoff } from './prune.js?v=1795184608';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795184608';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795184608';
+import { nowHtml } from './nowview.js?v=1795184608';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -85,6 +85,7 @@ function render() {
       const c = L.dayChecks(ctx, id, d), ls = L.lists(ctx, id, d);
       [...ls.morning, ...ls.day, ...ls.bed].forEach((it) => {
         if (c[it.key] !== SKIP) return;
+        if (it.derived && L.isOn(ctx, id, d, it)) return; // done anyway (e.g. the driving lesson): nothing to approve
         ex.push(row(k.name, k.accent, esc(it.label.replace(/^Chore: /, '')), DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d),
           exBtns(ymd(d), id, it.key)));
       });

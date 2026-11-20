@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795094899';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795094899';
-import { SETTINGS } from './settings.js?v=1795094899';
-import { askParent } from './parent.js?v=1795094899';
-import * as L from './lists.js?v=1795094899';
-import { dayStreak, cheerIf } from './streaks.js?v=1795094899';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795184608';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795184608';
+import { SETTINGS } from './settings.js?v=1795184608';
+import { askParent } from './parent.js?v=1795184608';
+import * as L from './lists.js?v=1795184608';
+import { dayStreak, cheerIf } from './streaks.js?v=1795184608';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -54,7 +54,7 @@ function itemHtml(it, checks, extra) {
   }
   if (it.link && !locked) h += '<a class="cklink" href="' + it.link + '">Open &rarr;</a>';
   if (canExcuse) {
-    if (pending) h += '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-excuse="approve" data-key="' + it.key + '">Approve</button><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
+    if (pending && !on) h += '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-excuse="approve" data-key="' + it.key + '">Approve</button><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
     else if (excused) h += '<div class="excuse"><span>Excused tonight · counts, but not done</span><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
     else if (!on) h += '<button class="linkbtn excuse-ask" data-excuse="mark" data-key="' + it.key + '">Not able to do it?</button>';
   }

@@ -257,7 +257,7 @@ test('knowledge tests: a sitting opens on its date, and after its lesson is fini
 });
 
 test('knowledge tests: the checker catches bad forms and sittings', () => {
-  const good = Array.from({ length: 25 }, (_, i) => ({ id: 't' + i, topic: 'Signs', q: 'Question ' + i, choices: ['a', 'b', 'c', 'd'], answer: i % 4, why: 'w', ref: "Iowa Driver's Manual p.6" }));
+  const good = Array.from({ length: 25 }, (_, i) => ({ id: 't' + i, topic: 'Signs', q: 'Question ' + i, choices: ['a', 'bb', 'ccc', 'dddd'], answer: i % 4, why: 'w', ref: "Iowa Driver's Manual p.6" }));
   assert.deepEqual(D.checkTests({ A: good }, [{ id: 'base', form: 'A' }], ['Signs'], LESSONS), []);
   const bad = good.slice(0, 24).concat([{ ...good[0], id: 'L1q1', topic: 'Nope', answer: 9, why: '' }]);
   const out = D.checkTests({ A: bad }, [{ id: 'L1', form: 'B', after: 'nope' }], ['Signs'], LESSONS, { Signs: 25 }).join(' | ');

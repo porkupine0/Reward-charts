@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795094899';
+import { checkSign } from './signs.js?v=1795184608';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -126,7 +126,7 @@ export function grade(quiz, picks) {
   return { right: quiz.length - missed.length, total: quiz.length, missed };
 }
 
-const LIVE_BEFORE_RULE = ['w1d1', 'w1d2'];
+const LIVE_BEFORE_RULE = []; // lessons that went live before this rule (none: Eli hadn't started when it was tightened)
 // Check course content before it ships: a list of problems (empty = fine).
 export function checkCourse(lessons) {
   const out = [], seen = new Set(), lessonIds = new Set();
@@ -149,7 +149,6 @@ export function checkCourse(lessons) {
       if (!v.title || !v.channel || !/^\d{1,2}:\d{2}$/.test(v.len || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs a title, channel and length (m:ss)');
     });
     // answers must not be guessable: spread over the positions, and the right one not usually the longest.
-    // (w1d1 and w1d2 went live before this rule; their positions can't change, since stored picks are positions.)
     const qs = l.questions || [];
     if (qs.length >= 5) {
       const per = [0, 1, 2, 3].map((i) => qs.filter((q) => q.answer === i).length);
@@ -227,7 +226,7 @@ export function checkTests(forms, sittings, topics, lessons, blueprint) {
     if (longest > Math.ceil(form.length / 4)) out.push('form ' + name + ': the right answer is the longest choice ' + longest + ' times');
     const ranks = [0, 0, 0, 0];
     form.forEach((x) => { if ((x.choices || []).length === 4) ranks[x.choices.filter((c) => c.length > (x.choices[x.answer] || '').length).length]++; });
-    if (name !== 'A' && Math.max(...ranks) > Math.ceil(form.length * 0.6)) out.push('form ' + name + ': the right answer is usually the same length rank (' + ranks.join('/') + ')'); // Form A was taken before this rule
+    if (Math.max(...ranks) > Math.ceil(form.length * 0.6)) out.push('form ' + name + ': the right answer is usually the same length rank (' + ranks.join('/') + ')');
     form.forEach((x) => {
       if (!/^[A-Za-z0-9]+$/.test(x.id || '')) out.push((x.id || '?') + ': question id must be letters and digits');
       if (seen.has(x.id)) out.push(x.id + ': id used twice');

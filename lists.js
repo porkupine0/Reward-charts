@@ -1,14 +1,23 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795094899';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795094899';
-import { SETTINGS, onSettings } from './settings.js?v=1795094899';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795094899';
-import { LESSONS } from './driving-course.js?v=1795094899';
-import { dueOn } from './driving.js?v=1795094899';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795094899';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795184608';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795184608';
+import { SETTINGS, onSettings } from './settings.js?v=1795184608';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795184608';
+import { LESSONS } from './driving-course.js?v=1795184608';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795184608';
+import * as TESTS from './driving-tests.js?v=1795184608';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795184608';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
+// The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
+// day, so the lesson after it is optional), or 'done' (finished on an earlier day, or there is no baseline).
+export function baselineBy(drive, dayKey) {
+  const s = (TESTS.SITTINGS || []).find((x) => x.id === 'base');
+  if (!s || !(TESTS.FORMS || {})[s.form] || !openSittings([s], drive, dayKey).length) return 'done';
+  const on = testDoneOn(TESTS.FORMS[s.form], drive, s.id);
+  return !on || on > dayKey ? 'open' : on === dayKey ? 'today' : 'done';
+}
 // Days of this week so far, Monday through today (Mon = 1 ... Sun = 7), whatever the time of day.
 export const daysSoFar = (now) => dowOf(now) + 1;
 // Each weekly item has its own week: AELP Thu–Wed, Awana Wed–Tue.
@@ -79,7 +88,12 @@ function listsOn(ctx, kid, date) {
     // game time. Approved that same day: optional. Computer work (waits for chores).
     if (dow <= 4) {
       const due = dueOn(driveCourse, ctx.drive || {}, ymd(date), dow);
-      if (due) day.push({ key: 'drive', label: due.lesson.review ? 'Driving: unit test' : 'Driving lesson', sub: due.lesson.review ? 'Questions on this unit’s lessons. Tap to open it.' : 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' });
+      // The baseline knowledge test comes first (the Driving page holds lessons until it's done), so a lesson
+      // isn't required on a day before the baseline was finished: it's optional that day.
+      const base = baselineBy(ctx.drive || {}, ymd(date));
+      if (due) day.push(base === 'open'
+        ? { key: 'drive', label: 'Driving: baseline test first', sub: 'Take the 25-question baseline test, then today’s lesson. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: true }
+        : { key: 'drive', label: due.lesson.review ? 'Driving: unit test' : 'Driving lesson', sub: due.lesson.review ? 'Questions on this unit’s lessons. Tap to open it.' : 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' || base === 'today' });
     }
     // After the training plan ends there's nothing to check off, so no Running item
     if (!p && ymd(date) >= planEndYmd()) { const at = day.findIndex((i) => i.key === 'activity'); if (at >= 0) day.splice(at, 1); }

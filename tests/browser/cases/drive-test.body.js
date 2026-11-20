@@ -39,7 +39,7 @@
   check(!(await p.$('#tests .dq')), 'no questions or answers shown after finishing');
   check(await p.$eval('#tests', (e) => e.previousElementSibling.id === 'today'), 'a finished test moves below the lesson');
   check(!!(await p.$('#today [data-watched="w1d1"]')), 'baseline done: lesson 1 opens');
-  check((await p.$$('#today .dkey li')).length === 3 && await p.$eval('#today .dkey', (e) => !!(e.compareDocumentPosition(document.querySelector('#today .dv')) & 4)) && /Manual p\.47/.test(await p.$eval('#today .dkey', (e) => e.textContent)), 'lesson 1: 3 key points with manual pages, above the video');
+  check((await p.$$('#today .dkey li')).length === 3 && await p.$eval('#today .dkey', (e) => !!(e.compareDocumentPosition(document.querySelector('#today .dv')) & 4)) && /\(Manual p\.47\)/.test(await p.$eval('#today .dkey', (e) => e.textContent)), 'lesson 1: 3 key points with manual pages, above the video');
   await p.click('#today [data-watched="w1d1"]'); await p.waitForTimeout(200);
   check(!!(await p.$('#today .dq')) && !(await p.$('#today .dkey')), 'once the questions show, the key points are hidden');
   const dv = (await db()).charts['eli-drive'];

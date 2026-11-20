@@ -646,7 +646,7 @@ test("leftover game time: a parent moves it to the next week, once, with the amo
   assert.equal(L.gameWeek(ctx2, 'rhett', last).left, 30, 'a later backfill stays on last week');
 });
 
-test("driving row: due days count toward his full day and streak, never game time; locked like computer work", async () => {
+test("driving row: due days (after the baseline test) count toward his full day and streak, never game time; locked like computer work", async () => {
   const S = await load('streaks.js');
   const fx = (n) => ({ id: 'F' + n, title: 'Fixture ' + n, videos: [], questions: [] });
   const empty = { routines: { days: {} }, run: {}, isaiah: {} };
@@ -668,7 +668,10 @@ test("driving row: due days count toward his full day and streak, never game tim
     const approved = Object.fromEntries(Array.from({ length: 120 }, (_, i) => ['F' + (i + 1), '2026-11-01']));
     const done = {}; let n = 0;
     for (let x = d('2026-11-16'); ymd(x) <= '2027-03-14'; x = addDays(x, 1)) if (L.dowOf(x) <= 4 && x.getDate() % 3 !== 0) done['F' + (++n)] = ymd(x);
-    const withDrive = Object.assign({}, base, { drive: { approved, done } });
+    // the baseline knowledge test was taken long before (until it is, lessons are only optional)
+    const T = await load('driving-tests.js'), answers = {};
+    T.FORMS.A.forEach((q) => { answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-01' } }; });
+    const withDrive = Object.assign({}, base, { drive: { approved, done, answers } });
     for (let x = d('2026-11-16'); ymd(x) <= '2027-03-14'; x = addDays(x, 1)) {
       const k = ymd(x), mon = mondayOf(x);
       assert.equal(L.gameDay(withDrive, 'eli', x).earned, L.gameDay(base, 'eli', x).earned, 'game time unchanged ' + k);
@@ -693,4 +696,18 @@ test("driving row: due days count toward his full day and streak, never game tim
     c = rc(monTue, { done: { F1: '2026-11-18' } });
     assert.equal(L.lockedBy(c, 'eli', NOW, row(c), L.lists(c, 'eli', NOW).day), false, 'a finished lesson is open');
   } finally { L.useCourse([]); }
+});
+
+test('driving row: before the baseline test is finished, a lesson is only optional (the page holds lessons until it is done)', async () => {
+  const T = await load('driving-tests.js'), C = await load('driving-course.js');
+  L.useCourse(C.LESSONS);
+  const drive = { approved: { w1d1: '2026-11-18', w1d2: '2026-11-18' }, answers: {} };
+  const row = (k) => { const x = d(k); return L.lists({ routines: { days: {} }, run: {}, isaiah: {}, drive }, 'eli', x).day.find((i) => i.key === 'drive'); };
+  // Nov 19 and 20 (Thu, Fri): lesson 1 approved the day before, baseline not taken: optional, says baseline first
+  for (const k of ['2026-11-19', '2026-11-20']) { const r = row(k); assert.ok(r && r.opt === true && /baseline test first/.test(r.label), k + ' ' + JSON.stringify(r)); }
+  // the baseline taken Mon Nov 23: that day the lesson is optional; from Tue it's required
+  T.FORMS.A.forEach((q) => { drive.answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-23' } }; });
+  assert.equal(L.baselineBy(drive, '2026-11-22'), 'open'); assert.equal(L.baselineBy(drive, '2026-11-23'), 'today'); assert.equal(L.baselineBy(drive, '2026-11-24'), 'done');
+  assert.ok(row('2026-11-23').opt === true && row('2026-11-23').label === 'Driving lesson', 'baseline day: lesson optional');
+  assert.ok(row('2026-11-24').opt === false, 'after the baseline day: required');
 });

@@ -2,9 +2,11 @@
   // for chores; a parent approves on the Parents page). The excused day counts; the same lesson is due Friday.
   await p.clock.setFixedTime(new Date(2026, 10, 26, 10, 0)); // Thu Nov 26
   await p.goto(B + 'index.html');
-  await p.evaluate(() => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
+  await p.evaluate(async () => { const T = await import('./driving-tests.js?v=' + window.__V), answers = {};
+    T.FORMS.A.forEach((q) => { answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-20' } }; }); // the baseline, taken Nov 20
+    localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
     routines: { days: { '2026-11-23': { eli: { chore: true } }, '2026-11-24': { eli: { chore: true } }, '2026-11-25': { eli: { chore: true } } } },
-    'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' } } } })); });
+    'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers } } })); });
   await visit('checklist.html?kid=eli', 'excuse-thu');
   check(!!(await p.$('.ck.locked .ckbtn[data-key="drive"]')), 'Thursday: the driving row is there, locked (chores not done)');
   check(!!(await p.$('[data-excuse="mark"][data-key="drive"]')), 'the locked driving row still offers "Not able to do it?"');
