@@ -52,12 +52,11 @@ export const CHORE_LISTS = [
     'Doors: close the closet doors all the way.'
   ] },
   { name: 'Stairs, landing + upstairs hallway', steps: [
-    'Landing: bags, clothes and shoes go back to the owner’s room or where they’re kept.',
+    'Landing: everything left on the landing goes back to its owner’s room or where it’s kept.',
     'Stairs: nothing left on any step, top to bottom.',
-    'Railings: nothing hanging on them; coats and stuffed animals go where they’re kept.',
+    'Railings: nothing hanging on the railings or posts.',
     'Hallway: anything on the hallway floor goes where it belongs.',
-    'Laundry baskets: clothes inside, none on the floor around them; baskets against the wall.',
-    'Handrails: wipe both handrails.',
+    'Laundry baskets: clothes inside, none on the floor around them.',
     'Vacuum: every stair, the landing and the whole hallway.'
   ] },
   { name: 'Dining/Front Room', steps: [
