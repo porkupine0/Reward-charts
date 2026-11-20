@@ -69,6 +69,14 @@ export const CHORE_LISTS = [
     'Red Monster: tie every bag closed and put them all in the Red Monster.',
     'Curb: take the Red Monster to the curb.'
   ] },
+  { name: 'Laundry + clean your room (30 min)', steps: [
+    'Dishes and trash: cups, bottles, plates and wrappers out of your room.',
+    'Dirty clothes: every dirty piece in your hamper.',
+    'Clean clothes: folded in drawers or hung up, drawers shut.',
+    'Bed: sheet straight, blankets pulled up, pillows at the top.',
+    'Tops: dresser and nightstand neat; things you want to keep where they belong.',
+    'Floor: clear, including the closet floor and under the bed.'
+  ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: hung up or put where they’re kept.',
