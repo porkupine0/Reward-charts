@@ -1,5 +1,5 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795215703';
-import { choreSteps } from './chorelists.js?v=1795215703';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795217718';
+import { choreSteps } from './chorelists.js?v=1795217718';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -23,7 +23,7 @@ export { applySettings as applyConfig };
 
 export function choreItems(kid, dow) {
   return (CHORES[kid][dow] || []).map((label, i) => {
-    const it = { key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, chore: true };
+    const it = { key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, name: label, chore: true };
     const steps = choreSteps(SETTINGS.choreSteps, label);
     if (steps) it.steps = steps; // a step-by-step list; ticking the last step ticks the chore
     return it;

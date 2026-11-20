@@ -1,13 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795215703';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795215703';
-import { SETTINGS, onSettings } from './settings.js?v=1795215703';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795215703';
-import { LESSONS } from './driving-course.js?v=1795215703';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795215703';
-import * as TESTS from './driving-tests.js?v=1795215703';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795215703';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795217718';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795217718';
+import { SETTINGS, onSettings } from './settings.js?v=1795217718';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795217718';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795217718';
+import { LESSONS } from './driving-course.js?v=1795217718';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795217718';
+import * as TESTS from './driving-tests.js?v=1795217718';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795217718';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -64,6 +65,20 @@ function weeklyItems(ctx, kid, date) {
 
 // The day's lists for one kid: { morning, day, bed }.
 // (each day uses the chores, showers and lights out that applied that day)
+// The days a chore is on anyone's schedule (each day's own schedule), from CADENCE_START through date.
+const cadenceCache = new Map();
+onSettings(() => cadenceCache.clear());
+function choreDays(name, date) {
+  const today = ymd(date), k = norm(name) + '|' + today;
+  if (cadenceCache.has(k)) return cadenceCache.get(k);
+  const out = [];
+  for (let d = parseYmd(CADENCE_START); ymd(d) <= today; d = addDays(d, 1)) {
+    const dw = dowOf(d);
+    if (atDate(d, () => Object.values(SETTINGS.chores).some((days) => (days[dw] || []).some((c) => norm(c) === norm(name))))) out.push(ymd(d));
+  }
+  cadenceCache.set(k, out);
+  return out;
+}
 export function lists(ctx, kid, date) { return atDate(date, () => listsOn(ctx, kid, date)); }
 function listsOn(ctx, kid, date) {
   const dow = dowOf(date);
@@ -72,6 +87,12 @@ function listsOn(ctx, kid, date) {
   const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow);
   const day = [];
   raw.forEach((i) => (i.weekly === true ? day.push(...weeklyItems(ctx, kid, date)) : day.push(i)));
+  // "every other time" and "monthly" chore steps: only on the days they're due
+  day.forEach((it, n) => {
+    if (!it.chore || !it.steps || !it.steps.some((s) => s.when)) return;
+    const days = choreDays(it.name, date);
+    day[n] = Object.assign({}, it, { steps: it.steps.filter((s) => stepShows(s, ymd(date), days)) });
+  });
   if (kid === 'eli') {
     // Saturday run (on his chart from Nov 21, 2026): shown on the weekend list too
     const p = planFor(date);

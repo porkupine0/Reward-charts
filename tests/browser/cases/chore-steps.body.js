@@ -53,6 +53,16 @@
   await p.emulateMedia({ colorScheme: 'dark' });
   await p.screenshot({ path: OUT + 'steps-dark.png', fullPage: false });
   await p.emulateMedia({ colorScheme: 'light' });
+  // Every other time: Isaiah's Friday Sunroom (the 3rd Sunroom day) has the mop step; Eli's Wednesday didn't
+  await visit('checklist.html?kid=isaiah&date=2026-11-20', 'steps-mop');
+  await tap('[data-steps="2026-11-20|chore"]');
+  const mopTxt = await p.$eval('#day', (e) => e.textContent);
+  check(/7 steps/.test(mopTxt) && /Mop/.test(mopTxt), 'mop step shows on the 3rd Sunroom day');
+  // Monthly: Rhett's first Tuesday in December has the shower step, the next Tuesday doesn't
+  await visit('checklist.html?kid=rhett&date=2026-12-01', 'steps-monthly');
+  check(/9 steps/.test(await p.$eval('[data-steps="2026-12-01|chore"]', (e) => e.textContent)), 'shower step on the first Tuesday');
+  await visit('checklist.html?kid=rhett&date=2026-12-08', 'steps-monthly2');
+  check(/8 steps/.test(await p.$eval('[data-steps="2026-12-08|chore"]', (e) => e.textContent)), 'no shower step the next Tuesday');
   // A parent edits the lists on Settings: Living Room gets 2 steps, Sunroom is blanked (one box again)
   await visit('settings.html', 'steps-settings');
   const lr = '[data-list="Living Room"]', sr = '[data-list="Sunroom"]';
@@ -93,4 +103,4 @@
   check(/8 steps/.test(await p.$eval('[data-steps="2026-11-16|chore2"]', (e) => e.textContent).catch(() => '')), 'Isaiah’s trash chore has 8 steps');
   // Rhett's Saturday laundry + room chore opens to the shared bedroom list
   await visit('checklist.html?kid=rhett&date=2026-11-21', 'steps-room');
-  check(/11 steps/.test(await p.$eval('[data-steps="2026-11-21|chore"]', (e) => e.textContent).catch(() => '')), 'Rhett’s room chore has 11 steps');
+  check(/12 steps/.test(await p.$eval('[data-steps="2026-11-21|chore"]', (e) => e.textContent).catch(() => '')), 'Rhett’s room chore has 12 steps');

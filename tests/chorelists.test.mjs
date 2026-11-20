@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS } from '../settings.js';
-import { CHORE_LISTS, mergeLists, listsToSave, choreSteps, stepKey, cleanSteps } from '../chorelists.js';
+import { CHORE_LISTS, mergeLists, listsToSave, choreSteps, stepKey, cleanSteps, stepShows } from '../chorelists.js';
 
 test('built-in lists are used when nothing is saved', () => {
   const l = mergeLists(undefined);
@@ -11,7 +11,7 @@ test('built-in lists are used when nothing is saved', () => {
   assert.equal(s.length, 8);
   assert.equal(s[0].label, 'Pick up');
   assert.match(s[0].sub, /^Take anything/);
-  assert.equal(choreSteps(l, 'Kitchen + dining room with the family'), null, 'no substring match');
+  assert.equal(choreSteps(l, 'Kitchen helper'), null, 'no substring match');
   assert.ok(choreSteps(l, 'Dining/Front Room'), 'a name with / works');
 });
 
@@ -46,4 +46,18 @@ test('only lists that differ from the built-in ones are saved', () => {
 test('every built-in list matches a chore name exactly', () => {
   const names = new Set(Object.values(DEFAULTS.chores).flat(2).map((n) => n.trim().toLowerCase()));
   CHORE_LISTS.forEach((l) => assert.ok(names.has(l.name.trim().toLowerCase()), 'no chore named ' + l.name));
+});
+
+test('how-often tags: every other time and monthly', () => {
+  const st = choreSteps([{ name: 'X', steps: ['[every other time] Mop: the floor', '[Monthly] Tub: scrub it', '[weekly] Odd: stays text', 'Sweep'] }], 'X');
+  assert.equal(st[0].label, 'Mop'); assert.equal(st[0].when, 'other');
+  assert.equal(st[1].label, 'Tub'); assert.equal(st[1].when, 'monthly');
+  assert.equal(st[2].label, '[weekly] Odd', 'an unknown tag stays as text'); assert.equal(st[2].when, undefined);
+  // Sunroom: Mon (Rhett), Wed (Eli), Fri (Isaiah) from Nov 16: the mop alternates across the boys
+  const sun = ['2026-11-16', '2026-11-18', '2026-11-20', '2026-11-23'];
+  assert.deepEqual(sun.map((d, i) => stepShows(st[0], d, sun.slice(0, i + 1))), [true, false, true, false]);
+  // Bathrooms on Tuesdays: the first Tuesday of the month only
+  const tue = ['2026-11-17', '2026-11-24', '2026-12-01', '2026-12-08'];
+  assert.deepEqual(tue.map((d, i) => stepShows(st[1], d, tue.slice(0, i + 1))), [true, false, true, false]);
+  assert.equal(stepShows(st[3], '2026-12-08', []), true);
 });

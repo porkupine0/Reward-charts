@@ -3,6 +3,20 @@
 // only the lists that differ from these). A list is matched to a chore by its exact name (case and spaces
 // at the ends don't matter). One step per line; "Vacuum: both rooms" shows "Vacuum" in bold.
 // A chore with no list (or a blank one) stays a single box.
+const KITCHEN = [
+  'Food away: leftovers into containers and the fridge; everything else back in the pantry.',
+  'Unload: if the dishwasher is clean, empty it first.',
+  'Load: rinse the dishes and load the dishwasher. Run it if it’s full.',
+  'Hand-wash: wash, dry and put away pans, knives and cutting boards that don’t go in the dishwasher. Cast iron: no soaking, dry it right away.',
+  'Counters: clear the counters and island, then wipe them with the food-safe sanitizer (the red one), and the stovetop once it’s cool.',
+  'Sink: scrub the sink and faucet, shake out the drying mat, hang up the dish towels.',
+  'Trash: empty the kitchen trash, put in a new bag, flatten boxes for recycling.',
+  'Floor: sweep the whole floor, under the island and table too, and wipe up sticky spots.'
+];
+const DINING = [
+  'Dining table: cleared and wiped with the food-safe sanitizer (the red one), chairs pushed in.',
+  'Dining floor: vacuum the dining room, under the table too, and put the vacuum back in the front room.'
+];
 export const CHORE_LISTS = [
   { name: 'Living Room', steps: [
     'Pick up: take anything that doesn’t belong in here back where it goes.',
@@ -12,7 +26,7 @@ export const CHORE_LISTS = [
     'Tables: clear and straighten the little table and the table by the mirror.',
     'Dust: dust the shelves and mantel and set the pictures straight.',
     'Glass: wipe the big mirror with the blue glass cleaner; dust the TV screen with a dry cloth only.',
-    'Vacuum: the whole carpet, along the walls and under the front of the couches.'
+    'Vacuum: the whole carpet, along the walls and under the front of the couches. Put the vacuum back in the front room.'
   ] },
   { name: 'Sunroom', steps: [
     'Pick up: take anything that doesn’t belong in here back where it goes. Trash and recycling out.',
@@ -20,40 +34,35 @@ export const CHORE_LISTS = [
     'Bar counter: clear it, then wipe the counter and the little sink with a disinfectant wipe.',
     'Scarlett’s corner: dog toys put away, crate cover straight, spills wiped up.',
     'Chairs: push in the table chairs and bar stools and straighten the cushions.',
-    'Sweep: the whole tile floor, corners and under the table and stools too.'
+    'Sweep: the whole tile floor, corners and under the table and stools too.',
+    '[every other time] Mop: mop the tile floor with the floor cleaner, then put the mop back in its spot in the sunroom.'
   ] },
-  { name: 'Kitchen', steps: [
-    'Food away: leftovers into containers and the fridge; everything else back in the pantry.',
-    'Unload: if the dishwasher is clean, empty it first.',
-    'Load: rinse the dishes and load the dishwasher. Run it if it’s full.',
-    'Hand-wash: wash, dry and put away pans, knives and cutting boards that don’t go in the dishwasher. Cast iron: no soaking, dry it right away.',
-    'Counters: clear the counters and island, then wipe them with the kitchen sanitizer, and the stovetop once it’s cool.',
-    'Sink: scrub the sink and faucet, shake out the drying mat, hang up the dish towels.',
-    'Trash: empty the kitchen trash, put in a new bag, flatten boxes for recycling.',
-    'Floor: sweep the whole floor, under the island and table too, and wipe up sticky spots.'
-  ] },
+  { name: 'Kitchen', steps: KITCHEN },
+  { name: 'Kitchen + dining room with the family', steps: KITCHEN.concat(DINING) },
+  { name: 'Kitchen + dining room (all hands)', steps: KITCHEN.concat(DINING) },
   { name: 'Bathrooms', steps: [
     'Pick up: in all three bathrooms, clothes and towels on the floor or counter go to the laundry; anything else back where it goes.',
     'Counters: in all three, things back in their spots, then wipe the counters and sinks with a disinfectant wipe.',
     'Mirrors: clean all three mirrors with the blue glass cleaner.',
-    'Toilets: in all three, squirt toilet bowl cleaner inside and scrub with the brush; wipe the seat, lid and outside with a fresh disinfectant wipe. Wipes go in the trash, not the toilet.',
+    'Toilets: in all three, squirt toilet bowl cleaner inside and scrub with that bathroom’s brush; wipe the seat, lid and outside with a fresh disinfectant wipe. Wipes go in the trash, not the toilet.',
     'Towels: in all three, hang the towels straight on the bars and hooks.',
     'Toilet paper: in all three, a roll on each holder and a spare within reach.',
     'Trash: empty all three trash cans and put in new bags.',
-    'Floors: in all three, shake out any rugs and sweep or wipe the floor.'
+    'Floors: in all three, shake out any rugs and sweep or wipe the floor.',
+    '[monthly] Showers and tub: scrub the shower and the tub, walls and floor, then rinse.'
   ] },
   { name: 'Front closet + shoe organizing', steps: [
     'Entry: anything that doesn’t belong by the front door goes back where it goes. Ask before recycling a box.',
     'Shoes: every shoe in the entry and on the closet floor goes in pairs on the shoe rack.',
-    'Coats: every coat on a hanger; pick up any that fell.',
+    'Coats: every coat on a hanger in the closet or on the front-room coat tree; pick up any that fell.',
     'Hats, gloves and scarves: matched up and put where they’re kept.',
-    'Closet floor: clear except the shoe rack; anything stored here standing up neatly.',
+    'Closet floor: clear except the shoe rack; the sweeper standing up in the corner.',
     'Rug and floor: shake out the rug and sweep the entry floor.',
     'Doors: close the closet doors all the way.'
   ] },
   { name: 'Stairs, landing + upstairs hallway', steps: [
-    'Landing: everything left on the landing goes back to its owner’s room or where it’s kept.',
-    'Stairs: nothing left on any step, top to bottom.',
+    'Landing: clothes go in the laundry basket; everything else back to its owner’s room or where it’s kept.',
+    'Stairs: nothing left on any step, top to bottom. Clothes go in the laundry basket.',
     'Railings: nothing hanging on the railings or posts.',
     'Hallway: anything on the hallway floor goes where it belongs.',
     'Laundry baskets: clothes inside, none on the floor around them.',
@@ -77,6 +86,7 @@ export const CHORE_LISTS = [
     'Bed: make your bed. Sheet straight, blankets pulled up, pillows and stuffed animals at the top.',
     'Tops: dresser, nightstand, shelves and window seat neat; things you keep where they belong.',
     'Floor: clear, including under the beds. Sharing a room? Clear the whole floor together.',
+    'Vacuum: your whole bedroom floor, then put the vacuum back in the front room.',
     'Dry: move the wet clothes to the dryer and start it.',
     'Fold: fold everything once it’s dry.',
     'Put away: in drawers, bins or on hangers; drawers shut.',
@@ -84,11 +94,11 @@ export const CHORE_LISTS = [
   ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
-    'Coats, shoes and bags: hung up or put where they’re kept.',
-    'Dining table: cleared and wiped, chairs pushed in.',
+    'Coats, shoes and bags: coats on the coat tree or in the front closet; shoes and bags where they’re kept.',
+    'Dining table: cleared and wiped with the food-safe sanitizer (the red one), chairs pushed in.',
     'Couch and games: pillows up, blanket folded, games back on the shelf.',
-    'Desks: floor around them clear and chairs pushed in. Leave what’s on the desks alone.',
-    'Vacuum: both rooms, under the table too.'
+    'Your desk: Eli’s is the left desk, Rhett’s is the right desk by the window. Tidy your own desk and the floor around it, chair pushed in. Your brother does his.',
+    'Vacuum: both rooms, under the table too, then put the vacuum back in its spot in the front room.'
   ] }
 ];
 export const MAX_STEPS = 15, MAX_STEP_LEN = 200;
@@ -133,8 +143,23 @@ export function choreSteps(lists, name) {
   const l = (lists || []).find((x) => norm(x.name) === norm(name));
   if (!l || !l.steps.length) return null;
   return l.steps.map((line) => {
-    const i = line.indexOf(': '); // "Start by 4:30" has no bold part
-    const lead = i > 0 && i <= 40 ? line.slice(0, i).trim() : line, text = i > 0 && i <= 40 ? line.slice(i + 1).trim() : '';
-    return { key: stepKey(name, line), label: lead, sub: text ? text.charAt(0).toUpperCase() + text.slice(1) : '' };
+    const tag = TAG.exec(line), body = tag ? line.slice(tag[0].length) : line;
+    const i = body.indexOf(': '); // "Start by 4:30" has no bold part
+    const lead = i > 0 && i <= 40 ? body.slice(0, i).trim() : body, text = i > 0 && i <= 40 ? body.slice(i + 1).trim() : '';
+    const st = { key: stepKey(name, line), label: lead, sub: text ? text.charAt(0).toUpperCase() + text.slice(1) : '' };
+    if (tag) st.when = tag[1].toLowerCase().startsWith('every') ? 'other' : 'monthly';
+    return st;
   });
+}
+
+// "How often" tags at the start of a step: "[every other time] Mop: ..." or "[monthly] Showers: ...".
+// Counted over the days the chore is on anyone's schedule: every other time alternates from Nov 16, 2026
+// (the first time shows it); monthly shows on the first of those days in each month.
+const TAG = /^\[(every other time|monthly)\]\s*/i;
+export const CADENCE_START = '2026-11-16';
+// days: the dates (YYYY-MM-DD, sorted) the chore is scheduled, from CADENCE_START up to and including today.
+export function stepShows(step, today, days) {
+  if (!step.when) return true;
+  if (step.when === 'other') return days.length % 2 === 1;
+  return !days.some((d) => d < today && d.slice(0, 7) === today.slice(0, 7));
 }
