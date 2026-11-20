@@ -42,6 +42,16 @@ export const CHORE_LISTS = [
     'Trash: empty all three trash cans and put in new bags.',
     'Floors: in all three, shake out any rugs and sweep or wipe the floor.'
   ] },
+  { name: 'Front closet + shoes', steps: [
+    'Entry: anything that doesn’t belong by the front door goes back where it goes; empty boxes flattened for recycling.',
+    'Shoes: every shoe in the entry and on the closet floor goes in pairs on the shoe rack.',
+    'Coats: every coat on a hanger, zipped or buttoned so it stays on; pick up any that fell.',
+    'Hats, gloves and scarves: matched up and put where they’re kept.',
+    'Closet floor: clear except the shoe rack; mop and sweeper standing up in the corner.',
+    'Top shelf: bags and baskets pushed back neatly, nothing hanging over the edge.',
+    'Rug and floor: shake out the rug and sweep the entry floor.',
+    'Doors: close the closet doors all the way.'
+  ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: hung up or put where they’re kept.',
