@@ -85,3 +85,6 @@
   // Isaiah's Tuesday closet chore opens to its list
   await visit('checklist.html?kid=isaiah&date=2026-11-17', 'steps-closet');
   check(!!(await p.$('[data-steps="2026-11-17|chore"]')), 'Isaiah’s closet chore has a steps row');
+  // Isaiah's Thursday stairs chore opens to its list
+  await visit('checklist.html?kid=isaiah&date=2026-11-19', 'steps-stairs');
+  check(!!(await p.$('[data-steps="2026-11-19|chore"]')), 'Isaiah’s stairs chore has a steps row');
