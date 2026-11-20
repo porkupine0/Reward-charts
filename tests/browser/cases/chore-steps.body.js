@@ -93,4 +93,4 @@
   check(/8 steps/.test(await p.$eval('[data-steps="2026-11-16|chore2"]', (e) => e.textContent).catch(() => '')), 'Isaiah’s trash chore has 8 steps');
   // Rhett's Saturday laundry + room chore opens to the shared bedroom list
   await visit('checklist.html?kid=rhett&date=2026-11-21', 'steps-room');
-  check(/6 steps/.test(await p.$eval('[data-steps="2026-11-21|chore"]', (e) => e.textContent).catch(() => '')), 'Rhett’s room chore has 6 steps');
+  check(/7 steps/.test(await p.$eval('[data-steps="2026-11-21|chore"]', (e) => e.textContent).catch(() => '')), 'Rhett’s room chore has 7 steps');

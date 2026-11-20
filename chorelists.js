@@ -71,11 +71,12 @@ export const CHORE_LISTS = [
   ] },
   { name: 'Laundry + clean your room (30 min)', steps: [
     'Dishes and trash: cups, bottles, plates and wrappers out of your room.',
-    'Dirty clothes: every dirty piece in your hamper.',
-    'Clean clothes: folded in drawers or hung up, drawers shut.',
-    'Bed: sheet straight, blankets pulled up, pillows at the top.',
-    'Tops: dresser and nightstand neat; things you want to keep where they belong.',
-    'Floor: clear, including the closet floor and under the bed.'
+    'Dirty clothes: every dirty piece in the hamper.',
+    'Clean clothes: folded in drawers or bins, drawers shut.',
+    'Closet: clothes on hangers or folded in bins; closet floor clear.',
+    'Bed: make your bed. Sheet straight, blankets pulled up, pillows and stuffed animals at the top.',
+    'Tops: dresser, nightstand, shelves and window seat neat; things you keep where they belong.',
+    'Floor: clear, including under the beds. Sharing a room? Clear the whole floor together.'
   ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
