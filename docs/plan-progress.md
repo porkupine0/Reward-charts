@@ -63,16 +63,39 @@ Driving storage (chart `eli-drive`): `approved/<lesson>` = true | 'skip', `done/
 Decided Nov 18 (afternoon): lessons 1 and 2 approved, Eli hasn't started; a DIFFERENT knowledge test every sitting (baseline, progress tests, final: Forms A-F, all new questions, rules may come back in new situations); permit test in about 3 months (mid-February 2027), so the course is cut to 55 lesson days (66 weekdays from Nov 19 to Feb 18). w1d5 becomes unit 1's test (nothing finished yet). A lesson he hasn't begun waits on the Driving page until the baseline is done.
 Decided Nov 18: only Eli's typing and driving wait for today's chores (assignments and homework don't; homework still locks when an earlier day's chore is owed). The driving lesson counts toward his daily streak, not game time.
 
-## Next steps (the weekly check-ins work this list in order: one dated item per check-in, unless something is overdue)
-- **Sat Nov 21: Form C groundwork.**
-  - Demand for Forms C-F (4 forms x blueprint): signs 16, signals and markings 8, right of way 4, school buses and emergency vehicles 16, railroad and work zones 8, alcohol and phones 4, general rules (speed, turns, passing, lights) 28, highways/weather/road types 16.
-  - Count NUMBER facts first: each form needs 8-10 number questions; Forms A and B used about 18. Number facts may be tighter than school buses.
-  - Detailed inventory only where supply is under about 1.5x demand; a rough count elsewhere.
-  - Output (in docs/driving-syllabus.md): a table reserving facts for Forms C-F, showing which rules repeat and in what new situation.
-  - Add a shared-QUOTE report to checkTests (report, don't reject: later forms must reuse rules).
-- **Sat Nov 28: unit 5** (speed, stopping, turning). Must be on main by Dec 12.
-- **Sat Dec 5: Form C** (opens after the Unit 4 test, about Dec 16).
-- **Sat Dec 12: unit 6, plus a place to record Iowa DOT practice-test scores** (the parent enters his score and date on the Parents page). His first Iowa DOT online practice test is after the Unit 5 test, about Dec 23.
+## Two-week completion plan (Nov 21 - Dec 14, 2026; the parent asked Nov 20; the advisor set the order)
+A nightly check-in fires about 12:47 am Central into this session. Each night: read this file; FIRST finish any unfinished night; call the advisor before starting and for sign-off; work until tokens run out (the next night resumes). "The app" = all of Reward Charts; building = the driving course; reviews cover the whole app, deepest on what changed since the last full review.
+
+| Night | Work | Done |
+|---|---|---|
+| Sat Nov 21 | Foundations: Form C groundwork (number facts first; supply vs demand per topic; reservation table for Forms C-F), shared-QUOTE report in checkTests (report, don't reject), let the checker cite docs/iowa/gdl-*.txt (Iowa DOT permit pages), commit a script that re-fetches Iowa DOT's 68 practice stems WITHOUT the answer codes | [ ] |
+| Sun Nov 22 | Early checks: (1) tag all 44 planned lesson days beginner / intermediate / advanced (write the definition into the syllabus; units 5-10 can still be reordered); (2) a cold independent reviewer on units 1-4 + Forms A-B under the same brief as the final review (tests the brief); fix the recipe | [ ] |
+| Mon Nov 23 | Unit 5 (speed, stopping, turning) | [ ] |
+| Tue Nov 24 | Unit 6 (highways and passing) | [ ] |
+| Wed Nov 25 | Forms C and D | [ ] |
+| Thu Nov 26 | Unit 7 (sharing the road) | [ ] |
+| Fri Nov 27 | Unit 8 (railroad, work zones, parking, backing) | [ ] |
+| Sat Nov 28 | Unit 9 (night, weather, rural Iowa) | [ ] |
+| Sun Nov 29 | Unit 10 (the driver and the car) | [ ] |
+| Mon Nov 30 | Final week: checkCourse allows the two no-video days; Iowa DOT practice-test score entry (Parents page); end-of-course state; a test walking a simulated Eli through all 55 days | [ ] |
+| Tue Dec 1 | Forms E and F | [ ] |
+| Wed Dec 2 | Review: content, coverage, compliance | [ ] |
+| Thu Dec 3 | Review: skill levels (beginner / intermediate / advanced) and gaps on the finished course. Per skill: quizzed / only mentioned / can't be taught by an app (report that group; don't build for it). Benchmarks: manual sections, the 68 DOT stems, Iowa's driver-ed topic list (FETCH it, starting with iowadot.gov driver-education pages) | [ ] |
+| Fri Dec 4 | Review: bugs, UI, missing features (trace docs/requirements.md), whole-app regression | [ ] |
+| Sat Dec 5 - Sun Dec 6 | Fixes, full rerun, advisor sign-off; record the frozen commit here | [ ] |
+| Mon Dec 7 | Independent review: a FRESH agent (not a fork), read-only; gets the frozen commit, docs/requirements.md, the manual, the list of frozen lessons; NOT this session's history or the advisor's sign-offs; writes docs/independent-review.md, ranked, with evidence per finding | [ ] |
+| Tue Dec 8 | Triage each recommendation: accept / decline / ask the parent, with a reason | [ ] |
+| Wed Dec 9 - Sat Dec 12 | Implement accepted recommendations | [ ] |
+| Sun Dec 13 | A fresh reviewer rechecks the changed items | [ ] |
+| Mon Dec 14 | Final sign-off and report to the parent; DISABLE the nightly check-in and set the Saturday check-in back to normal | [ ] |
+
+**Rules every night**
+- Each build night ends with one cold sub-agent answering that night's new questions from the manual WITHOUT the keys; any disagreement is a defect until resolved.
+- Review nights: at most three read-only sub-agents, one lens each; findings go to a file. Fix nothing without a failing test, a screenshot or a manual page.
+- Frozen content: assume Eli advances one lesson each weekday from Nov 19 (his Unit 1 test about Nov 25). On lessons he may have seen, only reword wrong choices or append questions.
+- Overruns: a late build night takes the next night, absorbed by Dec 5-6. Forms E and F move past Dec 14 only if more than two nights are lost. The reviews never shrink.
+- Mark the night's row [x] and add a Log line when done; push to main and the session branch; check both CI jobs.
+- The parent's jobs (report them, don't wait on them): approve lessons; apply the database rules and add the BACKUP_KEY secret (docs/database-safety.md); share Eli's baseline score.
 
 ## How to write a driving unit (for the weekly check-ins)
 1. Run node scripts/check-videos.mjs; take the unit's videos (titles, channels, lengths) from docs/driving-videos.json; swap in a spare if one is gone (find more with scripts/youtube-search.py).
