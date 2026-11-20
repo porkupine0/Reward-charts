@@ -32,6 +32,16 @@ export const CHORE_LISTS = [
     'Trash: empty the kitchen trash, put in a new bag, flatten boxes for recycling.',
     'Floor: sweep the whole floor, under the island and table too, and wipe up sticky spots.'
   ] },
+  { name: 'Bathrooms', steps: [
+    'Pick up: in all three bathrooms, clothes and dirty towels go to the laundry; anything else back where it goes.',
+    'Counters: put things away, then wipe the counters and sinks.',
+    'Mirrors: wipe all three mirrors.',
+    'Toilets: scrub inside with the brush, then wipe the seat, lid and outside.',
+    'Towels: hang clean towels straight on the bars and hooks.',
+    'Toilet paper: a full roll on each holder and a spare nearby.',
+    'Trash: empty all three trash cans and put in new bags.',
+    'Floors: shake out the rugs and sweep or wipe each floor.'
+  ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: hung up or put where they’re kept.',
