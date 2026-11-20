@@ -1,14 +1,14 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795184608';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795184608';
-import { CHARTS, weekProgress } from './charts.js?v=1795184608';
-import { planFor } from './plan.js?v=1795184608';
-import * as L from './lists.js?v=1795184608';
-import { score, fmt, nextMilestone } from './trials.js?v=1795184608';
-import { dayStreak } from './streaks.js?v=1795184608';
-import { lessonFor } from './driving.js?v=1795184608';
-import { nowHtml } from './nowview.js?v=1795184608';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795185533';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795185533';
+import { CHARTS, weekProgress } from './charts.js?v=1795185533';
+import { planFor } from './plan.js?v=1795185533';
+import * as L from './lists.js?v=1795185533';
+import { score, fmt, nextMilestone } from './trials.js?v=1795185533';
+import { dayStreak } from './streaks.js?v=1795185533';
+import { lessonFor } from './driving.js?v=1795185533';
+import { nowHtml } from './nowview.js?v=1795185533';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {}, drive: {} };
@@ -47,7 +47,8 @@ function render() {
     links.push(card('run.html', 'run', 'Training', 'Today’s run · Time trials · History', pl ? 'Today: ' + pl.title + (L.eliRunDone(ctx.run, now) ? ' · done!' : '') : 'Plan finished'));
     // Driving: ready, done, waiting for approval, or locked until chores
     const course = L.course(), st = lessonFor(course, ctx.drive, ymd(now)), lock = L.computerLock(ctx, 'eli', now);
-    const dtext = !course.length ? 'No lessons yet' : st.status === 'done' ? 'Today’s lesson done ✓' : st.status === 'finished' ? 'Course finished' : st.status === 'waiting' ? 'Next lesson waiting for Mom or Dad' : L.dowOf(now) > 4 ? 'Next lesson Monday' : lock ? 'Today’s lesson: chores first' : 'Today’s lesson is ready';
+    const baseFirst = st.status === 'ready' && L.baselineBy(ctx.drive || {}, ymd(now)) === 'open';
+    const dtext = !course.length ? 'No lessons yet' : baseFirst ? 'Baseline test first, then today’s lesson' : st.status === 'done' ? 'Today’s lesson done ✓' : st.status === 'finished' ? 'Course finished' : st.status === 'waiting' ? 'Next lesson waiting for Mom or Dad' : L.dowOf(now) > 4 ? 'Next lesson Monday' : lock ? 'Today’s lesson: chores first' : 'Today’s lesson is ready';
     if (course.length) links.push(card('drive.html', 'run', 'Driving', 'A lesson a weekday; unit test every 5th', dtext));
     links.push(card('trials.html', 'trials', 'Time trials', 'Milestones · Prizes', (nx ? 'Next mile: under ' + fmt(nx[0]) : 'Mile done') + ' · ' + (n5 ? '5K: under ' + fmt(n5[0]) : '5K done')));
   }

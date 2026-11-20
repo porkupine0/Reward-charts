@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795184608';
-import { applyConfig } from './routines.js?v=1795184608';
-import { askParent } from './parent.js?v=1795184608';
-import * as L from './lists.js?v=1795184608';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795184608';
-import { signSvg } from './signs.js?v=1795184608';
-import * as COURSE from './driving-course.js?v=1795184608';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795184608';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795185533';
+import { applyConfig } from './routines.js?v=1795185533';
+import { askParent } from './parent.js?v=1795185533';
+import * as L from './lists.js?v=1795185533';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings } from './driving.js?v=1795185533';
+import { signSvg } from './signs.js?v=1795185533';
+import * as COURSE from './driving-course.js?v=1795185533';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795185533';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -70,7 +70,8 @@ function render() {
   if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
     : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
   // the key points show until the questions do (then they'd give the answers away)
-  else if (watched) h += (noVideo ? '' : (lesson.videos || []).map(video).join('')) + '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';
+  // once the questions show, the video stays (to rewatch) but its Iowa note hides, like the key points (it can state answers)
+  else if (watched) h += (noVideo ? '' : (lesson.videos || []).map((v) => video(Object.assign({}, v, { iowa: '' }))).join('')) + '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';
   else if (noVideo) h += '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>' + keyCard(lesson) + '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I’ve read these</button>';
   else h += keyCard(lesson) + (lesson.videos || []).map(video).join('') + '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>';
   if (watched || lesson.review) h += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';

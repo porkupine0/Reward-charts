@@ -5,6 +5,8 @@
   await p.evaluate(() => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
     routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } } } },
     'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' } } } })); });
+  await visit('kid.html?kid=eli', 'test-hub');
+  check(/Baseline test first/.test(await p.$eval('body', (e) => e.textContent)), 'Eli hub card: baseline test first');
   await visit('parents.html', 'test-parents-none');
   check(/Baseline knowledge test: not started \(best taken before his first lesson\)/.test(await p.$eval('#testscores', (e) => e.textContent)), 'Parents page: not started yet');
   await visit('drive.html', 'test-locked');
@@ -42,6 +44,7 @@
   check((await p.$$('#today .dkey li')).length === 3 && await p.$eval('#today .dkey', (e) => !!(e.compareDocumentPosition(document.querySelector('#today .dv')) & 4)) && /\(Manual p\.47\)/.test(await p.$eval('#today .dkey', (e) => e.textContent)), 'lesson 1: 3 key points with manual pages, above the video');
   await p.click('#today [data-watched="w1d1"]'); await p.waitForTimeout(200);
   check(!!(await p.$('#today .dq')) && !(await p.$('#today .dkey')), 'once the questions show, the key points are hidden');
+  check(!(await p.$('#today .dv-iowa')), 'once the questions show, the In Iowa note is hidden too');
   const dv = (await db()).charts['eli-drive'];
   check(Object.values(dv.answers).every((a) => a.base) && Object.keys(dv.answers).length === 25, 'answers stored under the sitting');
   check(!dv.done, 'not stored as a finished lesson');
