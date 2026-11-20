@@ -20,13 +20,13 @@ const LISTS = {
     ['chairs', 'Chairs', 'Push in the table chairs and bar stools and straighten the cushions.'],
     ['glass', 'Glass', 'Wipe nose and paw prints off the French doors and low windows.'],
     ['sweep', 'Sweep', 'The whole tile floor, corners and under the table and stools too.'],
-    ['mop', 'Mop', 'Mop the floor, then put the mop and broom back by the door.']
+    ['mop', 'Mop', 'Mop the floor, then put the mop and broom away.']
   ] },
   'kitchen': { id: 'kitchen', steps: [
     ['food', 'Food away', 'Leftovers into containers and the fridge; everything else back in the pantry.'],
     ['unload', 'Unload', 'If the dishwasher is clean, empty it first.'],
     ['load', 'Load', 'Rinse the dishes and load the dishwasher. Run it if it’s full.'],
-    ['handwash', 'Hand-wash', 'Wash, dry and put away pans and cutting boards that don’t go in the dishwasher. Cast iron: hot water and the brush, a drop of soap is okay, never soak it, dry it right away.'],
+    ['handwash', 'Hand-wash', 'Wash, dry and put away pans and cutting boards that don’t go in the dishwasher. Cast iron: no soaking, dry it right away.'],
     ['counters', 'Counters', 'Clear the counters and island, then wipe them and the stovetop once it’s cool.'],
     ['fronts', 'Fronts', 'Wipe the microwave inside and out, and the fridge, dishwasher and oven doors.'],
     ['sink', 'Sink', 'Scrub the sink and faucet, shake out the drying mat, hang up the dish towels.'],

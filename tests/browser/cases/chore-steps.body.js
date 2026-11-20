@@ -34,5 +34,22 @@
   check(os.length === 8 && os.every((s) => s.startsWith('2026-11-18|chore|st_sun_')), 'owed steps save on Wednesday');
   for (const s of os) await tap('[data-step="' + s + '"]');
   check(!(await p.$('.owed')), 'Finish first gone once every step is ticked');
-  // Eli's Thursday Kitchen has 9 steps
-  check(/0 of 9 steps/.test(await p.$eval('[data-steps="2026-11-19|chore"]', (e) => e.textContent)), 'Kitchen shows 0 of 9');
+  // Eli's Thursday Kitchen has 9 steps; the last two tapped fast still tick the chore
+  const kr = '[data-steps="2026-11-19|chore"]';
+  check(/0 of 9 steps/.test(await p.$eval(kr, (e) => e.textContent)), 'Kitchen shows 0 of 9');
+  await tap(kr);
+  await p.screenshot({ path: OUT + 'steps-kitchen.png', fullPage: false });
+  const ks = await p.$$eval('#day .stepbtn', (els) => els.map((e) => e.dataset.step));
+  for (const s of ks.slice(0, 7)) await tap('[data-step="' + s + '"]');
+  await p.click('[data-step="' + ks[7] + '"]'); await p.click('[data-step="' + ks[8] + '"]'); await p.waitForTimeout(300);
+  check(await p.$eval(kr, (e) => e.closest('.ck').classList.contains('on')), 'fast last two taps tick the chore');
+  // Waiting for an excuse: the owed chore keeps its steps (no one-tap tick)
+  await p.evaluate(() => { const d = JSON.parse(sessionStorage.getItem('mockdb')); d.charts.routines.days['2026-11-18'] = { eli: {} }; sessionStorage.setItem('mockdb', JSON.stringify(d)); });
+  await visit('checklist.html?kid=eli', 'steps-owed-wait');
+  await tap('.owed [data-owedex^="mark|"]');
+  check(!!(await p.$('.owed [data-steps="2026-11-18|chore"]')) && !(await p.$('.owed [data-owed]')), 'waiting chore keeps its steps');
+  await tap('.owed [data-steps="2026-11-18|chore"]');
+  await p.screenshot({ path: OUT + 'steps-owed-open.png', fullPage: false });
+  await p.emulateMedia({ colorScheme: 'dark' });
+  await p.screenshot({ path: OUT + 'steps-dark.png', fullPage: false });
+  await p.emulateMedia({ colorScheme: 'light' });

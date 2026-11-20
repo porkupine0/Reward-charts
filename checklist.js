@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795209257';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795209257';
-import { SETTINGS } from './settings.js?v=1795209257';
-import { askParent } from './parent.js?v=1795209257';
-import * as L from './lists.js?v=1795209257';
-import { dayStreak, cheerIf } from './streaks.js?v=1795209257';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795209822';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795209822';
+import { SETTINGS } from './settings.js?v=1795209822';
+import { askParent } from './parent.js?v=1795209822';
+import * as L from './lists.js?v=1795209822';
+import { dayStreak, cheerIf } from './streaks.js?v=1795209822';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -165,8 +165,10 @@ function renderOn() {
       owed.map((o) => {
         const v = L.dayChecks(ctx, kid, o.date)[o.item.key], ref = ymd(o.date) + '|' + o.item.key;
         const from = 'From ' + o.date.toLocaleDateString('en-US', { weekday: 'long' });
-        if (o.item.steps && v !== SKIP) return '<div class="owedsteps">' + stepsHtml(o.item, L.dayChecks(ctx, kid, o.date), ymd(o.date), from) + '</div>' +
-          '<button class="linkbtn excuse-ask" data-owedex="mark|' + ref + '">Not able to do it?</button>';
+        const ask = v === SKIP
+          ? '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-owedex="approve|' + ref + '">Approve</button><button class="linkbtn" data-owedex="undo|' + ref + '">Undo</button></div>'
+          : '<button class="linkbtn excuse-ask" data-owedex="mark|' + ref + '">Not able to do it?</button>';
+        if (o.item.steps) return '<div class="owedsteps">' + stepsHtml(o.item, L.dayChecks(ctx, kid, o.date), ymd(o.date), from) + '</div>' + ask;
         return '<button class="ckbtn owedbtn" data-owed="' + ref + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
           '<span class="cktext"><strong>' + esc(o.item.label) + '</strong><small>From ' + esc(o.date.toLocaleDateString('en-US', { weekday: 'long' })) + '</small></span></button>' +
           (v === SKIP
