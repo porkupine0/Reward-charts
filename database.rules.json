@@ -100,6 +100,7 @@
         "checks": { ".write": true },
         "rewards": { ".write": true },
         "prizeLevels": { ".write": true },
+        "choreSteps": { ".write": true },
         "history": {
           "$date": { ".write": true }
         }

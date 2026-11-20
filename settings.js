@@ -1,9 +1,12 @@
 // Things parents can change on the Settings page without a code change.
 // Defaults live here; anything saved in Firebase (chart "config") replaces them on every phone.
+import { CHORE_LISTS, mergeLists } from './chorelists.js?v=1795211660';
 const FAMILY_KITCHEN = 'Kitchen + dining room with the family';
 const LAUNDRY = 'Laundry + clean your room (30 min)';
 
 export const DEFAULTS = {
+  // Step-by-step chore lists (chorelists.js); parents can change them on Settings
+  choreSteps: CHORE_LISTS,
   // Chores by day, Mon (0) … Sun (6); each day can have several.
   chores: {
     eli: [[FAMILY_KITCHEN, LAUNDRY], ['Living Room'], ['Sunroom'], ['Kitchen'], ['Dining/Front Room'], ['Vacuum/brush Scarlett'], ['Kitchen + dining room (all hands)']],
@@ -138,6 +141,7 @@ export function applySettings(cfg) {
     const v = c.prizeLevels && clean(c.prizeLevels[lvl]);
     if (v && v.length) fresh.prizeLevels[lvl] = v;
   });
+  fresh.choreSteps = mergeLists(c.choreSteps);
   Object.keys(SETTINGS).forEach((k) => delete SETTINGS[k]);
   Object.assign(SETTINGS, fresh);
   listeners.forEach((fn) => fn(SETTINGS));

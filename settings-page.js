@@ -1,9 +1,10 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc, isLive } from './store.js?v=1795211416';
-import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795211416';
-import { KIDS } from './routines.js?v=1795211416';
-import { LEVELS } from './trials.js?v=1795211416';
-import { askParent } from './parent.js?v=1795211416';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1795211660';
+import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795211660';
+import { KIDS } from './routines.js?v=1795211660';
+import { LEVELS } from './trials.js?v=1795211660';
+import { listsToSave, norm, MAX_STEPS } from './chorelists.js?v=1795211660';
+import { askParent } from './parent.js?v=1795211660';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -34,15 +35,41 @@ function renderKid() {
     Object.entries(draft.checks[kid]).map(([key, w]) => '<div class="scheck"><label class="field"><span class="flabel">Check</span><input id="ck-' + key + '-label" maxlength="60" value="' + esc(w.label) + '"></label>' +
       '<label class="field"><span class="flabel">Detail (optional)</span><input id="ck-' + key + '-sub" maxlength="100" value="' + esc(w.sub) + '"></label></div>').join('') + '</fieldset>';
 }
+// Chore checklists: one box per chore name used by any kid (plus any saved list), one step per line.
+function listNames() {
+  const names = [];
+  const add = (n) => { if (n && !names.some((x) => norm(x) === norm(n))) names.push(n); };
+  Object.values(draft.chores).forEach((days) => days.forEach((d) => (d || []).forEach(add)));
+  draft.choreSteps.forEach((l) => { if (l.steps.length) add(l.name); });
+  return names;
+}
+const stepsOf = (name) => { const l = draft.choreSteps.find((x) => norm(x.name) === norm(name)); return l ? l.steps : []; };
+function renderLists() {
+  $('steplists').innerHTML = listNames().map((n, i) => {
+    const st = stepsOf(n);
+    return '<details class="slist"><summary><b>' + esc(n) + '</b> <span>' + (st.length ? st.length + ' step' + (st.length > 1 ? 's' : '') : 'one box, no steps') + '</span></summary>' +
+      '<label class="field"><span class="flabel">One step per line (up to ' + MAX_STEPS + '). Words before a colon show in bold. Leave it empty for a single box.</span>' +
+      '<textarea id="sl' + i + '" data-list="' + esc(n) + '" rows="' + Math.max(3, st.length + 1) + '">' + esc(st.join('\n')) + '</textarea></label></details>';
+  }).join('');
+}
+function readLists() {
+  document.querySelectorAll('[data-list]').forEach((t) => {
+    const name = t.dataset.list, steps = lines(t.value);
+    const hit = draft.choreSteps.find((x) => norm(x.name) === norm(name));
+    if (hit) hit.steps = steps; else if (steps.length) draft.choreSteps.push({ name, steps });
+  });
+}
 function renderAll() {
   $('gameMin').value = draft.game; $('grace').value = draft.grace;
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => { $('r-' + id + '-' + w).value = draft.rewards[id][w].join('\n'); }));
   $('levels').innerHTML = LEVELS.map((l) => '<label class="field"><span class="flabel">' + l + '</span><textarea id="lv-' + l + '" rows="4">' + esc(draft.prizeLevels[l].join('\n')) + '</textarea></label>').join('');
   renderKid();
+  renderLists();
 }
 const bounded = (v, [lo, hi], d) => { const n = Number(v); return v !== '' && Number.isInteger(n) && n >= lo && n <= hi ? n : d; };
 function readAll() {
   readKid();
+  readLists();
   draft.game = bounded($('gameMin').value, LIMITS.game, draft.game);
   draft.grace = bounded($('grace').value, LIMITS.grace, draft.grace);
   ['eli', 'trombone'].forEach((id) => ['weekly', 'monthly'].forEach((w) => { draft.rewards[id][w] = lines($('r-' + id + '-' + w).value); }));
@@ -51,7 +78,7 @@ function readAll() {
 
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-kid]');
-  if (t) { readKid(); kid = t.dataset.kid; renderKid(); }
+  if (t) { readKid(); readLists(); kid = t.dataset.kid; renderKid(); renderLists(); }
 });
 document.addEventListener('input', () => { dirty = true; $('msg').textContent = 'Unsaved changes.'; });
 const notLive = () => { $('msg').textContent = 'Still connecting. Save once this phone has the latest settings, so earlier days keep the right ones.'; };
@@ -76,6 +103,8 @@ $('save').onclick = async () => {
   await save('config', 'checks', cfg.checks);
   await save('config', 'rewards', cfg.rewards);
   await save('config', 'prizeLevels', cfg.prizeLevels);
+  const lists = listsToSave(cfg.choreSteps);
+  await save('config', 'choreSteps', lists.length ? lists : null);
   dirty = false;
   $('msg').textContent = 'Saved. Every phone uses the new settings from today; earlier days keep what they had.';
 };
@@ -84,7 +113,7 @@ $('reset').onclick = async () => {
   if (!confirm('Go back to the original chores, bedtimes and prize lists?')) return;
   if (!(await askParent())) return;
   await keepPastDays();
-  ['chores', 'showers', 'lights', 'game', 'grace', 'checks', 'rewards', 'prizeLevels'].forEach((k) => save('config', k, null));
+  ['chores', 'showers', 'lights', 'game', 'grace', 'checks', 'rewards', 'prizeLevels', 'choreSteps'].forEach((k) => save('config', k, null));
   draft = copy(DEFAULTS); dirty = false; renderAll();
   $('msg').textContent = 'Back to the original settings.';
 };

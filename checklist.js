@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795211416';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795211416';
-import { SETTINGS } from './settings.js?v=1795211416';
-import { askParent } from './parent.js?v=1795211416';
-import * as L from './lists.js?v=1795211416';
-import { dayStreak, cheerIf } from './streaks.js?v=1795211416';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795211660';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795211660';
+import { SETTINGS } from './settings.js?v=1795211660';
+import { askParent } from './parent.js?v=1795211660';
+import * as L from './lists.js?v=1795211660';
+import { dayStreak, cheerIf } from './streaks.js?v=1795211660';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -422,6 +422,10 @@ document.addEventListener('click', (e) => {
   if (!t) return;
   e.stopPropagation();
   const k = kid + '|' + t.dataset.steps;
+  // every step ticked but the chore isn't (a parent removed the last unticked step): tick it now
+  const [d, key] = t.dataset.steps.split('|'), day = parseYmd(d);
+  const item = L.lists(ctx, kid, day).day.find((i) => i.key === key), c = L.dayChecks(ctx, kid, day);
+  if (item && item.steps && !isDone(c[key]) && item.steps.every((s) => c[s.key])) { save(ID, 'days/' + d + '/' + kid + '/' + key, true); openSteps.delete(k); render(); return; }
   if (openSteps.has(k)) openSteps.delete(k); else openSteps.add(k);
   render();
 }, true);

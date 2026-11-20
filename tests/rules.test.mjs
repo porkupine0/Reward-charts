@@ -42,7 +42,7 @@ const WRITES = [
   'charts/eli-trials/trials/p2026-11-21', 'charts/eli-trials/trials/m3k2x', 'charts/eli-trials/paid/mile-6:45', 'charts/eli-trials/pick/mile-6:45',
   // settings
   'charts/config/chores', 'charts/config/showers', 'charts/config/lights', 'charts/config/game', 'charts/config/grace', 'charts/config/checks',
-  'charts/config/rewards', 'charts/config/prizeLevels', 'charts/config/history/2026-11-18', 'charts/settings/pinHash', 'charts/settings/pin'
+  'charts/config/rewards', 'charts/config/prizeLevels', 'charts/config/choreSteps', 'charts/config/history/2026-11-18', 'charts/settings/pinHash', 'charts/settings/pin'
 ];
 
 const PROTECTED = [

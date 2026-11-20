@@ -738,3 +738,7 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .stepbtn.on .cktext strong { color: var(--muted); }
 .owedsteps { border: 2px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 6px 0 2px; }
 .owedsteps .ckbtn { padding: 10px 12px; }
+.slist { border-top: 1px solid var(--line); padding: 4px 0; }
+.slist summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.slist summary span { color: var(--muted); font-size: 13px; }
+.slist textarea { width: 100%; }

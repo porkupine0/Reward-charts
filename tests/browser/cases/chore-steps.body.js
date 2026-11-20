@@ -31,17 +31,17 @@
   check(!!(await p.$(owed)), 'owed Sunroom has a steps row');
   await tap(owed);
   const os = await p.$$eval('.owed .stepbtn', (els) => els.map((e) => e.dataset.step));
-  check(os.length === 8 && os.every((s) => s.startsWith('2026-11-18|chore|st_sun_')), 'owed steps save on Wednesday');
+  check(os.length === 6 && os.every((s) => s.startsWith('2026-11-18|chore|st_')), 'owed steps save on Wednesday');
   for (const s of os) await tap('[data-step="' + s + '"]');
   check(!(await p.$('.owed')), 'Finish first gone once every step is ticked');
-  // Eli's Thursday Kitchen has 9 steps; the last two tapped fast still tick the chore
+  // Eli's Thursday Kitchen has 8 steps; the last two tapped fast still tick the chore
   const kr = '[data-steps="2026-11-19|chore"]';
-  check(/0 of 9 steps/.test(await p.$eval(kr, (e) => e.textContent)), 'Kitchen shows 0 of 9');
+  check(/0 of 8 steps/.test(await p.$eval(kr, (e) => e.textContent)), 'Kitchen shows 0 of 8');
   await tap(kr);
   await p.screenshot({ path: OUT + 'steps-kitchen.png', fullPage: false });
   const ks = await p.$$eval('#day .stepbtn', (els) => els.map((e) => e.dataset.step));
-  for (const s of ks.slice(0, 7)) await tap('[data-step="' + s + '"]');
-  await p.click('[data-step="' + ks[7] + '"]'); await p.click('[data-step="' + ks[8] + '"]'); await p.waitForTimeout(300);
+  for (const s of ks.slice(0, 6)) await tap('[data-step="' + s + '"]');
+  await p.click('[data-step="' + ks[6] + '"]'); await p.click('[data-step="' + ks[7] + '"]'); await p.waitForTimeout(300);
   check(await p.$eval(kr, (e) => e.closest('.ck').classList.contains('on')), 'fast last two taps tick the chore');
   // Waiting for an excuse: the owed chore keeps its steps (no one-tap tick)
   await p.evaluate(() => { const d = JSON.parse(sessionStorage.getItem('mockdb')); d.charts.routines.days['2026-11-18'] = { eli: {} }; sessionStorage.setItem('mockdb', JSON.stringify(d)); });
@@ -53,3 +53,20 @@
   await p.emulateMedia({ colorScheme: 'dark' });
   await p.screenshot({ path: OUT + 'steps-dark.png', fullPage: false });
   await p.emulateMedia({ colorScheme: 'light' });
+  // A parent edits the lists on Settings: Living Room gets 2 steps, Sunroom is blanked (one box again)
+  await visit('settings.html', 'steps-settings');
+  const lr = '[data-list="Living Room"]', sr = '[data-list="Sunroom"]';
+  check(!!(await p.$(lr)) && !!(await p.$('[data-list="Dining/Front Room"]')) && !!(await p.$('[data-list="Bathrooms"]')), 'a box for each chore name');
+  await p.click('.slist:has(' + lr + ') summary');
+  await p.fill(lr, 'Pick up: everything\nVacuum'); await p.dispatchEvent(lr, 'input');
+  await p.click('.slist:has(' + sr + ') summary');
+  await p.fill(sr, ''); await p.dispatchEvent(sr, 'input');
+  await p.screenshot({ path: OUT + 'steps-settings.png', fullPage: false });
+  await p.click('#save'); await p.waitForTimeout(500);
+  const saved = (await db()).charts.config.choreSteps;
+  notes.push('saved lists: ' + JSON.stringify(saved));
+  check(Array.isArray(saved) && saved.length === 2, 'only the two changed lists are saved');
+  await visit('checklist.html?kid=rhett', 'steps-edited');
+  check(/2 steps/.test(await p.$eval('[data-steps="2026-11-19|chore"]', (e) => e.textContent)), 'Rhett sees the 2-step Living Room');
+  await visit('checklist.html?kid=rhett&date=2026-11-16', 'steps-blanked');
+  check(!(await p.$('[data-steps="2026-11-16|chore2"]')) && !!(await p.$('.ckbtn[data-key="chore2"]')), 'blanked Sunroom is a single box');
