@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795213978';
+import { checkSign } from './signs.js?v=1795214068';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):

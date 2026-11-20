@@ -88,3 +88,6 @@
   // Isaiah's Thursday stairs chore opens to its list
   await visit('checklist.html?kid=isaiah&date=2026-11-19', 'steps-stairs');
   check(!!(await p.$('[data-steps="2026-11-19|chore"]')), 'Isaiah’s stairs chore has a steps row');
+  // Isaiah's Monday trash chore (his second chore) opens to its 8 stops
+  await visit('checklist.html?kid=isaiah&date=2026-11-16', 'steps-trash');
+  check(/8 steps/.test(await p.$eval('[data-steps="2026-11-16|chore2"]', (e) => e.textContent).catch(() => '')), 'Isaiah’s trash chore has 8 steps');

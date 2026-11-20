@@ -59,6 +59,16 @@ export const CHORE_LISTS = [
     'Laundry baskets: clothes inside, none on the floor around them.',
     'Vacuum: every stair, the landing and the whole hallway.'
   ] },
+  { name: 'Trash: empty every trash can in the house', steps: [
+    'Kitchen: empty the trash and put in a new bag.',
+    'Main floor bathroom: empty the trash and put in a new bag.',
+    'Basement bathroom: empty the trash and put in a new bag.',
+    'Basement office: empty the trash and put in a new bag.',
+    'Kids’ bathroom: empty the trash and put in a new bag.',
+    'Master bathroom: empty the trash and put in a new bag.',
+    'Red Monster: tie every bag closed and put them all in the Red Monster.',
+    'Curb: take the Red Monster to the curb.'
+  ] },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: hung up or put where they’re kept.',
