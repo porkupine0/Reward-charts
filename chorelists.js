@@ -27,7 +27,7 @@ export const CHORE_LISTS = [
     'Unload: if the dishwasher is clean, empty it first.',
     'Load: rinse the dishes and load the dishwasher. Run it if it’s full.',
     'Hand-wash: wash, dry and put away pans, knives and cutting boards that don’t go in the dishwasher. Cast iron: no soaking, dry it right away.',
-    'Counters: clear the counters and island, then wipe them with the food-safe sanitizer, and the stovetop once it’s cool.',
+    'Counters: clear the counters and island, then wipe them with the kitchen sanitizer, and the stovetop once it’s cool.',
     'Sink: scrub the sink and faucet, shake out the drying mat, hang up the dish towels.',
     'Trash: empty the kitchen trash, put in a new bag, flatten boxes for recycling.',
     'Floor: sweep the whole floor, under the island and table too, and wipe up sticky spots.'
@@ -36,7 +36,7 @@ export const CHORE_LISTS = [
     'Pick up: in all three bathrooms, clothes and towels on the floor or counter go to the laundry; anything else back where it goes.',
     'Counters: in all three, things back in their spots, then wipe the counters and sinks with a disinfectant wipe.',
     'Mirrors: clean all three mirrors with the blue glass cleaner.',
-    'Toilets: in all three, squirt toilet bowl cleaner inside and scrub with the brush; wipe the seat, lid and outside with a fresh disinfectant wipe.',
+    'Toilets: in all three, squirt toilet bowl cleaner inside and scrub with the brush; wipe the seat, lid and outside with a fresh disinfectant wipe. Wipes go in the trash, not the toilet.',
     'Towels: in all three, hang the towels straight on the bars and hooks.',
     'Toilet paper: in all three, a roll on each holder and a spare within reach.',
     'Trash: empty all three trash cans and put in new bags.',
@@ -85,7 +85,7 @@ export const CHORE_LISTS = [
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: hung up or put where they’re kept.',
-    'Dining table: cleared and wiped with the food-safe sanitizer, chairs pushed in.',
+    'Dining table: cleared and wiped, chairs pushed in.',
     'Couch and games: pillows up, blanket folded, games back on the shelf.',
     'Desks: floor around them clear and chairs pushed in. Leave what’s on the desks alone.',
     'Vacuum: both rooms, under the table too.'
