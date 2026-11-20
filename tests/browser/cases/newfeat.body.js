@@ -8,7 +8,9 @@
   check((await p.$$('#day .ck.locked')).length === 0, 'Isaiah: nothing on his list locks (no screen tasks)');
   check((await p.$$('#bed .ck.locked')).length === 0, 'bed locked');
   check((await p.$$('[data-daycheck]')).length === 6, 'isaiah 3 checks');
-  await tap('[data-owed]');
+  // Wednesday's chore has a step list now (Kitchen): open it and tick every step
+  await tap('.owed [data-steps]');
+  for (let j = 0; j < 20; j++) { const s = await p.$('.owed .stepbtn[aria-pressed="false"]'); if (!s) break; await s.click(); await p.waitForTimeout(60); }
   await p.waitForTimeout(200);
   check(!(await p.$('.owed')), 'owed block still there');
   const st = await db(); notes.push('owed saved: ' + JSON.stringify(((((st.charts||{}).routines||{}).days||{})['2026-11-18']||{}).isaiah));

@@ -88,6 +88,8 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   // 2. No more copying: Eli's Running opens Training; the chart follows Training
   await visit('checklist.html?kid=eli&date=2026-11-11');
   for (let i = 0; i < 30; i++) { const btn = await p.$('.ckbtn[aria-pressed="false"]:not([data-key="activity"])'); if (!btn) break; await btn.click(); await p.waitForTimeout(60); }
+  // a chore with a step list: open it and tick every step (the last one ticks the chore)
+  for (let i = 0; i < 4; i++) { const r = await p.$('.ck:not(.on) > .stepsbtn'); if (!r) break; await r.click(); await p.waitForTimeout(60); for (let j = 0; j < 20; j++) { const s = await p.$('.stepbtn[aria-pressed="false"]'); if (!s) break; await s.click(); await p.waitForTimeout(60); } }
   await p.click('.ckbtn[data-key="activity"]'); await p.waitForTimeout(400);
   check(/run\.html/.test(p.url()), 'Running did not open Training: ' + p.url());
   await visit('eli.html?week=2026-11-09');

@@ -723,3 +723,18 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .dprev h3 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin: 0 0 6px; }
 .dprev-q { margin: 8px 0; padding-left: 20px; font-size: 14px; }
 .drivecard h2 { font-family: "Archivo Black", "Archivo", sans-serif; font-weight: 400; font-size: 22px; letter-spacing: 0; text-transform: none; color: var(--ink); }
+
+/* Chore step lists: the chore row opens and closes its steps; the chore box fills when every step is ticked. */
+.stepsbtn .chev { flex: none; width: 12px; height: 12px; margin: 0 6px 0 auto; border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink); transform: rotate(45deg); transition: transform .15s; }
+.stepsbtn[aria-expanded="true"] .chev { transform: rotate(-135deg); margin-top: 8px; }
+.steps { border-top: 1px solid var(--line); padding: 4px 10px 8px 30px; display: flex; flex-direction: column; }
+.stepbtn { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 4px; min-height: 48px; border: 0; border-bottom: 1px dashed var(--line); background: none; text-align: left; cursor: pointer; color: var(--ink); font: inherit; -webkit-tap-highlight-color: transparent; }
+.stepbtn:last-child { border-bottom: 0; }
+.stepbtn .box { flex: none; width: 24px; height: 24px; border: 2.5px solid var(--ink); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+.stepbtn .box svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; visibility: hidden; }
+.stepbtn.on .box { background: var(--accent); border-color: var(--accent); }
+.stepbtn.on .box svg { visibility: visible; }
+.stepbtn .cktext strong { font-size: 15px; }
+.stepbtn.on .cktext strong { color: var(--muted); }
+.owedsteps { border: 2px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 6px 0 2px; }
+.owedsteps .ckbtn { padding: 10px 12px; }

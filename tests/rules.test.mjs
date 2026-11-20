@@ -24,7 +24,7 @@ export function canWrite(path) {
 const WRITES = [
   // routines (checklists): every item, timers, parts, excuses, evening checks, candy, wake time, a whole day (clearing old logs)
   'charts/routines/days/2026-11-18/eli/teeth', 'charts/routines/days/2026-11-18/eli/bedTimer', 'charts/routines/days/2026-11-18/eli/bedTimer/end',
-  'charts/routines/days/2026-11-18/isaiah/clothes_shirt', 'charts/routines/days/2026-11-18/rhett/noLies', 'charts/routines/days/2026-11-18/rhett/bedOk',
+  'charts/routines/days/2026-11-18/isaiah/clothes_shirt', 'charts/routines/days/2026-11-18/eli/st_kitchen_trash', 'charts/routines/days/2026-11-18/rhett/noLies', 'charts/routines/days/2026-11-18/rhett/bedOk',
   'charts/routines/days/2026-11-18/eli/mCandyGiven', 'charts/routines/days/2026-11-18/eli/wokeAt', 'charts/routines/days/2024-01-01',
   'charts/routines/weekly/eli/aelp/2026-11-12', 'charts/routines/game/rhett/2026-11-16/1795000000000', 'charts/routines/carry/rhett/2026-11-16',
   // Eli's Training

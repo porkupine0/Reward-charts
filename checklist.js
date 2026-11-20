@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795186079';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795186079';
-import { SETTINGS } from './settings.js?v=1795186079';
-import { askParent } from './parent.js?v=1795186079';
-import * as L from './lists.js?v=1795186079';
-import { dayStreak, cheerIf } from './streaks.js?v=1795186079';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795209257';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795209257';
+import { SETTINGS } from './settings.js?v=1795209257';
+import { askParent } from './parent.js?v=1795209257';
+import * as L from './lists.js?v=1795209257';
+import { dayStreak, cheerIf } from './streaks.js?v=1795209257';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -26,6 +26,27 @@ function isOn(it) {
   return L.isOn(ctx, kid, date, it);
 }
 
+// Chores with a step-by-step list: the row opens and closes the steps; ticking the last step ticks the chore.
+// Which lists are open is kept here (not in the page), so a save's re-render doesn't close them.
+const openSteps = new Set();
+const BOX = '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
+function stepsHtml(it, checks, day, sub) {
+  const ref = day + '|' + it.key, open = openSteps.has(kid + '|' + ref);
+  const all = isDone(checks[it.key]); // a done chore (or one ticked before it had steps) shows every step ticked
+  const n = all ? it.steps.length : it.steps.filter((s) => checks[s.key]).length;
+  let h = '<button class="ckbtn stepsbtn" data-steps="' + ref + '" aria-expanded="' + open + '">' + BOX +
+    '<span class="cktext"><strong>' + esc(it.label) + '</strong><small>' + (sub ? esc(sub) + ' · ' : '') + (all ? 'All ' + n + ' steps done' : n + ' of ' + it.steps.length + ' steps') + '</small></span>' +
+    '<span class="chev" aria-hidden="true"></span></button>';
+  if (open) {
+    h += '<div class="steps">' + it.steps.map((st) => {
+      const on = all || !!checks[st.key];
+      return '<button class="stepbtn' + (on ? ' on' : '') + '" data-step="' + ref + '|' + st.key + '" aria-pressed="' + on + '">' + BOX +
+        '<span class="cktext"><strong>' + esc(st.label) + '</strong><small>' + esc(st.sub) + '</small></span></button>';
+    }).join('') + '</div>';
+  }
+  return h;
+}
+
 function itemHtml(it, checks, extra) {
   const v = isOn(it);
   const on = !!v;
@@ -37,7 +58,8 @@ function itemHtml(it, checks, extra) {
   const canExcuse = EXCUSABLE.includes(it.key) && (!it.derived || it.key === 'activity' || it.key === 'drive') && (!locked || it.key === 'drive');
   const excused = raw === EXCUSED, pending = raw === SKIP;
   let h = '<div class="ck' + (on ? ' on' : '') + (excused ? ' excused' : '') + (pending ? ' pending' : '') + (locked ? ' locked' : '') + (it.late ? ' late' : '') + (extra && extra.next ? ' next' : '') + '">';
-  h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
+  if (it.steps && !excused && !pending) h += stepsHtml(it, checks, ymd(date), it.sub);
+  else h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
     (extra && extra.time ? '<span class="rtime">' + esc(extra.time) + '</span>' : '') +
     '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
     '<span class="cktext"><strong>' + esc(it.label) + (it.opt ? ' <em>optional</em>' : '') + (it.hot ? ' <em class="hot">shower night</em>' : '') + '</strong>' +
@@ -142,6 +164,9 @@ function renderOn() {
       '<small>' + (locks ? 'Homework and screen time unlock once it’s done. ' : '') + (held ? 'It’s holding up to ' + held + ' min of game time until it’s done (or Mom or Dad excuses it).' : 'Get it done (or ask Mom or Dad to excuse it).') + '</small>' +
       owed.map((o) => {
         const v = L.dayChecks(ctx, kid, o.date)[o.item.key], ref = ymd(o.date) + '|' + o.item.key;
+        const from = 'From ' + o.date.toLocaleDateString('en-US', { weekday: 'long' });
+        if (o.item.steps && v !== SKIP) return '<div class="owedsteps">' + stepsHtml(o.item, L.dayChecks(ctx, kid, o.date), ymd(o.date), from) + '</div>' +
+          '<button class="linkbtn excuse-ask" data-owedex="mark|' + ref + '">Not able to do it?</button>';
         return '<button class="ckbtn owedbtn" data-owed="' + ref + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
           '<span class="cktext"><strong>' + esc(o.item.label) + '</strong><small>From ' + esc(o.date.toLocaleDateString('en-US', { weekday: 'long' })) + '</small></span></button>' +
           (v === SKIP
@@ -386,6 +411,37 @@ document.addEventListener('click', (e) => {
   e.stopPropagation();
   const path = 'days/' + ymd(date) + '/' + kid + '/bedOk', v = b.dataset.bedok === '1' ? true : null;
   askParent().then((ok) => { if (ok) save(ID, path, v); });
+}, true);
+
+// Chore steps: the row opens or closes its list; each step saves on the chore's own day (a "Finish first"
+// chore saves on the day it was for). The last step ticks the chore and closes the list; unticking a step un-ticks it.
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-steps]');
+  if (!t) return;
+  e.stopPropagation();
+  const k = kid + '|' + t.dataset.steps;
+  if (openSteps.has(k)) openSteps.delete(k); else openSteps.add(k);
+  render();
+}, true);
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-step]');
+  if (!b) return;
+  e.stopPropagation();
+  const [d, key, sk] = b.dataset.step.split('|');
+  const day = parseYmd(d);
+  const item = L.lists(ctx, kid, day).day.find((i) => i.key === key);
+  if (!item || !item.steps) return;
+  const c = L.dayChecks(ctx, kid, day), base = 'days/' + d + '/' + kid + '/';
+  const choreOn = isDone(c[key]);
+  if (choreOn || c[sk]) {
+    // unticking: if the chore was done, the other steps stay ticked and the chore isn't done any more
+    if (choreOn) { item.steps.forEach((s) => { if (s.key !== sk && !c[s.key]) save(ID, base + s.key, true); }); save(ID, base + key, null); }
+    save(ID, base + sk, null);
+  } else {
+    save(ID, base + sk, true);
+    if (item.steps.every((s) => s.key === sk || c[s.key])) { save(ID, base + key, true); openSteps.delete(kid + '|' + d + '|' + key); }
+  }
+  render();
 }, true);
 
 // A chore missed earlier this week: done now, saved on the day it was for.

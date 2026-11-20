@@ -1,4 +1,5 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795186079';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795209257';
+import { choreSteps } from './chorelists.js?v=1795209257';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -21,7 +22,12 @@ export const CHORES = new Proxy({}, { get: (_, kid) => SETTINGS.chores[kid] });
 export { applySettings as applyConfig };
 
 export function choreItems(kid, dow) {
-  return (CHORES[kid][dow] || []).map((label, i) => ({ key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, chore: true }));
+  return (CHORES[kid][dow] || []).map((label, i) => {
+    const it = { key: i ? 'chore' + (i + 1) : 'chore', label: 'Chore: ' + label, chore: true };
+    const steps = choreSteps(label);
+    if (steps) it.steps = steps; // a step-by-step list; ticking the last step ticks the chore
+    return it;
+  });
 }
 
 // Shower nights (never Wednesday, it's already a late night). Eli 5 nights (not Wed or Sun); Rhett and Isaiah 3x a week.
