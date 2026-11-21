@@ -1,10 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795230976';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795230976';
-import { SETTINGS } from './settings.js?v=1795230976';
-import { askParent } from './parent.js?v=1795230976';
-import * as L from './lists.js?v=1795230976';
-import { chapters, parseRef, nextRef } from './bible.js?v=1795230976';
-import { dayStreak, cheerIf } from './streaks.js?v=1795230976';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795231983';
+import { MEDS_GAP_MIN, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795231983';
+import { SETTINGS } from './settings.js?v=1795231983';
+import { askParent } from './parent.js?v=1795231983';
+import * as L from './lists.js?v=1795231983';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795231983';
+import { dayStreak, cheerIf } from './streaks.js?v=1795231983';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -187,6 +187,12 @@ function renderOn() {
 
   const school = dow <= 4;
   const items = lst.day;
+  // Eli's second Ritalin dose: due 4 hours after the morning dose was ticked
+  items.forEach((i) => {
+    if (i.key !== 'meds2') return;
+    const at = Number(checks.mMedsAt);
+    if (at) { const due = new Date(at + MEDS_GAP_MIN * 60000); i.sub = 'Due at ' + due.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' (4 hours after your morning dose)'; }
+  });
   $('day').innerHTML = school
     ? section('After school', 'Monday–Friday, as soon as you get home.', items, checks, false, 'day')
     : section('Today', '', items, checks, false, 'day');
@@ -366,6 +372,7 @@ document.addEventListener('click', (e) => {
     save(ID, base + 'bedTimer', { start: Date.now(), auto: true });
   }
   if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);
+  if (key === 'mMeds') save(ID, base + 'mMedsAt', next ? Date.now() : null);
   // Last box in Morning or Bedtime checked while that timer is running: stop and log it.
   if (next) {
     const after = Object.assign({}, dayChecks(), { [key]: next });

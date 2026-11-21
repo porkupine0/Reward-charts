@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795230976';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, BIBLE_FROM, BIBLE_KEYS } from './routines.js?v=1795230976';
-import { SETTINGS, onSettings } from './settings.js?v=1795230976';
-import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795230976';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795230976';
-import { LESSONS } from './driving-course.js?v=1795230976';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795230976';
-import * as TESTS from './driving-tests.js?v=1795230976';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795230976';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795231983';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795231983';
+import { SETTINGS, onSettings } from './settings.js?v=1795231983';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795231983';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795231983';
+import { LESSONS } from './driving-course.js?v=1795231983';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795231983';
+import * as TESTS from './driving-tests.js?v=1795231983';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795231983';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -84,7 +84,7 @@ function listsOn(ctx, kid, date) {
   const dow = dowOf(date);
   // Teeth was added Nov 11, 2026; leave it off earlier mornings so past candy isn't undone.
   // Eli's Bible reading and prayer start Nov 21, 2026 (earlier days keep the lists they had).
-  const bibleOk = (i) => !BIBLE_KEYS.includes(i.key) || ymd(date) >= BIBLE_FROM;
+  const bibleOk = (i) => !STARTS[i.key] || ymd(date) >= STARTS[i.key];
   const morn = morning(kid, dow).filter((i) => (i.key !== 'mTeeth' || ymd(date) >= '2026-11-11') && bibleOk(i));
   const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow);
   const day = [];

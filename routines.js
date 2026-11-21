@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795230976';
-import { choreSteps } from './chorelists.js?v=1795230976';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795230976';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795231983';
+import { choreSteps } from './chorelists.js?v=1795231983';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795231983';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -198,7 +198,7 @@ export function weekend(kid, dow) {
   items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO, { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video' });
   if (kid === 'rhett') items.push(TYPING, trombone(dow)); // Saturday and Sunday
-  if (kid === 'eli') items.push(ELI_AFTERNOON);
+  if (kid === 'eli') items.push(Object.assign({}, MEDS2), ELI_AFTERNOON);
   items.push({ weekly: true });
   return items;
 }
@@ -247,6 +247,12 @@ export function rewardWhen(dow) {
 // reading: the pickers, each saved as <key>_<part> = 'Book N'; the box can be ticked once every picker has a pick.
 export const BIBLE_FROM = '2026-11-21';
 export const BIBLE_KEYS = ['mBible', 'bibleRead', 'pray'];
+// Items added later, with the first day they show (earlier days keep the lists they had).
+export const STARTS = { mBible: BIBLE_FROM, bibleRead: BIBLE_FROM, pray: BIBLE_FROM, mMeds: '2026-11-21', meds2: '2026-11-21' };
+// Eli's Ritalin on Saturday and Sunday: the morning dose records its time (mMedsAt); the second dose is due 4 hours later.
+const MEDS = { key: 'mMeds', label: 'Take your Ritalin', sub: 'Records the time, so you know when the second dose is due' };
+export const MEDS2 = { key: 'meds2', label: 'Second dose of Ritalin', sub: '4 hours after your morning dose' };
+export const MEDS_GAP_MIN = 240;
 const ELI_MORNING = { key: 'mBible', label: 'Breakfast, Bible & prayer', sub: 'Read 1 chapter. Pray over anything you’re anxious about, and pray for others.', reading: [{ part: 'ch', label: 'Chapter you read', books: BIBLE_ALL }] };
 const ELI_AFTERNOON = { key: 'bibleRead', label: 'Read a psalm or proverb + 1 chapter from a Gospel', reading: [
   { part: 'pp', label: 'Psalm or proverb', books: ['Psalms', 'Proverbs'] },
@@ -254,7 +260,7 @@ const ELI_AFTERNOON = { key: 'bibleRead', label: 'Read a psalm or proverb + 1 ch
 ] };
 
 export function morning(kid, dow) {
-  if (kid === 'eli') return [ELI_MORNING];
+  if (kid === 'eli') return dow >= 5 ? [MEDS, ELI_MORNING] : [ELI_MORNING];
   if (kid !== 'isaiah') return [];
   const breakfast = { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] };
   const teeth = { key: 'mTeeth', label: 'Brush your teeth' };
