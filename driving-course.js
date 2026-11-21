@@ -36,7 +36,7 @@ export const LESSONS = [
         'Defensive driving means not depending on other drivers to do the right thing.', 47, 'Assume that drivers will run through red lights or stop signs and be prepared to react.'),
       q('w1d1q4', 'What is the “escape route” the manual tells you to always leave yourself?', ['A place to move your vehicle if your path is suddenly blocked', 'The lane you use to pass slower traffic', 'A route planned around road construction', 'Room behind you so nobody tailgates'], 0,
         'If the car ahead stops suddenly, having somewhere to go can keep you out of a crash.', 47, 'a place to move your vehicle if your immediate path of travel is suddenly blocked'),
-      q('w1d1q5', 'Besides other cars, what does the manual say to keep an eye on along the road?', ['Speed cameras and patrol cars', 'Billboards and store signs', 'Pedestrians, bicyclists, and animals', 'Mile markers, to track your trip'], 2,
+      q('w1d1q5', 'Besides other cars, what does the manual say to keep an eye on along the road?', ['Speed cameras and patrol cars', 'Your speedometer, every few seconds', 'Pedestrians, bicyclists, and animals', 'Only the car right in front of you'], 2,
         'People, bikes and animals can move into the road quickly; scanning catches them early.', 47, 'Also, keep an eye on pedestrians, bicyclists, and animals along the road.'),
       q('w1d1q6', 'You signal to merge, and a driver in the next lane sees you. What should you assume?', ['They will slow down and let you in', 'They will move to another lane for you', 'You have the right-of-way because you signaled', 'They may not move over or let you in'], 3,
         'Don’t count on other drivers; merge only when there’s really room.', 47, 'Do not assume another driver is going to move out of the way or allow you to merge.'),
@@ -57,9 +57,9 @@ export const LESSONS = [
     questions: [
       q('w1d2q1', 'You’re a new driver on a dry road in normal traffic. At least how much following distance does the manual tell new drivers to keep?', ['One second', 'Two seconds, like an experienced driver', 'At least three seconds', 'Ten seconds, the same as for a large truck'], 2,
         'Beginners need extra time to notice and react, so the manual asks for at least three seconds.', 41, 'An inexperienced or beginning driver should maintain at least a three-second following distance under normal driving conditions.'),
-      q('w1d2q2', 'The road is slippery. What following distance does the manual recommend?', ['Six or more seconds', 'Two seconds', 'Three seconds', 'It doesn’t matter if you drive slowly'], 0,
+      q('w1d2q2', 'The road is slippery. What following distance does the manual recommend?', ['Six or more seconds', 'Two seconds', 'Three seconds', 'One second, if you drive slowly'], 0,
         'On slippery roads you need much more room to stop.', 41, 'When road conditions are slippery or the vehicle in front of you blocks your view, a following distance of six or more seconds is recommended.'),
-      q('w1d2q3', 'How do you check your following distance?', ['Count car lengths between you and the car ahead, and keep one length for every ten miles per hour', 'Look at your speedometer', 'Wait until the car ahead brakes', 'When the car ahead passes a landmark, start counting; you shouldn’t reach it before “three”'], 3,
+      q('w1d2q3', 'How do you check your following distance?', ['Count car lengths between you and the car ahead, and keep one length for every ten miles per hour', 'Keep the car ahead’s rear tires in sight over your hood', 'Wait until the car ahead brakes', 'When the car ahead passes a landmark, start counting; you shouldn’t reach it before “three”'], 3,
         'Your front bumper shouldn’t pass the landmark before you’ve counted to three.', 41, 'Watch the vehicle ahead of you pass a landmark, such as a sign, and begin slowly counting.'),
       q('w1d2q4', 'Someone is tailgating you. What does the manual suggest?', ['Turn on your hazard lights and keep your speed', 'Move slightly right and signal early', 'Speed up to get away', 'Stop in your lane'], 1,
         'The manual adds: try slowing down and encouraging the driver behind you to pass.', 48, 'If you are being tailgated, move slightly to the right and give the tailgater a better view of what is ahead and signal early for turns, stops, or lane changes.'),
@@ -67,7 +67,7 @@ export const LESSONS = [
         'The faster you go, the farther you travel before you can stop.', 48, 'Higher speeds require greater stopping distances.'),
       q('w1d2q6', 'You spot a slow farm vehicle far ahead. Why does spotting it early help?', ['You can signal early to warn it you’re coming', 'You can get close enough to read its sign', 'You can line up to pass it on the shoulder', 'You have time to change lanes or slow down safely'], 3,
         'Slowing suddenly can cause a crash; seeing it early gives you time.', 48, 'If you spot these vehicles early, you have time to change lanes or slow down safely.'),
-      q('w1d2q7', 'According to the manual, when are roads safest?', ['When some cars go well below the speed of traffic', 'When all vehicles travel the same speed without going over the limit', 'When drivers weave to pass slower cars', 'When you drive a little faster than traffic so you can stay ahead of it'], 1,
+      q('w1d2q7', 'According to the manual, when are roads safest?', ['When some cars go well below the speed of traffic', 'When all vehicles travel the same speed without going over the limit', 'When most drivers stay in the left lane', 'When you drive a little faster than traffic so you can stay ahead of it'], 1,
         'Cars going faster or slower than the flow cause more lane changes, passing and tailgating.', 48, 'The safest roadways are when all vehicles travel the same speed but do not exceed the speed limit.')
     ]
   },
