@@ -38,13 +38,14 @@ test('only lists that differ from the built-in ones are saved', () => {
   const l = mergeLists(undefined);
   assert.deepEqual(listsToSave(l), []);
   l.find((x) => x.name === 'Sunroom').steps = [];
-  l.push({ name: 'Bathrooms', steps: ['Sink'] }, { name: 'Laundry', steps: [] });
+  l.push({ name: 'Bathrooms', steps: ['Sink'] }, { name: 'Some new chore', steps: [] });
   assert.deepEqual(listsToSave(l), [{ name: 'Sunroom', steps: [''] }, { name: 'Bathrooms', steps: ['Sink'] }]);
   assert.equal(cleanSteps(Array(30).fill(0).map((_, i) => 'step ' + i)).length, 15);
 });
 
 test('every built-in list matches a chore name exactly', () => {
-  const names = new Set(Object.values(DEFAULTS.chores).flat(2).map((n) => n.trim().toLowerCase()));
+  // plus the names parents use in Settings for Isaiah's split laundry and room chores
+  const names = new Set(Object.values(DEFAULTS.chores).flat(2).concat(['Laundry', 'Clean your room (30 min)']).map((n) => n.trim().toLowerCase()));
   CHORE_LISTS.forEach((l) => assert.ok(names.has(l.name.trim().toLowerCase()), 'no chore named ' + l.name));
 });
 

@@ -17,6 +17,25 @@ const DINING = [
   'Dining table: cleared and wiped with the food-safe sanitizer (the red one), chairs pushed in.',
   'Dining floor: vacuum the dining room, under the table too, and put the vacuum back in the front room.'
 ];
+// Laundry and bedroom steps: one chore for Eli and Rhett, two separate chores for Isaiah (laundry Saturday, room Monday).
+const LAUNDRY_START = [
+  'Collect: dirty clothes from your room’s laundry basket, your floor and the bathroom.',
+  'Wash: start the washer.'
+];
+const ROOM = [
+  'Dishes and trash: cups, bottles, plates and wrappers out of your room.',
+  'Closet: clothes on hangers or folded in bins; closet floor clear.',
+  'Bed: make your bed. Sheet straight, blankets pulled up, pillows and stuffed animals at the top.',
+  'Tops: dresser, nightstand, shelves and window seat neat; things you keep where they belong.',
+  'Floor: clear, including under the beds. Sharing a room? The whole floor, not just your side.',
+  'Vacuum: your whole bedroom floor, then put the vacuum back in the front room.'
+];
+const LAUNDRY_END = [
+  'Dry: move the wet clothes to the dryer and start it.',
+  'Fold: fold everything once it’s dry.',
+  'Put away: in drawers, bins or on hangers; drawers shut.',
+  'Baskets: empty laundry baskets back in your room and the bathroom.'
+];
 export const CHORE_LISTS = [
   { name: 'Living Room', steps: [
     'Pick up: take anything that doesn’t belong in here back where it goes.',
@@ -49,7 +68,7 @@ export const CHORE_LISTS = [
     'Toilet paper: in all three, a roll on each holder and a spare within reach.',
     'Trash: empty all three trash cans and put in new bags.',
     'Floors: in all three, shake out any rugs and sweep or wipe the floor.',
-    '[monthly] Showers and tub: scrub the shower and the tub, walls and floor, then rinse.'
+    '[monthly] Showers and tub: spray the purple cleaner, scrub the shower and the tub, walls and floor, then rinse.'
   ] },
   { name: 'Front closet + shoe organizing', steps: [
     'Entry: anything that doesn’t belong by the front door goes back where it goes. Ask before recycling a box.',
@@ -78,20 +97,9 @@ export const CHORE_LISTS = [
     'Red Monster: tie every bag closed and put them all in the Red Monster.',
     'Curb: take the Red Monster to the curb.'
   ] },
-  { name: 'Laundry + clean your room (30 min)', steps: [
-    'Collect: dirty clothes from your room’s laundry basket, your floor and the bathroom.',
-    'Wash: start the washer.',
-    'Dishes and trash: cups, bottles, plates and wrappers out of your room.',
-    'Closet: clothes on hangers or folded in bins; closet floor clear.',
-    'Bed: make your bed. Sheet straight, blankets pulled up, pillows and stuffed animals at the top.',
-    'Tops: dresser, nightstand, shelves and window seat neat; things you keep where they belong.',
-    'Floor: clear, including under the beds. Sharing a room? The whole floor, not just your side.',
-    'Vacuum: your whole bedroom floor, then put the vacuum back in the front room.',
-    'Dry: move the wet clothes to the dryer and start it.',
-    'Fold: fold everything once it’s dry.',
-    'Put away: in drawers, bins or on hangers; drawers shut.',
-    'Baskets: empty laundry baskets back in your room and the bathroom.'
-  ] },
+  { name: 'Laundry + clean your room (30 min)', steps: LAUNDRY_START.concat(ROOM, LAUNDRY_END) },
+  { name: 'Laundry', steps: LAUNDRY_START.concat(LAUNDRY_END) },
+  { name: 'Clean your room (30 min)', steps: ROOM },
   { name: 'Dining/Front Room', steps: [
     'Pick up: anything that doesn’t belong in the dining room or front room goes back where it goes.',
     'Coats, shoes and bags: coats on the coat tree or in the front closet; shoes and bags where they’re kept.',
