@@ -11,6 +11,10 @@ const q = (id, question, choices, answer, why, page, quote) => ({ id, q: questio
 const k = (text, page, quote) => ({ t: text, ref: "Iowa Driver's Manual p." + page, quote });
 // eslint-disable-next-line no-unused-vars
 const fam = (text) => ({ t: text, family: true });
+// Iowa's permit and license rules aren't in the manual: cite the saved Iowa DOT page ('permit' or 'license').
+const DOT_REF = { permit: 'Iowa DOT: Instruction Permit page', license: 'Iowa DOT: Intermediate License page' }; // = SOURCES in driving.js (the checker rejects any other ref)
+const qd = (id, question, choices, answer, why, src, quote) => ({ id, q: question, choices, answer, why, ref: DOT_REF[src], quote });
+const kd = (text, src, quote) => ({ t: text, ref: DOT_REF[src], quote });
 
 // Lesson days in the whole plan (docs/driving-syllabus.md): while LESSONS is shorter, the page says more are coming.
 export const PLANNED = 55;

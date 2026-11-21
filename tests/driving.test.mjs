@@ -227,8 +227,10 @@ test('driving course and knowledge tests: pass the checkers, and every quote is 
   assert.deepEqual(D.checkTests(FORMS, SITTINGS, TOPICS, LESSONS, BLUEPRINT), []);
   assert.deepEqual(Object.keys(BLUEPRINT), TOPICS);
   [...LESSONS.flatMap((l) => [...(l.questions || []), ...(l.key || []).filter((x) => !x.family).map((x, i) => ({ ...x, id: l.id + ' key ' + (i + 1) }))]), ...Object.values(FORMS).flat()].forEach((q) => {
-    const page = q.ref.match(/p\.\s?(\d+)/)[1];
-    if (!q.quote || !norm(pages[page] || '').includes(norm(q.quote))) missing.push(q.id + ' (p.' + page + '): ' + q.quote);
+    const dot = Object.values(D.SOURCES).find((s) => s.ref === q.ref);
+    const page = dot ? dot.file : q.ref.match(/p\.\s?(\d+)/)[1];
+    const text = dot ? readFileSync(new URL('../docs/iowa/' + dot.file, import.meta.url), 'utf8').split('\n').slice(2).join('\n') : pages[page] || ''; // (skips the Source/Saved lines)
+    if (!q.quote || !norm(text).includes(norm(q.quote))) missing.push(q.id + ' (' + (dot ? '' : 'p.') + page + '): ' + q.quote);
   });
   assert.deepEqual(missing, []);
 });
@@ -273,3 +275,40 @@ test('knowledge tests: the checker catches bad forms and sittings', () => {
   assert.match(D.checkTests({ A: longest }, [], ['Signs'], []).join(' | '), /the right answer is the longest choice 25 times/);
   assert.match(D.checkTests({ A: good.map((x) => ({ ...x, choices: ['a', 'b', 'c'], answer: x.answer % 3 })) }, [], ['Signs'], []).join(' | '), /every question needs 4 choices/);
 });
+
+const FORM_A_SHA = '0a697406d3a9a637ef0476a89921e3f8ef3101252bc307e0d205c0f93d1d9312'; // Form A as of bc148bc (Nov 20)
+// Form A is the baseline Eli took on Nov 20, 2026: it must never change (later scores compare against it).
+// If this fails, put Form A back; a new or changed question belongs in a new form.
+test('Form A (the baseline he has taken) is unchanged', async () => {
+  const { createHash } = await import('node:crypto');
+  const { FORMS } = await import('../driving-tests.js?v=' + V);
+  assert.equal(createHash('sha256').update(JSON.stringify(FORMS.A)).digest('hex'), FORM_A_SHA);
+});
+
+test('sources: a manual page or a saved Iowa DOT page; the key points card shows a short label', () => {
+  assert.ok(D.isSourced("Iowa Driver's Manual p.12") && D.isSourced('Iowa DOT: Instruction Permit page') && D.isSourced('Iowa DOT: Intermediate License page'));
+  assert.ok(!D.isSourced('Iowa DOT') && !D.isSourced('') && !D.isSourced(undefined));
+  assert.equal(D.refLabel("Iowa Driver's Manual p.12"), 'Manual p.12');
+  assert.equal(D.refLabel('Iowa DOT: Instruction Permit page'), 'Iowa DOT: Instruction Permit page');
+  const dotQ = { id: 'x1', q: 'Q?', choices: ['a', 'b'], answer: 0, why: 'w', ref: D.SOURCES.permit.ref, quote: 'z' };
+  const L = [{ id: 'L1', title: 'L', videos: [{ yt: 'abcdefghijk', title: 't', min: 3 }], key: [{ t: 'A', ref: D.SOURCES.license.ref, quote: 'q' }, { t: 'B', family: true }], questions: [dotQ] }];
+  assert.ok(!D.checkCourse(L).some((e) => /needs a manual page/.test(e)), 'DOT refs pass the course checker');
+  assert.ok(D.checkCourse([{ ...L[0], questions: [{ ...dotQ, ref: 'Iowa DOT' }] }]).some((e) => /x1: needs a manual page/.test(e)), 'an unknown source does not');
+});
+
+test('shared-quote report: the same or overlapping quote on one page, across forms and lessons (a report, never a rule)', async () => {
+  const r = "Iowa Driver's Manual p.5";
+  const forms = { A: [{ id: 'a1', ref: r, quote: 'Always come to a complete stop at a stop sign' }, { id: 'a2', ref: r, quote: 'yield to pedestrians' }],
+    B: [{ id: 'b1', ref: r, quote: 'Always come to a complete stop at a stop sign' }, { id: 'b2', ref: "Iowa Driver's Manual p.6", quote: 'yield to pedestrians' }, { id: 'b3', ref: r, quote: 'You must come to a complete stop at a stop sign and look' }]
+  };
+  const lessons = [{ id: 'L1', key: [{ t: 'k', ref: r, quote: 'yield to pedestrians' }, { t: 'f', family: true }], questions: [{ id: 'L1q1', ref: r, quote: 'yield to pedestrians' }] }];
+  const rows = D.quoteReport(forms, lessons).map((x) => x.a + '|' + x.b + '|' + x.kind);
+  assert.ok(rows.includes('a1 (form A)|b1 (form B)|same'));
+  assert.ok(rows.includes('a1 (form A)|b3 (form B)|overlap'), 'overlapping words count, not just exact quotes');
+  assert.ok(rows.includes('a2 (form A)|L1q1 (L1)|same') && rows.includes('a2 (form A)|L1 key 1 (L1)|same'), 'form against lesson');
+  assert.ok(!rows.some((x) => /b2/.test(x)), 'a different page is a different fact');
+  assert.ok(!rows.includes('L1 key 1 (L1)|L1q1 (L1)|same'), 'a lesson repeating its own key point is not reported');
+  const { FORMS } = await import('../driving-tests.js?v=' + V), { LESSONS } = await import('../driving-course.js?v=' + V);
+  assert.ok(Array.isArray(D.quoteReport(FORMS, LESSONS)), 'runs on the real course (its rows are in docs/driving-quote-report.md)');
+});
+

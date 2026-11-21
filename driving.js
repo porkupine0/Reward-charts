@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795231983';
+import { checkSign } from './signs.js?v=1795244259';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -7,6 +7,17 @@ import { checkSign } from './signs.js?v=1795231983';
 //   done:     { lessonId: 'YYYY-MM-DD' }          the day the lesson was finished
 //   answers:  { questionId: { lessonId: { ok, on } } }   one answer per question per lesson; the first counts
 // Everything here is deterministic: the same progress always gives the same lesson and the same quiz.
+
+// Where a fact comes from: a page of the Iowa Driver's Manual ("Iowa Driver's Manual p.N"), or, for Iowa's
+// permit and license rules (which the manual leaves to the DOT's web pages), one of these saved DOT pages.
+// The node tests read docs/iowa/<file> to check every quote; the browser only uses the label.
+export const SOURCES = {
+  permit: { ref: 'Iowa DOT: Instruction Permit page', file: 'gdl-instruction-permit.txt' },
+  license: { ref: 'Iowa DOT: Intermediate License page', file: 'gdl-intermediate-license.txt' },
+};
+export const isSourced = (ref) => /^Iowa Driver.s Manual p\.\s?\d+/.test(ref || '') || Object.values(SOURCES).some((s) => s.ref === ref);
+// The short label on the key points card: "Manual p.12", or the DOT page's name.
+export const refLabel = (ref) => String(ref || '').replace(/^Iowa Driver.s Manual /, 'Manual ');
 
 // The lesson for a day: the one finished that day, else the next one in order that a parent approved.
 // A skip only skips the VIDEO: the lesson still runs (its quiz, and its questions come back later), so a
@@ -142,7 +153,7 @@ export function checkCourse(lessons) {
     if (!l.review && (l.key || []).length < 2) out.push(l.id + ': needs at least 2 key points');
     (l.key || []).forEach((x, ki) => {
       if (!x.t) out.push(l.id + ': key point ' + (ki + 1) + ' needs text');
-      if (!x.family && !(/^Iowa Driver.s Manual p\.\s?\d+/.test(x.ref || '') && x.quote)) out.push(l.id + ': key point ' + (ki + 1) + ' needs a manual page and quote (or to be marked a family rule)');
+      if (!x.family && !(isSourced(x.ref) && x.quote)) out.push(l.id + ': key point ' + (ki + 1) + ' needs a manual page and quote (or to be marked a family rule)');
     });
     (l.videos || []).forEach((v, vi) => {
       if (!/^[A-Za-z0-9_-]{11}$/.test(v.yt || '')) out.push(l.id + ': video ' + (vi + 1) + ' needs an 11-character YouTube id (yt)');
@@ -169,7 +180,7 @@ export function checkCourse(lessons) {
       if (!Array.isArray(q.choices) || q.choices.length < 2) out.push(q.id + ': needs choices');
       else if (!(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < q.choices.length)) out.push(q.id + ': answer is not one of the choices');
       if (!q.why) out.push(q.id + ': needs an explanation');
-      if (!/^Iowa Driver.s Manual p\.\s?\d+/.test(q.ref || '')) out.push(q.id + ': needs a manual page (Iowa Driver\'s Manual p.N)');
+      if (!isSourced(q.ref)) out.push(q.id + ': needs a manual page (Iowa Driver\'s Manual p.N) or an Iowa DOT page');
       out.push(...checkSign(q.id, q.sign));
     });
   });
@@ -235,7 +246,7 @@ export function checkTests(forms, sittings, topics, lessons, blueprint) {
       if (!Array.isArray(x.choices) || x.choices.length < 2) out.push(x.id + ': needs choices');
       else if (!(Number.isInteger(x.answer) && x.answer >= 0 && x.answer < x.choices.length)) out.push(x.id + ': answer is not one of the choices');
       if (!x.why) out.push(x.id + ': needs an explanation');
-      if (!/^Iowa Driver.s Manual p\.\s?\d+/.test(x.ref || '')) out.push(x.id + ': needs a manual page');
+      if (!isSourced(x.ref)) out.push(x.id + ': needs a manual page or an Iowa DOT page');
       out.push(...checkSign(x.id, x.sign));
     });
   });
@@ -249,3 +260,28 @@ export function checkTests(forms, sittings, topics, lessons, blueprint) {
   });
   return out;
 }
+
+// Quotes used more than once: the same page and the same (or overlapping) words, across the test forms and
+// the lessons. A REPORT, not a rule (Form A is frozen once he's taken it, so a rule could never be met):
+// it shows which manual facts are already used, so new forms pick fresh ones. Each row: { ref, a, b, kind }
+// where kind is 'same' (the same quote) or 'overlap' (at least minWords words in a row in common).
+export function quoteReport(forms, lessons, minWords = 6) {
+  const items = [];
+  Object.entries(forms || {}).forEach(([name, form]) => form.forEach((x) => items.push({ id: x.id, where: 'form ' + name, ref: x.ref, quote: x.quote })));
+  (lessons || []).forEach((l) => {
+    (l.questions || []).forEach((x) => items.push({ id: x.id, where: l.id, ref: x.ref, quote: x.quote }));
+    (l.key || []).forEach((x, i) => { if (!x.family) items.push({ id: l.id + ' key ' + (i + 1), where: l.id, ref: x.ref, quote: x.quote }); });
+  });
+  const words = (t) => String(t || '').toLowerCase().replace(/[‘’]/g, "'").replace(/-/g, '').split(/[^a-z0-9'.]+/).filter(Boolean);
+  const grams = (w) => { const g = new Set(); for (let i = 0; i + minWords <= w.length; i++) g.add(w.slice(i, i + minWords).join(' ')); return g; };
+  const out = [], byRef = new Map();
+  items.filter((x) => x.quote).forEach((x) => { x.w = words(x.quote); x.g = grams(x.w); (byRef.get(x.ref) || byRef.set(x.ref, []).get(x.ref)).push(x); });
+  byRef.forEach((list, ref) => list.forEach((a, i) => list.slice(i + 1).forEach((b) => {
+    if (a.where === b.where && !/^form/.test(a.where)) return; // within one lesson, its key points and questions share quotes on purpose
+    const same = a.w.join(' ') === b.w.join(' ');
+    if (same || [...a.g].some((g) => b.g.has(g)) || (a.w.length < minWords && b.w.join(' ').includes(a.w.join(' '))) || (b.w.length < minWords && a.w.join(' ').includes(b.w.join(' '))))
+      out.push({ ref, a: a.id + ' (' + a.where + ')', b: b.id + ' (' + b.where + ')', kind: same ? 'same' : 'overlap' });
+  })));
+  return out;
+}
+
