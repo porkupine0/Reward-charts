@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795229642';
-import { choreSteps } from './chorelists.js?v=1795229642';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795229642';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795230976';
+import { choreSteps } from './chorelists.js?v=1795230976';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795230976';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -243,9 +243,9 @@ export function rewardWhen(dow) {
 }
 
 // Isaiah's morning checklists: school days (Mon–Fri), an optional Saturday, and Sunday church mornings.
-// Eli's Bible reading (from Nov 22, 2026): he picks the book and chapter he read on the checklist.
+// Eli's Bible reading (from Nov 21, 2026): he picks the book and chapter he read on the checklist.
 // reading: the pickers, each saved as <key>_<part> = 'Book N'; the box can be ticked once every picker has a pick.
-export const BIBLE_FROM = '2026-11-22';
+export const BIBLE_FROM = '2026-11-21';
 export const BIBLE_KEYS = ['mBible', 'bibleRead', 'pray'];
 const ELI_MORNING = { key: 'mBible', label: 'Breakfast, Bible & prayer', sub: 'Read 1 chapter. Pray over anything you’re anxious about, and pray for others.', reading: [{ part: 'ch', label: 'Chapter you read', books: BIBLE_ALL }] };
 const ELI_AFTERNOON = { key: 'bibleRead', label: 'Read a psalm or proverb + 1 chapter from a Gospel', reading: [
