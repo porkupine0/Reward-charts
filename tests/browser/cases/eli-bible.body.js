@@ -9,19 +9,19 @@
   await tap('#morning .ckbtn[data-key="mBible"]');
   check(!!(await p.$('.bneed')), 'asks him to pick first');
   check((await p.$eval('#morning .ckbtn[data-key="mBible"]', (e) => e.getAttribute('aria-pressed'))) === 'false', 'not ticked without a pick');
-  await tap('[data-bnext="mBible_ch|John 4"]');
+  await tap('[data-bnext="2026-11-23|mBible_ch|John 4"]');
   check((await db()).charts.routines.days['2026-11-23'].eli.mBible_ch === 'John 4', 'next-chapter chip saves John 4');
-  await p.selectOption('[data-bbook="mBible_ch"]', 'Romans'); await p.waitForTimeout(150);
-  await p.selectOption('[data-bchap="mBible_ch"]', '8'); await p.waitForTimeout(300);
+  await p.selectOption('[data-bbook="2026-11-23|mBible_ch"]', 'Romans'); await p.waitForTimeout(150);
+  await p.selectOption('[data-bchap="2026-11-23|mBible_ch"]', '8'); await p.waitForTimeout(300);
   check((await db()).charts.routines.days['2026-11-23'].eli.mBible_ch === 'Romans 8', 'wheels save Romans 8');
   await tap('#morning .ckbtn[data-key="mBible"]');
   check((await p.$eval('#morning .ckbtn[data-key="mBible"]', (e) => e.getAttribute('aria-pressed'))) === 'true', 'ticks once picked');
   await p.screenshot({ path: OUT + 'bible-am.png' });
   // afternoon: two pickers, limited books
-  const pp = await p.$$eval('[data-bbook="bibleRead_pp"] option', (o) => o.map((x) => x.value).filter(Boolean));
-  const gos = await p.$$eval('[data-bbook="bibleRead_gos"] option', (o) => o.map((x) => x.value).filter(Boolean));
+  const pp = await p.$$eval('[data-bbook="2026-11-23|bibleRead_pp"] option', (o) => o.map((x) => x.value).filter(Boolean));
+  const gos = await p.$$eval('[data-bbook="2026-11-23|bibleRead_gos"] option', (o) => o.map((x) => x.value).filter(Boolean));
   check(pp.join() === 'Psalms,Proverbs' && gos.join() === 'Matthew,Mark,Luke,John', 'afternoon pickers: psalm/proverb and Gospels');
-  await p.locator('[data-bbook="bibleRead_pp"]').scrollIntoViewIfNeeded();
+  await p.locator('[data-bbook="2026-11-23|bibleRead_pp"]').scrollIntoViewIfNeeded();
   await p.screenshot({ path: OUT + 'bible-pm.png' });
   // not on days before Nov 22
   await visit('checklist.html?kid=eli&date=2026-11-20', 'bible-before');

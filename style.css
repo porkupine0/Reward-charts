@@ -753,3 +753,5 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .bpick select[data-bchap] { flex: 1; min-width: 0; }
 .blast { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 13px; margin-top: 4px; }
 .bneed { color: var(--accent-ink); font-weight: 800; font-size: 13px; }
+.owed.carry .bible { padding-left: 42px; border-top: 0; }
+.owed.carry .ckbtn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; }

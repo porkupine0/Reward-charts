@@ -1,10 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795229069';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795229069';
-import { SETTINGS } from './settings.js?v=1795229069';
-import { askParent } from './parent.js?v=1795229069';
-import * as L from './lists.js?v=1795229069';
-import { chapters, parseRef, nextRef } from './bible.js?v=1795229069';
-import { dayStreak, cheerIf } from './streaks.js?v=1795229069';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795229642';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795229642';
+import { SETTINGS } from './settings.js?v=1795229642';
+import { askParent } from './parent.js?v=1795229642';
+import * as L from './lists.js?v=1795229642';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795229642';
+import { dayStreak, cheerIf } from './streaks.js?v=1795229642';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -53,27 +53,28 @@ function stepsHtml(it, checks, day, sub) {
 // this day shows under the wheels, with a one-tap "next chapter".
 const bookDraft = {};
 let needPick = '';
-function lastRead(key, part) {
+function lastRead(key, part, day) {
   for (let i = 1; i <= 30; i++) {
-    const d = addDays(date, -i), v = L.dayChecks(ctx, kid, d)[key + '_' + part];
+    const d = addDays(day, -i), v = L.dayChecks(ctx, kid, d)[key + '_' + part];
     if (parseRef(v)) return { ref: v, day: d };
   }
   return null;
 }
-function readingHtml(it, checks) {
+function readingHtml(it, checks, day = date) {
+  const dy = ymd(day);
   return '<div class="bible">' + it.reading.map((r) => {
-    const k = it.key + '_' + r.part, cur = parseRef(checks[k]), dk = kid + '|' + ymd(date) + '|' + k;
+    const k = it.key + '_' + r.part, cur = parseRef(checks[k]), dk = kid + '|' + dy + '|' + k;
     const book = bookDraft[dk] || (cur && cur.book) || '';
-    const last = lastRead(it.key, r.part), next = last && nextRef(last.ref, r.books);
+    const last = lastRead(it.key, r.part, day), next = last && nextRef(last.ref, r.books);
     const opt = (v, txt, on) => '<option value="' + esc(v) + '"' + (on ? ' selected' : '') + '>' + esc(txt) + '</option>';
     return '<div class="bpick"><span class="flabel">' + esc(r.label) + '</span><div class="bwheels">' +
-      '<select data-bbook="' + k + '" aria-label="' + esc(r.label) + ': book">' + opt('', 'Book…', !book) + r.books.map((b) => opt(b, b, b === book)).join('') + '</select>' +
-      '<select data-bchap="' + k + '" aria-label="' + esc(r.label) + ': chapter"' + (book ? '' : ' disabled') + '>' + opt('', 'Ch.', !cur || cur.book !== book) +
+      '<select data-bbook="' + dy + '|' + k + '" aria-label="' + esc(r.label) + ': book">' + opt('', 'Book…', !book) + r.books.map((b) => opt(b, b, b === book)).join('') + '</select>' +
+      '<select data-bchap="' + dy + '|' + k + '" aria-label="' + esc(r.label) + ': chapter"' + (book ? '' : ' disabled') + '>' + opt('', 'Ch.', !cur || cur.book !== book) +
         (book ? Array.from({ length: chapters(book) }, (_, i) => opt(String(i + 1), String(i + 1), cur && cur.book === book && cur.ch === i + 1)).join('') : '') + '</select></div>' +
       (last ? '<small class="blast">Last time (' + esc(last.day.toLocaleDateString('en-US', { weekday: 'short' })) + '): ' + esc(last.ref) +
-        (next && !cur ? ' <button class="chip" data-bnext="' + k + '|' + esc(next) + '">' + esc(next) + '</button>' : '') + '</small>' : '') +
+        (next && !cur ? ' <button class="chip" data-bnext="' + dy + '|' + k + '|' + esc(next) + '">' + esc(next) + '</button>' : '') + '</small>' : '') +
       '</div>';
-  }).join('') + (needPick === it.key ? '<small class="bneed">Pick what you read first, then tick the box.</small>' : '') + '</div>';
+  }).join('') + (needPick === dy + '|' + it.key ? '<small class="bneed">Pick what you read first, then tick the box.</small>' : '') + '</div>';
 }
 const readingDone = (it, checks) => it.reading.every((r) => parseRef(checks[it.key + '_' + r.part]));
 
@@ -209,6 +210,23 @@ function renderOn() {
             : '<button class="linkbtn excuse-ask" data-owedex="mark|' + ref + '">Not able to do it?</button>');
       }).join('') + '</div>');
   }
+  // Yesterday's unfinished schoolwork, practice and reading (not chores: those are in Finish first above)
+  const carry = L.carried(ctx, kid, date);
+  if (carry.length && items.length) {
+    const lock = L.computerLock(ctx, kid, date);
+    const box = '<div class="owed carry"><strong>From yesterday</strong><small>Not finished yesterday. Get it done, or ask Mom or Dad if you weren’t able to.</small>' +
+      carry.map((o) => {
+        const c = L.dayChecks(ctx, kid, o.date), v = c[o.item.key], ref = ymd(o.date) + '|' + o.item.key, locked = o.item.computer && lock;
+        return '<button class="ckbtn owedbtn" data-owed="' + ref + '"' + (locked ? ' aria-disabled="true"' : '') + '>' + BOX +
+          '<span class="cktext"><strong>' + esc(o.item.label) + '</strong><small>' + (locked ? 'Do your chores first' : 'From ' + esc(o.date.toLocaleDateString('en-US', { weekday: 'long' }))) + '</small></span></button>' +
+          (o.item.reading ? readingHtml(o.item, c, o.date) : '') +
+          (v === SKIP
+            ? '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-owedex="approve|' + ref + '">Approve</button><button class="linkbtn" data-owedex="undo|' + ref + '">Undo</button></div>'
+            : '<button class="linkbtn excuse-ask" data-owedex="mark|' + ref + '">Not able to do it?</button>');
+      }).join('') + '</div>';
+    const after = $('day').querySelector('.owed:not(.carry)') || $('day').querySelector('.rhead');
+    after.insertAdjacentHTML('afterend', box);
+  }
   // Candy handed out this afternoon: this morning's checklist + last night's bedtime.
   const candy = MORNING_REWARD[kid];
   if (candy && items.length) {
@@ -335,7 +353,7 @@ document.addEventListener('click', (e) => {
   }
   // Bible reading: pick what was read before ticking
   const rItem = [...L.lists(ctx, kid, date).morning, ...L.lists(ctx, kid, date).day].find((i) => i.key === key && i.reading);
-  if (rItem && !dayChecks()[key] && !readingDone(rItem, dayChecks())) { needPick = key; render(); return; }
+  if (rItem && !dayChecks()[key] && !readingDone(rItem, dayChecks())) { needPick = ymd(date) + '|' + key; render(); return; }
   needPick = '';
   const cur = dayChecks()[key];
   let next;
@@ -491,18 +509,18 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   const b = e.target.closest('[data-bbook]'), c = e.target.closest('[data-bchap]');
   if (!b && !c) return;
-  const k = (b || c).dataset.bbook || (b || c).dataset.bchap, dk = kid + '|' + ymd(date) + '|' + k;
+  const [d, k] = ((b || c).dataset.bbook || (b || c).dataset.bchap).split('|'), dk = kid + '|' + d + '|' + k;
   if (b) { bookDraft[dk] = b.value; render(); return; }
-  const book = bookDraft[dk] || (parseRef(dayChecks()[k]) || {}).book;
-  if (book && c.value) { needPick = ''; delete bookDraft[dk]; save(ID, 'days/' + ymd(date) + '/' + kid + '/' + k, book + ' ' + c.value); }
+  const book = bookDraft[dk] || (parseRef(L.dayChecks(ctx, kid, parseYmd(d))[k]) || {}).book;
+  if (book && c.value) { needPick = ''; delete bookDraft[dk]; save(ID, 'days/' + d + '/' + kid + '/' + k, book + ' ' + c.value); }
 });
 document.addEventListener('click', (e) => {
   const n = e.target.closest('[data-bnext]');
   if (!n) return;
   e.stopPropagation();
-  const [k, ref] = n.dataset.bnext.split('|');
+  const [d, k, ref] = n.dataset.bnext.split('|');
   needPick = '';
-  save(ID, 'days/' + ymd(date) + '/' + kid + '/' + k, ref);
+  save(ID, 'days/' + d + '/' + kid + '/' + k, ref);
 }, true);
 
 // A chore missed earlier this week: done now, saved on the day it was for.
@@ -511,6 +529,10 @@ document.addEventListener('click', (e) => {
   if (!b) return;
   e.stopPropagation();
   const [d, k] = b.dataset.owed.split('|');
+  if (b.getAttribute('aria-disabled') === 'true') return; // a screen task waiting for chores
+  // Bible reading: pick what was read first
+  const it = L.lists(ctx, kid, parseYmd(d)).day.find((i) => i.key === k && i.reading);
+  if (it && !readingDone(it, L.dayChecks(ctx, kid, parseYmd(d)))) { needPick = d + '|' + k; render(); return; }
   save(ID, 'days/' + d + '/' + kid + '/' + k, true);
 }, true);
 

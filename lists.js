@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795229069';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, BIBLE_FROM, BIBLE_KEYS } from './routines.js?v=1795229069';
-import { SETTINGS, onSettings } from './settings.js?v=1795229069';
-import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795229069';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795229069';
-import { LESSONS } from './driving-course.js?v=1795229069';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795229069';
-import * as TESTS from './driving-tests.js?v=1795229069';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795229069';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795229642';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, BIBLE_FROM, BIBLE_KEYS } from './routines.js?v=1795229642';
+import { SETTINGS, onSettings } from './settings.js?v=1795229642';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795229642';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795229642';
+import { LESSONS } from './driving-course.js?v=1795229642';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795229642';
+import * as TESTS from './driving-tests.js?v=1795229642';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795229642';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -165,6 +165,17 @@ export function lockedBy(ctx, kid, date, it, list) {
 // Chores left undone on an earlier day this week (from Nov 16, 2026). Until they're done (or excused
 // by Mom or Dad), screen and school tasks are locked and today earns no game time. [{ date, item }]
 export const OWED_FROM = '2026-11-16';
+// Yesterday's unfinished items (from Nov 22, 2026) show on today's checklist under "From yesterday", unless
+// a parent approved "not able to do it". Ticked there, they save on the day they were for. Only items that
+// can still be done a day late: schoolwork, practice, screen tasks and Bible reading. Not optional items,
+// times of day (morning, snacks, bedtime), things done on another page, or chores (those have Finish first).
+export const CARRY_FROM = '2026-11-22';
+export const CARRY = ['organize', 'due', 'missing', 'homework', 'duolingo', 'typing', 'trombone', 'bibleRead'];
+export function carried(ctx, kid, date) {
+  const d = addDays(date, -1);
+  if (ymd(d) < CARRY_FROM) return [];
+  return lists(ctx, kid, d).day.filter((i) => CARRY.includes(i.key) && !i.opt && !i.derived && !isOn(ctx, kid, d, i)).map((item) => ({ date: d, item }));
+}
 export function choresOwed(ctx, kid, date) {
   const out = [], mon = mondayOf(date);
   for (let d = mon; ymd(d) < ymd(date); d = addDays(d, 1)) {
