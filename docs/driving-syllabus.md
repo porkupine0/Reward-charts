@@ -41,6 +41,39 @@ Each cell: the day's topic, the Iowa manual sections its questions come from, an
 **Spares** (if a video fails your preview): listed with titles in docs/driving-videos.json.
 **Hazard-spotting** (the research's strongest item; not a written-test topic): covered by the weekly hazard ride (built; ticked on the Driving page). Three TeenDrivingPlan clips (2–3 min each, US) stay in the spares.
 
+## Skill levels (tagged Nov 21, 2026)
+Each lesson day is tagged in `LEVELS` in scripts/build-video-plan.py; `python3 scripts/build-video-plan.py --levels`
+checks every day has a tag and that no advanced day comes before what it relies on, and prints these counts.
+
+- **Beginner:** Eli knows and can recall a rule, sign, colour, shape or number (what a pennant means; 3 seconds
+  behind). Most of the permit test.
+- **Intermediate:** he applies the rules to a situation that needs one decision (who goes first; when a lane change
+  is safe; what to do for a school bus from the front).
+- **Advanced:** he combines several rules under pressure, in rare or risky conditions, or needs car control:
+  freeway merges, passing, skids and hydroplaning, night and snow, gravel and deer, brake failure, the diverging
+  diamond, and **backing and reverse parking** (unit 8 day 3; the family rule: he backs into every space). The app
+  teaches what to know and look for; the car skill itself is practised on the weekly hazard ride.
+- Unit 11 (final week) is review: practice tests across all levels.
+
+| Unit | Topic | Beginner | Intermediate | Advanced |
+|---|---|---|---|---|
+| 1 | Seeing the road | 2 | 2 | 0 |
+| 2 | Signs and signals | 4 | 0 | 0 |
+| 3 | Markings and lanes | 1 | 3 | 0 |
+| 4 | Right of way and Iowa intersections | 0 | 3 | 1 |
+| 5 | Speed, stopping and turning | 2 | 2 | 0 |
+| 6 | Highways and passing | 0 | 1 | 3 |
+| 7 | Sharing the road | 1 | 3 | 0 |
+| 8 | Railroad, work zones, parking | 1 | 2 | 1 |
+| 9 | Night, weather, rural Iowa | 0 | 1 | 3 |
+| 10 | The driver and the car | 3 | 0 | 1 |
+| | **Total** | **14** | **17** | **9** |
+
+The course climbs: units 1-3 are mostly beginner, units 4-8 mostly intermediate, units 6 and 9 mostly advanced.
+Finding: unit 4 day 4 (reduced-conflict intersections and the diverging diamond, advanced) comes before freeway
+ramps (5.2, unit 6 day 1). The lesson is already written; the Dec 3 skill-level review decides whether it needs
+a ramp primer or a later slot.
+
 ## Likely test questions
 Each of Iowa DOT's 68 practice questions maps to a unit: signs, signals and the sign pictures to unit 2; markings and lane changes to 3; right of way to 4; speed, stopping, turning, signaling distances and speed limits to 5; passing, freeway entrances and merging to 6; school buses (7 questions, the most of any one topic: their own day), emergency vehicles and Move Over (3) and motorcycles to 7; railroad, work zones, parking and backing to 8; headlights, rain, hydroplaning, gravel and skids to 9; phones, alcohol, implied consent and tires to 10; looking ahead, blind spots and following distance to 1.
 **At least 7 have no text in the manual.** I searched the manual for these and found nothing: which way to steer in a skid, the first half-hour of rain being slickest, time being the only way to sober up, a missed freeway exit, avoiding panic stops, common crash causes, and left-turn lane position (the other stems weren't each searched). Every quiz answer must quote the manual, so the app won't ask these; the videos for those days touch some of them, and **Iowa DOT's online practice test covers them** (final week).

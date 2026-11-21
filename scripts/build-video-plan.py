@@ -68,6 +68,42 @@ SPARES = [('-olqiG42Ud4', '9:47', 'Washington'), ('XnOjL1ZDJqk', '6:35', 'CA'), 
   ('lPPJ7S-ZLQE', '1:49', 'IA'), ('cTtEbLoJHyY', '11:58', ''), ('kxQHoBmjp4U', '13:01', ''), ('dWKsDvFBo6M', '12:34', ''),
   ('EJQQxcpQWE0', '0:31', 'IA'), ('xMutekpY0cs', '2:43', 'hazard-spotting'), ('oXh0uS9BHUo', '2:43', 'hazard-spotting'), ('-dQoLfMd-SI', '2:16', 'hazard-spotting')]
 
+# Skill level of each lesson day (unit -> one letter per day; see "Skill levels" in docs/driving-syllabus.md):
+# B = beginner (know and recall a rule, sign or number), I = intermediate (apply rules to a situation that needs one
+# decision), A = advanced (combine several rules under pressure, rare or risky conditions, or car control).
+# Unit 11 days are review (R): practice tests across all levels.
+LEVELS = {1: 'BBII', 2: 'BBBB', 3: 'BIII', 4: 'IIIA', 5: 'BIBI', 6: 'AAIA', 7: 'BIII', 8: 'BIAI', 9: 'IAAA', 10: 'BBBA', 11: 'RRRR'}
+# What an advanced day relies on (sections taught earlier): checked below so no advanced day comes first.
+NEEDS = {(4, 4): ['5.2'], (6, 4): ['4.9', '4.11'], (8, 3): ['3.2'], (9, 2): ['4.12'], (9, 3): ['4.4', '4.12'], (9, 4): ['4.6'], (10, 4): ['4.4']}
+
+def check_levels():
+    out = []
+    for u, t, days in PLAN:
+        tags = LEVELS.get(u, '')
+        if len(tags) != len(days) or any(c not in ('R' if u == 11 else 'BIA') for c in tags):
+            out.append('unit %d: levels %r do not match its %d days' % (u, tags, len(days)))
+    taught = {}
+    for u, t, days in PLAN:
+        for d, (top, secs, vs) in enumerate(days):
+            for sec in secs: taught.setdefault(sec, (u, d + 1))
+    late = []
+    for (u, d), needs in NEEDS.items():
+        for sec in needs:
+            if taught.get(sec, (99, 9)) >= (u, d): late.append('unit %d day %d (advanced) relies on %s, first taught at unit %d day %d' % (u, d, sec, *taught.get(sec, (0, 0))))
+    counts = ['| ' + str(u) + ' | ' + t + ' | ' + ' | '.join(str(LEVELS.get(u, '').count(c)) for c in 'BIA') + ' |' for u, t, days in PLAN if u != 11]
+    tot = ''.join(LEVELS[u] for u in LEVELS if u != 11)
+    counts.append('| | **Total** | ' + ' | '.join('**' + str(tot.count(c)) + '**' for c in 'BIA') + ' |')
+    return out, late, counts
+
+if '--levels' in sys.argv:
+    bad, late, counts = check_levels()
+    print('\n'.join(bad) or 'every lesson day has a level')
+    print('\n'.join(late) or 'no advanced day comes before what it relies on')
+    print('\n'.join(counts))
+    sys.exit(1 if bad else 0)
+if check_levels()[0]: sys.exit('\n'.join(check_levels()[0]))
+
+
 def oembed(i):
     out = subprocess.run(['curl', '-s', '-m', '20', '-w', '\n%{http_code}', 'https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=' + i], capture_output=True, text=True).stdout
     body, code = out.rsplit('\n', 1)

@@ -315,3 +315,9 @@ test('shared-quote report: the same or overlapping quote on one page, across for
   assert.ok(Array.isArray(D.quoteReport(FORMS, LESSONS)), 'runs on the real course (its rows are in docs/driving-quote-report.md)');
 });
 
+
+test('skill levels: every planned lesson day is beginner, intermediate or advanced (scripts/build-video-plan.py --levels)', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const out = execFileSync('python3', ['scripts/build-video-plan.py', '--levels'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' });
+  assert.match(out, /every lesson day has a level/);
+});
