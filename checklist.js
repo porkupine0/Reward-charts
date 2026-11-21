@@ -1,9 +1,9 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795221865';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795221865';
-import { SETTINGS } from './settings.js?v=1795221865';
-import { askParent } from './parent.js?v=1795221865';
-import * as L from './lists.js?v=1795221865';
-import { dayStreak, cheerIf } from './streaks.js?v=1795221865';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795222284';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795222284';
+import { SETTINGS } from './settings.js?v=1795222284';
+import { askParent } from './parent.js?v=1795222284';
+import * as L from './lists.js?v=1795222284';
+import { dayStreak, cheerIf } from './streaks.js?v=1795222284';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -253,7 +253,7 @@ function bedTreatHtml(prize, bed, checks, dow) {
   const timed = (checks.bedTimer && checks.bedTimer.end) || (checks.lights && checks.lightsAt);
   if (bedOnTime(date, checks)) {
     return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy earned!</strong>' +
-      '<small>' + (checks.bedOk ? 'Parent OK’d tonight' : 'In bed on time') + '. Enjoy ' + esc(prize) + ' ' + when + '.</small></div>' + (checks.bedOk ? approveBtn('approved') : '') + '</div>';
+      '<small>' + (checks.bedOk === true ? 'Parent OK’d tonight' : 'In bed on time') + '. Enjoy ' + esc(prize) + ' ' + when + '.</small></div>' + (checks.bedOk === true ? approveBtn('approved') : '') + '</div>';
   }
   if (timed) {
     return '<div class="treat missed"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>No bedtime candy tonight</strong>' +

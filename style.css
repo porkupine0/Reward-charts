@@ -742,3 +742,6 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .slist summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .slist summary span { color: var(--muted); font-size: 13px; }
 .slist textarea { width: 100%; }
+/* Late nights: Deny keeps the night late and takes it off the to-review lists */
+.tbtn.deny { background: var(--surface); color: var(--ink); border: 2px solid var(--line); min-width: 80px; }
+#late .prow2 .exbtns { grid-column: 2 / -1; justify-content: flex-start; }

@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795221865';
-import { CHARTS, weekProgress } from './charts.js?v=1795221865';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795221865';
-import * as L from './lists.js?v=1795221865';
-import { owed, score, planned, fmt } from './trials.js?v=1795221865';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795221865';
-import { askParent, setParent, changePin } from './parent.js?v=1795221865';
-import { dayFull } from './streaks.js?v=1795221865';
-import { owedItems } from './owed.js?v=1795221865';
-import { pruneList, pruneCutoff } from './prune.js?v=1795221865';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795221865';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795221865';
-import { nowHtml } from './nowview.js?v=1795221865';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795222284';
+import { CHARTS, weekProgress } from './charts.js?v=1795222284';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795222284';
+import * as L from './lists.js?v=1795222284';
+import { owed, score, planned, fmt } from './trials.js?v=1795222284';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795222284';
+import { askParent, setParent, changePin } from './parent.js?v=1795222284';
+import { dayFull } from './streaks.js?v=1795222284';
+import { owedItems } from './owed.js?v=1795222284';
+import { pruneList, pruneCutoff } from './prune.js?v=1795222284';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795222284';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795222284';
+import { nowHtml } from './nowview.js?v=1795222284';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -20,6 +20,7 @@ const ctx = { get routines() { return D.routines; }, get run() { return D['eli-r
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const tick = (chart, path, label) => '<button class="cash" data-chart="' + chart + '" data-path="' + esc(path) + '"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' + esc(label) + '</button>';
+const bedBtns = (d, kid) => '<span class="exbtns"><button class="tbtn approve" data-bedok="' + d + '|' + kid + '">Parent OK</button><button class="tbtn deny" data-bedok="' + d + '|' + kid + '|no">Deny</button></span>';
 const row = (who, accent, what, when, action) => '<div class="prow2" style="--accent:' + accent + '"><span class="pwho">' + esc(who) + '</span><span class="pwhat">' + what + (when ? '<small>' + esc(when) + '</small>' : '') + '</span>' + (action || '') + '</div>';
 
 const owedList = () => owedItems(D, ctx, row, tick);
@@ -45,7 +46,7 @@ function renderTonight(today) {
       (t.open && isLive('routines') ? '<button class="tbtn approve" data-allgood="' + dk + '|' + t.kid + '">All good</button>' : '<span class="rcount all">Done</span>') + '</div>' +
       t.checks.map((c) => '<div class="tnrow"><span>' + esc(c.label) + '</span><span class="dchk-btns">' + chip(c, 'yes', 'Yes') + chip(c, 'no', 'Not today') + '</span></div>').join('') +
       t.excuses.map((x) => '<div class="tnrow"><span>Not able to: ' + esc(x.label) + '</span>' + exBtns(dk, t.kid, x.key) + '</div>').join('') +
-      (t.late ? '<div class="tnrow"><span>In bed ' + t.late + ' min late</span><button class="tbtn approve" data-bedok="' + dk + '|' + t.kid + '">Parent OK</button></div>' : '') +
+      (t.late ? '<div class="tnrow"><span>In bed ' + t.late + ' min late</span>' + bedBtns(dk, t.kid) + '</div>' : '') +
       '</div>';
   }).join('');
 }
@@ -72,7 +73,8 @@ function render() {
     const d = addDays(today, -i);
     Object.entries(KIDS).forEach(([id, k]) => {
       const c = L.dayChecks(ctx, id, d), r = timerResult(id, d, c.bedTimer, c);
-      if (r && r.status === 'late') late.push(row(k.name, k.accent, 'Late by ' + r.lateBy + ' min', DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d) + ' · lights out ' + atDate(d, () => bedtime(id, (d.getDay() + 6) % 7)).slice(-1)[0].time, '<button class="tbtn approve" data-bedok="' + ymd(d) + '|' + id + '">Parent OK</button>'));
+      if (r && r.status === 'late') late.push(row(k.name, k.accent, 'Late by ' + r.lateBy + ' min' + (r.denied ? ' · denied' : ''), DAYS[(d.getDay() + 6) % 7] + ' ' + shortDate(d) + ' · lights out ' + atDate(d, () => bedtime(id, (d.getDay() + 6) % 7)).slice(-1)[0].time,
+        r.denied ? '<button class="linkbtn" data-bedok="' + ymd(d) + '|' + id + '|undo">Undo</button>' : bedBtns(ymd(d), id)));
     });
   }
   $('late').innerHTML = late.join('') || '<p class="muted">No late nights in the last week.</p>';
@@ -177,7 +179,8 @@ document.addEventListener('click', async (e) => {
     return;
   }
   const b = e.target.closest('[data-bedok]');
-  if (b) { const [d, kid] = b.dataset.bedok.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/bedOk', true); return; }
+  // Parent OK counts the night as on time; Deny keeps it late (and off the to-review lists); Undo clears either
+  if (b) { const [d, kid, a] = b.dataset.bedok.split('|'); if (await askParent()) save('routines', 'days/' + d + '/' + kid + '/bedOk', a === 'no' ? 'no' : a === 'undo' ? null : true); return; }
   const ic = e.target.closest('[data-ics]');
   if (ic) download(ic.dataset.ics + '.ics', 'text/calendar', ics(ic.dataset.ics));
 });

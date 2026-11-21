@@ -1,5 +1,5 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795221865';
-import { choreSteps } from './chorelists.js?v=1795221865';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795222284';
+import { choreSteps } from './chorelists.js?v=1795222284';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -220,8 +220,10 @@ function timerResultOn(kid, dateObj, rec, checks) {
   const done = steps.filter((s) => checks && isDone(checks[s.key])).length;
   // Up to the grace minutes (Settings, 5 by default) past lights out still counts; beyond that only with a parent's OK.
   const lateBy = endMin - lo;
-  const status = lateBy <= 0 ? 'ontime' : lateBy <= (SETTINGS.grace ?? GRACE_MIN) ? 'grace' : checks && checks.bedOk ? 'approved' : 'late';
-  return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: status !== 'late', status, lateBy, endMin, lo, done, total: steps.length };
+  const status = lateBy <= 0 ? 'ontime' : lateBy <= (SETTINGS.grace ?? GRACE_MIN) ? 'grace' : checks && checks.bedOk === true ? 'approved' : 'late';
+  // denied: a parent looked at the late night and said no (it stays late, and drops off the to-review lists)
+  const denied = status === 'late' && !!checks && checks.bedOk === 'no';
+  return { secs: Math.max(0, Math.round((rec.end - rec.start) / 1000)), onTime: status !== 'late', status, denied, lateBy, endMin, lo, done, total: steps.length };
 }
 
 // Daily treat for finishing the whole morning checklist, handed out later that day.

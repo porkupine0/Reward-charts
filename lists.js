@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795221865';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795221865';
-import { SETTINGS, onSettings } from './settings.js?v=1795221865';
-import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795221865';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795221865';
-import { LESSONS } from './driving-course.js?v=1795221865';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795221865';
-import * as TESTS from './driving-tests.js?v=1795221865';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795221865';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795222284';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795222284';
+import { SETTINGS, onSettings } from './settings.js?v=1795222284';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795222284';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795222284';
+import { LESSONS } from './driving-course.js?v=1795222284';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795222284';
+import * as TESTS from './driving-tests.js?v=1795222284';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795222284';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -375,7 +375,7 @@ export function tonight(ctx, date) {
     const checks = CHECKS[kid].map((k) => ({ key: k.key, label: k.label, sub: k.sub, value: c[k.key] === true ? 'yes' : c[k.key] === 'no' ? 'no' : null }));
     const excuses = [...ls.morning, ...ls.day, ...ls.bed].filter((it) => c[it.key] === SKIP).map((it) => ({ key: it.key, label: it.label.replace(/^Chore: /, '') }));
     const r = timerResult(kid, date, c.bedTimer, c);
-    return { kid, checks, excuses, late: r && r.status === 'late' ? r.lateBy : 0, open: checks.filter((x) => !x.value).length };
+    return { kid, checks, excuses, late: r && r.status === 'late' && !r.denied ? r.lateBy : 0, open: checks.filter((x) => !x.value).length };
   });
 }
 // "All good": fill only the checks nobody has answered; never change a "Not today".
