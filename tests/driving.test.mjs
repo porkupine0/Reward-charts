@@ -321,3 +321,24 @@ test('skill levels: every planned lesson day is beginner, intermediate or advanc
   const out = execFileSync('python3', ['scripts/build-video-plan.py', '--levels'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' });
   assert.match(out, /every lesson day has a level/);
 });
+
+// Guessing tells (see guessReport): a hard rule for units 5+ and Forms C+; units 1-4 and Form B are reported until
+// reworked (scripts print them); Form A is frozen and exempt by name.
+const REPORT_ONLY = ['unit 1', 'unit 2', 'unit 3', 'unit 4', 'form B'];
+test('guessing tells: no length-rank tell, stock filler or padded wrong choice in new units and forms', async () => {
+  const { LESSONS } = await import('../driving-course.js?v=' + V), { FORMS } = await import('../driving-tests.js?v=' + V);
+  const units = {};
+  LESSONS.forEach((l) => { const u = 'unit ' + l.id.match(/^w(\d+)/)[1]; (units[u] = units[u] || []).push(...(l.questions || [])); });
+  const groups = [...Object.entries(units), ...Object.entries(FORMS).filter(([f]) => f !== 'A').map(([f, qs]) => ['form ' + f, qs])];
+  const hard = groups.filter(([g]) => !REPORT_ONLY.includes(g)).flatMap(([g, qs]) => D.guessReport(g, qs).issues);
+  assert.deepEqual(hard, []);
+});
+
+test('guessReport finds a rank tell, a filler and a padded choice', () => {
+  const mk = (i) => ({ id: 'g' + i, choices: ['Honk at them', 'Right answer here', 'Short', 'x'], answer: 1 });
+  const r = D.guessReport('t', [1, 2, 3, 4, 5, 6, 7, 8].map(mk));
+  assert.match(r.issues.join(' | '), /same length rank in 100%/);
+  assert.match(r.issues.join(' | '), /"honk" opens 8 wrong choices/);
+  const pad = D.guessReport('t', [{ id: 'p1', choices: ['Stop', 'Only where two highways cross each other out in the country', 'Go', 'Wait'], answer: 0 }]);
+  assert.match(pad.issues.join(' | '), /p1 has a padded wrong choice/);
+});
