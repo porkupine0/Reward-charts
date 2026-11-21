@@ -1,0 +1,538 @@
+[
+ {
+  "src": "p.4",
+  "topic": "Other",
+  "used": [],
+  "text": "lived in iowa continuously for 30 days."
+ },
+ {
+  "src": "p.4",
+  "topic": "Other",
+  "used": [],
+  "text": "driving farm equipment between the home farm and any nearby farmland or farm operation within two miles."
+ },
+ {
+  "src": "p.11",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tA04",
+   "w2d3q3",
+   "w2d3 key 2"
+  ],
+  "text": "chapter 2 2.5 slow-moving vehicle sign a reflective orange triangle on the rear of a vehicle means it is traveling 35 mph or less."
+ },
+ {
+  "src": "p.12",
+  "topic": "School buses and emergency vehicles",
+  "used": [],
+  "text": "never try to beat a train all school buses, charter buses, drivers markings carrying passengers for hire (such as uber or lyft), and all vehicles required to be placarded for hazardous materials, must stop within 15 to 50 feet of railroad tracks before crossing."
+ },
+ {
+  "src": "p.12",
+  "topic": "Other",
+  "used": [
+   "tA12"
+  ],
+  "text": "when stopped, leave at least 15 feet between the front and rear of your vehicle and the nearest rail."
+ },
+ {
+  "src": "p.19",
+  "topic": "School buses and emergency vehicles",
+  "used": [
+   "tB09"
+  ],
+  "text": "stay at least 500 feet behind any emergency vehicle using lights and sirens."
+ },
+ {
+  "src": "p.20",
+  "topic": "School buses and emergency vehicles",
+  "used": [],
+  "text": "stop no closer than 15 feet from the rear of the bus, and remain stopped until the stop arm is retracted and the school bus starts moving again."
+ },
+ {
+  "src": "p.20",
+  "topic": "Highways, weather and road types",
+  "used": [
+   "tA08"
+  ],
+  "text": "meeting the bus from the front: two-lane highway with center turn lane when you see amber warning lights flashing, you must slow your vehicle to no more than 20 mph and be prepared to stop."
+ },
+ {
+  "src": "p.20",
+  "topic": "Highways, weather and road types",
+  "used": [
+   "tB10"
+  ],
+  "text": "violating this law may result in your license being suspended for up to 180 days."
+ },
+ {
+  "src": "p.20",
+  "topic": "School buses and emergency vehicles",
+  "used": [],
+  "text": "stop no closer than 15 feet from the rear of the bus, and remain stopped until the stop arm is retracted and the school bus starts moving again."
+ },
+ {
+  "src": "p.20",
+  "topic": "School buses and emergency vehicles",
+  "used": [
+   "tB10"
+  ],
+  "text": "four-lane highway with center turn lane figure 2.14: stopped school bus scenarios pag e 20 violating this law may result in your license being suspended for up to 180 days."
+ },
+ {
+  "src": "p.21",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tB19"
+  ],
+  "text": "if there is a curb, park within 18 inches of the curb or closer."
+ },
+ {
+  "src": "p.21",
+  "topic": "Other",
+  "used": [],
+  "text": "closer than 20 feet from a fire station entrance."
+ },
+ {
+  "src": "p.21",
+  "topic": "Railroad crossings and work zones",
+  "used": [],
+  "text": "closer than 50 feet from a railroad crossing."
+ },
+ {
+  "src": "p.21",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tB20"
+  ],
+  "text": "closer than five feet from a fire hydrant; or in a designated hydrant red zone."
+ },
+ {
+  "src": "p.21",
+  "topic": "Signs",
+  "used": [],
+  "text": "closer than 10 feet from a stop sign."
+ },
+ {
+  "src": "p.22",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "for every minute a lane of traffic on the interstate is blocked, the risk of a secondary crash increases by roughly 2.8 percent."
+ },
+ {
+  "src": "p.24",
+  "topic": "Alcohol and phones",
+  "used": [],
+  "text": "you also need at least one red light on the back of the vehicle, and it should be visible for at least 500 feet."
+ },
+ {
+  "src": "p.24",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "turn signals are required for all cars, trucks, and trailers wider than 40 inches."
+ },
+ {
+  "src": "p.24",
+  "topic": "Other",
+  "used": [],
+  "text": "dirt on the lenses can cut the light's effectiveness by 50 percent."
+ },
+ {
+  "src": "p.24",
+  "topic": "Other",
+  "used": [],
+  "text": "iowa law requires tinted windshields and windows to the immediate right or left of the driver to allow at least 70 percent of the light through."
+ },
+ {
+  "src": "p.25",
+  "topic": "Other",
+  "used": [],
+  "text": "there should be at least 10 inches between the steering wheel and your chest, with the air bag pointing at your chest."
+ },
+ {
+  "src": "p.25",
+  "topic": "Other",
+  "used": [],
+  "text": "shorter drivers may need a seat cushion or pedal extenders to sit safely 10 inches from the air bag."
+ },
+ {
+  "src": "p.25",
+  "topic": "Other",
+  "used": [],
+  "text": "you must be able to see at least 200 feet behind you in your rearview mirror."
+ },
+ {
+  "src": "p.29",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "chapter 3 detec tion technologies bicycle, pedestrian, and obstacle detection description: alerts you when a bicycle, pedestrian, slow-moving or stationary obstacle has been detected when driving at low speeds, generally around 25 mph."
+ },
+ {
+  "src": "p.30",
+  "topic": "Other",
+  "used": [],
+  "text": "the forward collision warning system scans the traffic ahead 20 times per second up to 500 feet in front of your vehicle and then warns you to brake or steer if a hazard is in your path."
+ },
+ {
+  "src": "p.30",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "as an example, here are three levels of alerts*: speed 15–18 mph 18–50 mph 50+ mph warning time before a collision 3 seconds 4 seconds 5 seconds you should always be cautious, check traffic regularly, and keep a safe following distance."
+ },
+ {
+  "src": "p.34",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "the violation of this law is punishable with up to a $50 fine per passenger and $100 per passenger under 18."
+ },
+ {
+  "src": "p.35",
+  "topic": "Railroad crossings and work zones",
+  "used": [],
+  "text": "a child under six years old must be secured in a child restraint system (a safety seat or booster seat, not a seat belt)."
+ },
+ {
+  "src": "p.35",
+  "topic": "Other",
+  "used": [],
+  "text": "over half of all traffic deaths happen within 25 miles of home."
+ },
+ {
+  "src": "p.35",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "many occur on roads with speed limits of less than 45 mph."
+ },
+ {
+  "src": "p.35",
+  "topic": "Other",
+  "used": [],
+  "text": "at 60 miles per hour, a 20-pound object has the potential to exert well over 1,000 pounds of force in a sudden stop."
+ },
+ {
+  "src": "p.36",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "if you drive distracted and cause the death of another person, you could face more than $1,000 in fines, have your license suspended, and depending on the circumstances, be charged with vehicular homicide."
+ },
+ {
+  "src": "p.37",
+  "topic": "Alcohol and phones",
+  "used": [],
+  "text": "oper ating while intoxic ated (owi) the official name for the offense of drunk driving is \"operating while intoxicated\" and is defined as having a blood alcohol concentration (bac) of .08 or higher or operating with any amount of controlled substance in your system."
+ },
+ {
+  "src": "p.37",
+  "topic": "Permit and license rules",
+  "used": [],
+  "text": "even if you are not convicted of an owi offense in criminal court, your driving privileges will still be revoked for a minimum of 180 days if you operate while intoxicated."
+ },
+ {
+  "src": "p.37",
+  "topic": "Alcohol and phones",
+  "used": [
+   "tA14"
+  ],
+  "text": "implied consent to testing with a bac of .02 or more."
+ },
+ {
+  "src": "p.37",
+  "topic": "Alcohol and phones",
+  "used": [
+   "tA14"
+  ],
+  "text": "an underage driver will have their driving privileges revoked for a minimum of 60 days and for a minimum of 180 days if the bac is .08 or more."
+ },
+ {
+  "src": "p.37",
+  "topic": "Alcohol and phones",
+  "used": [],
+  "text": "the violation of this law is punishable as a simple misdemeanor with up to a $200 fine for each driver and passenger in the vehicle. 3.9 drowsy driving drowsy driving is just as dangerous as drunk driving."
+ },
+ {
+  "src": "p.37",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "the consequences for refusing a breathalyzer test are more severe than failing a test, with an automatic one year revocation of your license and a minimum $1,250 fine."
+ },
+ {
+  "src": "p.37",
+  "topic": "Alcohol and phones",
+  "used": [],
+  "text": "an underage driver is considered to be operating while intoxicated being awake for 18 hours straight is as impairing as a blood alcohol concentration (bac) of 0.08 percent, which is legally drunk and leaves you at equal risk for a crash."
+ },
+ {
+  "src": "p.40",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "(see figure 4.1) figure 4. 1: stopping distance stopping distance reaction distance + braking distance = stopping distance mph 20 44ft + 25ft = 69ft 30 66ft + 40 88ft 50 110ft 60 132ft 70 154ft pag e 40 57ft + = 123ft 101ft + = 158ft + 189ft = 227ft + 268ft = 310ft 359ft = 464ft"
+ },
+ {
+  "src": "p.41",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "at speeds of 40 mph, a four- to five-second following distance is recommended."
+ },
+ {
+  "src": "p.41",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "figure 4.2: 3- to 4- second rule using br ake lights to communic ate with other drivers if you are going to stop or slow down at a place where another driver does not expect it, or if the vehicle behind you is following too closely, tap your brake pedal three or four times quickly."
+ },
+ {
+  "src": "p.42",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "for example, a vehicle traveling 60 mph will travel 3 times further than a vehicle traveling 30 mph before coming to a stop."
+ },
+ {
+  "src": "p.42",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tB15"
+  ],
+  "text": "20 mph in any business district"
+ },
+ {
+  "src": "p.42",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tA15"
+  ],
+  "text": "25 mph in a residential district or school district"
+ },
+ {
+  "src": "p.42",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "45 mph in any suburban district"
+ },
+ {
+  "src": "p.42",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "45 mph for any vehicle pulling another vehicle"
+ },
+ {
+  "src": "p.42",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "50 mph on unsurfaced secondary roads from sunset until sunrise, and for all trucks on secondary roads at any time of day"
+ },
+ {
+  "src": "p.42",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "60 mph on all primary roads, urban interstate highways, and secondary roads, including unpaved roads from sunrise to sunset"
+ },
+ {
+  "src": "p.42",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "70 mph on rural interstate highways a lower limit may be set for any conditions listed above."
+ },
+ {
+  "src": "p.42",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "on the interstate system there is a minimum speed of 40 mph."
+ },
+ {
+  "src": "p.43",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tA16",
+   "tB16"
+  ],
+  "text": "iowa law requires you to signal at least 100 feet before a turn if the speed limit is 45 mph or less and if the speed limit is faster than 45 mph, you must signal at least 300 feet before you turn."
+ },
+ {
+  "src": "p.46",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tB17"
+  ],
+  "text": "do not pass within 100 feet of an intersection."
+ },
+ {
+  "src": "p.46",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tB17"
+  ],
+  "text": "pag e 46 do not pass within 100 feet of a narrow bridge, viaduct, or tunnel that has a sign posted to let you know it is there."
+ },
+ {
+  "src": "p.46",
+  "topic": "Railroad crossings and work zones",
+  "used": [
+   "tB17"
+  ],
+  "text": "do not pass within 100 feet of a railroad crossing."
+ },
+ {
+  "src": "p.47",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "chapter 4 4.11 defensive driving when you drive safely and use defensive driving techniques, you're aware and ready for whatever happens. 94 percent of serious crashes are due to dangerous choices or errors people make behind the wheel."
+ },
+ {
+  "src": "p.47",
+  "topic": "Other",
+  "used": [
+   "w1d1q1",
+   "w1d1 key 1"
+  ],
+  "text": "check your mirrors frequently and scan conditions 20 to 30 seconds ahead of you."
+ },
+ {
+  "src": "p.49",
+  "topic": "Highways, weather and road types",
+  "used": [
+   "tA18"
+  ],
+  "text": "iowa law requires the use of both headlights from sunset to sunrise or whenever visibility is 500 feet or less, (fog, heavy rain, snow, etc.)."
+ },
+ {
+  "src": "p.57",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "deer travel in groups, so always look for more animals if one is seen. 5.9 sharing the road with l arge trucks in crashes involving large trucks, the occupants of a car – usually the driver – sustain 78 percent of fatalities."
+ },
+ {
+  "src": "p.58",
+  "topic": "Speed, turns, passing and lights",
+  "used": [
+   "tA24"
+  ],
+  "text": "when driving behind a motorcycle, allow at least a 3-4 second following distance."
+ },
+ {
+  "src": "p.59",
+  "topic": "Other",
+  "used": [],
+  "text": "depending on the temperature and humidity, the inside of a vehicle can soar above 160 degrees in less than 10 minutes."
+ },
+ {
+  "src": "p.60",
+  "topic": "Speed, turns, passing and lights",
+  "used": [],
+  "text": "drive slower than normal and increase your following distance to five or six seconds."
+ },
+ {
+  "src": "p.60",
+  "topic": "Other",
+  "used": [],
+  "text": "as little as 6 inches of water may sweep away a vehicle, including suvs and pickups."
+ },
+ {
+  "src": "p.61",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "snowplows typically operate at 25-35 mph."
+ },
+ {
+  "src": "p.61",
+  "topic": "Highways, weather and road types",
+  "used": [
+   "tB22"
+  ],
+  "text": "stopping distances can be 10 times greater in ice and snow."
+ },
+ {
+  "src": "p.63",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "it is state law to report a crash to the police involving injury or death to another person, or property damage of more than $1,500."
+ },
+ {
+  "src": "p.63",
+  "topic": "Other",
+  "used": [],
+  "text": "failure to do so within 72 hours of the incident will result in the loss of your driving privileges and further penalties."
+ },
+ {
+  "src": "permit",
+  "topic": "Other",
+  "used": [],
+  "text": "be at least 14 years old."
+ },
+ {
+  "src": "permit",
+  "topic": "Other",
+  "used": [],
+  "text": "to apply to take the test at home, the child must be at least 14 years old."
+ },
+ {
+  "src": "permit",
+  "topic": "Other",
+  "used": [],
+  "text": "due to the high volume of applications coming through, it may take 7-14 days to process your application."
+ },
+ {
+  "src": "permit",
+  "topic": "Other",
+  "used": [],
+  "text": "the link sent in the email will expire after 72 hours."
+ },
+ {
+  "src": "permit",
+  "topic": "Other",
+  "used": [],
+  "text": "an immediate family member at least 21 years of age."
+ },
+ {
+  "src": "permit",
+  "topic": "Other",
+  "used": [],
+  "text": "a person at least 25 years of age with written permission from your parent, guardian, or custodian."
+ },
+ {
+  "src": "permit",
+  "topic": "Permit and license rules",
+  "used": [],
+  "text": "second offense: your permit will be suspended for 30 days."
+ },
+ {
+  "src": "permit",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "every time you get a conviction, cause a crash, or violate a restriction, it delays your ability to upgrade to the next phase of license by 6 months."
+ },
+ {
+  "src": "license",
+  "topic": "Other",
+  "used": [],
+  "text": "be at least 16 years old."
+ },
+ {
+  "src": "license",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "have a valid instruction permit (or instruction permit and special minor's restricted license) for a total of 12 months."
+ },
+ {
+  "src": "license",
+  "topic": "Permit and license rules",
+  "used": [],
+  "text": "adult supervision means your parent, guardian, custodian, an immediate family member at least 21 years of age, a driver education instructor, or a person at least 25 years with written permission from your parent, guardian, or custodian."
+ },
+ {
+  "src": "license",
+  "topic": "Alcohol and phones",
+  "used": [],
+  "text": "if the back of your license says you have a passenger restriction, for the first six months you have your intermediate license, you cannot carry more than one minor passenger that is not a relative when driving without adult supervision."
+ },
+ {
+  "src": "license",
+  "topic": "Permit and license rules",
+  "used": [],
+  "text": "second offense: your permit will be suspended for 30 days."
+ },
+ {
+  "src": "license",
+  "topic": "Highways, weather and road types",
+  "used": [],
+  "text": "every time you get a conviction, cause a crash, or violate a restriction, it delays your ability to upgrade to the next phase of license by 12 months."
+ }
+]
