@@ -235,7 +235,7 @@ test('driving course and knowledge tests: pass the checkers, and every quote is 
   assert.deepEqual(missing, []);
 });
 
-test('knowledge tests: score overall and per topic; done only when every question is answered', () => {
+test('knowledge tests: score overall and per topic; done only when every question is answered and he tapped Finish', () => {
   const form = [['a1', 'Signs'], ['a2', 'Signs'], ['a3', 'Right of way']].map(([id, topic]) => ({ id, topic, answer: 0 }));
   const p = { answers: { a1: { base: { ok: true, on: day(1) } }, a3: { base: { ok: false, on: day(2) } }, a2: { L1: { ok: true, on: day(1) } } } };
   let s = D.testScore(form, p, 'base');
@@ -243,9 +243,13 @@ test('knowledge tests: score overall and per topic; done only when every questio
   assert.equal(D.testDoneOn(form, p, 'base'), null);
   p.answers.a2.base = { ok: true, on: day(3) };
   s = D.testScore(form, p, 'base');
+  assert.deepEqual([s.answered, s.allIn, s.done], [3, true, false], 'all answered: not done until he taps Finish');
+  assert.equal(D.testDoneOn(form, p, 'base'), null);
+  p.watched = { base: day(4) };
+  s = D.testScore(form, p, 'base');
   assert.deepEqual([s.answered, s.right, s.done, s.pct, s.passed], [3, 2, true, 67, false]);
   assert.deepEqual(s.byTopic, [{ topic: 'Signs', right: 2, total: 2 }, { topic: 'Right of way', right: 0, total: 1 }]);
-  assert.equal(D.testDoneOn(form, p, 'base'), day(3));
+  assert.equal(D.testDoneOn(form, p, 'base'), day(4), 'done on the day he tapped Finish');
   p.answers.a3.base.ok = true;
   assert.equal(D.testScore(form, p, 'base').passed, true);
   assert.equal(D.testScore(form, p, 'p1').answered, 0, 'each sitting is scored on its own');

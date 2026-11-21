@@ -6,7 +6,7 @@
     T.FORMS.A.forEach((q) => { answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-20' } }; }); // baseline done Nov 20
     localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
       routines: { days: { '2026-11-23': { eli: { chore: true } } } },
-      'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers } } })); });
+      'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers, watched: { base: '2026-11-20' } } } })); });
   await visit('drive.html', 'wake-sat');
   const sat = await p.$eval('#today', (e) => e.textContent);
   await p.$eval('#today', (e) => e.insertAdjacentHTML('beforeend', '<i id="mark"></i>'));
@@ -23,7 +23,7 @@
   await p.goto(B + 'index.html');
   await p.evaluate(async () => { const T = await import('./driving-tests.js?v=' + window.__V), answers = {};
     T.FORMS.A.forEach((q) => { const ok = q.topic !== 'Right of way'; answers[q.id] = { base: { ok, pick: ok ? q.answer : (q.answer + 1) % 4, on: '2026-11-20' } }; });
-    localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { 'eli-drive': { approved: { w1d1: '2026-11-17' }, answers } } })); });
+    localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { 'eli-drive': { approved: { w1d1: '2026-11-17' }, answers, watched: { base: '2026-11-20' } } } })); });
   await visit('parents.html', 'wake-parents-weakest');
   const ts = await p.$eval('#testscores', (e) => e.textContent);
   notes.push('Parents: ' + ts.slice(0, 160));

@@ -10,7 +10,7 @@
     localStorage.clear();
     sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
       routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } },
-      'eli-drive': { done, answers } } }));
+      'eli-drive': { done, answers, watched: { base: '2026-11-17' } } } }));
   }, unit2done);
   await seed(false);
   await visit('drive.html', 'progress-hidden');
@@ -28,8 +28,9 @@
   await p.waitForTimeout(250);
   check(JSON.stringify(before) === JSON.stringify(await tops()), 'phone width: nothing moves after answering the sign question');
   await p.setViewportSize({ width: 375, height: 812 });
-  for (let k = 0; k < 24; k++) { await p.click('#tests .dq-choice:not([disabled])'); await p.waitForTimeout(60); }
+  for (let k = 0; k < 24; k++) { await p.click('#tests .dq:not(.answered) .dq-choice'); await p.waitForTimeout(60); }
   await p.waitForTimeout(300);
+  await p.click('[data-tfinish="p1"]'); await p.waitForTimeout(300);
   await visit('parents.html', 'progress-parents');
   const t = await p.$eval('#testscores', (e) => e.textContent);
   check(/Baseline knowledge test: \d+ of 25/.test(t) && /Progress test 1: \d+ of 25/.test(t), 'Parents page shows both scores');

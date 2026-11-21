@@ -12,6 +12,7 @@
     if (['lesson', 'done'].includes(st)) drive.watched = { w1d1: '2026-11-18' };
     if (st === 'lesson') { answers[l1.questions[0].id] = { w1d1: { ok: true, pick: l1.questions[0].answer, on: '2026-11-18', n: 1 } }; answers[l1.questions[1].id] = { w1d1: { ok: false, pick: (l1.questions[1].answer + 1) % 4, on: '2026-11-18', n: 2 } }; }
     if (st === 'done') { l1.questions.slice(0, 5).forEach((q, i) => { answers[q.id] = { w1d1: { ok: i !== 1, pick: i !== 1 ? q.answer : (q.answer + 1) % 4, on: '2026-11-18', n: i + 1 } }; }); drive.done = { w1d1: '2026-11-18' }; }
+    if (['score', 'key', 'lesson', 'done'].includes(st)) drive.watched = Object.assign({ base: '2026-11-18' }, drive.watched); // he tapped Finish
     drive.answers = answers;
     localStorage.clear();
     sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } }, 'eli-drive': drive } }));

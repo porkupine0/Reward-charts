@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795271407';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795271407';
-import { SETTINGS, onSettings } from './settings.js?v=1795271407';
-import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795271407';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795271407';
-import { LESSONS } from './driving-course.js?v=1795271407';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795271407';
-import * as TESTS from './driving-tests.js?v=1795271407';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795271407';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795280221';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795280221';
+import { SETTINGS, onSettings } from './settings.js?v=1795280221';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795280221';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795280221';
+import { LESSONS } from './driving-course.js?v=1795280221';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795280221';
+import * as TESTS from './driving-tests.js?v=1795280221';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795280221';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -117,7 +117,7 @@ function listsOn(ctx, kid, date) {
       const base = baselineBy(ctx.drive || {}, ymd(date));
       if (due) day.push(base === 'open'
         ? { key: 'drive', label: 'Driving: baseline test first', sub: 'Take the 25-question baseline test, then today’s lesson. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: true }
-        : { key: 'drive', label: due.lesson.review ? 'Driving: unit test' : 'Driving lesson', sub: due.lesson.review ? 'Questions on this unit’s lessons. Tap to open it.' : 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' || base === 'today' });
+        : { key: 'drive', label: due.lesson.review ? 'Driving: unit test' : 'Driving lesson', sub: due.lesson.review ? 'Questions on this unit’s lessons, then tap Finish. Tap to open it.' : 'A short video and 5 questions. Tap to open it.', link: 'drive.html', derived: 'drive', computer: true, noGame: true, opt: due.due === 'optional' || base === 'today' });
     }
     // After the training plan ends there's nothing to check off, so no Running item
     if (!p && ymd(date) >= planEndYmd()) { const at = day.findIndex((i) => i.key === 'activity'); if (at >= 0) day.splice(at, 1); }

@@ -5,7 +5,7 @@
     T.FORMS.A.forEach((q) => { answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-17' } }; }); // baseline done the day before
     localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
       routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } },
-      'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers } } })); });
+      'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers, watched: { base: '2026-11-17' } } } })); });
   await visit('drive.html', 'video-start');
   notes.push('today: ' + (await p.$eval('#today', (e) => e.textContent)).slice(0, 160));
   if (!(await p.$('#today iframe'))) throw new Error('no video; page says: ' + (await p.$eval('#today', (e) => e.textContent)).slice(0, 200));

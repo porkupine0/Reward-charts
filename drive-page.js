@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795271407';
-import { applyConfig } from './routines.js?v=1795271407';
-import { askParent } from './parent.js?v=1795271407';
-import * as L from './lists.js?v=1795271407';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795271407';
-import { signSvg } from './signs.js?v=1795271407';
-import * as COURSE from './driving-course.js?v=1795271407';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795271407';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795280221';
+import { applyConfig } from './routines.js?v=1795280221';
+import { askParent } from './parent.js?v=1795280221';
+import * as L from './lists.js?v=1795280221';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795280221';
+import { signSvg } from './signs.js?v=1795280221';
+import * as COURSE from './driving-course.js?v=1795280221';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795280221';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -37,7 +37,9 @@ function questionHtml(q, a, lessonId, hide) {
   const show = !hide && a.pick !== undefined;
   const choices = '<div class="dq-choices">' + q.choices.map((c, i) => '<button class="dq-choice' + (i === a.pick ? ' picked' : '') + (show && i === q.answer ? ' right' : '') +
     '" type="button" disabled aria-pressed="' + (i === a.pick) + '"' + (i === a.pick ? ' aria-label="Your answer: ' + esc(c) + '"' : '') + '>' + esc(c) + '</button>').join('') + '</div>';
-  if (hide) return '<div class="dq answered">' + head + choices + '</div>';
+  // a unit test not finished yet: his pick marked, and every choice still tappable to change it until Finish
+  if (hide) return '<div class="dq answered">' + head + '<div class="dq-choices">' + q.choices.map((c, i) => '<button class="dq-choice' + (i === a.pick ? ' picked' : '') +
+    '" type="button" data-pick="' + esc(q.id) + '|' + esc(lessonId) + '|' + i + '" aria-pressed="' + (i === a.pick) + '"' + (i === a.pick ? ' aria-label="Your answer: ' + esc(c) + '"' : '') + '>' + esc(c) + '</button>').join('') + '</div></div>';
   return '<div class="dq answered ' + (a.ok ? 'ok' : 'miss') + '">' + head + choices +
     '<p class="dq-result">' + (a.ok ? '✓ Right: ' : '✗ You picked “' + esc(q.choices[a.pick] || '') + '”. Right answer: ') + '<b>' + esc(q.choices[q.answer]) + '</b></p>' +
     '<p class="dq-why">' + esc(q.why) + ' <small>(' + esc(q.ref) + ')</small></p></div>';
@@ -66,18 +68,21 @@ function render() {
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);
   // a unit test: no right/wrong until every question is answered, then the score and every answer
   const answered = quiz.filter((q) => answerOf(q.id, lesson.id)), allIn = quiz.length > 0 && answered.length === quiz.length;
+  // a unit test: answers can change until he taps Finish; then the score and the right answers
+  const fin = !!(d.done || {})[lesson.id];
   // Three parts: before the video, the video, after it. When only the parts around it change (a brother's tick,
   // an answer, a parent's approval), the video player is left in place so it doesn't restart.
   let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>', post = '';
   const vids = lesson.review || noVideo ? [] : (lesson.videos || []);
-  if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
-    : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
+  if (lesson.review) h += fin ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
+    : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. Tap a different choice to change an answer. When all are answered, tap Finish to see your score and the answers.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
   // the key points show until the questions do (then they'd give the answers away)
   // once the questions show, the video stays (to rewatch) but its Iowa note hides, like the key points (it can state answers)
   else if (watched) post += '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';
   else if (noVideo) { h += '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>' + keyCard(lesson); post += '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I’ve read these</button>'; }
   else { h += keyCard(lesson); post += '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>'; }
-  if (watched || lesson.review) post += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
+  if (watched || lesson.review) post += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !fin)).join('') + '</div>';
+  if (lesson.review && allIn && !fin) post += '<p class="dt-count">' + quiz.length + ' of ' + quiz.length + ' answered. Check them, then tap Finish.</p><button class="tt-save" type="button" data-ufinish="' + esc(lesson.id) + '">Finish the unit test</button>';
   if (st.status === 'done') post += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
   const el = $('today'), vkey = lesson.id + '|' + vids.map((v) => v.yt).join(','), box = el.querySelector(':scope > .dvbox');
   if (vids.length && box && box.dataset.vkey === vkey && el.querySelector(':scope > .dpre')) {
@@ -129,16 +134,18 @@ function renderTests() {
     const lock = L.computerLock(ctx, 'eli', now);
     if (lock) { h += '<p class="lockmsg">' + (lock === 'owed' ? 'Finish the chore you missed earlier this week first.' : 'Do today’s chores first, then come back.') + '</p>'; return; }
     if (testOpen !== s.id && !sc.answered) {
-      h += '<p class="note">' + form.length + ' questions like Iowa’s written permit test, about 15 minutes. No video and no hints: answer what you know, and guess if you’re not sure. You’ll see your score and your strong and weak topics at the end.</p>' +
+      h += '<p class="note">' + form.length + ' questions like Iowa’s written permit test, about 15 minutes. No video and no hints: answer what you know, and guess if you’re not sure. You can change an answer until you tap Finish; then you’ll see your score and your strong and weak topics.</p>' +
         '<button class="tt-save" type="button" data-tstart="' + esc(s.id) + '">Start the test</button>';
       return;
     }
-    h += '<p class="dt-count">' + sc.answered + ' of ' + sc.total + ' answered</p><div class="dquiz">' + form.map((q, i) => {
+    h += '<p class="note">Tap a different choice to change an answer, until you tap Finish.</p><p class="dt-count">' + sc.answered + ' of ' + sc.total + ' answered</p><div class="dquiz">' + form.map((q, i) => {
       const a = answerOf(q.id, s.id), head = qHead(q, i + 1);
       // answered: the choices stay where they were (so nothing slides under his finger), his pick marked
-      if (a) return '<div class="dq answered">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice' + (ci === a.pick ? ' picked' : '') + '" type="button" disabled aria-pressed="' + (ci === a.pick) + '"' + (ci === a.pick ? ' aria-label="Your answer: ' + esc(c) + '"' : '') + '>' + esc(c) + '</button>').join('') + '</div></div>';
+      // (every choice stays tappable: a different one changes his answer, until he taps Finish)
+      if (a) return '<div class="dq answered">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice' + (ci === a.pick ? ' picked' : '') + '" type="button" data-tpick="' + esc(q.id) + '|' + esc(s.id) + '|' + ci + '" aria-pressed="' + (ci === a.pick) + '"' + (ci === a.pick ? ' aria-label="Your answer: ' + esc(c) + '"' : '') + '>' + esc(c) + '</button>').join('') + '</div></div>';
       return '<div class="dq">' + head + '<div class="dq-choices">' + q.choices.map((c, ci) => '<button class="dq-choice" type="button" data-tpick="' + esc(q.id) + '|' + esc(s.id) + '|' + ci + '">' + esc(c) + '</button>').join('') + '</div></div>';
-    }).join('') + '</div>';
+    }).join('') + '</div>' +
+      (sc.allIn ? '<p class="dt-count">' + sc.total + ' of ' + sc.total + ' answered. Check them, then tap Finish to see your score.</p><button class="tt-save" type="button" data-tfinish="' + esc(s.id) + '">Finish the test</button>' : '');
   });
   el.innerHTML = h;
 }
@@ -177,18 +184,26 @@ document.addEventListener('click', async (e) => {
   const tp = e.target.closest('[data-tpick]');
   if (tp) {
     const [qid, sid, pick] = tp.dataset.tpick.split('|'), s = SITTINGS.find((x) => x.id === sid), q = s && (FORMS[s.form] || []).find((x) => x.id === qid);
-    if (!q || answerOf(qid, sid)) return; // the first answer counts
-    const n = Object.values(ctx.drive.answers || {}).filter((a) => a[sid]).length + 1;
+    const was = answerOf(qid, sid);
+    // he can change an answer until Finish (the score and topics only show after it)
+    if (!q || testScore(FORMS[s.form] || [], ctx.drive || {}, sid, PASS).done || (was && was.pick === Number(pick))) return;
+    const n = was ? was.n : Object.values(ctx.drive.answers || {}).filter((a) => a[sid]).length + 1;
     save(ID, 'answers/' + qid + '/' + sid, { ok: Number(pick) === q.answer, pick: Number(pick), on: ymd(new Date()), n });
     return;
   }
+  const tf = e.target.closest('[data-tfinish]');
+  if (tf) { const s = SITTINGS.find((x) => x.id === tf.dataset.tfinish); if (s && testScore(FORMS[s.form] || [], ctx.drive || {}, s.id, PASS).allIn) save(ID, 'watched/' + s.id, ymd(new Date())); return; }
+  const uf = e.target.closest('[data-ufinish]');
+  if (uf) { finishUnitTest(uf.dataset.ufinish); return; }
   const ts = e.target.closest('[data-tstart]');
   if (ts) { testOpen = ts.dataset.tstart; renderTests(); return; }
   const pk = e.target.closest('[data-pick]');
   if (pk) {
     const [qid, lessonId, pick] = pk.dataset.pick.split('|'), q = L.course().flatMap((l) => l.questions || []).find((x) => x.id === qid);
-    if (!q || answerOf(qid, lessonId)) return; // the first answer counts
-    const n = Object.values(ctx.drive.answers || {}).filter((a) => a[lessonId]).length + 1;
+    // a lesson: the first answer counts (it shows right or wrong at once). A unit test: he can change it until Finish.
+    const lesson = L.course().find((l) => l.id === lessonId), was = answerOf(qid, lessonId);
+    if (!q || (was && !(lesson && lesson.review && !((ctx.drive || {}).done || {})[lessonId])) || (was && was.pick === Number(pick))) return;
+    const n = was ? was.n : Object.values(ctx.drive.answers || {}).filter((a) => a[lessonId]).length + 1;
     // don't wait for the server: this page's copy already has the answer
     save(ID, 'answers/' + qid + '/' + lessonId, { ok: Number(pick) === q.answer, pick: Number(pick), on: ymd(new Date()), n });
     finishIfDone(lessonId);
@@ -211,15 +226,22 @@ document.addEventListener('click', async (e) => {
 });
 $('previewbtn').onclick = async () => { if (await askParent()) { previewOpen = true; renderPreview(); } };
 
-// Finished = watched (or a review) + all 5 answered; no pass mark.
+// Finished = watched + all 5 answered; no pass mark. (A unit test finishes only when he taps Finish.)
 function finishIfDone(lessonId) {
   const course = L.course(), d = ctx.drive || {}, key = ymd(new Date()), st = lessonFor(course, d, key);
-  if (!st.lesson || st.lesson.id !== lessonId || st.status !== 'ready') return;
+  if (!st.lesson || st.lesson.id !== lessonId || st.status !== 'ready' || st.lesson.review) return;
   const quiz = quizFor(course, st.index, d);
   const watched = st.lesson.review || isSkipped((d.approved || {})[lessonId]) || (d.watched || {})[lessonId];
   if (watched && quiz.length && quiz.every((q) => answerOf(q.id, lessonId))) save(ID, 'done/' + lessonId, key);
 }
 
+// Finish on a unit test: every question answered; it's today's unit test.
+function finishUnitTest(lessonId) {
+  const course = L.course(), d = ctx.drive || {}, key = ymd(new Date()), st = lessonFor(course, d, key);
+  if (!st.lesson || st.lesson.id !== lessonId || !st.lesson.review || st.status !== 'ready') return;
+  const quiz = quizFor(course, st.index, d);
+  if (quiz.length && quiz.every((q) => answerOf(q.id, lessonId))) save(ID, 'done/' + lessonId, key);
+}
 // The lock needs the chores (routines), the chore list (config) and the course progress.
 const live = () => isLive('routines') && isLive(ID) && isLive('config');
 // A lesson with every answer in but no "done" (the page closed right after the last tap): finish it,
@@ -228,7 +250,8 @@ function finishLeftovers() {
   if (!live()) return;
   const d = ctx.drive || {}, course = L.course();
   course.forEach((l) => {
-    if ((d.done || {})[l.id] || !(l.review || isSkipped((d.approved || {})[l.id]) || (d.watched || {})[l.id])) return;
+    // (a unit test waits for his Finish tap, so it's never finished here)
+    if (l.review || (d.done || {})[l.id] || !(isSkipped((d.approved || {})[l.id]) || (d.watched || {})[l.id])) return;
     const mine = Object.values(d.answers || {}).map((a) => a[l.id]).filter(Boolean);
     // a lesson needs its 5 answers; a unit test needs all of its questions answered
     const need = l.review ? quizFor(course, course.indexOf(l), d).length : 5;

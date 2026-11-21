@@ -31,11 +31,22 @@
   await p.setViewportSize({ width: 375, height: 812 });
   const first = await p.$eval('#tests .dq:nth-of-type(1)', (e) => e.textContent);
   check(!/Right|✓|✗|Iowa Driver/.test(first) && /^Your answer: /.test(await p.$eval('#tests .dq:nth-of-type(1) .picked', (e) => e.getAttribute('aria-label'))), 'answered: his pick only (marked, labelled for screen readers), no right/wrong or explanation');
-  check((await p.$$('#tests .dq:nth-of-type(1) .dq-choice[disabled]')).length === 4 && (await p.$$('#tests .dq:nth-of-type(1) .dq-choice.picked')).length === 1, 'answered: the 4 choices stay, disabled, his pick marked');
+  check((await p.$$('#tests .dq:nth-of-type(1) .dq-choice')).length === 4 && (await p.$$('#tests .dq:nth-of-type(1) .dq-choice.picked')).length === 1, 'answered: the 4 choices stay, his pick marked');
+  // a slip: he taps a different choice, and that becomes his answer (still no right/wrong shown)
+  const q1 = await p.$eval('#tests .dq:nth-of-type(1) .picked', (e) => e.dataset.tpick);
+  const other = await p.$eval('#tests .dq:nth-of-type(1)', (q) => { const b = q.querySelector('.dq-choice:not(.picked)'); b.click(); return b.dataset.tpick; });
+  await p.waitForTimeout(250);
+  const [qid1, , pick2] = other.split('|');
+  check((await db()).charts['eli-drive'].answers[qid1].base.pick === Number(pick2) && (await p.$eval('#tests .dq:nth-of-type(1) .picked', (e) => e.dataset.tpick)) === other && q1 !== other, 'a different tap changes his answer (stored), no right/wrong shown');
+  check(!/Right|✓|✗/.test(await p.$eval('#tests .dq:nth-of-type(1)', (e) => e.textContent)), 'still no right/wrong after a change');
   await visit('drive.html', 'test-reload');
   check((await p.$$('#tests .dq')).length === 25 && /1 of 25 answered/.test(await p.$eval('#tests', (e) => e.textContent)), 'a reload keeps his place');
-  for (let k = 0; k < 24; k++) { await p.click('#tests .dq-choice:not([disabled])'); await p.waitForTimeout(60); }
+  check((await p.$eval('#tests .dq:nth-of-type(1) .picked', (e) => e.dataset.tpick)) === other, 'a reload keeps his changed answer');
+  for (let k = 0; k < 24; k++) { await p.click('#tests .dq:not(.answered) .dq-choice'); await p.waitForTimeout(60); }
   await p.waitForTimeout(300);
+  // all 25 answered: not finished until he taps Finish (he can still change answers; no score yet)
+  check(!!(await p.$('[data-tfinish="base"]')) && !/pass mark/.test(await p.$eval('#tests', (e) => e.textContent)) && !(await p.$('#today [data-watched="w1d1"]')), 'all answered: Finish shows; no score yet; the lesson still waits');
+  await p.click('[data-tfinish="base"]'); await p.waitForTimeout(300);
   const t = await p.$eval('#tests', (e) => e.textContent);
   check(/of 25/.test(t) && /pass mark/.test(t) && (await p.$$('#tests .dt-topics tr')).length === 8, 'score and 8 topics at the end');
   check(!(await p.$('#tests .dq')), 'no questions or answers shown after finishing');
@@ -46,8 +57,8 @@
   check(!!(await p.$('#today .dq')) && !(await p.$('#today .dkey')), 'once the questions show, the key points are hidden');
   check(!(await p.$('#today .dv-iowa')), 'once the questions show, the In Iowa note is hidden too');
   const dv = (await db()).charts['eli-drive'];
-  check(Object.values(dv.answers).every((a) => a.base) && Object.keys(dv.answers).length === 25, 'answers stored under the sitting');
-  check(!dv.done, 'not stored as a finished lesson');
+  check(Object.values(dv.answers).filter((a) => a.base).length === 25, 'answers stored under the sitting');
+  check(!dv.done && (dv.watched || {}).base === '2026-11-18', 'not stored as a finished lesson; Finish stored as the day');
   await visit('checklist.html?kid=eli', 'test-checklist');
   check(!(await p.$('.ckbtn[data-key="drive"][aria-pressed="true"]')), 'checklist driving row not filled by the test');
   await visit('parents.html', 'test-parents');

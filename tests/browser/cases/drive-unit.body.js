@@ -17,14 +17,24 @@ export const LESSONS = [L('U1'), L('U2'), L('U3'), L('U4'), { id: 'U5', title: '
   await visit('drive.html', 'unit-start');
   const t0 = await p.$eval('#today', (e) => e.textContent);
   check(/Unit test/.test(t0) && /16 questions/.test(t0) && (await p.$$('#today .dq')).length === 16, 'unit test: 16 questions, 4 from each lesson');
-  for (let k = 0; k < 5; k++) { await p.click('#today .dq-choice:not([disabled])'); await p.waitForTimeout(150); }
+  for (let k = 0; k < 5; k++) { await p.click('#today .dq:not(.answered) .dq-choice'); await p.waitForTimeout(150); }
   const t5 = await p.$eval('#today', (e) => e.textContent);
   check(/5 of 16 answered/.test(t5) && !/Right answer|✓ Right|Why 1\./.test(t5), 'while taking it: no right/wrong, no explanations');
   check(!((await db()).charts['eli-drive'].done || {}).U5, 'not finished after 5 answers');
   const ids = await p.$$eval('#today [data-pick]', (els) => [...new Set(els.map((e) => e.dataset.pick.split('|')[0]))]);
   await visit('drive.html', 'unit-reload');
   check(JSON.stringify(await p.$$eval('#today [data-pick]', (els) => [...new Set(els.map((e) => e.dataset.pick.split('|')[0]))])) === JSON.stringify(ids) && /5 of 16 answered/.test(await p.$eval('#today', (e) => e.textContent)), 'a reload keeps the same questions and his answers');
-  for (let k = 0; k < 11; k++) { await p.click('#today .dq-choice:not([disabled])'); await p.waitForTimeout(120); }
+  for (let k = 0; k < 11; k++) { await p.click('#today .dq:not(.answered) .dq-choice'); await p.waitForTimeout(120); }
+  await p.waitForTimeout(300);
+  // all 16 answered: no score yet; he can still change an answer; Finish shows the score
+  check(!((await db()).charts['eli-drive'].done || {}).U5 && !!(await p.$('[data-ufinish="U5"]')) && !/Right answer|✓ Right/.test(await p.$eval('#today', (e) => e.textContent)), 'all answered: not done until Finish; no right/wrong yet');
+  const chg = await p.$eval('#today .dq', (q) => { const b = q.querySelector('.dq-choice:not(.picked)'); b.click(); return b.dataset.pick; });
+  await p.waitForTimeout(250);
+  const [cq, cl, cp] = chg.split('|');
+  check((await db()).charts['eli-drive'].answers[cq][cl].pick === Number(cp), 'a unit test answer can be changed before Finish');
+  await p.click('[data-ufinish="U5"]'); await p.waitForTimeout(300);
+  const locked = await p.$eval('#today .dq', (q) => q.querySelectorAll('.dq-choice[disabled]').length);
+  check(locked > 0, 'after Finish: the answers are locked');
   await p.waitForTimeout(400);
   const t16 = await p.$eval('#today', (e) => e.textContent);
   check(/\d+ of 16<\/b>|\d+ of 16 right/.test(await p.$eval('#today', (e) => e.innerHTML)) && /Right answer|✓ Right/.test(t16) && /Unit test done/.test(t16), 'at the end: score, the right answers, done');

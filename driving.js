@@ -1,11 +1,13 @@
-import { checkSign } from './signs.js?v=1795271407';
+import { checkSign } from './signs.js?v=1795280221';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
 //   approved: { lessonId: 'YYYY-MM-DD' | 'skip:YYYY-MM-DD' } the day a parent approved or skipped it
 //             (older entries: true / 'skip')
 //   done:     { lessonId: 'YYYY-MM-DD' }          the day the lesson was finished
-//   answers:  { questionId: { lessonId: { ok, on } } }   one answer per question per lesson; the first counts
+//   answers:  { questionId: { lessonId: { ok, on } } }   one answer per question per lesson; in a lesson the first
+//             counts; in a unit test or knowledge test he can change it until he taps Finish
+//   watched:  { sittingId: 'YYYY-MM-DD' }   also: the day he tapped Finish on a knowledge test (done/<unit test> for a unit test)
 // Everything here is deterministic: the same progress always gives the same lesson and the same quiz.
 
 // Where a fact comes from: a page of the Iowa Driver's Manual ("Iowa Driver's Manual p.N"), or, for Iowa's
@@ -194,7 +196,9 @@ export function testScore(form, progress, sittingId, pass = 0.8) {
   const ans = (progress || {}).answers || {};
   const got = (form || []).map((x) => (ans[x.id] || {})[sittingId]).filter(Boolean);
   const right = (form || []).filter((x) => ((ans[x.id] || {})[sittingId] || {}).ok).length;
-  const total = (form || []).length, done = total > 0 && got.length === total;
+  // done = every question answered AND Finish tapped (watched/<sitting> holds the day; until then he can change
+  // any answer). allIn = every question answered (Finish shows).
+  const total = (form || []).length, allIn = total > 0 && got.length === total, done = allIn && !!(((progress || {}).watched || {})[sittingId]);
   const byTopic = [];
   (form || []).forEach((x) => {
     let t = byTopic.find((b) => b.topic === x.topic);
@@ -203,13 +207,13 @@ export function testScore(form, progress, sittingId, pass = 0.8) {
     if (((ans[x.id] || {})[sittingId] || {}).ok) t.right++;
   });
   const pct = total ? Math.round((100 * right) / total) : 0;
-  return { answered: got.length, right, total, done, pct, passed: done && right / total >= pass, byTopic };
+  return { answered: got.length, right, total, allIn, done, pct, passed: done && right / total >= pass, byTopic };
 }
-// The day a sitting was finished: its last answer's day (null while unfinished).
+// The day a sitting was finished: the day he tapped Finish with every question answered (null until then).
 export function testDoneOn(form, progress, sittingId) {
-  const ans = (progress || {}).answers || {};
+  const ans = (progress || {}).answers || {}, fin = ((progress || {}).watched || {})[sittingId];
   const got = (form || []).map((x) => (ans[x.id] || {})[sittingId]).filter(Boolean);
-  return got.length && got.length === (form || []).length ? got.map((a) => a.on).sort().pop() : null;
+  return fin && got.length && got.length === (form || []).length ? fin : null;
 }
 // Sittings open on this day: from its date, and (if it names one) once that lesson is finished.
 export function openSittings(sittings, progress, dayKey) {

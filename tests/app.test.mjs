@@ -673,7 +673,7 @@ test("driving row: due days (after the baseline test) count toward his full day 
     // the baseline knowledge test was taken long before (until it is, lessons are only optional)
     const T = await load('driving-tests.js'), answers = {};
     T.FORMS.A.forEach((q) => { answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-01' } }; });
-    const withDrive = Object.assign({}, base, { drive: { approved, done, answers } });
+    const withDrive = Object.assign({}, base, { drive: { approved, done, answers, watched: { base: '2026-11-01' } } });
     for (let x = d('2026-11-16'); ymd(x) <= '2027-03-14'; x = addDays(x, 1)) {
       const k = ymd(x), mon = mondayOf(x);
       assert.equal(L.gameDay(withDrive, 'eli', x).earned, L.gameDay(base, 'eli', x).earned, 'game time unchanged ' + k);
@@ -709,6 +709,8 @@ test('driving row: before the baseline test is finished, a lesson is only option
   for (const k of ['2026-11-19', '2026-11-20']) { const r = row(k); assert.ok(r && r.opt === true && /baseline test first/.test(r.label), k + ' ' + JSON.stringify(r)); }
   // the baseline taken Mon Nov 23: that day the lesson is optional; from Tue it's required
   T.FORMS.A.forEach((q) => { drive.answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-23' } }; });
+  assert.equal(L.baselineBy(drive, '2026-11-23'), 'open', 'every question answered but Finish not tapped: still open');
+  drive.watched = { base: '2026-11-23' }; // he tapped Finish
   assert.equal(L.baselineBy(drive, '2026-11-22'), 'open'); assert.equal(L.baselineBy(drive, '2026-11-23'), 'today'); assert.equal(L.baselineBy(drive, '2026-11-24'), 'done');
   assert.ok(row('2026-11-23').opt === true && row('2026-11-23').label === 'Driving lesson', 'baseline day: lesson optional');
   assert.ok(row('2026-11-24').opt === false, 'after the baseline day: required');

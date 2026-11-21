@@ -6,7 +6,7 @@
     T.FORMS.A.forEach((q) => { answers[q.id] = { base: { ok: true, pick: q.answer, on: '2026-11-20' } }; }); // the baseline, taken Nov 20
     localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: {
     routines: { days: { '2026-11-23': { eli: { chore: true } }, '2026-11-24': { eli: { chore: true } }, '2026-11-25': { eli: { chore: true } } } },
-    'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers } } })); });
+    'eli-drive': { approved: { w1d1: '2026-11-17', w1d2: '2026-11-17' }, answers, watched: { base: '2026-11-20' } } } })); });
   await visit('checklist.html?kid=eli', 'excuse-thu');
   check(!!(await p.$('.ck.locked .ckbtn[data-key="drive"]')), 'Thursday: the driving row is there, locked (chores not done)');
   check(!!(await p.$('[data-excuse="mark"][data-key="drive"]')), 'the locked driving row still offers "Not able to do it?"');
