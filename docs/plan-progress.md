@@ -94,6 +94,7 @@ A nightly check-in fires about 12:47 am Central into this session. Each night: r
 - Review nights: at most three read-only sub-agents, one lens each; findings go to a file. Fix nothing without a failing test, a screenshot or a manual page.
 - Frozen content: the parent said (Nov 20) Eli takes the baseline (Form A) on the evening of Fri Nov 20 and starts lessons early the week of Mon Nov 23. From Nov 21 on, Form A is FROZEN: never edit it, even wording. Lessons 1-2 (w1d1, w1d2) may still get the Sunday Nov 22 reword-only leftovers (wrong choices, no key or stem meaning changes), then freeze on Mon Nov 23. Ask the parent for his real first lesson date (and whether the baseline is done) and record it here; don't read the live database. Once he starts, he advances one lesson each weekday; on lessons he may have seen, only reword wrong choices or append questions.
 - Overruns: a late build night takes the next night, absorbed by Dec 5-6. Forms E and F move past Dec 14 only if more than two nights are lost. The reviews never shrink.
+- A row done early (the parent can ask for one in the day) is marked [x] with its date; the next nightly run starts at the first row not marked [x], so the schedule moves up a day.
 - Mark the night's row [x] and add a Log line when done; push to main and the session branch; check both CI jobs.
 - The parent's jobs (report them, don't wait on them): approve lessons; apply the database rules and add the BACKUP_KEY secret (docs/database-safety.md); share Eli's baseline score.
 

@@ -33,7 +33,7 @@ states a number (82 on Nov 21), with the questions that already quote it, in doc
   The baseline Form A facts may repeat from Form C on; Form B facts from Form D on.
 - The forms quote the MANUAL only (checkTests enforces it). The Iowa DOT permit/license pages (permit age 14, supervisors 21/25,
   passenger limits, the 6- and 12-month delays) belong in lessons (Unit 10), not the knowledge test, because the
-  test is built from the manual (unverified: the DOT practice stems that could confirm it were not fetched).
+  test is built from the manual (confirmed Nov 21: none of the 68 DOT practice questions asks a permit or license rule; docs/iowa/dot-practice-stems.txt).
 - Trivia is not a test fact: crash statistics, technology descriptions, processing times, link expiry.
 
 ## Number facts reserved (page + verbatim quote; checked on the page pictures Nov 21 unless marked)
@@ -94,3 +94,10 @@ p.36 distracted driving death '$1,000 in fines'.
 
 Not-number questions (16 per form) are chosen at build from the manual sections each topic covers, checked with
 the quote report so a form does not reuse another form's fact.
+
+## Decided Nov 21: tA16 and tB16
+Both come from the same p.43 sentence (signal 100 feet before a turn at 45 mph or less; 300 feet above 45 mph),
+in consecutive forms. Kept: they ask different numbers for different speeds (tA16: 45 mph or less, 100 feet;
+tB16: 55 mph, 300 feet), and Form A can't change. The rule from here: "never in consecutive forms" means the same
+number for the same case; another number from the same sentence may follow.
+
