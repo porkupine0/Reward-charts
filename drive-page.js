@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795268430';
-import { applyConfig } from './routines.js?v=1795268430';
-import { askParent } from './parent.js?v=1795268430';
-import * as L from './lists.js?v=1795268430';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795268430';
-import { signSvg } from './signs.js?v=1795268430';
-import * as COURSE from './driving-course.js?v=1795268430';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795268430';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795268966';
+import { applyConfig } from './routines.js?v=1795268966';
+import { askParent } from './parent.js?v=1795268966';
+import * as L from './lists.js?v=1795268966';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795268966';
+import { signSvg } from './signs.js?v=1795268966';
+import * as COURSE from './driving-course.js?v=1795268966';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795268966';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -227,7 +227,13 @@ function finishLeftovers() {
     if (need && mine.length >= need) save(ID, 'done/' + l.id, mine.map((a) => a.on).sort().pop());
   });
 }
-const draw = () => { finishLeftovers(); render(); renderTests(); renderRide(); renderPreview(); };
+let shownDay = '';
+const draw = () => { shownDay = ymd(new Date()); finishLeftovers(); render(); renderTests(); renderRide(); renderPreview(); };
+// Left open (or suspended as an app) overnight: redraw when it's shown again on a new day, and only then (a redraw
+// mid-test on the same day would be needless; answers are saved as he taps either way).
+const onWake = () => { if (shownDay && ymd(new Date()) !== shownDay) draw(); };
+document.addEventListener('visibilitychange', () => { if (!document.hidden) onWake(); });
+window.addEventListener('pageshow', onWake);
 watch(ID, (v) => { ctx.drive = v || {}; draw(); }, statusPill($('sync')));
 watch('routines', (v) => { ctx.routines = v || {}; draw(); });
 watch('config', (v) => { applyConfig(v); draw(); });
