@@ -42,7 +42,9 @@ test('bedtime: lights out by kid and night', () => {
   assert.ok(wed[0].min >= 20 * 60 + 45, 'Wednesday counts forward from getting home');
   for (const kid of ['eli', 'rhett', 'isaiah']) for (let dow = 0; dow < 7; dow++) {
     const b = bedtime(kid, dow);
-    assert.equal(b[b.length - 1].key, 'lights');
+    const main = b.filter((x) => !x.afterLights);
+    assert.equal(main[main.length - 1].key, 'lights');
+    b.filter((x) => x.afterLights).forEach((x) => assert.equal(x.min, main[main.length - 1].min, 'after-lights items share the lights-out time'));
     for (let i = 1; i < b.length; i++) assert.ok(b[i].min >= b[i - 1].min, kid + ' ' + dow + ' steps in order');
   }
 });

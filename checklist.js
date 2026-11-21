@@ -1,9 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795222284';
-import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795222284';
-import { SETTINGS } from './settings.js?v=1795222284';
-import { askParent } from './parent.js?v=1795222284';
-import * as L from './lists.js?v=1795222284';
-import { dayStreak, cheerIf } from './streaks.js?v=1795222284';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795229069';
+import { atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795229069';
+import { SETTINGS } from './settings.js?v=1795229069';
+import { askParent } from './parent.js?v=1795229069';
+import * as L from './lists.js?v=1795229069';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795229069';
+import { dayStreak, cheerIf } from './streaks.js?v=1795229069';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -47,6 +48,35 @@ function stepsHtml(it, checks, day, sub) {
   return h;
 }
 
+// Bible pickers (Eli): a book wheel and a chapter wheel per reading, saved as <key>_<part> = 'Book N'.
+// A book picked before its chapter is kept here until the chapter is chosen. The last reading before
+// this day shows under the wheels, with a one-tap "next chapter".
+const bookDraft = {};
+let needPick = '';
+function lastRead(key, part) {
+  for (let i = 1; i <= 30; i++) {
+    const d = addDays(date, -i), v = L.dayChecks(ctx, kid, d)[key + '_' + part];
+    if (parseRef(v)) return { ref: v, day: d };
+  }
+  return null;
+}
+function readingHtml(it, checks) {
+  return '<div class="bible">' + it.reading.map((r) => {
+    const k = it.key + '_' + r.part, cur = parseRef(checks[k]), dk = kid + '|' + ymd(date) + '|' + k;
+    const book = bookDraft[dk] || (cur && cur.book) || '';
+    const last = lastRead(it.key, r.part), next = last && nextRef(last.ref, r.books);
+    const opt = (v, txt, on) => '<option value="' + esc(v) + '"' + (on ? ' selected' : '') + '>' + esc(txt) + '</option>';
+    return '<div class="bpick"><span class="flabel">' + esc(r.label) + '</span><div class="bwheels">' +
+      '<select data-bbook="' + k + '" aria-label="' + esc(r.label) + ': book">' + opt('', 'Book…', !book) + r.books.map((b) => opt(b, b, b === book)).join('') + '</select>' +
+      '<select data-bchap="' + k + '" aria-label="' + esc(r.label) + ': chapter"' + (book ? '' : ' disabled') + '>' + opt('', 'Ch.', !cur || cur.book !== book) +
+        (book ? Array.from({ length: chapters(book) }, (_, i) => opt(String(i + 1), String(i + 1), cur && cur.book === book && cur.ch === i + 1)).join('') : '') + '</select></div>' +
+      (last ? '<small class="blast">Last time (' + esc(last.day.toLocaleDateString('en-US', { weekday: 'short' })) + '): ' + esc(last.ref) +
+        (next && !cur ? ' <button class="chip" data-bnext="' + k + '|' + esc(next) + '">' + esc(next) + '</button>' : '') + '</small>' : '') +
+      '</div>';
+  }).join('') + (needPick === it.key ? '<small class="bneed">Pick what you read first, then tick the box.</small>' : '') + '</div>';
+}
+const readingDone = (it, checks) => it.reading.every((r) => parseRef(checks[it.key + '_' + r.part]));
+
 function itemHtml(it, checks, extra) {
   const v = isOn(it);
   const on = !!v;
@@ -74,6 +104,7 @@ function itemHtml(it, checks, extra) {
       return '<button class="chip part' + (pOn ? ' on' : '') + '" data-key="' + it.key + '" data-part="' + esc(p) + '" data-parts="' + esc(it.parts.join('|')) + '" aria-pressed="' + pOn + '">' + (pOn ? '✓ ' : '') + esc(p) + '</button>';
     }).join('') + '</div>';
   }
+  if (it.reading) h += readingHtml(it, checks);
   if (it.link && !locked) h += '<a class="cklink" href="' + it.link + '">Open &rarr;</a>';
   if (canExcuse) {
     if (pending && !on) h += '<div class="excuse"><span>Not able to do it · waiting for Mom or Dad</span><button class="tbtn approve" data-excuse="approve" data-key="' + it.key + '">Approve</button><button class="linkbtn" data-excuse="undo" data-key="' + it.key + '">Undo</button></div>';
@@ -139,7 +170,9 @@ function renderOn() {
   const prize = when && MORNING_REWARD[kid];
   const mornDone = morn.filter((i) => isOn(i)).length;
   const earned = morn.length > 0 && mornDone === morn.length;
-  if (morn.length) {
+  if (morn.length && kid === 'eli') {
+    $('morning').innerHTML = section('Morning', '', morn, checks, false, 'morning');
+  } else if (morn.length) {
     $('morning').innerHTML = section(dow === 6 ? 'Church morning' : 'Morning', prize ? '' : dow === 5 ? 'Optional on Saturdays. No rush!' : 'Optional. Time yourself if you want!', morn, checks, false, 'morning');
     $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', mornTimerHtml());
     if (prize) $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', treatHtml(prize, when, mornDone, morn.length));
@@ -300,6 +333,10 @@ document.addEventListener('click', (e) => {
     save(ID, 'weekly/' + kid + '/' + w.key + '/' + cycleOf(date, w.start), cur ? null : ymd(date));
     return;
   }
+  // Bible reading: pick what was read before ticking
+  const rItem = [...L.lists(ctx, kid, date).morning, ...L.lists(ctx, kid, date).day].find((i) => i.key === key && i.reading);
+  if (rItem && !dayChecks()[key] && !readingDone(rItem, dayChecks())) { needPick = key; render(); return; }
+  needPick = '';
   const cur = dayChecks()[key];
   let next;
   if (chip) next = cur === btn.dataset.choice ? null : btn.dataset.choice;
@@ -319,7 +356,7 @@ document.addEventListener('click', (e) => {
       const list = lst[sec] || [];
       if (!list.some((i) => i.key === key)) return;
       const t = after[timer] || {};
-      if (t.start && !t.end && list.filter((i) => !i.opt).every((i) => isDone(after[i.key]))) save(ID, base + timer + '/end', Date.now());
+      if (t.start && !t.end && list.filter((i) => !i.opt && !i.afterLights).every((i) => isDone(after[i.key]))) save(ID, base + timer + '/end', Date.now());
     });
   }
   if (key === 'mHigh5') {
@@ -448,6 +485,24 @@ document.addEventListener('click', (e) => {
     if (item.steps.every((s) => s.key === sk || c[s.key])) { save(ID, base + key, true); openSteps.delete(kid + '|' + d + '|' + key); }
   }
   render();
+}, true);
+
+// Bible wheels: a book choice waits for its chapter; a chapter saves 'Book N' on this day.
+document.addEventListener('change', (e) => {
+  const b = e.target.closest('[data-bbook]'), c = e.target.closest('[data-bchap]');
+  if (!b && !c) return;
+  const k = (b || c).dataset.bbook || (b || c).dataset.bchap, dk = kid + '|' + ymd(date) + '|' + k;
+  if (b) { bookDraft[dk] = b.value; render(); return; }
+  const book = bookDraft[dk] || (parseRef(dayChecks()[k]) || {}).book;
+  if (book && c.value) { needPick = ''; delete bookDraft[dk]; save(ID, 'days/' + ymd(date) + '/' + kid + '/' + k, book + ' ' + c.value); }
+});
+document.addEventListener('click', (e) => {
+  const n = e.target.closest('[data-bnext]');
+  if (!n) return;
+  e.stopPropagation();
+  const [k, ref] = n.dataset.bnext.split('|');
+  needPick = '';
+  save(ID, 'days/' + ymd(date) + '/' + kid + '/' + k, ref);
 }, true);
 
 // A chore missed earlier this week: done now, saved on the day it was for.

@@ -1,5 +1,5 @@
-import { planFor, planEndYmd } from './plan.js?v=1795222284';
-import { SETTINGS } from './settings.js?v=1795222284';
+import { planFor, planEndYmd } from './plan.js?v=1795229069';
+import { SETTINGS } from './settings.js?v=1795229069';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';

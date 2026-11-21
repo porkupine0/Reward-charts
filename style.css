@@ -745,3 +745,11 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 /* Late nights: Deny keeps the night late and takes it off the to-review lists */
 .tbtn.deny { background: var(--surface); color: var(--ink); border: 2px solid var(--line); min-width: 80px; }
 #late .prow2 .exbtns { grid-column: 2 / -1; justify-content: flex-start; }
+/* Eli's Bible pickers: book and chapter wheels (native selects show as wheels on iPhone) */
+.bible { border-top: 1px solid var(--line); padding: 8px 12px 10px 54px; display: flex; flex-direction: column; gap: 8px; }
+.bpick .bwheels { display: flex; gap: 8px; margin-top: 4px; }
+.bpick select { min-height: 44px; font: inherit; font-size: 16px; padding: 0 8px; border: 2px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+.bpick select[data-bbook] { flex: 2; min-width: 0; }
+.bpick select[data-bchap] { flex: 1; min-width: 0; }
+.blast { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 13px; margin-top: 4px; }
+.bneed { color: var(--accent-ink); font-weight: 800; font-size: 13px; }

@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795222284';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate } from './routines.js?v=1795222284';
-import { SETTINGS, onSettings } from './settings.js?v=1795222284';
-import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795222284';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795222284';
-import { LESSONS } from './driving-course.js?v=1795222284';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795222284';
-import * as TESTS from './driving-tests.js?v=1795222284';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795222284';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795229069';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, BIBLE_FROM, BIBLE_KEYS } from './routines.js?v=1795229069';
+import { SETTINGS, onSettings } from './settings.js?v=1795229069';
+import { stepShows, CADENCE_START, norm } from './chorelists.js?v=1795229069';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795229069';
+import { LESSONS } from './driving-course.js?v=1795229069';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795229069';
+import * as TESTS from './driving-tests.js?v=1795229069';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795229069';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -83,10 +83,12 @@ export function lists(ctx, kid, date) { return atDate(date, () => listsOn(ctx, k
 function listsOn(ctx, kid, date) {
   const dow = dowOf(date);
   // Teeth was added Nov 11, 2026; leave it off earlier mornings so past candy isn't undone.
-  const morn = morning(kid, dow).filter((i) => i.key !== 'mTeeth' || ymd(date) >= '2026-11-11');
+  // Eli's Bible reading and prayer start Nov 22, 2026 (earlier days keep the lists they had).
+  const bibleOk = (i) => !BIBLE_KEYS.includes(i.key) || ymd(date) >= BIBLE_FROM;
+  const morn = morning(kid, dow).filter((i) => (i.key !== 'mTeeth' || ymd(date) >= '2026-11-11') && bibleOk(i));
   const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow);
   const day = [];
-  raw.forEach((i) => (i.weekly === true ? day.push(...weeklyItems(ctx, kid, date)) : day.push(i)));
+  raw.filter(bibleOk).forEach((i) => (i.weekly === true ? day.push(...weeklyItems(ctx, kid, date)) : day.push(i)));
   // "every other time" and "monthly" chore steps: only on the days they're due
   day.forEach((it, n) => {
     if (!it.chore || !it.steps || !it.steps.some((s) => s.when)) return;
@@ -125,7 +127,7 @@ function listsOn(ctx, kid, date) {
     if (i.key === 'activity' && kid === 'eli') i.derived = 'run';
     if (i.key === 'activity' && kid === 'isaiah') i.derived = 'touches';
   });
-  return { morning: morn, day, bed: bedtime(kid, dow) };
+  return { morning: morn, day, bed: bedtime(kid, dow).filter(bibleOk) };
 }
 
 // A computer task (typing, Duolingo, checking assignments, homework) can't be ticked until every chore in the day's list is done.
@@ -139,16 +141,24 @@ export function useCourse(lessons) { driveCourse = lessons; }
 export const course = () => driveCourse;
 // Computer work's lock for a day: 'owed' (a chore from earlier this week), 'chores' (today's chores not all
 // done) or false. The checklist rows and the Driving page both use it.
+// Screens can open once a laundry chore's Dry step is ticked: the rest waits on the dryer (and can carry to
+// the next day). Any chore list with a step named "Dry" works this way.
+function screenReady(ctx, kid, date, it) {
+  if (isOn(ctx, kid, date, it)) return true;
+  const dry = (it.steps || []).find((s) => /^dry$/i.test(s.label));
+  return !!dry && !!dayChecks(ctx, kid, date)[dry.key];
+}
+const owedForScreens = (ctx, kid, date) => choresOwed(ctx, kid, date).filter((o) => !screenReady(ctx, kid, o.date, o.item));
 export function computerLock(ctx, kid, date) {
-  if (choresOwed(ctx, kid, date).length) return 'owed';
-  return lists(ctx, kid, date).day.filter((i) => i.chore).some((c) => !isOn(ctx, kid, date, c)) ? 'chores' : false;
+  if (owedForScreens(ctx, kid, date).length) return 'owed';
+  return lists(ctx, kid, date).day.filter((i) => i.chore).some((c) => !screenReady(ctx, kid, date, c)) ? 'chores' : false;
 }
 export function lockedBy(ctx, kid, date, it, list) {
   if (isOn(ctx, kid, date, it)) return false;
   // computer work (typing, Duolingo, the driving lesson, Rhett's school checks): one rule for all of it
   if (it.computer) return computerLock(ctx, kid, date);
   // Eli's assignments and homework: only an earlier day's missed chore locks them
-  if (lockable(kid, it) && lists(ctx, kid, date).day.some((i) => i.key === it.key) && choresOwed(ctx, kid, date).length) return 'owed';
+  if (lockable(kid, it) && lists(ctx, kid, date).day.some((i) => i.key === it.key) && owedForScreens(ctx, kid, date).length) return 'owed';
   return false;
 }
 

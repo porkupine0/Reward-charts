@@ -1,5 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795222284';
-import { choreSteps } from './chorelists.js?v=1795222284';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795229069';
+import { choreSteps } from './chorelists.js?v=1795229069';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795229069';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -115,11 +116,15 @@ export function bedtime(kid, dow) {
   const rows = schedule(kid, dow);
   // Fri/Sat: 30 min later; Rhett gets another 30 on top of Isaiah's
   const late = dow === 4 || dow === 5 ? (kid === 'rhett' ? 60 : 30) : 0;
-  return rows.map(([key, min]) => ({
+  const out = rows.map(([key, min]) => ({
     key, time: fmtTime(min + late), min: min + late, label: bedLabel(key, kid, dow),
     choices: key === 'snack' ? BED_SNACKS : null,
     hot: key === 'shower' && kid !== 'eli' && SHOWER[kid].includes(dow)
   }));
+  // Eli: 5 minutes of prayer once the lights are out. It comes after lights out, so it doesn't stop the
+  // bedtime timer or make him late (afterLights); same time as lights out, so lights out stays the last time.
+  if (kid === 'eli') { const lo = out[out.length - 1]; out.push({ key: 'pray', time: lo.time, min: lo.min, label: 'Prayer · 5 min', sub: 'Talk with God about your day, confess your sin, and tell him what you’re thankful for.', afterLights: true }); }
+  return out;
 }
 
 export function notes(kid, dow) {
@@ -165,6 +170,7 @@ export function afterSchool(kid, dow, runPlan) {
   if (kid !== 'isaiah') items.push({ key: 'homework', label: 'Do homework', computer: kid === 'rhett' });
   if (kid === 'rhett') items.push(DUO, TYPING);
   if (kid === 'rhett' && dow === 4) items.push(trombone(dow));
+  if (kid === 'eli') items.push(ELI_AFTERNOON);
   items.push({ weekly: true });
   if (kid === 'eli') {
     items.push(runPlan && runPlan.swim
@@ -192,6 +198,7 @@ export function weekend(kid, dow) {
   items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO, { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video' });
   if (kid === 'rhett') items.push(TYPING, trombone(dow)); // Saturday and Sunday
+  if (kid === 'eli') items.push(ELI_AFTERNOON);
   items.push({ weekly: true });
   return items;
 }
@@ -216,7 +223,7 @@ function timerResultOn(kid, dateObj, rec, checks) {
   // by the clock, so daylight-saving nights work; each day past the checklist date adds 24h
   const dayGap = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate(), 12) - new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 12)) / 86400000);
   const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
-  const steps = bedtime(kid, dow);
+  const steps = bedtime(kid, dow).filter((s) => !s.afterLights);
   const done = steps.filter((s) => checks && isDone(checks[s.key])).length;
   // Up to the grace minutes (Settings, 5 by default) past lights out still counts; beyond that only with a parent's OK.
   const lateBy = endMin - lo;
@@ -236,7 +243,18 @@ export function rewardWhen(dow) {
 }
 
 // Isaiah's morning checklists: school days (Mon–Fri), an optional Saturday, and Sunday church mornings.
+// Eli's Bible reading (from Nov 22, 2026): he picks the book and chapter he read on the checklist.
+// reading: the pickers, each saved as <key>_<part> = 'Book N'; the box can be ticked once every picker has a pick.
+export const BIBLE_FROM = '2026-11-22';
+export const BIBLE_KEYS = ['mBible', 'bibleRead', 'pray'];
+const ELI_MORNING = { key: 'mBible', label: 'Breakfast, Bible & prayer', sub: 'Read 1 chapter. Pray over anything you’re anxious about, and pray for others.', reading: [{ part: 'ch', label: 'Chapter you read', books: BIBLE_ALL }] };
+const ELI_AFTERNOON = { key: 'bibleRead', label: 'Read a psalm or proverb + 1 chapter from a Gospel', reading: [
+  { part: 'pp', label: 'Psalm or proverb', books: ['Psalms', 'Proverbs'] },
+  { part: 'gos', label: 'Gospel chapter', books: ['Matthew', 'Mark', 'Luke', 'John'] }
+] };
+
 export function morning(kid, dow) {
+  if (kid === 'eli') return [ELI_MORNING];
   if (kid !== 'isaiah') return [];
   const breakfast = { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] };
   const teeth = { key: 'mTeeth', label: 'Brush your teeth' };
