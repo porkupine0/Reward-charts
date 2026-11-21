@@ -12,7 +12,8 @@ Rules
 - Read only. Do not edit files, do not run git, do not install packages, do not reach the network (the Iowa
   manual's text is in docs/iowa/drivers-manual.txt; DOT permit pages in docs/iowa/gdl-*.txt; the DOT practice-test
   question text, without answers, in docs/iowa/dot-practice-stems.txt). Do not fetch Iowa DOT quiz files.
-- You may run `node --test tests/*.test.mjs` and read any file.
+- You may run `node --test tests/*.test.mjs` and `node tests/browser/run.mjs` (a local browser suite; no network),
+  and read any file.
 - Form A is FROZEN (Eli takes it before anything else; later scores compare against it). Report problems in it,
   but mark them "frozen: record only".
 - Every finding needs evidence: a file and line, a manual page and verbatim quote, or a test you ran.
@@ -25,8 +26,17 @@ What to look for (one section each, ranked within):
    advanced balance and order (docs/driving-syllabus.md, "Skill levels").
 3. Code and UX: bugs a 14-year-old or a parent would hit (lost answers, wrong day, streak or game-time wrongly
    affected, stuck screens, offline), accessibility, phone layout.
-4. Process: anything in how lessons are written (docs/plan-progress.md is NOT provided; use the code, tests and
+4. Repeated facts: questions anywhere (lessons, unit tests, forms) that test the same fact, especially in
+   consecutive test forms.
+5. Process: anything in how lessons are written (docs/plan-progress.md is NOT provided; use the code, tests and
    data) that will cause repeat problems in the remaining units.
 
 Write your findings to {OUT} as markdown: a one-paragraph verdict, then the four sections, each finding as
 "severity (high / medium / low) - what - evidence - suggested fix". End with the 5 changes you'd make first.
+
+## How to run it (for the person launching it; not part of the brief)
+1. `git archive <commit> | tar -x -C <scratch>/cold`, then remove docs/reviews/ and docs/plan-progress.md.
+2. Before launching, write 5-6 known open issues to a scratch file (not in the brief); score the brief by how many
+   it finds.
+3. Launch a FRESH agent (not a fork) on the copy only; save its output and scripts under docs/reviews/; triage
+   each finding (accept / decline / ask the parent / record only) in a separate file.

@@ -342,3 +342,15 @@ test('guessReport finds a rank tell, a filler and a padded choice', () => {
   const pad = D.guessReport('t', [{ id: 'p1', choices: ['Stop', 'Only where two highways cross each other out in the country', 'Go', 'Wait'], answer: 0 }]);
   assert.match(pad.issues.join(' | '), /p1 has a padded wrong choice/);
 });
+
+// Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026 (last rewords before Eli starts). Like Form A: if this
+// fails, put them back; new questions are appended in a later lesson. Pin each later lesson once it is approved.
+const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6' };
+test('frozen lessons are unchanged', async () => {
+  const { createHash } = await import('node:crypto');
+  const { LESSONS } = await import('../driving-course.js?v=' + V);
+  Object.entries(PINNED_LESSONS).forEach(([ids, sha]) => {
+    const ls = ids.split(',').map((id) => LESSONS.find((l) => l.id === id));
+    assert.equal(createHash('sha256').update(JSON.stringify(ls)).digest('hex'), sha, ids);
+  });
+});

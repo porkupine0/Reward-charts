@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795270791';
-import { choreSteps } from './chorelists.js?v=1795270791';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795270791';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795271407';
+import { choreSteps } from './chorelists.js?v=1795271407';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795271407';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },

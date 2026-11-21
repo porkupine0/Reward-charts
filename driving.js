@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795270791';
+import { checkSign } from './signs.js?v=1795271407';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -289,11 +289,13 @@ export function quoteReport(forms, lessons, minWords = 6) {
 // Can the answers be guessed without knowing the rule? For a group of questions (a unit, or a test form):
 // - rank: how often the right answer is the longest, 2nd-longest, 3rd, shortest choice. A guesser who always
 //   picks one rank scores that share; above 35% is a tell (25% is even).
-// - fillers: a word that opens 4+ wrong choices and no right one in the group (e.g. "Honk ..."), so it marks a
-//   choice as wrong.
+// - fillers: a listed word (FILLERS) that opens 4+ wrong choices and no right one in the group (e.g. "Honk ...").
+//   Clear one by replacing the choice, never by starting a right answer with that word.
 // - padded: a wrong choice more than twice as long as the right one (and over 40 characters).
 // Returns { ranks, worst, issues: [text] }. A rule for new content (units 5+, Forms C+); a report for the rest.
-const OPENERS = new Set(['a', 'an', 'the', 'you', 'your', 'it', 'its', 'they', 'when', 'at', 'to', 'in', 'on', 'if', 'no', 'yes', 'one', 'two', 'three', 'four', 'five', 'six']);
+// Openers that mark a choice as wrong when they keep opening wrong choices (absolutes and stock silly moves);
+// ordinary verbs (turn, keep, slow) are not on the list.
+const FILLERS = new Set(['honk', 'only', 'whoever', 'nothing', 'anywhere', 'always', 'never', 'ignore', 'flash', 'stare', 'race']);
 export function guessReport(name, qs) {
   const ranks = [0, 0, 0, 0], issues = [], right = {}, wrong = {};
   qs.filter((q) => (q.choices || []).length === 4).forEach((q) => {
@@ -301,7 +303,7 @@ export function guessReport(name, qs) {
     ranks[q.choices.filter((c) => c.length > a).length]++;
     q.choices.forEach((c, i) => {
       const w = (c.toLowerCase().match(/[a-z’']+/) || [''])[0];
-      if (!w || OPENERS.has(w)) return;
+      if (!FILLERS.has(w)) return;
       (i === q.answer ? right : wrong)[w] = (i === q.answer ? right : wrong)[w] || [];
       (i === q.answer ? right : wrong)[w].push(q.id);
       if (i !== q.answer && c.length > 40 && c.length > 2 * a) issues.push(name + ': ' + q.id + ' has a padded wrong choice (' + c.length + ' vs ' + a + ' characters): ' + c);

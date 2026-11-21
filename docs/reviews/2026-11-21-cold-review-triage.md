@@ -10,7 +10,7 @@ reviewer run the browser suite, and add a "repeated fact" lens.
 
 | # | Finding | Decision | When / evidence |
 |---|---|---|---|
-| U1 | Video restarts on any save | ACCEPT, fixed | bc8bacc; browser case drive-video failed before the fix |
+| U1 | Video restarts on any save | ACCEPT: lesson video fixed; parent preview still rebuilds (OPEN, low) | bc8bacc; browser case drive-video failed before the fix |
 | C1/P1 | Right answer usually the 2nd-longest (48% lessons, 48% A, 40% B) | ACCEPT | Confirmed on HEAD (lenstat). New rule: guessReport (rank <= 35% per unit/form, stock fillers, padded choices), hard for units 5+ and Forms C+, report for units 1-4 and B (docs/driving-guess-report.md). Rework units 1-4 wrong choices in the order Eli reaches them (w1d3-w1d4 first, before the parent approves them); lessons 1-2 only for stock fillers. Form A: frozen, record only (his baseline may read a little high) |
 | C2 | Form B repeats Form A (tB01 same picture and fact as tA01; tB15; tB16) | ACCEPT tB01, tB15; tB16 recorded | Nov 25 forms night, before Form B opens. tB16 asks another number from the same sentence (allowed by the Nov 21 rule; the reviewer disagreed, recorded). Add a `fact` key per form question and a test for consecutive forms |
 | C3 | Stems that give the answer away (tB03, tB04) | ACCEPT | Nov 25 |
@@ -24,12 +24,12 @@ reviewer run the browser suite, and add a "repeated fact" lens.
 | V2 | The 3- to 4-second rule never asked | ACCEPT | with the selection fix (core flag) |
 | V3 | Form B mostly measures untaught topics | RECORD (by design: a progress test) | |
 | V4 | Questions are nearly all recall | RECORD | Dec 3 skill-level review |
-| U2/P4 | Questions 8+ of a lesson are never asked (20 of 132, incl. flashing red/yellow w2d4q10-11) | ACCEPT | Confirmed (sim). Misses DO return in the daily quiz's earlier slots, so U2's "misses never return" part is mostly moot. Fix the selection (a `core` flag and/or unit tests reaching the never-asked tail) before the unit 1 test (about Nov 27), with a test that a quiz in progress doesn't change |
+| U2/P4 | Questions 8+ of a lesson are never asked (20 of 132, incl. flashing red/yellow w2d4q10-11) | ACCEPT | Confirmed (sim; the sim answers everything right, so it can't show misses). By the code (driving.js quizFor: missed ones first in the earlier slots) and its unit tests, misses DO return in the daily quiz, so U2's "misses never return" part is mostly moot. Fix the selection (a `core` flag and/or unit tests reaching the never-asked tail) before the unit 1 test (about Nov 27), with a test that a quiz in progress doesn't change |
 | U3 | One tap is final, even on tests | ASK THE PARENT | changes baseline behaviour |
 | U4 | Offline open stays on "Loading…" | DECLINE (by design) | answers queue; code-review #6 |
 | U5 | Parent preview can stay open on a shared iPad | RECORD | |
 | U6 | Accessibility items | ACCEPT the specific ones | with the rework |
 | U7 | Rules can't enforce "first answer counts" | RECORD | |
 | P2 | Quote test proves the quote is on the page, not that it supports the answer | ACCEPT (process) | blind check stays the guard |
-| P3 | "Append only" not enforced for lessons | ACCEPT | pin each lesson's questions by hash once it is approved (like Form A) |
+| P3 | "Append only" not enforced for lessons | ACCEPT, started | w1d1-w1d2 pinned Nov 21 (tests/driving.test.mjs PINNED_LESSONS); pin each later lesson once reworked and approved |
 | P5 | Duplicate check matches exact stems only | ACCEPT | `fact` keys |
