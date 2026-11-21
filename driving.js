@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795244259';
+import { checkSign } from './signs.js?v=1795245038';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -246,7 +246,7 @@ export function checkTests(forms, sittings, topics, lessons, blueprint) {
       if (!Array.isArray(x.choices) || x.choices.length < 2) out.push(x.id + ': needs choices');
       else if (!(Number.isInteger(x.answer) && x.answer >= 0 && x.answer < x.choices.length)) out.push(x.id + ': answer is not one of the choices');
       if (!x.why) out.push(x.id + ': needs an explanation');
-      if (!isSourced(x.ref)) out.push(x.id + ': needs a manual page or an Iowa DOT page');
+      if (!/^Iowa Driver.s Manual p\.\s?\d+/.test(x.ref || '')) out.push(x.id + ': needs a manual page (the knowledge test quotes the manual only; DOT pages are for lessons)');
       out.push(...checkSign(x.id, x.sign));
     });
   });

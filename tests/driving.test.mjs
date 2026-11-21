@@ -277,7 +277,8 @@ test('knowledge tests: the checker catches bad forms and sittings', () => {
 });
 
 const FORM_A_SHA = '0a697406d3a9a637ef0476a89921e3f8ef3101252bc307e0d205c0f93d1d9312'; // Form A as of bc148bc (Nov 20)
-// Form A is the baseline Eli took on Nov 20, 2026: it must never change (later scores compare against it).
+// Form A is the baseline (planned for the evening of Nov 20, 2026; not yet confirmed taken): it must never change
+// (later scores compare against it).
 // If this fails, put Form A back; a new or changed question belongs in a new form.
 test('Form A (the baseline he has taken) is unchanged', async () => {
   const { createHash } = await import('node:crypto');
@@ -294,6 +295,8 @@ test('sources: a manual page or a saved Iowa DOT page; the key points card shows
   const L = [{ id: 'L1', title: 'L', videos: [{ yt: 'abcdefghijk', title: 't', min: 3 }], key: [{ t: 'A', ref: D.SOURCES.license.ref, quote: 'q' }, { t: 'B', family: true }], questions: [dotQ] }];
   assert.ok(!D.checkCourse(L).some((e) => /needs a manual page/.test(e)), 'DOT refs pass the course checker');
   assert.ok(D.checkCourse([{ ...L[0], questions: [{ ...dotQ, ref: 'Iowa DOT' }] }]).some((e) => /x1: needs a manual page/.test(e)), 'an unknown source does not');
+  const f = (ref) => D.checkTests({ C: [{ id: 'c1', topic: 'Signs', q: 'Q?', choices: ['a', 'b', 'c', 'd'], answer: 0, why: 'w', ref, quote: 'z' }] }, [], ['Signs'], []).some((e) => /c1: needs a manual page/.test(e));
+  assert.ok(f(D.SOURCES.permit.ref) && !f("Iowa Driver's Manual p.3"), 'the knowledge-test forms quote the manual only');
 });
 
 test('shared-quote report: the same or overlapping quote on one page, across forms and lessons (a report, never a rule)', async () => {

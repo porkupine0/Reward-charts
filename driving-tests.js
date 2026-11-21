@@ -7,9 +7,6 @@
 // APPEND ONLY: never change a question once a sitting has used it (old scores are rebuilt from it).
 
 const q = (id, topic, question, choices, answer, why, page, quote) => ({ id, topic, q: question, choices, answer, why, ref: "Iowa Driver's Manual p." + page, quote });
-// Iowa's permit and license rules: cite the saved Iowa DOT page ('permit' or 'license').
-const DOT_REF = { permit: 'Iowa DOT: Instruction Permit page', license: 'Iowa DOT: Intermediate License page' }; // = SOURCES in driving.js (the checker rejects any other ref)
-const qd = (id, topic, question, choices, answer, why, src, quote) => ({ id, topic, q: question, choices, answer, why, ref: DOT_REF[src], quote });
 
 // How many questions each form has per topic. From a tally of Iowa DOT's 68 practice questions, scaled to
 // 25: signs 10, signals and markings 5, right of way 3, school buses and emergency vehicles 10, railroad and

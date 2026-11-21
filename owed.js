@@ -1,11 +1,11 @@
 // Everything the kids have earned and not received yet (Parents page and the home Parents button).
 // row(who, accent, whatHtml, when, actionHtml) and tick(chart, path, label) decide how each item looks.
-import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1795244259';
-import { CHARTS, weekProgress } from './charts.js?v=1795244259';
-import { KIDS } from './routines.js?v=1795244259';
-import * as L from './lists.js?v=1795244259';
-import { owed } from './trials.js?v=1795244259';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795244259';
+import { ymd, parseYmd, mondayOf, addDays, shortDate, esc } from './store.js?v=1795245038';
+import { CHARTS, weekProgress } from './charts.js?v=1795245038';
+import { KIDS } from './routines.js?v=1795245038';
+import * as L from './lists.js?v=1795245038';
+import { owed } from './trials.js?v=1795245038';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795245038';
 
 export function owedItems(D, ctx, row, tick) {
   const out = [];
