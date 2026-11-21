@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795268966';
-import { applyConfig } from './routines.js?v=1795268966';
-import { askParent } from './parent.js?v=1795268966';
-import * as L from './lists.js?v=1795268966';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795268966';
-import { signSvg } from './signs.js?v=1795268966';
-import * as COURSE from './driving-course.js?v=1795268966';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795268966';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795270314';
+import { applyConfig } from './routines.js?v=1795270314';
+import { askParent } from './parent.js?v=1795270314';
+import * as L from './lists.js?v=1795270314';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795270314';
+import { signSvg } from './signs.js?v=1795270314';
+import * as COURSE from './driving-course.js?v=1795270314';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795270314';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -66,17 +66,25 @@ function render() {
   const quiz = st.status === 'done' ? storedQuiz(course, lesson.id) : quizFor(course, st.index, d);
   // a unit test: no right/wrong until every question is answered, then the score and every answer
   const answered = quiz.filter((q) => answerOf(q.id, lesson.id)), allIn = quiz.length > 0 && answered.length === quiz.length;
-  let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>';
+  // Three parts: before the video, the video, after it. When only the parts around it change (a brother's tick,
+  // an answer, a parent's approval), the video player is left in place so it doesn't restart.
+  let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>', post = '';
+  const vids = lesson.review || noVideo ? [] : (lesson.videos || []);
   if (lesson.review) h += allIn ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
     : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. You’ll see your score and the answers at the end.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
   // the key points show until the questions do (then they'd give the answers away)
   // once the questions show, the video stays (to rewatch) but its Iowa note hides, like the key points (it can state answers)
-  else if (watched) h += (noVideo ? '' : (lesson.videos || []).map((v) => video(Object.assign({}, v, { iowa: '' }))).join('')) + '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';
-  else if (noVideo) h += '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>' + keyCard(lesson) + '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I’ve read these</button>';
-  else h += keyCard(lesson) + (lesson.videos || []).map(video).join('') + '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>';
-  if (watched || lesson.review) h += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
-  if (st.status === 'done') h += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
-  $('today').innerHTML = h;
+  else if (watched) post += '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';
+  else if (noVideo) { h += '<p class="note">No video for this one (Mom or Dad skipped it): read the key points, then the questions.</p>' + keyCard(lesson); post += '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I’ve read these</button>'; }
+  else { h += keyCard(lesson); post += '<button class="tt-save" type="button" data-watched="' + esc(lesson.id) + '">I watched it</button>'; }
+  if (watched || lesson.review) post += '<div class="dquiz"><h3>' + quiz.length + ' questions</h3>' + quiz.map((q) => questionHtml(q, answerOf(q.id, lesson.id), lesson.id, lesson.review && !allIn)).join('') + '</div>';
+  if (st.status === 'done') post += '<p class="dv-done big">' + (lesson.review ? 'Unit test done ✓' : 'Lesson done for today ✓') + '</p>';
+  const el = $('today'), vkey = lesson.id + '|' + vids.map((v) => v.yt).join(','), box = el.querySelector(':scope > .dvbox');
+  if (vids.length && box && box.dataset.vkey === vkey && el.querySelector(':scope > .dpre')) {
+    el.querySelector(':scope > .dpre').innerHTML = h;
+    if (watched) box.querySelectorAll('.dv-iowa').forEach((n) => n.remove());
+    el.querySelector(':scope > .dpost').innerHTML = post;
+  } else el.innerHTML = '<div class="dpre">' + h + '</div>' + (vids.length ? '<div class="dvbox" data-vkey="' + esc(vkey) + '">' + vids.map((v) => video(watched ? Object.assign({}, v, { iowa: '' }) : v)).join('') + '</div>' : '') + '<div class="dpost">' + post + '</div>';
 }
 // A finished lesson: the questions he answered in it, from what was stored (not a rebuilt quiz)
 function storedQuiz(course, lessonId) {
