@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795316877';
+import { checkSign } from './signs.js?v=1795330340';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -116,8 +116,9 @@ export function quizFor(lessons, index, progress, size = 5) {
 
 // The unit test (every 5th lesson): PER_LESSON questions from each finished lesson of its unit (the lessons
 // since the previous test): never-asked first, then missed ones, then the least recently asked, then course
-// order. Answers given in the test itself are left out, so the test stays the same while he takes it.
-export const PER_LESSON = 4;
+// order; then up to BACKLOG never-asked questions from earlier units. Answers given in the test itself are left
+// out, so the test stays the same while he takes it.
+export const PER_LESSON = 4, BACKLOG = 4;
 export function unitTestFor(lessons, index, progress) {
   const lesson = lessons[index], done = (progress || {}).done || {};
   if (!lesson) return [];
@@ -130,6 +131,10 @@ export function unitTestFor(lessons, index, progress) {
     }).sort((a, b) => a.rank - b.rank || (a.last < b.last ? -1 : a.last > b.last ? 1 : 0) || a.qi - b.qi);
     ranked.slice(0, PER_LESSON).sort((a, b) => a.qi - b.qi).forEach((x) => out.push(x.q));
   });
+  // plus up to BACKLOG questions from earlier units that were never asked (when he misses some, the daily
+  // review slots go to those, so a lesson's later questions can otherwise never come up): oldest first
+  if (start > 0) lessons.slice(0, start).forEach((l, li) => { if (l.review || !done[l.id]) return;
+    (l.questions || []).forEach((q, qi) => { if (out.length < lessons.slice(start, index).filter((x) => done[x.id]).length * PER_LESSON + BACKLOG && !history(progress, q.id, lesson.id).length) out.push(q); }); });
   return out;
 }
 

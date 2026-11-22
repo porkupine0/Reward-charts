@@ -101,6 +101,7 @@ A nightly check-in fires about 12:47 am Central into this session. Each night: r
 
 ## How to write a driving unit (for the weekly check-ins)
 
+**Added Nov 22:** at most 7 questions per lesson (3 go in its daily quiz, 4 in its unit test; a test enforces it for units 5+); a fact the permit test asks goes in the first 7. Unit tests also take up to 4 never-asked questions from earlier units (BACKLOG in driving.js) to drain units 2-4's extras.
 **Added Nov 21 (cold review):** wrong choices are a neighbouring number or the rule for the other situation,
 never filler ("Honk…", absurd, or padded to hide the answer's length). Run `node scripts/guess-report.mjs`: each
 length rank at 35% or less per unit and form (a test enforces it for units 5+ and Forms C+). One question per fact
@@ -196,3 +197,4 @@ in a lesson; a fact the DOT test asks gets a `core` flag (once that lands). The 
 - Nov 22 (parent): Eli's baseline (Form A) score: 80% (20 of 25), exactly the practice-test pass mark. Taken on the Nov 20 version of Form A (giveaway choices rewritten, signs drawn; the length pattern unchanged). Date taken and first lesson date not yet given.
 - Nov 22 (parent): baseline taken Sun Nov 22; lesson 1 starts Mon Nov 23 (required that day: the baseline was finished on an earlier day). From Nov 23 on, w1d1-w1d2 are seen (already pinned); the nightly rework of w1d3-w1d5 must land before he reaches lesson 3 (about Wed Nov 25), then the parent approves.
 - Nov 22 (parent): a finished knowledge test now has "See every answer" on the Driving page (his pick, the right answer, why, the manual page), for Eli and the parents; the Parents page links to it ("His answers"). Forms B-F use different questions, so it doesn't spoil later tests.
+- Nov 22 (nightly): own trace (real functions, stored as the page stores): all answers right, the extras drain; with 1 in 4 wrong, 20 questions in units 2-4 (each lesson's q8+) never come up, because missed ones take the daily review slots. Fix confined to unitTestFor (first used at the unit 1 test, about Nov 27; lesson 1-2 quizzes unchanged): +4 never-asked from earlier units per unit test; with misses the backlog holds at 12 instead of growing to 20, and drains once new lessons stop adding extras (max 7 questions per lesson for units 5+, tested). Units 2-4 rework: move must-ask facts (w2d4q10-11 flashing red/yellow) into the first 7.

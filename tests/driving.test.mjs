@@ -112,7 +112,8 @@ test('driving: the unit test is 4 questions from each finished lesson of its uni
   assert.equal(D.quizFor(LESSONS, 4, { done: { L1: day(1), L2: day(2) }, answers: {} }).length, 8);
   // the next unit's test only uses its own unit (L6-L9)
   const ten = course(10), p2 = { done: Object.fromEntries(ten.map((l, i) => [l.id, day(i + 1)])), answers: {} };
-  assert.ok(D.quizFor(ten, 9, p2).every((x) => /^L[6-9]q/.test(x.id)));
+  const t2 = D.quizFor(ten, 9, p2);
+  assert.ok(t2.slice(0, 16).every((x) => /^L[6-9]q/.test(x.id)) && t2.slice(16).every((x) => /^L[1-4]q/.test(x.id)) && t2.length === 20, 'its own unit (L6-L9), plus up to 4 never-asked from unit 1');
 });
 
 test('driving: a unit test looks only at its own unit (an empty one would be passed over)', () => {
@@ -122,7 +123,7 @@ test('driving: a unit test looks only at its own unit (an empty one would be pas
   assert.equal(D.lessonFor(ten, p, day(8)).lesson.id, 'L6', 'videos skipped: the unit 2 lessons still run');
   Object.assign(p.done, { L6: day(6), L7: day(7), L8: day(8), L9: '2026-12-09' });
   assert.equal(D.lessonFor(ten, p, '2026-12-10').lesson.id, 'L10');
-  assert.equal(D.quizFor(ten, 9, p).length, 16, 'its test has all four lessons');
+  assert.equal(D.quizFor(ten, 9, p).filter((x) => /^L[6-9]q/.test(x.id)).length, 16, 'its test has all four lessons');
   // the guard: a unit test with nothing finished in its own unit is passed over (unit 1's lessons don't count)
   const odd = [...ten.slice(0, 5), { ...ten[9], id: 'T2' }, ...ten.slice(10)];
   assert.equal(D.lessonFor(odd, { approved: { L11: '2026-12-01' }, done: { L1: day(1), L2: day(2), L3: day(3), L4: day(4), L5: day(5) } }, day(8)).lesson.id, 'L11');
@@ -357,4 +358,28 @@ test('frozen lessons are unchanged', async () => {
     const ls = ids.split(',').map((id) => LESSONS.find((l) => l.id === id));
     assert.equal(createHash('sha256').update(JSON.stringify(ls)).digest('hex'), sha, ids);
   });
+});
+
+test('driving: a unit test also takes up to 4 never-asked questions from earlier units (oldest first)', () => {
+  const C = course(10).map((l) => (l.review ? l : { ...l, questions: [1, 2, 3, 4, 5, 6, 7, 8].map((k) => q(l.id + 'q' + k)) }));
+  const p = { approved: {}, done: {}, answers: {} };
+  // unit 1: each lesson's q1-q3 asked in its daily quiz; the unit test asks q4-q7 (never asked); q8 is left over
+  ['L1', 'L2', 'L3', 'L4'].forEach((id, i) => { [1, 2, 3].forEach((k) => answer(p, id + 'q' + k, id, true, day(i + 1))); p.done[id] = day(i + 1); });
+  const u1 = D.unitTestFor(C, 4, p).map((x) => x.id);
+  assert.equal(u1.length, 16);
+  assert.ok(!u1.some((id) => /q8$/.test(id)), 'unit 1: q8 not asked (only 4 per lesson)');
+  u1.forEach((id) => answer(p, id, 'L5', true, day(5))); p.done.L5 = day(5);
+  ['L6', 'L7', 'L8', 'L9'].forEach((id, i) => { [1, 2, 3].forEach((k) => answer(p, id + 'q' + k, id, true, day(i + 8))); p.done[id] = day(i + 8); });
+  const u2 = D.unitTestFor(C, 9, p).map((x) => x.id);
+  assert.equal(u2.length, 20, '16 from unit 2 + 4 never-asked from unit 1');
+  assert.deepEqual(u2.slice(16), ['L1q8', 'L2q8', 'L3q8', 'L4q8']);
+  // it stays the same while he takes it (his answers in it don't count as "asked" for its own selection)
+  u2.slice(0, 18).forEach((id) => answer(p, id, 'L10', true, day(12)));
+  assert.deepEqual(D.unitTestFor(C, 9, p).map((x) => x.id), u2);
+});
+
+test('lessons in units 5+ have at most 7 questions (3 in the daily quiz + 4 in the unit test), so none go unasked', async () => {
+  const { LESSONS } = await import('../driving-course.js?v=' + V);
+  const over = LESSONS.filter((l) => Number(l.id.match(/^w(\d+)/)[1]) >= 5 && (l.questions || []).length > 7).map((l) => l.id + ' (' + l.questions.length + ')');
+  assert.deepEqual(over, []);
 });

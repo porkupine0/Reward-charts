@@ -1,12 +1,12 @@
-import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1795316877';
-import { askParent } from './parent.js?v=1795316877';
-import { celebrate } from './streaks.js?v=1795316877';
-import { PLAN_START, trialOn } from './plan.js?v=1795316877';
+import { watch, save, ymd, parseYmd, addDays, mondayOf, shortDate, esc, statusPill } from './store.js?v=1795330340';
+import { askParent } from './parent.js?v=1795330340';
+import { celebrate } from './streaks.js?v=1795330340';
+import { PLAN_START, trialOn } from './plan.js?v=1795330340';
 
 const ID = 'eli-trials';
 
 // Prize levels, smallest to biggest. The lists can be changed on the Settings page.
-import { SETTINGS, applySettings } from './settings.js?v=1795316877';
+import { SETTINGS, applySettings } from './settings.js?v=1795330340';
 export const LEVELS = ['Small', 'Medium', 'Big', 'Huge', 'Grand'];
 const T1 = 'Small', T2 = 'Medium', T3 = 'Big', T4 = 'Huge', T5 = 'Grand';
 const tierName = (lvl) => lvl;
