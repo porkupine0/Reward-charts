@@ -63,3 +63,7 @@ Status: **built** (shipped; test named where one exists) · **partial** · **pla
 | P2 | Nightly work from about 1 am until tokens run out, Nov 21 - Dec 14 (complete the course; test for comprehension, compliance, bugs, missing features, improvements, UI) | planned |
 | P3 | Check beginner, intermediate and advanced skills and gaps; an independent reviewer of the whole program; a week to act on its recommendations | planned (Nov 22, Dec 3, Dec 7-13) |
 | P4 | Push to main (the family's app) and the session branch | ongoing |
+| P5 | Iowa DOT practice-test questions saved, question text only (no answers), as a coverage benchmark (Nov 21) | done: docs/iowa/dot-practice-stems.txt, scripts/fetch-dot-stems.mjs |
+| P6 | Right answers not guessable from length; wrong choices plausible, not filler (Nov 21) | lessons 1-4 done (unit 1 ranks 6/7/7/8); rule enforced for units 5+ and Forms C+; units 2-4 and Form B scheduled (plan) |
+| P7 | On tests he can change an answer until he taps Finish (accidental taps) (Nov 21) | done: knowledge tests and unit tests (drive-test, drive-unit) |
+| P8 | Eli and the parents can see every baseline answer (his pick, the right one, why, the page) (Nov 22) | done: "See every answer" on the Driving page; "His answers" on the Parents page (drive-test) |

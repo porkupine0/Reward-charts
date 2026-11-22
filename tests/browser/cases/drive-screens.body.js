@@ -7,12 +7,12 @@
     const answers = {}, drive = { approved: { w1d1: '2026-11-18', w1d2: '2026-11-18' } };
     const addBase = (k) => { Object.entries(base).slice(0, k).forEach(([id, a]) => { answers[id] = a; }); };
     if (st === 'midtest') addBase(10);
-    if (['score', 'key', 'lesson', 'done'].includes(st)) addBase(25);
+    if (['score', 'key', 'lesson', 'done', 'allin', 'answers'].includes(st)) addBase(25);
     const l1 = C.LESSONS.find((l) => l.id === 'w1d1');
     if (['lesson', 'done'].includes(st)) drive.watched = { w1d1: '2026-11-18' };
     if (st === 'lesson') { answers[l1.questions[0].id] = { w1d1: { ok: true, pick: l1.questions[0].answer, on: '2026-11-18', n: 1 } }; answers[l1.questions[1].id] = { w1d1: { ok: false, pick: (l1.questions[1].answer + 1) % 4, on: '2026-11-18', n: 2 } }; }
     if (st === 'done') { l1.questions.slice(0, 5).forEach((q, i) => { answers[q.id] = { w1d1: { ok: i !== 1, pick: i !== 1 ? q.answer : (q.answer + 1) % 4, on: '2026-11-18', n: i + 1 } }; }); drive.done = { w1d1: '2026-11-18' }; }
-    if (['score', 'key', 'lesson', 'done'].includes(st)) drive.watched = Object.assign({ base: '2026-11-18' }, drive.watched); // he tapped Finish
+    if (['score', 'key', 'lesson', 'done', 'answers'].includes(st)) drive.watched = Object.assign({ base: '2026-11-18' }, drive.watched); // he tapped Finish ('allin': all answered, Finish not tapped)
     drive.answers = answers;
     localStorage.clear();
     sessionStorage.setItem('mockdb', JSON.stringify({ charts: { routines: { days: { '2026-11-16': { eli: { chore: true, chore2: true } }, '2026-11-17': { eli: { chore: true } }, '2026-11-18': { eli: { chore: true } } } }, 'eli-drive': drive } }));
@@ -36,13 +36,14 @@
     });
     return bad;
   });
-  for (const st of ['start', 'midtest', 'score', 'key', 'lesson', 'done']) {
+  for (const st of ['start', 'midtest', 'allin', 'score', 'answers', 'key', 'lesson', 'done']) {
     for (const scheme of ['light', 'dark']) {
       await p.emulateMedia({ colorScheme: scheme });
       await seed(st);
       await visit('drive.html', 'scr-' + st + '-' + scheme);
       if (st === 'start' && await p.$('[data-tstart="base"]')) { await p.click('[data-tstart="base"]'); await p.waitForTimeout(200); }
       if (st === 'midtest') { await p.click('[data-tstart="base"]').catch(() => {}); await p.waitForTimeout(200); }
+      if (st === 'answers') { await p.click('[data-ans="base|1"]'); await p.waitForTimeout(200); }
       const bad = await contrast();
       notes.push(st + ' ' + scheme + ': ' + (bad.length ? 'below contrast: ' + bad.join(' | ') : 'ok'));
       check(!bad.length, st + ' ' + scheme + ' text below contrast: ' + bad.join(' | '));
@@ -52,6 +53,8 @@
   }
   await p.emulateMedia({ colorScheme: 'light' });
   // what each state shows
+  await seed('allin'); await visit('drive.html', 'scr-allin-check');
+  check(!!(await p.$('[data-tfinish="base"]')) && !/pass mark/.test(await p.$eval('#tests', (e) => e.textContent)), 'allin: Finish shows, no score yet');
   await seed('key'); await visit('drive.html', 'scr-key-check');
   check(!!(await p.$('#today .dkey li')) && /Look ahead/.test(await p.$eval('#today', (e) => e.textContent)), 'key: lesson 1 open with its key points after the baseline');
   await seed('done'); await visit('drive.html', 'scr-done-check');

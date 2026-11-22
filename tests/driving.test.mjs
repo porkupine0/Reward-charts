@@ -282,7 +282,7 @@ test('knowledge tests: the checker catches bad forms and sittings', () => {
 });
 
 const FORM_A_SHA = '0a697406d3a9a637ef0476a89921e3f8ef3101252bc307e0d205c0f93d1d9312'; // Form A as of bc148bc (Nov 20)
-// Form A is the baseline (planned for the evening of Nov 20, 2026; not yet confirmed taken): it must never change
+// Form A is the baseline Eli took (the parent: Nov 22, 2026; 80%): it must never change
 // (later scores compare against it).
 // If this fails, put Form A back; a new or changed question belongs in a new form.
 test('Form A (the baseline he has taken) is unchanged', async () => {
