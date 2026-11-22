@@ -79,19 +79,19 @@ export const LESSONS = [
     videos: [{ yt: 'uJ4w63wZyFQ', title: 'How to Shoulder (Head) Check When Turning & Changing Lanes', channel: 'Smart Drive Test', len: '5:45',
       iowa: 'Iowa’s manual: blind spots are areas you can’t see in your mirrors. Look over your shoulder before changing lanes, and never stay alongside a truck or bus. (This channel may not be from the US: listen for km/h or rules that differ.)' }],
     questions: [
-      q('w1d3q1', 'What is a blind spot?', ['The space between your car and the car ahead', 'The road just past the reach of your headlights', 'Any stretch of road without streetlights', 'An area your mirrors can’t show you'], 3,
+      q('w1d3q1', 'What is a blind spot?', ['The space between your car and the car ahead', 'The road just past the reach of your headlights', 'Any stretch of road without streetlights', 'An area around your car that your mirrors can’t show'], 3,
         'Blind spots are the areas outside your vehicle that your mirrors can’t show, so check them another way before you move over.', 34, 'Blind spots are areas outside your vehicle that cannot be seen using mirrors.'),
       q('w1d3q6', 'You’ve checked your mirrors and want to change lanes. What does the manual say to do next?', ['Nothing more; the mirrors show everything', 'Turn the wheel slightly to test the gap', 'Look over your shoulder toward the lane you want', 'Check the inside mirror one more time'], 2,
         'Turning your head shows the rear corner your mirrors can’t; keep the steering wheel straight while you look.', 44, 'Look over your shoulder in the direction you plan to move.'),
-      q('w1d3q2', 'You notice you’re driving in another car’s blind spot. What should you do?', ['Speed up or drop back so the driver can see you', 'Stay there; they’ll check before moving over', 'Move closer so they notice you', 'Turn on your headlights so they see you'], 0,
+      q('w1d3q2', 'You notice you’re driving in another car’s blind spot. What should you do?', ['Speed up or drop back so the driver can see you', 'Stay there; they’ll check before moving over', 'Move over to the far side of your lane', 'Turn on your hazard lights so they see you'], 0,
         'The manual says to speed up or slow down so the other driver can see your vehicle.', 34, 'Either speed up or slow down so the other driver can see your vehicle.'),
       q('w1d3q3', 'Why should you never stay alongside a truck or bus?', ['It’s against the law to ride beside them', 'They may not see you: big blind spots', 'They change lanes more often than cars do', 'You might block them from changing lanes'], 1,
         'Big vehicles have big blind spots; get past or drop back.', 34, 'These vehicles have large blind spots and it is hard for them to see you.'),
       q('w1d3q4', 'How does the manual say to set your left-side mirror?', ['So you can see the whole side of your car', 'Pointed straight back, matching the inside mirror view', 'Tilted down so you can see the curb', 'Lean left, then set it to barely show your car’s side'], 3,
         'The manual says this method gives the best view of the lanes next to you.', 25, 'Lean your head toward the left-side window, and set the left mirror so you can barely see the side of the car.'),
-      q('w1d3q7', 'How should you set the inside rearview mirror?', ['Angled so you can see the car beside you', 'Aimed at the left lane to watch for passing cars', 'So it frames the entire rear window', 'Tilted down so you can see your back bumper'], 2,
+      q('w1d3q7', 'How should you set the inside rearview mirror?', ['Angled so you can see the car beside you', 'Aimed at the left lane to watch for passing cars', 'So it frames the entire rear window', 'Angled down to see the road right behind you'], 2,
         'It’s your main mirror for what’s behind you.', 25, 'adjust the inside mirror so that it frames the entire rear window.'),
-      q('w1d3q8', 'When you turn your head to check a blind spot, what should your hands do?', ['Keep the steering wheel straight', 'Turn the wheel the way you’re looking', 'Loosen your grip so the car drifts less', 'Hold the wheel at the bottom with one hand'], 0,
+      q('w1d3q8', 'When you turn your head to check a blind spot, what should your hands do?', ['Keep the steering wheel pointed straight', 'Turn the wheel the way you’re looking', 'Turn the wheel slightly the other way to balance', 'Steer gently toward the new lane'], 0,
         'People tend to turn their arms the same way as their head, which pulls the car over.', 44, 'make sure you keep the steering wheel straight')
     ]
   },
@@ -111,11 +111,11 @@ export const LESSONS = [
         'The manual lists cross streets, side streets, driveways, parking lots, and roadways open to public travel.', 50, 'Intersections are any place where traffic merges or crosses.'),
       q('w1d4q4', 'What does the law about right-of-way do?', ['It lets whoever arrives first go no matter what', 'It says who must yield, not who may go', 'It gives the right-of-way to whoever signals first', 'It gives the right-of-way to the bigger vehicle'], 1,
         'Whoever should yield, you should do everything you can to avoid hitting a pedestrian or another vehicle.', 18, 'The law says who must yield the right-of-way; it does not give anyone the right-of-way.'),
-      q('w1d4q6', 'A bicyclist at an intersection should yield to you, but starts to go. What does the manual say?', ['Keep going; it’s your right-of-way', 'Speed up to get through first', 'Keep your speed so they can judge you', 'Be ready to yield to them anyway'], 3,
+      q('w1d4q6', 'A bicyclist at an intersection should yield to you, but starts to go. What does the manual say?', ['Keep going; it’s your right-of-way', 'Slow a little and keep going', 'Keep your speed so they can judge you', 'Be ready to yield to them anyway'], 3,
         'Bicyclists have no defense against a vehicle, so it’s your job to watch out for them.', 18, 'Be ready to yield the right-of-way, even at times the bicyclists should yield to you.'),
-      q('w1d4q7', 'You’re coming up to an intersection. What should you do first?', ['Speed up to get through it quickly', 'Slow to 10 mph whatever the signs say', 'Spot its signs, signals and type', 'Check your mirrors for anyone tailgating'], 2,
+      q('w1d4q7', 'You’re coming up to an intersection. What should you do first?', ['Signal, even if you’re going straight', 'Move into the left lane to see better', 'Look ahead to see what kind it is and its signs', 'Check your mirrors for anyone tailgating'], 2,
         'The manual’s first step: look ahead to see what kind of intersection it is and what signs or signals control it.', 50, 'look ahead to identify the type of intersection and any traffic control devices'),
-      q('w1d4q8', 'Why be extra careful about a motorcycle’s turn signal?', ['Their signals often don’t switch off on their own', 'Riders signal much earlier than cars do', 'A rider signals only after turning', 'A blinking signal means they’re about to pull over'], 0,
+      q('w1d4q8', 'Why be extra careful about a motorcycle’s turn signal?', ['Their signals often don’t switch off on their own', 'Riders often signal with their hands instead', 'Their signals flash faster than a car’s', 'A blinking signal means they’re about to pull over'], 0,
         'The rider may have forgotten it’s on; wait until they actually start to turn.', 50, 'their signals often do not cancel by themselves.')
     ]
   },

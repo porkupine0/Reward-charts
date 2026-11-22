@@ -10,5 +10,9 @@ for (const [g, qs] of [...Object.entries(units), ...Object.entries(FORMS).map(([
   const r = D.guessReport(g, qs);
   out.push('## ' + g + ': ' + r.ranks.join('/') + ' (worst ' + Math.round(r.worst * 100) + '%)', '', ...(r.issues.length ? r.issues.map((x) => '- ' + x) : ['- none']), '');
 }
+// per lesson too: a unit reworked in pieces can hide a tell inside one part
+out.push('## Per lesson (longest / 2nd / 3rd / shortest)', '');
+LESSONS.filter((l) => (l.questions || []).length).forEach((l) => out.push('- ' + l.id + ': ' + D.guessReport(l.id, l.questions).ranks.join('/')));
+out.push('');
 writeFileSync(new URL('../docs/driving-guess-report.md', import.meta.url), out.join('\n'));
 console.log('written');

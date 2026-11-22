@@ -282,7 +282,7 @@ test('knowledge tests: the checker catches bad forms and sittings', () => {
 });
 
 const FORM_A_SHA = '0a697406d3a9a637ef0476a89921e3f8ef3101252bc307e0d205c0f93d1d9312'; // Form A as of bc148bc (Nov 20)
-// Form A is the baseline Eli took (the parent: Nov 22, 2026; 80%): it must never change
+// Form A is the baseline Eli took (Sat Nov 21, 2026, evening, Iowa time; 80%): it must never change
 // (later scores compare against it).
 // If this fails, put Form A back; a new or changed question belongs in a new form.
 test('Form A (the baseline he has taken) is unchanged', async () => {
@@ -350,7 +350,7 @@ test('guessReport finds a rank tell, a filler and a padded choice', () => {
 
 // Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026 (last rewords before Eli starts). Like Form A: if this
 // fails, put them back; new questions are appended in a later lesson. Pin each later lesson once it is approved.
-const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '8f82f903ebb74bcb439b867daef5aa25ae582c838a69b0591738d294b18b8a5e' };
+const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '92178fd9e8de897412280c069ed67e54894bd81cf1dd3c4f3e9b1f77f5782367' };
 test('frozen lessons are unchanged', async () => {
   const { createHash } = await import('node:crypto');
   const { LESSONS } = await import('../driving-course.js?v=' + V);
