@@ -329,7 +329,7 @@ test('skill levels: every planned lesson day is beginner, intermediate or advanc
 
 // Guessing tells (see guessReport): a hard rule for units 5+ and Forms C+; units 1-4 and Form B are reported until
 // reworked (scripts print them); Form A is frozen and exempt by name.
-const REPORT_ONLY = ['unit 1', 'unit 2', 'unit 3', 'unit 4', 'form B'];
+const REPORT_ONLY = ['unit 2', 'unit 3', 'unit 4', 'form B'];
 test('guessing tells: no length-rank tell, stock filler or padded wrong choice in new units and forms', async () => {
   const { LESSONS } = await import('../driving-course.js?v=' + V), { FORMS } = await import('../driving-tests.js?v=' + V);
   const units = {};
@@ -350,7 +350,7 @@ test('guessReport finds a rank tell, a filler and a padded choice', () => {
 
 // Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026 (last rewords before Eli starts). Like Form A: if this
 // fails, put them back; new questions are appended in a later lesson. Pin each later lesson once it is approved.
-const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6' };
+const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '8f82f903ebb74bcb439b867daef5aa25ae582c838a69b0591738d294b18b8a5e' };
 test('frozen lessons are unchanged', async () => {
   const { createHash } = await import('node:crypto');
   const { LESSONS } = await import('../driving-course.js?v=' + V);
