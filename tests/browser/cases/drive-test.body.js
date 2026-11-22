@@ -49,7 +49,12 @@
   await p.click('[data-tfinish="base"]'); await p.waitForTimeout(300);
   const t = await p.$eval('#tests', (e) => e.textContent);
   check(/of 25/.test(t) && /pass mark/.test(t) && (await p.$$('#tests .dt-topics tr')).length === 8, 'score and 8 topics at the end');
-  check(!(await p.$('#tests .dq')), 'no questions or answers shown after finishing');
+  check(!(await p.$('#tests .dq')), 'no questions or answers shown after finishing (until he asks)');
+  await p.click('[data-ans="base|1"]'); await p.waitForTimeout(200);
+  const ansT = await p.$eval('#tests', (e) => e.textContent);
+  check((await p.$$('#tests .dq')).length === 25 && (await p.$$('#tests .dq.ok, #tests .dq.miss')).length === 25 && /Right/.test(ansT) && /Iowa Driver.s Manual p\.\d+/.test(ansT) && /Every answer · \d+ missed/.test(ansT), 'See every answer: all 25 with his pick, the right answer, why and the page');
+  await p.click('[data-ans="base|0"]'); await p.waitForTimeout(200);
+  check(!(await p.$('#tests .dq')), 'Hide the answers');
   check(await p.$eval('#tests', (e) => e.previousElementSibling.id === 'today'), 'a finished test moves below the lesson');
   check(!!(await p.$('#today [data-watched="w1d1"]')), 'baseline done: lesson 1 opens');
   check((await p.$$('#today .dkey li')).length === 3 && await p.$eval('#today .dkey', (e) => !!(e.compareDocumentPosition(document.querySelector('#today .dv')) & 4)) && /\(Manual p\.47\)/.test(await p.$eval('#today .dkey', (e) => e.textContent)), 'lesson 1: 3 key points with manual pages, above the video');
@@ -63,6 +68,9 @@
   check(!(await p.$('.ckbtn[data-key="drive"][aria-pressed="true"]')), 'checklist driving row not filled by the test');
   await visit('parents.html', 'test-parents');
   check(/Baseline knowledge test: \d+ of 25 \(\d+%\)/.test(await p.$eval('#testscores', (e) => e.textContent)) && !(await p.$eval('#testcard', (e) => e.hidden)), 'Parents page shows the score');
+  check(await p.$eval('#testscores a[href="drive.html#ans-base"]', (a) => /His answers/.test(a.textContent)).catch(() => false), 'Parents page links to his answers');
+  await p.click('#testscores a[href="drive.html#ans-base"]'); await p.waitForTimeout(800);
+  check((await p.$$('#tests .dq')).length === 25, 'the link opens the Driving page with every answer shown');
   // the weekend: lessons wait for Monday, but the baseline can be taken once the day's chore is done
   for (const [d, name] of [[21, 'Saturday'], [22, 'Sunday']]) {
     await p.clock.setFixedTime(new Date(2026, 10, d, 11, 0));

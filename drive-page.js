@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795280221';
-import { applyConfig } from './routines.js?v=1795280221';
-import { askParent } from './parent.js?v=1795280221';
-import * as L from './lists.js?v=1795280221';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795280221';
-import { signSvg } from './signs.js?v=1795280221';
-import * as COURSE from './driving-course.js?v=1795280221';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795280221';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795316877';
+import { applyConfig } from './routines.js?v=1795316877';
+import { askParent } from './parent.js?v=1795316877';
+import * as L from './lists.js?v=1795316877';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795316877';
+import { signSvg } from './signs.js?v=1795316877';
+import * as COURSE from './driving-course.js?v=1795316877';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795316877';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -16,6 +16,7 @@ const params = new URLSearchParams(location.search);
 const pastDay = params.get('date') && parseYmd(params.get('date')) ? params.get('date') : null;
 let previewOpen = false;
 let testOpen = null; // the sitting he's taking (questions shown)
+const ansOpen = {}; // a finished test's answer list, shown on request
 
 // The lesson's key points (above the video): each from the manual (page shown) or marked as a family rule.
 const keyCard = (l) => (l.key || []).length ? '<div class="dkey"><h3>Key points</h3><ul>' + l.key.map((x) => '<li>' + esc(x.t) + ' <small>(' + (x.family ? 'Family rule' : esc(refLabel(x.ref))) + ')</small></li>').join('') + '</ul></div>' : '';
@@ -130,7 +131,17 @@ function renderTests() {
   open.forEach((s) => {
     const form = FORMS[s.form] || [], sc = testScore(form, d, s.id, PASS);
     h += '<h2>' + esc(s.title) + '</h2>';
-    if (sc.done) { h += scoreHtml(s, sc); return; }
+    if (sc.done) {
+      // after Finish: every question with his answer, the right one, why, and the manual page (for him and for a
+      // parent, from the Parents page link). Later tests use different questions, so this doesn't spoil them.
+      h += scoreHtml(s, sc);
+      if (ansOpen[s.id] || location.hash === '#ans-' + s.id) {
+        const missed = form.filter((q) => !(answerOf(q.id, s.id) || {}).ok).length;
+        h += '<div class="dquiz" id="ans-' + esc(s.id) + '"><h3>Every answer · ' + missed + ' missed</h3>' + form.map((q, i) => questionHtml(Object.assign({}, q, { q: (i + 1) + '. ' + q.q }), answerOf(q.id, s.id), s.id, false)).join('') +
+          '<button class="tt-save" type="button" data-ans="' + esc(s.id) + '|0">Hide the answers</button></div>';
+      } else h += '<button class="tt-save" type="button" data-ans="' + esc(s.id) + '|1">See every answer</button>';
+      return;
+    }
     const lock = L.computerLock(ctx, 'eli', now);
     if (lock) { h += '<p class="lockmsg">' + (lock === 'owed' ? 'Finish the chore you missed earlier this week first.' : 'Do today’s chores first, then come back.') + '</p>'; return; }
     if (testOpen !== s.id && !sc.answered) {
@@ -195,6 +206,8 @@ document.addEventListener('click', async (e) => {
   if (tf) { const s = SITTINGS.find((x) => x.id === tf.dataset.tfinish); if (s && testScore(FORMS[s.form] || [], ctx.drive || {}, s.id, PASS).allIn) save(ID, 'watched/' + s.id, ymd(new Date())); return; }
   const uf = e.target.closest('[data-ufinish]');
   if (uf) { finishUnitTest(uf.dataset.ufinish); return; }
+  const sa = e.target.closest('[data-ans]');
+  if (sa) { const [sid, on] = sa.dataset.ans.split('|'); ansOpen[sid] = on === '1'; if (!ansOpen[sid] && location.hash) history.replaceState(null, '', location.pathname + location.search); renderTests(); return; }
   const ts = e.target.closest('[data-tstart]');
   if (ts) { testOpen = ts.dataset.tstart; renderTests(); return; }
   const pk = e.target.closest('[data-pick]');
