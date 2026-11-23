@@ -1,14 +1,14 @@
 // Each kid's page: what's left right now, then their checklist, chart, training and month.
 // Brother tabs at the top so the shared iPad can switch quickly.
-import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795331684';
-import { KIDS, timerResult, applyConfig } from './routines.js?v=1795331684';
-import { CHARTS, weekProgress } from './charts.js?v=1795331684';
-import { planFor } from './plan.js?v=1795331684';
-import * as L from './lists.js?v=1795331684';
-import { score, fmt, nextMilestone } from './trials.js?v=1795331684';
-import { dayStreak } from './streaks.js?v=1795331684';
-import { lessonFor } from './driving.js?v=1795331684';
-import { nowHtml } from './nowview.js?v=1795331684';
+import { watch, ymd, mondayOf, addDays, esc, statusPill } from './store.js?v=1795400309';
+import { KIDS, timerResult, applyConfig } from './routines.js?v=1795400309';
+import { CHARTS, weekProgress } from './charts.js?v=1795400309';
+import { planFor } from './plan.js?v=1795400309';
+import * as L from './lists.js?v=1795400309';
+import { score, fmt, nextMilestone } from './trials.js?v=1795400309';
+import { dayStreak } from './streaks.js?v=1795400309';
+import { lessonFor } from './driving.js?v=1795400309';
+import { nowHtml } from './nowview.js?v=1795400309';
 
 const $ = (id) => document.getElementById(id);
 const ctx = { routines: {}, run: {}, isaiah: {}, drive: {} };
@@ -42,7 +42,7 @@ function render() {
   if (kid === 'eli') {
     const p = weekProgress(CHARTS.eli, L.effectiveWeek(CHARTS.eli, mon, (charts.eli.weeks || {})[ymd(mon)], ctx));
     const g = L.gameWeek(ctx, 'eli', mon);
-    links.push(card('eli.html', 'eli', 'Reward chart', 'Weekend game time · Run or swim · Chores · School', 'Game time: ' + g.minutes + ' of ' + g.max + ' min' + (L.GAME.days.includes(L.dowOf(now)) && !L.gameDay(ctx, 'eli', now).earned ? ' · today not yet' : '')));
+    links.push(card('eli.html', 'eli', 'Reward chart', 'Weekend game time · Run or swim · Chores · School', (g.days.some((d) => d.off) ? 'No game time this week' : 'Game time: ' + g.minutes + ' of ' + g.max + ' min' + (L.GAME.days.includes(L.dowOf(now)) && !L.gameDay(ctx, 'eli', now).earned ? ' · today not yet' : ''))));
     const pl = planFor(now), sc = score(trials), nx = nextMilestone('mile', sc), n5 = nextMilestone('5k', sc);
     links.push(card('run.html', 'run', 'Training', 'Today’s run · Time trials · History', pl ? 'Today: ' + pl.title + (L.eliRunDone(ctx.run, now) ? ' · done!' : '') : 'Plan finished'));
     // Driving: ready, done, waiting for approval, or locked until chores

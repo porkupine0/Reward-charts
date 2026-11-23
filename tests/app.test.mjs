@@ -560,7 +560,7 @@ test("game-time minutes and bedtime grace are settings, by date", () => {
   const snap = snapshotToSave({}, new Date(2026, 11, 1)).value; // what applied before Dec 1 (30, 5)
   applySettings({ game: 20, grace: 10, history: { '2026-12-01': JSON.parse(JSON.stringify(snap)) } });
   const ctx = { routines: {}, run: {}, isaiah: {} };
-  assert.equal(L.gameWeek(ctx, 'eli', d('2026-11-23')).max, 150, 'earlier weeks keep 30 a day');
+  assert.equal(L.gameWeek(ctx, 'rhett', d('2026-11-23')).max, 150, 'earlier weeks keep 30 a day (Rhett: Eli has no game time that week)');
   assert.equal(L.gameWeek(ctx, 'eli', d('2026-11-30')).max, 30 + 20 * 4, 'the week of the change mixes (Mon 30, Tue-Fri 20)');
   assert.equal(L.gameWeek(ctx, 'eli', d('2026-12-07')).max, 100);
   // a snapshot saved before these settings existed means the defaults (30, 5), not today's values
@@ -714,4 +714,21 @@ test('driving row: before the baseline test is finished, a lesson is only option
   assert.equal(L.baselineBy(drive, '2026-11-22'), 'open'); assert.equal(L.baselineBy(drive, '2026-11-23'), 'today'); assert.equal(L.baselineBy(drive, '2026-11-24'), 'done');
   assert.ok(row('2026-11-23').opt === true && row('2026-11-23').label === 'Driving lesson', 'baseline day: lesson optional');
   assert.ok(row('2026-11-24').opt === false, 'after the baseline day: required');
+});
+
+test('Eli, Nov 23-29, 2026: an extra chore every day (bathrooms; kitchen Tue and Sat; basement Wed) and no game time that week', async () => {
+  const L = await load('lists.js');
+  const ctx = { routines: { days: {} }, run: {}, isaiah: {}, drive: {} };
+  const x = (day) => (L.lists(ctx, 'eli', new Date(2026, 10, day)).day.find((i) => i.key === 'xchore') || {}).name;
+  assert.deepEqual([23, 24, 25, 26, 27, 28, 29].map(x), ['Bathrooms', 'Kitchen', 'Basement', 'Stairs, landing + upstairs hallway', 'Front closet + shoe organizing', 'Kitchen', 'Trash: empty every trash can in the house']);
+  assert.equal(x(22), undefined); assert.equal(x(30), undefined);
+  assert.equal(L.lists(ctx, 'rhett', new Date(2026, 10, 24)).day.some((i) => i.key === 'xchore'), false, 'Eli only');
+  // it's a real chore: on the list (left to do), and his day isn't full without it
+  const d = new Date(2026, 10, 24), ls = L.lists(ctx, 'eli', d);
+  assert.ok(L.progress(ctx, 'eli', d, ls.day).left.some((i) => i.key === 'xchore'));
+  // no game time those days (any week day), back to normal Nov 30
+  [23, 24, 25, 26, 27].forEach((k) => { const g = L.gameDay(ctx, 'eli', new Date(2026, 10, k)); assert.ok(g.worth === 0 && g.minutes === 0 && /No game time/.test(g.off), String(k)); });
+  assert.equal(L.gameWeek(ctx, 'eli', new Date(2026, 10, 23)).max, 0);
+  assert.ok(L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).worth > 0 && !L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).off);
+  assert.ok(L.gameDay(ctx, 'rhett', new Date(2026, 10, 24)).worth > 0, 'Rhett unaffected');
 });

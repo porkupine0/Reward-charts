@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795331684';
-import { askParent } from './parent.js?v=1795331684';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795331684';
-import { applySettings, SETTINGS } from './settings.js?v=1795331684';
-import { weekStreak, cheerIf } from './streaks.js?v=1795331684';
-import { gameWeek } from './lists.js?v=1795331684';
-import * as L from './lists.js?v=1795331684';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795331684';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795400309';
+import { askParent } from './parent.js?v=1795400309';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795400309';
+import { applySettings, SETTINGS } from './settings.js?v=1795400309';
+import { weekStreak, cheerIf } from './streaks.js?v=1795400309';
+import { gameWeek } from './lists.js?v=1795400309';
+import * as L from './lists.js?v=1795400309';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795400309';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -44,7 +44,8 @@ function renderGame() {
   const g = gameWeek(ctx, kidId, week), now = new Date(), today = ymd(now);
   const n = (L.CHECKS[kidId] || []).length;
   $('gamecard').classList.toggle('unlocked', g.minutes > 0);
-  $('gtstatus').innerHTML = '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
+  const off = (g.days.find((d) => d.off) || {}).off;
+  $('gtstatus').innerHTML = off ? '<b>' + esc(off) + '</b>' : '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
   const t = g.days.find((d) => ymd(d.date) === today);
   $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => { const k = ymd(d.date); return '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+' + d.worth + ' min' : k > today ? 'to come' : k === today ? 'not yet' : 'not earned') + '</span></div>'; }).join('') + '</div>' +
     // past days that didn't earn: why (a late chore or a filled-in check can still earn them)
