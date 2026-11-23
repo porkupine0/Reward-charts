@@ -729,6 +729,10 @@ test('Eli, Nov 23-29, 2026: an extra chore every day (bathrooms; kitchen Tue and
   // no game time those days (any week day), back to normal Nov 30
   [23, 24, 25, 26, 27].forEach((k) => { const g = L.gameDay(ctx, 'eli', new Date(2026, 10, k)); assert.ok(g.worth === 0 && g.minutes === 0 && /No game time/.test(g.off), String(k)); });
   assert.equal(L.gameWeek(ctx, 'eli', new Date(2026, 10, 23)).max, 0);
+  // minutes carried in from the week before can't be used that week either
+  const withCarry = { ...ctx, routines: { days: {}, carry: { eli: { '2026-11-16': { minutes: 45, add: true } } } } };
+  const gw = L.gameWeek(withCarry, 'eli', new Date(2026, 10, 23));
+  assert.ok(gw.carriedIn === 45 && gw.left === 0 && gw.off, 'carried-in minutes: shown, not usable');
   assert.ok(L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).worth > 0 && !L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).off);
   assert.ok(L.gameDay(ctx, 'rhett', new Date(2026, 10, 24)).worth > 0, 'Rhett unaffected');
 });

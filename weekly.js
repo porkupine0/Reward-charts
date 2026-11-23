@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795418263';
-import { askParent } from './parent.js?v=1795418263';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795418263';
-import { applySettings, SETTINGS } from './settings.js?v=1795418263';
-import { weekStreak, cheerIf } from './streaks.js?v=1795418263';
-import { gameWeek } from './lists.js?v=1795418263';
-import * as L from './lists.js?v=1795418263';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795418263';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795442387';
+import { askParent } from './parent.js?v=1795442387';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795442387';
+import { applySettings, SETTINGS } from './settings.js?v=1795442387';
+import { weekStreak, cheerIf } from './streaks.js?v=1795442387';
+import { gameWeek } from './lists.js?v=1795442387';
+import * as L from './lists.js?v=1795442387';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795442387';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -51,7 +51,7 @@ function renderGame() {
     // past days that didn't earn: why (a late chore or a filled-in check can still earn them)
     g.days.filter((d) => !d.earned && ymd(d.date) < today).map((d) => '<p class="gt-why"><b>' + DAYS[(d.date.getDay() + 6) % 7] + ' not earned:</b> ' + esc(L.leftSummary(d.left).replace(/^\d+ still to do: /, '')) + '</p>').join('') +
     (t && !t.earned ? '<p class="gt-today"><b>Today, ' + esc(L.leftSummary(t.left)).replace(': ', ':</b> ') + '</p>' : t ? '<p class="gt-today"><b>Today: +' + t.worth + ' min earned ✓</b></p>' : '') +
-    (g.carriedIn ? '<p class="gt-why"><b>+' + fmtMin(g.carriedIn) + ' carried over</b> from last week.</p>' : '') +
+    (g.carriedIn ? '<p class="gt-why"><b>+' + fmtMin(g.carriedIn) + ' carried over</b> from last week' + (g.off ? ', on hold this week (no game time).' : '.') + '</p>' : '') +
     (g.carriedOut ? '<p class="gt-why"><b>' + fmtMin(g.carriedOut) + ' moved</b> to the next week.</p>' : '') +
     (g.letGo ? '<p class="gt-why"><b>' + fmtMin(g.letGo) + ' let go</b> (not carried over).</p>' : '') +
     '<div class="gt-sum"><span>Earned <b>' + fmtMin(g.minutes) + '</b></span><span>Used <b>' + fmtMin(g.used) + '</b></span><span>Left <b>' + fmtMin(g.left) + '</b></span></div>' +

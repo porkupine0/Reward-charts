@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795418263';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795418263';
-import { SETTINGS, onSettings } from './settings.js?v=1795418263';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795418263';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795418263';
-import { LESSONS } from './driving-course.js?v=1795418263';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795418263';
-import * as TESTS from './driving-tests.js?v=1795418263';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795418263';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795442387';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795442387';
+import { SETTINGS, onSettings } from './settings.js?v=1795442387';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795442387';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795442387';
+import { LESSONS } from './driving-course.js?v=1795442387';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795442387';
+import * as TESTS from './driving-tests.js?v=1795442387';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795442387';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -393,7 +393,9 @@ export function gameWeek(ctx, kid, monday) {
   const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
   const out = carryFrom(ctx, kid, monday);
   const carriedIn = arrives(carryFrom(ctx, kid, addDays(monday, -7))), carriedOut = arrives(out), letGo = out && !out.add ? leaves(out) : 0;
-  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, left: Math.max(0, minutes + carriedIn - used - leaves(out)) };
+  // a no-game-time week (GAME_OFF): nothing earned, and minutes carried in from before can't be used either
+  const off = days.some((d) => d.off);
+  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, off, left: off ? 0 : Math.max(0, minutes + carriedIn - used - leaves(out)) };
 }
 // Parents page: boys with game time left from last week and no answer yet. [{ kid, from, minutes }]
 export function carryPrompts(ctx, today, kids) {
