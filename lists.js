@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795417328';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795417328';
-import { SETTINGS, onSettings } from './settings.js?v=1795417328';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795417328';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795417328';
-import { LESSONS } from './driving-course.js?v=1795417328';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795417328';
-import * as TESTS from './driving-tests.js?v=1795417328';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795417328';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795417827';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795417827';
+import { SETTINGS, onSettings } from './settings.js?v=1795417827';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795417827';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795417827';
+import { LESSONS } from './driving-course.js?v=1795417827';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795417827';
+import * as TESTS from './driving-tests.js?v=1795417827';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795417827';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
