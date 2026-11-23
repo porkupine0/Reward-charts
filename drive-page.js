@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795416784';
-import { applyConfig } from './routines.js?v=1795416784';
-import { askParent } from './parent.js?v=1795416784';
-import * as L from './lists.js?v=1795416784';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795416784';
-import { signSvg } from './signs.js?v=1795416784';
-import * as COURSE from './driving-course.js?v=1795416784';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795416784';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795417328';
+import { applyConfig } from './routines.js?v=1795417328';
+import { askParent } from './parent.js?v=1795417328';
+import * as L from './lists.js?v=1795417328';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795417328';
+import { signSvg } from './signs.js?v=1795417328';
+import * as COURSE from './driving-course.js?v=1795417328';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795417328';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
@@ -76,7 +76,7 @@ function render() {
   let h = '<p class="eyebrow">' + (lesson.review ? 'Unit test' : 'Today’s lesson') + '</p><h2>' + esc(lesson.title) + '</h2>', post = '';
   const vids = lesson.review || noVideo ? [] : (lesson.videos || []);
   if (lesson.review) h += fin ? '<p class="dt-score"><b>' + answered.filter((q) => answerOf(q.id, lesson.id).ok).length + ' of ' + quiz.length + '</b> right. Your answers and the right ones are below.</p>'
-    : '<p class="note">No video today: ' + quiz.length + ' questions from this unit’s lessons. Tap a different choice to change an answer. When all are answered, tap Finish to see your score and the answers.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
+    : '<p class="note">No video today: ' + quiz.length + ' questions on this unit’s lessons (and a few from earlier units). Tap a different choice to change an answer. When all are answered, tap Finish to see your score and the answers.</p><p class="dt-count">' + answered.length + ' of ' + quiz.length + ' answered</p>';
   // the key points show until the questions do (then they'd give the answers away)
   // once the questions show, the video stays (to rewatch) but its Iowa note hides, like the key points (it can state answers)
   else if (watched) post += '<p class="dv-done">✓ ' + (noVideo ? 'Key points read' : 'Watched') + '</p>';

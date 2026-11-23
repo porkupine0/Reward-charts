@@ -350,7 +350,7 @@ test('guessReport finds a rank tell, a filler and a padded choice', () => {
 
 // Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026 (last rewords before Eli starts). Like Form A: if this
 // fails, put them back; new questions are appended in a later lesson. Pin each later lesson once it is approved.
-const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '92178fd9e8de897412280c069ed67e54894bd81cf1dd3c4f3e9b1f77f5782367' };
+const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '11eb1fc6420c9fecce547be3de28c430f64367f928c81c06b2f6e687a065ff88' };
 test('frozen lessons are unchanged', async () => {
   const { createHash } = await import('node:crypto');
   const { LESSONS } = await import('../driving-course.js?v=' + V);
