@@ -348,9 +348,9 @@ test('guessReport finds a rank tell, a filler and a padded choice', () => {
   assert.match(pad.issues.join(' | '), /p1 has a padded wrong choice/);
 });
 
-// Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026 (last rewords before Eli starts). Like Form A: if this
+// Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026; w1d3-w1d4 and w2d1-w2d2 reworked, checked and pinned Nov 22-23 (last rewords before Eli starts). Like Form A: if this
 // fails, put them back; new questions are appended in a later lesson. Pin each later lesson once it is approved.
-const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '5b81f4623f3ae937faaba51591604a9830e36cb6af23ae1ddd6e295d4c166042' };
+const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '96ad6a9e592a75dcc0b3a7ae21aedbc726bb4c4b3c8f28086382b0fd61904f9d', 'w2d1,w2d2': '613200dc19121b691c4b21185572a183f102b370979112d923320a8b98e90603' };
 test('frozen lessons are unchanged', async () => {
   const { createHash } = await import('node:crypto');
   const { LESSONS } = await import('../driving-course.js?v=' + V);
