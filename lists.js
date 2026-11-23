@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795400309';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795400309';
-import { SETTINGS, onSettings } from './settings.js?v=1795400309';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795400309';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795400309';
-import { LESSONS } from './driving-course.js?v=1795400309';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795400309';
-import * as TESTS from './driving-tests.js?v=1795400309';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795400309';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795416784';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS } from './routines.js?v=1795416784';
+import { SETTINGS, onSettings } from './settings.js?v=1795416784';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795416784';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795416784';
+import { LESSONS } from './driving-course.js?v=1795416784';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795416784';
+import * as TESTS from './driving-tests.js?v=1795416784';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795416784';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -83,8 +83,9 @@ function choreDays(name, date) {
 // { kid: { 'YYYY-MM-DD': chore name } }. Stored like any chore (days/<date>/<kid>/xchore), so a missed one carries.
 // Eli, Nov 23-29, 2026: lost video games for the week; a second chore every day, rotating through the house
 // (the parent: bathrooms one day; kitchen Tuesday and Saturday; basement Monday, Wednesday or Thursday).
-export const EXTRA_CHORES = { eli: { '2026-11-23': 'Bathrooms', '2026-11-24': 'Kitchen', '2026-11-25': 'Basement', '2026-11-26': 'Stairs, landing + upstairs hallway',
-  '2026-11-27': 'Front closet + shoe organizing', '2026-11-28': 'Kitchen', '2026-11-29': 'Trash: empty every trash can in the house' } };
+// No extra is a chore someone else has that day (Isaiah does the stairs on Thursdays).
+export const EXTRA_CHORES = { eli: { '2026-11-23': 'Bathrooms', '2026-11-24': 'Kitchen', '2026-11-25': 'Basement', '2026-11-26': 'Front closet + shoe organizing',
+  '2026-11-27': 'Stairs, landing + upstairs hallway', '2026-11-28': 'Kitchen', '2026-11-29': 'Trash: empty every trash can in the house' } };
 // Weeks a boy earns no game time (a parent's decision): { kid: [{ from, to, why }] } (dates inclusive).
 export const GAME_OFF = { eli: [{ from: '2026-11-23', to: '2026-11-29', why: 'No game time this week (video games lost)' }] };
 export const gameOffOn = (kid, date) => (GAME_OFF[kid] || []).find((o) => ymd(date) >= o.from && ymd(date) <= o.to) || null;
@@ -359,8 +360,8 @@ export function gameUses(ctx, kid, monday) {
 export function owedHeld(ctx, kid, date) {
   const owed = choresOwed(ctx, kid, date);
   if (!owed.length) return 0;
-  const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date))).map((o) => ymd(o.date)));
-  if (GAME.days.includes(dowOf(date))) days.add(ymd(date));
+  const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date)) && !gameOffOn(kid, o.date)).map((o) => ymd(o.date)));
+  if (GAME.days.includes(dowOf(date)) && !gameOffOn(kid, date)) days.add(ymd(date)); // (none on a no-game-time day)
   return [...days].reduce((a, k) => a + gameMinOn(parseYmd(k)), 0);
 }
 // Minutes typed into "Other…": "90", "45 min", "1 hr", "1:30", "1.5 hours". Anything else (or 0) is null.

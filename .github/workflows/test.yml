@@ -11,7 +11,8 @@ jobs:
         with:
           node-version: 22
       - name: Check every script parses
-        run: for f in *.js; do node --check "$f"; done
+        # (as ES modules: plain `node --check` missed a missing ")" in kid.js on Nov 23, 2026)
+        run: for f in *.js; do node --input-type=module --check < "$f" || { echo "syntax error in $f"; exit 1; }; done
       - name: Date, schedule and scoring tests
         run: node --test tests/*.test.mjs
   browser:

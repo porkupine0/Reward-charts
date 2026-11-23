@@ -720,7 +720,7 @@ test('Eli, Nov 23-29, 2026: an extra chore every day (bathrooms; kitchen Tue and
   const L = await load('lists.js');
   const ctx = { routines: { days: {} }, run: {}, isaiah: {}, drive: {} };
   const x = (day) => (L.lists(ctx, 'eli', new Date(2026, 10, day)).day.find((i) => i.key === 'xchore') || {}).name;
-  assert.deepEqual([23, 24, 25, 26, 27, 28, 29].map(x), ['Bathrooms', 'Kitchen', 'Basement', 'Stairs, landing + upstairs hallway', 'Front closet + shoe organizing', 'Kitchen', 'Trash: empty every trash can in the house']);
+  assert.deepEqual([23, 24, 25, 26, 27, 28, 29].map(x), ['Bathrooms', 'Kitchen', 'Basement', 'Front closet + shoe organizing', 'Stairs, landing + upstairs hallway', 'Kitchen', 'Trash: empty every trash can in the house']);
   assert.equal(x(22), undefined); assert.equal(x(30), undefined);
   assert.equal(L.lists(ctx, 'rhett', new Date(2026, 10, 24)).day.some((i) => i.key === 'xchore'), false, 'Eli only');
   // it's a real chore: on the list (left to do), and his day isn't full without it
@@ -732,3 +732,16 @@ test('Eli, Nov 23-29, 2026: an extra chore every day (bathrooms; kitchen Tue and
   assert.ok(L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).worth > 0 && !L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).off);
   assert.ok(L.gameDay(ctx, 'rhett', new Date(2026, 10, 24)).worth > 0, 'Rhett unaffected');
 });
+
+test('extra chores never double up with a chore someone else has that day', async () => {
+  const L = await load('lists.js');
+  const ctx = { routines: { days: {} }, run: {}, isaiah: {}, drive: {} };
+  Object.entries(L.EXTRA_CHORES).forEach(([kid, days]) => Object.entries(days).forEach(([k, name]) => {
+    const dt = new Date(k + 'T12:00:00');
+    ['eli', 'rhett', 'isaiah'].forEach((who) => {
+      const theirs = L.lists(ctx, who, dt).day.filter((i) => i.chore && i.key !== 'xchore').map((i) => i.name.toLowerCase());
+      assert.ok(!theirs.includes(name.toLowerCase()), k + ': ' + name + ' is also ' + who + '\'s chore');
+    });
+  }));
+});
+
