@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795537825';
-import { choreSteps } from './chorelists.js?v=1795537825';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795537825';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795538620';
+import { choreSteps } from './chorelists.js?v=1795538620';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795538620';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -14,6 +14,17 @@ export const KIDS = {
 // Excused counts for credit (lists, streaks, rewards) but is recorded as not done (reading tracker).
 export const SKIP = '~skip', EXCUSED = '~excused';
 export const isDone = (v) => !!v && v !== SKIP;
+
+// Ankeny schools 2026-27: weekdays with no school for students, from the district calendar's table
+// (Nov 25 on; earlier days keep the lists they had). The calendar ends May 28, 2027: after that, summer
+// weekdays still count as school days until a new year's dates are added here.
+export const NO_SCHOOL = [['2026-11-25', '2026-11-27'], ['2026-12-21', '2027-01-01'], ['2027-01-15'], ['2027-01-18'], ['2027-02-15'], ['2027-03-12', '2027-03-19'], ['2027-04-26']];
+const ymdOf = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+// A school day: Monday to Friday and not a listed day off.
+export function isSchoolDay(date) {
+  const dow = (date.getDay() + 6) % 7, k = ymdOf(date);
+  return dow <= 4 && !NO_SCHOOL.some(([a, b]) => k >= a && k <= (b || a));
+}
 // Items a kid can mark "not able to do it": schoolwork, reading and practice, not chores or bedtime basics.
 export const EXCUSABLE = ['reading', 'homework', 'due', 'missing', 'duolingo', 'typing', 'trombone', 'organize', 'activity', 'drive']; // activity = Eli's run/swim, Isaiah's soccer, Rhett's move/racquetball; drive = Eli's driving lesson (holidays, sick days)
 
@@ -86,8 +97,8 @@ function schedule(kid, dow) {
     rows.unshift(['lights', at]);
     steps.slice().reverse().forEach((k) => { at -= duration(k, kid, showers, false); rows.unshift([k, at]); });
   }
-  // Isaiah: glasses in their case in the kitchen, right after his snack (before heading up).
-  if (kid === 'isaiah') { const s = rows.findIndex(([k]) => k === 'snack'); rows.splice(s + 1, 0, ['glasses', rows[s + 1][1]]); }
+  // Isaiah: glasses in their case in the kitchen after reading (they help him read), at lights out.
+  if (kid === 'isaiah') { const l = rows.findIndex(([k]) => k === 'lights'); rows.splice(l, 0, ['glasses', rows[l][1]]); }
   // Eli charges his watch every night, right before reading.
   if (kid === 'eli') { const r = rows.findIndex(([k]) => k === 'reading'); rows.splice(r, 0, ['watch', rows[r][1]]); }
   // Show choir alarm: Monday and Thursday nights, 5 min before lights out.
@@ -165,7 +176,7 @@ export function afterSchool(kid, dow, runPlan) {
       : { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
     ...(kid === 'isaiah' ? [{ key: 'glassesHome', label: 'School glasses away, home glasses on', sub: 'In the kitchen' }] : []),
     { key: 'afterSnack', label: 'After-school snack', choices: AFTER_SNACKS },
-    kid === 'isaiah' ? Object.assign({}, CLOTHES, { tag: glassesFor(dow) }) : { key: 'clothes', label: 'Lay out clothes for tomorrow' },
+    kid === 'isaiah' ? Object.assign({}, CLOTHES) : { key: 'clothes', label: 'Lay out clothes for tomorrow' },
     ...choreItems(kid, dow),
     { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' }
   ];
@@ -192,15 +203,13 @@ export function afterSchool(kid, dow, runPlan) {
 
 // Isaiah lays out each piece of tomorrow's clothes by his bed; the box checks itself when all four are out.
 const CLOTHES = { key: 'clothes', label: 'Lay out clothes downstairs', sub: 'Tap each one as it goes in your pile downstairs', parts: ['Shirt', 'Pants', 'Underwear', 'Socks'] };
-// The pile goes with the glasses he'll wear the day the clothes are for: school glasses for a school day
-// (laid out Sunday to Thursday), home glasses for Saturday (laid out Friday).
-const glassesFor = (dow) => (dow === 4 ? 'with your home glasses' : 'with your school glasses');
+// The pile goes with the glasses he'll wear the day the clothes are for (tag set in lists.js by the date).
 
 // Weekend daytime list (Sat chore; Isaiah's weekly work).
 export function weekend(kid, dow) {
   const items = [];
   if (dow === 6) items.push(kid === 'isaiah'
-    ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes in your pile downstairs', tag: glassesFor(dow) })
+    ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes in your pile downstairs' })
     : { key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
   items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO, { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video' });
@@ -277,6 +286,7 @@ export function morning(kid, dow) {
   if (dow === 5) {
     return [
       { key: 'mDress', label: 'Get dressed' },
+      { key: 'mGlasses', label: 'Put on your home glasses' },
       { key: 'mScarlett', label: 'Let Scarlett out' },
       breakfast,
       teeth
@@ -285,7 +295,7 @@ export function morning(kid, dow) {
   const church = dow === 6;
   return [
     { key: 'mDress', label: church ? 'Get dressed for church' : 'Get dressed' },
-    ...(church ? [] : [{ key: 'mGlasses', label: 'Put on your school glasses' }]),
+    { key: 'mGlasses', label: church ? 'Put on your home glasses' : 'Put on your school glasses' },
     { key: 'mScarlett', label: 'Let Scarlett out' },
     breakfast,
     teeth,
