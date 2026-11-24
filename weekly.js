@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795539997';
-import { askParent } from './parent.js?v=1795539997';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795539997';
-import { applySettings, SETTINGS } from './settings.js?v=1795539997';
-import { weekStreak, cheerIf } from './streaks.js?v=1795539997';
-import { gameWeek } from './lists.js?v=1795539997';
-import * as L from './lists.js?v=1795539997';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795539997';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795540494';
+import { askParent } from './parent.js?v=1795540494';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795540494';
+import { applySettings, SETTINGS } from './settings.js?v=1795540494';
+import { weekStreak, cheerIf } from './streaks.js?v=1795540494';
+import { gameWeek } from './lists.js?v=1795540494';
+import * as L from './lists.js?v=1795540494';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795540494';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -45,9 +45,11 @@ function renderGame() {
   const n = (L.CHECKS[kidId] || []).length;
   $('gamecard').classList.toggle('unlocked', g.minutes > 0);
   const off = (g.days.find((d) => d.off) || {}).off;
-  $('gtstatus').innerHTML = off ? '<b>' + esc(off) + '</b>' : '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
+  const ahead = g.hold ? L.groundedAhead(ctx, kidId, now) : [];
+  const holdTxt = ahead.length ? 'Grounded from electronics: ' + ahead.length + ' day' + (ahead.length > 1 ? 's' : '') + ' left (through ' + parseYmd(ahead[ahead.length - 1].day).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + '). Game time is on hold until then.' : '';
+  $('gtstatus').innerHTML = holdTxt ? '<b>' + esc(holdTxt) + '</b>' : off ? '<b>' + esc(off) + '</b>' : '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
   const t = g.days.find((d) => ymd(d.date) === today);
-  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => { const k = ymd(d.date); return '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.earned ? '+' + d.worth + ' min' : k > today ? 'to come' : k === today ? 'not yet' : 'not earned') + '</span></div>'; }).join('') + '</div>' +
+  $('gtbody').innerHTML = '<div class="gt-days">' + g.days.map((d) => { const k = ymd(d.date); return '<div class="gt-day' + (d.earned ? ' on' : '') + '"><b>' + DAYS[(d.date.getDay() + 6) % 7] + '</b><span>' + (d.grounded ? 'grounded' : d.earned ? '+' + d.worth + ' min' : k > today ? 'to come' : k === today ? 'not yet' : 'not earned') + '</span></div>'; }).join('') + '</div>' +
     // past days that didn't earn: why (a late chore or a filled-in check can still earn them)
     g.days.filter((d) => !d.earned && ymd(d.date) < today).map((d) => '<p class="gt-why"><b>' + DAYS[(d.date.getDay() + 6) % 7] + ' not earned:</b> ' + esc(L.leftSummary(d.left).replace(/^\d+ still to do: /, '')) + '</p>').join('') +
     (t && !t.earned ? '<p class="gt-today"><b>Today, ' + esc(L.leftSummary(t.left)).replace(': ', ':</b> ') + '</p>' : t ? '<p class="gt-today"><b>Today: +' + t.worth + ' min earned ✓</b></p>' : '') +
@@ -55,7 +57,8 @@ function renderGame() {
     (g.carriedOut ? '<p class="gt-why"><b>' + fmtMin(g.carriedOut) + ' moved</b> to the next week.</p>' : '') +
     (g.letGo ? '<p class="gt-why"><b>' + fmtMin(g.letGo) + ' let go</b> (not carried over).</p>' : '') +
     '<div class="gt-sum"><span>Earned <b>' + fmtMin(g.minutes) + '</b></span><span>Used <b>' + fmtMin(g.used) + '</b></span><span>Left <b>' + fmtMin(g.left) + '</b></span></div>' +
-    (g.left > 0 ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
+    (g.hold && g.left > 0 ? '<p class="gt-why"><b>' + fmtMin(g.left) + ' on hold</b> until the grounding ends.</p>' : '') +
+    (g.left > 0 && !g.hold ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
       '<button class="chip" data-gtuse="other">Other…</button></div>' : '') +
     (g.uses.length ? '<ul class="gt-log">' + g.uses.map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + fmtMin(u.minutes) + '</b></span><button class="linkbtn" data-gtundo="' + u.at + '">Undo</button></li>').join('') + '</ul>' : '') +
     '<p class="note">Each school day with the whole checklist done and ' + (n === 3 ? 'all three' : 'both') + ' evening checks = ' + (t ? t.worth : SETTINGS.game) + ' minutes, to use Saturday and Sunday. Log each time you play so you know what’s left.</p>';

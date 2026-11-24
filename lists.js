@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795539997';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2 } from './routines.js?v=1795539997';
-import { SETTINGS, onSettings } from './settings.js?v=1795539997';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795539997';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795539997';
-import { LESSONS } from './driving-course.js?v=1795539997';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795539997';
-import * as TESTS from './driving-tests.js?v=1795539997';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795539997';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795540494';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2 } from './routines.js?v=1795540494';
+import { SETTINGS, onSettings } from './settings.js?v=1795540494';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795540494';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795540494';
+import { LESSONS } from './driving-course.js?v=1795540494';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795540494';
+import * as TESTS from './driving-tests.js?v=1795540494';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795540494';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -89,6 +89,24 @@ export const EXTRA_CHORES = { eli: { '2026-11-23': 'Bathrooms', '2026-11-24': 'K
 // Weeks a boy earns no game time (a parent's decision): { kid: [{ from, to, why }] } (dates inclusive).
 export const GAME_OFF = { eli: [{ from: '2026-11-23', to: '2026-11-29', why: 'No game time this week (video games lost)' }] };
 export const gameOffOn = (kid, date) => (GAME_OFF[kid] || []).find((o) => ymd(date) >= o.from && ymd(date) <= o.to) || null;
+// Grounded from electronics, set on the Parents page: routines grounded/<kid>/<YYYY-MM-DD> = true, one entry
+// per day (past days stay grounded after it ends). A grounded day earns no game time, and while today is
+// grounded the boy's game time is on hold (kept, not lost; it can't be used until the grounding ends).
+// GAME_OFF weeks above count as grounded days too (they're set in code, so the page can't remove them).
+const storedGrounded = (ctx, kid) => (((ctx.routines || {}).grounded || {})[kid]) || {};
+export const groundedOn = (ctx, kid, date) => !!storedGrounded(ctx, kid)[ymd(date)] || !!gameOffOn(kid, date);
+// Grounded days from today on (sorted), each { day, fixed } (fixed = set in code).
+export function groundedAhead(ctx, kid, today) {
+  const t = ymd(today), out = {};
+  Object.keys(storedGrounded(ctx, kid)).filter((k) => storedGrounded(ctx, kid)[k] && k >= t).forEach((k) => { out[k] = { day: k, fixed: false }; });
+  (GAME_OFF[kid] || []).forEach((o) => { for (let d = parseYmd(o.from); ymd(d) <= o.to; d = addDays(d, 1)) if (ymd(d) >= t) out[ymd(d)] = { day: ymd(d), fixed: true }; });
+  return Object.values(out).sort((a, b) => (a.day < b.day ? -1 : 1));
+}
+// The day "+1 day" adds: the day after the last grounded day (or today when not grounded).
+export function nextGroundDay(ctx, kid, today) {
+  const ahead = groundedAhead(ctx, kid, today);
+  return ahead.length ? ymd(addDays(parseYmd(ahead[ahead.length - 1].day), 1)) : ymd(today);
+}
 // School items: not on a weekday off (the school calendar in routines.js).
 const SCHOOL_KEYS = ['putaway', 'organize', 'due', 'missing', 'homework'];
 export function lists(ctx, kid, date) { return atDate(date, () => listsOn(ctx, kid, date)); }
@@ -363,9 +381,9 @@ export function gameDay(ctx, kid, date) {
   const c = dayChecks(ctx, kid, date);
   [...new Set(choresOwed(ctx, kid, date).map((o) => o.date.toLocaleDateString('en-US', { weekday: 'long' })))].forEach((day) => left.push('Finish ' + day + '’s chore first'));
   (CHECKS[kid] || []).forEach((k) => { if (c[k.key] !== true) left.push(c[k.key] === 'no' ? k.label + ': not today' : k.label + ' (Mom or Dad)'); });
-  const off = gameOffOn(kid, date);
-  const worth = GAME.days.includes(dowOf(date)) && !off ? gameMinOn(date) : 0;
-  return { earned: !left.length, left, worth, minutes: left.length ? 0 : worth, off: off ? off.why : '' };
+  const off = gameOffOn(kid, date), grounded = !off && groundedOn(ctx, kid, date);
+  const worth = GAME.days.includes(dowOf(date)) && !off && !grounded ? gameMinOn(date) : 0;
+  return { earned: !left.length, left, worth, minutes: left.length ? 0 : worth, off: off ? off.why : '', grounded };
 }
 // Game time used is logged in pieces: routines game/<kid>/<monday>/<timestamp> = minutes.
 export function gameUses(ctx, kid, monday) {
@@ -377,8 +395,8 @@ export function gameUses(ctx, kid, monday) {
 export function owedHeld(ctx, kid, date) {
   const owed = choresOwed(ctx, kid, date);
   if (!owed.length) return 0;
-  const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date)) && !gameOffOn(kid, o.date)).map((o) => ymd(o.date)));
-  if (GAME.days.includes(dowOf(date)) && !gameOffOn(kid, date)) days.add(ymd(date)); // (none on a no-game-time day)
+  const days = new Set(owed.filter((o) => GAME.days.includes(dowOf(o.date)) && !groundedOn(ctx, kid, o.date)).map((o) => ymd(o.date)));
+  if (GAME.days.includes(dowOf(date)) && !groundedOn(ctx, kid, date)) days.add(ymd(date)); // (none on a no-game-time day)
   return [...days].reduce((a, k) => a + gameMinOn(parseYmd(k)), 0);
 }
 // Minutes typed into "Other…": "90", "45 min", "1 hr", "1:30", "1.5 hours". Anything else (or 0) is null.
@@ -404,7 +422,7 @@ export function leftSummary(left, n = 3) {
 export function carryFrom(ctx, kid, monday) { return ((((ctx.routines || {}).carry || {})[kid] || {})[ymd(monday)]); }
 const leaves = (v) => (v && typeof v.minutes === 'number' && v.minutes > 0 ? v.minutes : 0);
 const arrives = (v) => (v && v.add === true ? leaves(v) : 0);
-export function gameWeek(ctx, kid, monday) {
+export function gameWeek(ctx, kid, monday, now = new Date()) {
   const days = GAME.days.map((i) => { const date = addDays(monday, i); return Object.assign({ date }, gameDay(ctx, kid, date)); });
   const minutes = days.reduce((a, d) => a + d.minutes, 0);
   const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
@@ -412,7 +430,9 @@ export function gameWeek(ctx, kid, monday) {
   const carriedIn = arrives(carryFrom(ctx, kid, addDays(monday, -7))), carriedOut = arrives(out), letGo = out && !out.add ? leaves(out) : 0;
   // a no-game-time week (GAME_OFF): nothing earned, and minutes carried in from before can't be used either
   const off = days.some((d) => d.off);
-  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, off, left: off ? 0 : Math.max(0, minutes + carriedIn - used - leaves(out)) };
+  // grounded today: what's left is on hold (kept for after the grounding, not usable now)
+  const hold = !off && groundedOn(ctx, kid, now);
+  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, off, hold, left: off ? 0 : Math.max(0, minutes + carriedIn - used - leaves(out)) };
 }
 // Parents page: boys with game time left from last week and no answer yet. [{ kid, from, minutes }]
 export function carryPrompts(ctx, today, kids) {

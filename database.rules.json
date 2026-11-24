@@ -26,6 +26,11 @@
           "$kid": {
             "$week": { ".write": true }
           }
+        },
+        "grounded": {
+          "$kid": {
+            "$day": { ".write": true }
+          }
         }
       },
       "eli-run": {

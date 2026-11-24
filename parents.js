@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795539997';
-import { CHARTS, weekProgress } from './charts.js?v=1795539997';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795539997';
-import * as L from './lists.js?v=1795539997';
-import { owed, score, planned, fmt } from './trials.js?v=1795539997';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795539997';
-import { askParent, setParent, changePin } from './parent.js?v=1795539997';
-import { dayFull } from './streaks.js?v=1795539997';
-import { owedItems } from './owed.js?v=1795539997';
-import { pruneList, pruneCutoff } from './prune.js?v=1795539997';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795539997';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795539997';
-import { nowHtml } from './nowview.js?v=1795539997';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795540494';
+import { CHARTS, weekProgress } from './charts.js?v=1795540494';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795540494';
+import * as L from './lists.js?v=1795540494';
+import { owed, score, planned, fmt } from './trials.js?v=1795540494';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795540494';
+import { askParent, setParent, changePin } from './parent.js?v=1795540494';
+import { dayFull } from './streaks.js?v=1795540494';
+import { owedItems } from './owed.js?v=1795540494';
+import { pruneList, pruneCutoff } from './prune.js?v=1795540494';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795540494';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795540494';
+import { nowHtml } from './nowview.js?v=1795540494';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -77,6 +77,14 @@ function render() {
         r.denied ? '<button class="linkbtn" data-bedok="' + ymd(d) + '|' + id + '|undo">Undo</button>' : bedBtns(ymd(d), id)));
     });
   }
+  // Grounded from electronics: days left (today counts), last day, +1 day / -1 day (PIN)
+  $('grounded').innerHTML = Object.entries(KIDS).map(([id, k]) => {
+    const ahead = L.groundedAhead(ctx, id, today), last = ahead[ahead.length - 1];
+    const canRemove = ahead.some((a) => !a.fixed);
+    const when = last ? 'Through ' + parseYmd(last.day).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + (ahead.some((a) => a.fixed) ? ' · this week’s set days can’t be removed here' : '') : '';
+    return row(k.name, k.accent, ahead.length ? '<b>' + ahead.length + ' day' + (ahead.length > 1 ? 's' : '') + ' left</b>' : 'Not grounded', when,
+      '<span class="exbtns"><button class="tbtn approve" data-ground="' + id + '|add">+1 day</button><button class="tbtn deny" data-ground="' + id + '|remove"' + (canRemove ? '' : ' disabled') + '>−1 day</button></span>');
+  }).join('');
   $('late').innerHTML = late.join('') || '<p class="muted">No late nights in the last week.</p>';
 
   // Not able to complete: waiting for approval (last 7 days)
@@ -176,6 +184,15 @@ document.addEventListener('click', async (e) => {
     const [d, kid] = ag.dataset.allgood.split('|');
     if (!isLive('routines') || !(await askParent())) return;
     L.allGoodKeys(ctx, kid, parseYmd(d)).forEach((k) => save('routines', 'days/' + d + '/' + kid + '/' + k, true));
+    return;
+  }
+  const gr = e.target.closest('[data-ground]');
+  if (gr) {
+    const [kid, a] = gr.dataset.ground.split('|');
+    if (!isLive('routines') || !(await askParent())) return;
+    const now = new Date();
+    if (a === 'add') save('routines', 'grounded/' + kid + '/' + L.nextGroundDay(ctx, kid, now), true);
+    else { const last = L.groundedAhead(ctx, kid, now).filter((x) => !x.fixed).pop(); if (last) save('routines', 'grounded/' + kid + '/' + last.day, null); }
     return;
   }
   const b = e.target.closest('[data-bedok]');

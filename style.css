@@ -755,3 +755,5 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .bneed { color: var(--accent-ink); font-weight: 800; font-size: 13px; }
 .owed.carry .bible { padding-left: 42px; border-top: 0; }
 .owed.carry .ckbtn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; }
+#grounded .prow2 .exbtns { grid-column: 2 / -1; justify-content: flex-start; }
+.tbtn.deny:disabled { opacity: .45; cursor: not-allowed; }
