@@ -90,6 +90,27 @@ A nightly check-in fires about 12:47 am Central into this session. Each night: r
 | Sun Dec 13 | A fresh reviewer rechecks the changed items | [ ] |
 | Mon Dec 14 | Final sign-off and report to the parent; DISABLE the nightly check-in and set the Saturday check-in back to normal | [ ] |
 
+**Work queue (Nov 24; replaces the night-by-night order above; the advisor set it by when Eli reaches each item)**
+Measured pace: about 2-4 lessons reworked or built per night, each with a fresh blind check. Do the first item
+not done; one item can span nights. The rows above stay as a record.
+
+| # | Item | Eli reaches it | Status |
+|---|---|---|---|
+| 1 | Unit 2 lessons 3-4 rework + pin; real-course unit-test browser case | Dec 2 | done Nov 24 |
+| 2 | Form B fixes (tB01, tB15, tB03, tB04, length ranks, fact keys, consecutive-forms test); C8 number quota first | about Dec 4 | [ ] |
+| 3 | Unit 3 rework (4 lessons + pin) | Dec 7 | [ ] |
+| 4 | Unit 4 rework (4 lessons + pin) | Dec 14 | [ ] |
+| 5 | Form C | about Dec 18 | [ ] |
+| 6 | Unit 5 build | Dec 21 | [ ] |
+| 7 | Unit 6 build; Form D | Dec 28 / about Jan 1 | [ ] |
+| 8 | Units 7-8 | Jan 4 / Jan 11 | [ ] |
+| 9 | Units 9-10, final week; Forms E-F | Jan 18 - Feb | [ ] |
+| R | Reviews: each unit gets its fresh blind check when built; the whole-course reviews (skill levels, gaps, bugs/UI, independent review, triage, fixes) run once units 5-10 are built. They don't shrink. | | [ ] |
+
+Doesn't fit by Dec 14: items 1-4 do (about 6-7 nights); 5-9 and the whole-course reviews need about 25 more nights.
+The parent decides whether the nightly run continues past Dec 14 (recommended: yes, through about mid-January, always
+at least a week ahead of Eli). What slips first at no cost to Eli: Forms E-F, then D, then units 9-10.
+
 **Rules every night**
 - Each build night ends with one cold sub-agent answering that night's new questions from the manual WITHOUT the keys; any disagreement is a defect until resolved.
 - Review nights: at most three read-only sub-agents, one lens each; findings go to a file. Fix nothing without a failing test, a screenshot or a manual page.
