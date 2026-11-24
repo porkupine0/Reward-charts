@@ -184,7 +184,7 @@ export const LESSONS = [
       { ...q('w2d3q1', 'What does a MERGING TRAFFIC sign tell you?', ['Your lane ends ahead; merge into the next lane', 'Turn right at the next road', 'No passing ahead', 'Expect cars to blend into your lane'], 3,
         'That’s the Merging Traffic sign.', 9, 'If you are on the main road and see this sign, be prepared for other vehicles blending into your lane.'), sign: { shape: 'diamond', color: 'yellow' } },
       q('w2d3q2', 'A LANE ENDS sign means two lanes will soon become one. What does the manual say about merging?', ['The ending lane has the right-of-way', 'Traffic must yield when merging', 'Every car must stop before merging', 'The left lane always goes first'], 1,
-        'Merge carefully, and be ready to let others merge too.', 9, 'Two lanes of traffic will soon become one lane of traffic. Traffic must yield when merging.'),
+        'The manual says traffic must yield when merging: two lanes are becoming one.', 9, 'Two lanes of traffic will soon become one lane of traffic. Traffic must yield when merging.'),
       q('w2d3q8', 'Who must you yield to at a crosswalk under Iowa’s 2024 law?', ['Only people on foot; anyone on wheels uses the street like a car', 'Only people in wheelchairs', 'Walkers and people on scooters, skateboards or in wheelchairs', 'Nobody, if your light is green'], 2,
         'The law calls those devices pedestrian conveyances.', 10, 'vehicles must yield the right of way to pedestrians on foot and those using any human powered device'),
       q('w2d3q5', 'A T-INTERSECTION AHEAD sign means:', ['Get ready to turn right or left', 'Check your brakes for a hill', 'Be ready for cars merging in', 'Two lanes become one ahead'], 0,
