@@ -1,10 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795503292';
-import { MEDS_GAP_MIN, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795503292';
-import { SETTINGS } from './settings.js?v=1795503292';
-import { askParent } from './parent.js?v=1795503292';
-import * as L from './lists.js?v=1795503292';
-import { chapters, parseRef, nextRef } from './bible.js?v=1795503292';
-import { dayStreak, cheerIf } from './streaks.js?v=1795503292';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795537825';
+import { MEDS_GAP_MIN, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795537825';
+import { SETTINGS } from './settings.js?v=1795537825';
+import { askParent } from './parent.js?v=1795537825';
+import * as L from './lists.js?v=1795537825';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795537825';
+import { dayStreak, cheerIf } from './streaks.js?v=1795537825';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -93,7 +93,7 @@ function itemHtml(it, checks, extra) {
   else h += '<button class="ckbtn" data-key="' + it.key + '" aria-pressed="' + on + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
     (extra && extra.time ? '<span class="rtime">' + esc(extra.time) + '</span>' : '') +
     '<span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
-    '<span class="cktext"><strong>' + esc(it.label) + (it.opt ? ' <em>optional</em>' : '') + (it.hot ? ' <em class="hot">shower night</em>' : '') + '</strong>' +
+    '<span class="cktext"><strong>' + esc(it.label) + (it.opt ? ' <em>optional</em>' : '') + (it.hot ? ' <em class="hot">shower night</em>' : '') + (it.tag ? ' <em class="hot">' + esc(it.tag) + '</em>' : '') + '</strong>' +
     (locked ? '<small>' + esc(lockMsg) + '</small>' : it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
   if (it.choices) {
     h += '<div class="chips">' + it.choices.map((c) =>

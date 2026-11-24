@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795503292';
-import { choreSteps } from './chorelists.js?v=1795503292';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795503292';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795537825';
+import { choreSteps } from './chorelists.js?v=1795537825';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795537825';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -86,6 +86,8 @@ function schedule(kid, dow) {
     rows.unshift(['lights', at]);
     steps.slice().reverse().forEach((k) => { at -= duration(k, kid, showers, false); rows.unshift([k, at]); });
   }
+  // Isaiah: glasses in their case in the kitchen, right after his snack (before heading up).
+  if (kid === 'isaiah') { const s = rows.findIndex(([k]) => k === 'snack'); rows.splice(s + 1, 0, ['glasses', rows[s + 1][1]]); }
   // Eli charges his watch every night, right before reading.
   if (kid === 'eli') { const r = rows.findIndex(([k]) => k === 'reading'); rows.splice(r, 0, ['watch', rows[r][1]]); }
   // Show choir alarm: Monday and Thursday nights, 5 min before lights out.
@@ -108,6 +110,7 @@ function bedLabel(key, kid, dow) {
     reading: 'Reading',
     alarm: 'Set alarm for 6:25 am (show choir)',
     watch: 'Charge your watch',
+    glasses: 'Glasses in their case in the kitchen',
     lights: 'Lights out'
   }[key];
 }
@@ -160,8 +163,9 @@ export function afterSchool(kid, dow, runPlan) {
     kid === 'isaiah'
       ? { key: 'putaway', label: 'Shoes, backpack + jacket laid out together', sub: 'All in one spot, ready for the morning' }
       : { key: 'putaway', label: 'Backpack, shoes + jacket put away' },
+    ...(kid === 'isaiah' ? [{ key: 'glassesHome', label: 'School glasses away, home glasses on', sub: 'In the kitchen' }] : []),
     { key: 'afterSnack', label: 'After-school snack', choices: AFTER_SNACKS },
-    kid === 'isaiah' ? CLOTHES : { key: 'clothes', label: 'Lay out clothes for tomorrow' },
+    kid === 'isaiah' ? Object.assign({}, CLOTHES, { tag: glassesFor(dow) }) : { key: 'clothes', label: 'Lay out clothes for tomorrow' },
     ...choreItems(kid, dow),
     { key: 'organize', label: 'Organize backpack', sub: 'Take out papers you don’t need' }
   ];
@@ -187,13 +191,16 @@ export function afterSchool(kid, dow, runPlan) {
 }
 
 // Isaiah lays out each piece of tomorrow's clothes by his bed; the box checks itself when all four are out.
-const CLOTHES = { key: 'clothes', label: 'Lay out clothes by your bed', sub: 'Tap each one as it goes by your bed', parts: ['Shirt', 'Pants', 'Underwear', 'Socks'] };
+const CLOTHES = { key: 'clothes', label: 'Lay out clothes downstairs', sub: 'Tap each one as it goes in your pile downstairs', parts: ['Shirt', 'Pants', 'Underwear', 'Socks'] };
+// The pile goes with the glasses he'll wear the day the clothes are for: school glasses for a school day
+// (laid out Sunday to Thursday), home glasses for Saturday (laid out Friday).
+const glassesFor = (dow) => (dow === 4 ? 'with your home glasses' : 'with your school glasses');
 
 // Weekend daytime list (Sat chore; Isaiah's weekly work).
 export function weekend(kid, dow) {
   const items = [];
   if (dow === 6) items.push(kid === 'isaiah'
-    ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes by your bed' })
+    ? Object.assign({}, CLOTHES, { key: 'weather', sub: 'Check the weather first · tap each one as it goes in your pile downstairs', tag: glassesFor(dow) })
     : { key: 'weather', label: 'Check weather & lay out appropriate clothes', sub: 'For school tomorrow' });
   items.push(...choreItems(kid, dow));
   if (dow === 5 && kid === 'rhett') items.push(DUO, { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video' });
@@ -223,7 +230,8 @@ function timerResultOn(kid, dateObj, rec, checks) {
   // by the clock, so daylight-saving nights work; each day past the checklist date adds 24h
   const dayGap = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate(), 12) - new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 12)) / 86400000);
   const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
-  const steps = bedtime(kid, dow).filter((s) => !s.afterLights);
+  const day = dateObj.getFullYear() + '-' + String(dateObj.getMonth() + 1).padStart(2, '0') + '-' + String(dateObj.getDate()).padStart(2, '0');
+  const steps = bedtime(kid, dow).filter((s) => !s.afterLights && (!STARTS[s.key] || day >= STARTS[s.key]));
   const done = steps.filter((s) => checks && isDone(checks[s.key])).length;
   // Up to the grace minutes (Settings, 5 by default) past lights out still counts; beyond that only with a parent's OK.
   const lateBy = endMin - lo;
@@ -248,7 +256,9 @@ export function rewardWhen(dow) {
 export const BIBLE_FROM = '2026-11-21';
 export const BIBLE_KEYS = ['mBible', 'bibleRead', 'pray'];
 // Items added later, with the first day they show (earlier days keep the lists they had).
-export const STARTS = { mBible: BIBLE_FROM, bibleRead: BIBLE_FROM, pray: BIBLE_FROM, mMeds: '2026-11-21', meds2: '2026-11-21' };
+export const STARTS = { mBible: BIBLE_FROM, bibleRead: BIBLE_FROM, pray: BIBLE_FROM, mMeds: '2026-11-21', meds2: '2026-11-21',
+  // Isaiah's glasses: each from the first day its time hadn't passed when it was added (Tue Nov 24, 10:30 am)
+  mGlasses: '2026-11-25', glassesHome: '2026-11-24', glasses: '2026-11-24' };
 // Eli's Ritalin on Saturday and Sunday: the morning dose records its time (mMedsAt); the second dose is due 4 hours later.
 const MEDS = { key: 'mMeds', label: 'Take your Ritalin', sub: 'Records the time, so you know when the second dose is due' };
 export const MEDS2 = { key: 'meds2', label: 'Second dose of Ritalin', sub: '4 hours after your morning dose' };
@@ -275,6 +285,7 @@ export function morning(kid, dow) {
   const church = dow === 6;
   return [
     { key: 'mDress', label: church ? 'Get dressed for church' : 'Get dressed' },
+    ...(church ? [] : [{ key: 'mGlasses', label: 'Put on your school glasses' }]),
     { key: 'mScarlett', label: 'Let Scarlett out' },
     breakfast,
     teeth,
