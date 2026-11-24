@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795540494';
-import { askParent } from './parent.js?v=1795540494';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795540494';
-import { applySettings, SETTINGS } from './settings.js?v=1795540494';
-import { weekStreak, cheerIf } from './streaks.js?v=1795540494';
-import { gameWeek } from './lists.js?v=1795540494';
-import * as L from './lists.js?v=1795540494';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795540494';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795561945';
+import { askParent } from './parent.js?v=1795561945';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795561945';
+import { applySettings, SETTINGS } from './settings.js?v=1795561945';
+import { weekStreak, cheerIf } from './streaks.js?v=1795561945';
+import { gameWeek } from './lists.js?v=1795561945';
+import * as L from './lists.js?v=1795561945';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795561945';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -61,7 +61,7 @@ function renderGame() {
     (g.left > 0 && !g.hold ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
       '<button class="chip" data-gtuse="other">Other…</button></div>' : '') +
     (g.uses.length ? '<ul class="gt-log">' + g.uses.map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + fmtMin(u.minutes) + '</b></span><button class="linkbtn" data-gtundo="' + u.at + '">Undo</button></li>').join('') + '</ul>' : '') +
-    '<p class="note">Each school day with the whole checklist done and ' + (n === 3 ? 'all three' : 'both') + ' evening checks = ' + (t ? t.worth : SETTINGS.game) + ' minutes, to use Saturday and Sunday. Log each time you play so you know what’s left.</p>';
+    '<p class="note">Cashing in time asks for Mom or Dad’s PIN (here or on the Parents page). Each school day with the whole checklist done and ' + (n === 3 ? 'all three' : 'both') + ' evening checks = ' + (t ? t.worth : SETTINGS.game) + ' minutes, to use Saturday and Sunday. Log each time you play so you know what’s left.</p>';
 }
 
 function render() {
@@ -161,14 +161,19 @@ document.addEventListener('click', (e) => {
       m = L.parseMinutes(typed);
       if (!m) { $('gtstatus').insertAdjacentHTML('afterend', '<p class="gt-msg" role="alert">Couldn’t read “' + esc(typed) + '”. Try 45, 1 hr or 1:30.</p>'); setTimeout(() => { const x = document.querySelector('.gt-msg'); if (x) x.remove(); }, 6000); return; }
     } else m = Number(gu.dataset.gtuse);
-    m = Math.min(Math.round(m), g.left);
-    let at = Date.now();
-    while (g.uses.some((u) => u.at === at)) at++; // each entry its own key
-    if (m > 0) save('routines', 'game/' + kidId + '/' + wk + '/' + at, m);
+    // cashing in game time needs Mom or Dad (the parent PIN)
+    askParent().then((ok) => {
+      if (!ok) return;
+      const g2 = gameWeek(ctx, kidId, week);
+      const mm = Math.min(Math.round(m), g2.hold ? 0 : g2.left);
+      let at = Date.now();
+      while (g2.uses.some((u) => u.at === at)) at++; // each entry its own key
+      if (mm > 0) save('routines', 'game/' + kidId + '/' + wk + '/' + at, mm);
+    });
     return;
   }
   const gx = e.target.closest('[data-gtundo]');
-  if (gx) { save('routines', 'game/' + kidId + '/' + wk + '/' + gx.dataset.gtundo, null); return; }
+  if (gx) { askParent().then((ok) => { if (ok) save('routines', 'game/' + kidId + '/' + wk + '/' + gx.dataset.gtundo, null); }); return; }
   if (cell) {
     // Boxes the checklist fills: a tap here is a hand override (stored as true or 'off');
     // tapping back to what the checklist says clears the override.

@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795540494';
-import { choreSteps } from './chorelists.js?v=1795540494';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795540494';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795561945';
+import { choreSteps } from './chorelists.js?v=1795561945';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795561945';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -173,7 +173,7 @@ const DUO = { key: 'duolingo', label: 'Duolingo · 10 min', opt: true, computer:
 // Rhett's typing practice, 10 min every day (a computer task, so it waits for chores too).
 const TYPING = { key: 'typing', label: 'Typing practice · 10 min', computer: true };
 // Rhett's trombone practice, Fri/Sat/Sun: 20 min Friday, 30 min Saturday and Sunday (the minutes on his reward chart).
-const trombone = (dow) => ({ key: 'trombone', label: 'Practice trombone · ' + (dow === 4 ? 20 : 30) + ' min', sub: 'Use the timer on your chart page. Tap to open it.', link: 'trombone.html' });
+export const trombone = (dow) => ({ key: 'trombone', label: 'Practice trombone · ' + (dow === 4 ? 20 : 30) + ' min', sub: 'Use the timer on your chart page. Tap to open it.', link: 'trombone.html' });
 
 export function afterSchool(kid, dow, runPlan) {
   if (dow > 4) return [];

@@ -757,3 +757,5 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .owed.carry .ckbtn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; }
 #grounded .prow2 .exbtns { grid-column: 2 / -1; justify-content: flex-start; }
 .tbtn.deny:disabled { opacity: .45; cursor: not-allowed; }
+#bank .prow2 .exbtns { grid-column: 2 / -1; justify-content: flex-start; flex-wrap: wrap; }
+.bank-log { margin: -4px 0 8px 68px; }

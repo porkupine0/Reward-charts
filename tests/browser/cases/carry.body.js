@@ -14,7 +14,7 @@
   const text = await p.$eval('#carry', (e) => e.textContent);
   notes.push('prompt: ' + text.replace(/\s+/g, ' ').slice(0, 80));
   check(/Rhett/.test(text) && /20 min left from last week/.test(text), 'asks about Rhett\'s 20 min');
-  await p.click('[data-carry="rhett|yes"]');
+  await p.click('[data-carry^="rhett|yes"]');
   await p.waitForSelector('.pindlg input', { timeout: 2000 });
   await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(400);
   const saved = (await db()).charts.routines.carry;

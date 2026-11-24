@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>window.__V='1795540494';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
+<script>window.__V='1795561945';fetch('version.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j.v!==window.__V){var u=new URL(location.href);if(u.searchParams.get('r')!==j.v){u.searchParams.set('r',j.v);location.replace(u)}}}).catch(function(){})</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Parents · Reward Charts</title>
@@ -13,7 +13,7 @@
 <link rel="icon" href="icons/parents.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1795540494">
+<link rel="stylesheet" href="style.css?v=1795561945">
 </head>
 <body class="parents">
 <main class="wrap">
@@ -41,6 +41,19 @@
   </section>
 
   <section class="card pcard">
+    <div class="rhead"><h2>Game time bank</h2></div>
+    <p class="note">Minutes each boy can use right now (this week’s earned, plus anything carried over, minus what’s used). Cash in when he plays: each tap asks for the parent PIN.</p>
+    <div id="bank" class="plist"></div>
+  </section>
+
+  <section class="card pcard">
+    <div class="rhead"><h2>Grounded from electronics</h2></div>
+    <p class="note">Days with no video game time. A grounded day earns no game time, and while a boy is grounded his game time is on hold (kept for after, not usable). Today counts as day one. Changing it asks for the parent PIN.</p>
+    <div id="grounded" class="plist"></div>
+  </section>
+
+
+  <section class="card pcard">
     <div class="rhead"><h2>To pay or give</h2><span class="rcount" id="owedcount"></span></div>
     <p class="note">Everything the kids have earned and not received yet. Tick it when it’s handed over.</p>
     <div id="owed" class="plist"></div>
@@ -62,12 +75,6 @@
     <div class="rhead"><h2>Reading</h2></div>
     <p class="note">Nights read out of nights with reading on the list. Excused nights count for credit but not as read.</p>
     <div class="tablewrap"><table class="histtable" id="reading"></table></div>
-  </section>
-
-  <section class="card pcard">
-    <div class="rhead"><h2>Grounded from electronics</h2></div>
-    <p class="note">Days with no video game time. A grounded day earns no game time, and while a boy is grounded his game time is on hold (kept for after, not usable). Today counts as day one. Changing it asks for the parent PIN.</p>
-    <div id="grounded" class="plist"></div>
   </section>
 
   <section class="card pcard">
@@ -101,6 +108,6 @@
     <p class="note" id="datamsg"></p>
   </section>
 </main>
-<script type="module" src="parents.js?v=1795540494"></script>
+<script type="module" src="parents.js?v=1795561945"></script>
 </body>
 </html>

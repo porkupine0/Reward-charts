@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795540494';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2 } from './routines.js?v=1795540494';
-import { SETTINGS, onSettings } from './settings.js?v=1795540494';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795540494';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795540494';
-import { LESSONS } from './driving-course.js?v=1795540494';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795540494';
-import * as TESTS from './driving-tests.js?v=1795540494';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795540494';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795561945';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795561945';
+import { SETTINGS, onSettings } from './settings.js?v=1795561945';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795561945';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795561945';
+import { LESSONS } from './driving-course.js?v=1795561945';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795561945';
+import * as TESTS from './driving-tests.js?v=1795561945';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795561945';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -125,6 +125,11 @@ function listsOn(ctx, kid, date) {
     for (let n = day.length - 1; n >= 0; n--) if (SCHOOL_KEYS.includes(day[n].key)) day.splice(n, 1);
     day.forEach((i, n) => { if (i.key === 'afterSnack') day[n] = Object.assign({}, i, { label: 'Afternoon snack' }); });
     if (kid === 'eli' && ymd(date) >= STARTS.meds2) { const b = day.findIndex((i) => i.key === 'bibleRead'); day.splice(b >= 0 ? b : day.length, 0, Object.assign({}, MEDS2)); }
+  }
+  // Rhett: 20 min of trombone on a weekday off and on a school day before a day off (like Friday), from Nov 24, 2026
+  if (kid === 'rhett' && dow <= 3 && ymd(date) >= '2026-11-24' && (off || noSchoolTomorrow(dow, date)) && !day.some((i) => i.key === 'trombone')) {
+    const t = day.findIndex((i) => i.key === 'typing');
+    day.splice(t >= 0 ? t + 1 : day.length, 0, trombone(4));
   }
   // Isaiah's glasses follow the school calendar: school glasses on school mornings, home glasses otherwise;
   // no after-school swap on a weekday off; his clothes pile goes with the pair for the day they're for.
@@ -427,7 +432,7 @@ export function gameWeek(ctx, kid, monday, now = new Date()) {
   const minutes = days.reduce((a, d) => a + d.minutes, 0);
   const uses = gameUses(ctx, kid, monday), used = uses.reduce((a, u) => a + u.minutes, 0);
   const out = carryFrom(ctx, kid, monday);
-  const carriedIn = arrives(carryFrom(ctx, kid, addDays(monday, -7))), carriedOut = arrives(out), letGo = out && !out.add ? leaves(out) : 0;
+  const carriedIn = carriedInto(ctx, kid, monday), carriedOut = arrives(out), letGo = out && !out.add ? leaves(out) : 0;
   // a no-game-time week (GAME_OFF): nothing earned, and minutes carried in from before can't be used either
   const off = days.some((d) => d.off);
   // grounded today: what's left is on hold (kept for after the grounding, not usable now)
@@ -435,10 +440,27 @@ export function gameWeek(ctx, kid, monday, now = new Date()) {
   return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, off, hold, left: off ? 0 : Math.max(0, minutes + carriedIn - used - leaves(out)) };
 }
 // Parents page: boys with game time left from last week and no answer yet. [{ kid, from, minutes }]
+// Every finished week (from Nov 16, 2026) not answered yet stays on the list, oldest first, until a parent
+// answers it. A late answer ("to" = the Monday it was answered) adds the minutes to that week instead.
+export const CARRY_WEEKS_FROM = '2026-11-16';
 export function carryPrompts(ctx, today, kids) {
-  const from = addDays(mondayOf(today), -7);
-  return kids.filter((kid) => carryFrom(ctx, kid, from) === undefined).map((kid) => ({ kid, from, minutes: gameWeek(ctx, kid, from).left })).filter((x) => x.minutes > 0);
+  const thisMon = mondayOf(today), out = [];
+  kids.forEach((kid) => {
+    for (let from = parseYmd(CARRY_WEEKS_FROM); addDays(from, 7) <= thisMon; from = addDays(from, 7)) {
+      if (carryFrom(ctx, kid, from) !== undefined) continue;
+      const minutes = gameWeek(ctx, kid, from).left;
+      if (minutes > 0) out.push({ kid, from, minutes, late: ymd(addDays(from, 7)) < ymd(thisMon) });
+    }
+  });
+  return out;
 }
+// Minutes moved into a week: answers for the week before ("Add"), plus late answers aimed at this week.
+function carriedInto(ctx, kid, monday) {
+  const all = (((ctx.routines || {}).carry || {})[kid]) || {}, w = ymd(monday);
+  return Object.entries(all).reduce((a, [from, v]) => a + ((v && v.to ? v.to : ymd(addDays(parseYmd(from), 7))) === w ? arrives(v) : 0), 0);
+}
+// Where an answer's minutes go: the next week, or this week when answered late.
+export const carryTarget = (from, today) => { const next = addDays(from, 7), mon = mondayOf(today); return ymd(next) < ymd(mon) ? ymd(mon) : null; };
 
 // ---- Parents' "Tonight" card: everything a parent signs off on for one evening ----
 // The evening a parent is closing out: before 5 am it's still last night (same as nowStatus).

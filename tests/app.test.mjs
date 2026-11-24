@@ -750,3 +750,15 @@ test('extra chores never double up with a chore someone else has that day', asyn
   }));
 });
 
+
+test("leftover game time: an unanswered week stays on the list; a late answer adds to this week", () => {
+  const ctx = { routines: { game: {} , carry: { rhett: { '2026-11-23': { minutes: 0, add: false } } } }, run: {}, isaiah: {} };
+  // pretend Nov 16 had 20 left: carry prompts look back to Nov 16 and include it on Dec 1, marked late
+  const g = L.gameWeek; // (real minutes need full checklists; use an answered/unanswered shape check)
+  const now = new Date(2026, 11, 1, 9);
+  assert.equal(L.carryTarget(d('2026-11-16'), now), '2026-11-30', 'late: lands on this week');
+  assert.equal(L.carryTarget(d('2026-11-23'), now), null, 'on time: the next week');
+  ctx.routines.carry.rhett['2026-11-16'] = { minutes: 25, add: true, to: '2026-11-30' };
+  assert.equal(g(ctx, 'rhett', d('2026-11-30'), now).carriedIn, 25);
+  assert.equal(g(ctx, 'rhett', d('2026-11-23'), now).carriedIn, 0, 'not the week after');
+});

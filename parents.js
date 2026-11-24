@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795540494';
-import { CHARTS, weekProgress } from './charts.js?v=1795540494';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795540494';
-import * as L from './lists.js?v=1795540494';
-import { owed, score, planned, fmt } from './trials.js?v=1795540494';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795540494';
-import { askParent, setParent, changePin } from './parent.js?v=1795540494';
-import { dayFull } from './streaks.js?v=1795540494';
-import { owedItems } from './owed.js?v=1795540494';
-import { pruneList, pruneCutoff } from './prune.js?v=1795540494';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795540494';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795540494';
-import { nowHtml } from './nowview.js?v=1795540494';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795561945';
+import { CHARTS, weekProgress } from './charts.js?v=1795561945';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795561945';
+import * as L from './lists.js?v=1795561945';
+import { owed, score, planned, fmt } from './trials.js?v=1795561945';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795561945';
+import { askParent, setParent, changePin } from './parent.js?v=1795561945';
+import { dayFull } from './streaks.js?v=1795561945';
+import { owedItems } from './owed.js?v=1795561945';
+import { pruneList, pruneCutoff } from './prune.js?v=1795561945';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795561945';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795561945';
+import { nowHtml } from './nowview.js?v=1795561945';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -57,8 +57,8 @@ function render() {
   // Leftover game time from last week: add it to this week, or not (asked once per boy)
   const carry = allLive() ? L.carryPrompts(ctx, today, Object.keys(KIDS).filter((id) => CHARTS[KIDS[id].chart] && CHARTS[KIDS[id].chart].gameTime)) : [];
   $('carrycard').hidden = !carry.length;
-  $('carry').innerHTML = carry.map((c) => row(KIDS[c.kid].name, KIDS[c.kid].accent, c.minutes + ' min left from last week', 'Add to this week?',
-    '<span class="exbtns"><button class="tbtn approve" data-carry="' + c.kid + '|yes">Add ' + c.minutes + ' min</button><button class="linkbtn" data-carry="' + c.kid + '|no">No</button></span>')).join('');
+  $('carry').innerHTML = carry.map((c) => row(KIDS[c.kid].name, KIDS[c.kid].accent, c.minutes + ' min left from ' + (c.late ? 'the week of ' + shortDate(c.from) : 'last week'), (c.late ? 'Not answered yet. ' : '') + 'Add to this week?',
+    '<span class="exbtns"><button class="tbtn approve" data-carry="' + c.kid + '|yes|' + ymd(c.from) + '">Add ' + c.minutes + ' min</button><button class="linkbtn" data-carry="' + c.kid + '|no|' + ymd(c.from) + '">No</button></span>')).join('');
   // Right now: where each kid is, given the time of day
   $('nowhead').textContent = 'Right now · ' + today.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   $('nowall').innerHTML = Object.entries(KIDS).map(([id, k]) => '<div class="nowkid" style="--accent:' + k.accent + '"><div class="nowkid-top"><a class="nowname" href="kid.html?kid=' + id + '">' + esc(k.name) + '</a>' +
@@ -77,6 +77,17 @@ function render() {
         r.denied ? '<button class="linkbtn" data-bedok="' + ymd(d) + '|' + id + '|undo">Undo</button>' : bedBtns(ymd(d), id)));
     });
   }
+  // Game time bank: minutes left now, cash in (PIN), last few cash-ins with Undo
+  const gameKids = Object.keys(KIDS).filter((id) => CHARTS[KIDS[id].chart] && CHARTS[KIDS[id].chart].gameTime);
+  $('bank').innerHTML = gameKids.map((id) => {
+    const k = KIDS[id], g = L.gameWeek(ctx, id, mon, today);
+    const waiting = carry.filter((c) => c.kid === id).reduce((a, c) => a + c.minutes, 0);
+    const head = g.off ? 'No game time this week' : g.hold ? '<b>' + g.left + ' min on hold</b> (grounded)' : '<b>' + g.left + ' min left</b>';
+    const sub = g.minutes + ' earned this week' + (g.carriedIn ? ' + ' + g.carriedIn + ' carried over' : '') + ' · ' + g.used + ' used' + (waiting ? ' · ' + waiting + ' more waiting on your leftover answer' : '');
+    const btns = g.left > 0 && !g.hold && !g.off ? '<span class="exbtns">' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-bank="' + id + '|' + m + '">' + (m === 60 ? '1 hr' : m + ' min') + '</button>').join('') + '<button class="chip" data-bank="' + id + '|other">Other…</button></span>' : '';
+    const log = g.uses.slice(-3).reverse().map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + u.minutes + ' min</b></span><button class="linkbtn" data-bankundo="' + id + '|' + u.at + '">Undo</button></li>').join('');
+    return row(k.name, k.accent, head, sub, btns) + (log ? '<ul class="gt-log bank-log">' + log + '</ul>' : '');
+  }).join('');
   // Grounded from electronics: days left (today counts), last day, +1 day / -1 day (PIN)
   $('grounded').innerHTML = Object.entries(KIDS).map(([id, k]) => {
     const ahead = L.groundedAhead(ctx, id, today), last = ahead[ahead.length - 1];
@@ -164,10 +175,10 @@ document.addEventListener('click', async (e) => {
   const cb = e.target.closest('[data-carry]');
   if (cb) {
     // the amount is worked out after the PIN, from the latest data, and fixed when saved
-    const [kid, a] = cb.dataset.carry.split('|');
+    const [kid, a, wk] = cb.dataset.carry.split('|');
     if (!allLive() || !(await askParent())) return;
-    const c = allLive() && L.carryPrompts(ctx, new Date(), [kid])[0];
-    if (c) save('routines', 'carry/' + kid + '/' + ymd(c.from), { minutes: c.minutes, add: a === 'yes' });
+    const c = allLive() && L.carryPrompts(ctx, new Date(), [kid]).find((x) => !wk || ymd(x.from) === wk);
+    if (c) { const to = L.carryTarget(c.from, new Date()); save('routines', 'carry/' + kid + '/' + ymd(c.from), Object.assign({ minutes: c.minutes, add: a === 'yes' }, to ? { to } : {})); }
     return;
   }
   const tn = e.target.closest('[data-tn]');
@@ -186,6 +197,21 @@ document.addEventListener('click', async (e) => {
     L.allGoodKeys(ctx, kid, parseYmd(d)).forEach((k) => save('routines', 'days/' + d + '/' + kid + '/' + k, true));
     return;
   }
+  const bk = e.target.closest('[data-bank]');
+  if (bk) {
+    const [kid, v] = bk.dataset.bank.split('|');
+    let m = Number(v);
+    if (v === 'other') { const typed = prompt('How long did ' + KIDS[kid].name + ' play? For example 45, 1 hr or 1:30', ''); if (typed === null) return; m = L.parseMinutes(typed); if (!m) { alert('Couldn’t read “' + typed + '”. Try 45, 1 hr or 1:30.'); return; } }
+    if (!isLive('routines') || !(await askParent())) return;
+    const now = new Date(), wk = mondayOf(now), g = L.gameWeek(ctx, kid, wk, now);
+    const mm = Math.min(Math.round(m), g.hold || g.off ? 0 : g.left);
+    let at = Date.now();
+    while (g.uses.some((u) => u.at === at)) at++;
+    if (mm > 0) save('routines', 'game/' + kid + '/' + ymd(wk) + '/' + at, mm);
+    return;
+  }
+  const bu = e.target.closest('[data-bankundo]');
+  if (bu) { const [kid, at] = bu.dataset.bankundo.split('|'); if (await askParent()) save('routines', 'game/' + kid + '/' + ymd(mondayOf(new Date())) + '/' + at, null); return; }
   const gr = e.target.closest('[data-ground]');
   if (gr) {
     const [kid, a] = gr.dataset.ground.split('|');
