@@ -1,5 +1,6 @@
-import { planFor, planEndYmd } from './plan.js?v=1795538620';
-import { SETTINGS } from './settings.js?v=1795538620';
+import { planFor, planEndYmd } from './plan.js?v=1795539997';
+import { isSchoolDay } from './routines.js?v=1795539997';
+import { SETTINGS } from './settings.js?v=1795539997';
 // The weekly charts. Cell codes: 'x' = required box, '-' = off day,
 // {t:'20 min'} = required box with a label, {t:'Bonus', opt:true} = optional.
 const X = 'x', O = '-';
@@ -97,7 +98,11 @@ const worded = (chart, rows) => rows.map((r) => {
   const w = r.parent && ((SETTINGS.checks || {})[chart.kidId] || {})[r.key];
   return w ? Object.assign({}, r, { label: w.label, sub: '' }) : r; // the label only: chart rows stay short
 });
-export function rowsFor(chart, monday) { return worded(chart, baseRows(chart, monday)); }
+export function rowsFor(chart, monday) { return worded(chart, schoolDays(baseRows(chart, monday), monday)); }
+// A School row is off on weekdays with no school (the school calendar in routines.js), like a weekend.
+const schoolDays = (rows, monday) => !monday ? rows : rows.map((r) => r.key !== 'school' ? r : Object.assign({}, r, {
+  cells: r.cells.map((c, i) => (c === O || isSchoolDay(new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)) ? c : O))
+}));
 function baseRows(chart, monday) {
   if (!chart.altFrom || !monday) return chart.rows;
   if (ymdOf(monday) < chart.altFrom) return chart.rows;

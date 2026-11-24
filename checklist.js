@@ -1,10 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795538620';
-import { MEDS_GAP_MIN, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795538620';
-import { SETTINGS } from './settings.js?v=1795538620';
-import { askParent } from './parent.js?v=1795538620';
-import * as L from './lists.js?v=1795538620';
-import { chapters, parseRef, nextRef } from './bible.js?v=1795538620';
-import { dayStreak, cheerIf } from './streaks.js?v=1795538620';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795539997';
+import { MEDS_GAP_MIN, isSchoolDay, noSchoolTomorrow, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795539997';
+import { SETTINGS } from './settings.js?v=1795539997';
+import { askParent } from './parent.js?v=1795539997';
+import * as L from './lists.js?v=1795539997';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795539997';
+import { dayStreak, cheerIf } from './streaks.js?v=1795539997';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -158,7 +158,7 @@ function renderOn() {
 
   const checks = dayChecks();
   const streak = dayStreak(ctx, kid, new Date());
-  $('notes').innerHTML = '<p class="rdate">' + esc(longDate(date)) + '</p>' + (streak >= 2 ? '<span class="rnote streak">' + streak + '-day streak</span>' : '') + notes(kid, dow).map((n) => '<span class="rnote">' + esc(n) + '</span>').join('');
+  $('notes').innerHTML = '<p class="rdate">' + esc(longDate(date)) + '</p>' + (streak >= 2 ? '<span class="rnote streak">' + streak + '-day streak</span>' : '') + notes(kid, dow, date).map((n) => '<span class="rnote">' + esc(n) + '</span>').join('');
 
   // Teeth was added Nov 11, 2026; leave it off earlier mornings so past candy isn't undone.
   const lst = L.lists(ctx, kid, date);
@@ -167,14 +167,16 @@ function renderOn() {
     if (i.key === 'mHigh5' && checks.readyAt) i.sub = 'All ready at ' + fmtTime(+checks.readyAt.slice(0, 2) * 60 + +checks.readyAt.slice(3)) + (+checks.readyAt.slice(0, 2) < 12 ? ' am' : ' pm');
   });
   $('morning').hidden = !morn.length;
-  const when = rewardWhen(dow);
+  // a weekday off is a Saturday morning (no school, so no candy for the morning)
+  const mdow = dow <= 4 && !isSchoolDay(date) ? 5 : dow;
+  const when = rewardWhen(mdow);
   const prize = when && MORNING_REWARD[kid];
   const mornDone = morn.filter((i) => isOn(i)).length;
   const earned = morn.length > 0 && mornDone === morn.length;
   if (morn.length && kid === 'eli') {
     $('morning').innerHTML = section('Morning', '', morn, checks, false, 'morning');
   } else if (morn.length) {
-    $('morning').innerHTML = section(dow === 6 ? 'Church morning' : 'Morning', prize ? '' : dow === 5 ? 'Optional on Saturdays. No rush!' : 'Optional. Time yourself if you want!', morn, checks, false, 'morning');
+    $('morning').innerHTML = section(mdow === 6 ? 'Church morning' : 'Morning', prize ? '' : mdow === 5 ? (dow === 5 ? 'Optional on Saturdays. No rush!' : 'No school today, so it’s optional. No rush!') : 'Optional. Time yourself if you want!', morn, checks, false, 'morning');
     $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', mornTimerHtml());
     if (prize) $('morning').querySelector('.rhead').insertAdjacentHTML('afterend', treatHtml(prize, when, mornDone, morn.length));
     const woke = checks.wokeAt || '';
@@ -185,7 +187,7 @@ function renderOn() {
     if (mnote) $('morning').querySelector('.rhead').after(mnote);
   }
 
-  const school = dow <= 4;
+  const school = isSchoolDay(date);
   const items = lst.day;
   // Eli's second Ritalin dose: due 4 hours after the morning dose was ticked
   items.forEach((i) => {
@@ -262,7 +264,7 @@ function renderOn() {
   const k0 = kid + ymd(date);
   const dp = L.progress(ctx, kid, date, lst.day), bp = L.progress(ctx, kid, date, lst.bed), mp = L.progress(ctx, kid, date, lst.morning);
   if (lst.morning.length) cheerIf(k0 + 'm', !mp.left.length, 'Morning done! Nice work, ' + KIDS[kid].name + '.');
-  if (dp.req.length) cheerIf(k0 + 'd', !dp.left.length, (dow <= 4 ? 'After school' : 'Today’s list') + ' done!');
+  if (dp.req.length) cheerIf(k0 + 'd', !dp.left.length, (school ? 'After school' : 'Today’s list') + ' done!');
   cheerIf(k0 + 'b', !bp.left.length, 'Bedtime done. Good night, ' + KIDS[kid].name + '!');
   tick();
 }
@@ -306,7 +308,7 @@ function bedOnTime(dateObj, c) {
 }
 function bedTreatHtml(prize, bed, checks, dow) {
   const lo = bed[bed.length - 1].time;
-  const when = dow === 4 || dow === 5 ? 'tomorrow afternoon' : 'after school tomorrow';
+  const when = noSchoolTomorrow(dow, date) ? 'tomorrow afternoon' : 'after school tomorrow';
   const timed = (checks.bedTimer && checks.bedTimer.end) || (checks.lights && checks.lightsAt);
   if (bedOnTime(date, checks)) {
     return '<div class="treat earned"><span class="treat-icon" aria-hidden="true">🍬</span><div><strong>Candy earned!</strong>' +
@@ -368,7 +370,7 @@ document.addEventListener('click', (e) => {
   save(ID, base + key, next);
   // Checking a bedtime step starts the bedtime timer if nobody has (today only).
   if (next && ymd(date) === ymd(new Date()) && !(dayChecks().bedTimer || {}).start &&
-      atDate(date, () => bedtime(kid, dowOf(date))).some((b) => b.key === key)) {
+      atDate(date, () => bedtime(kid, dowOf(date), date)).some((b) => b.key === key)) {
     save(ID, base + 'bedTimer', { start: Date.now(), auto: true });
   }
   if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);

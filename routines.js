@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795538620';
-import { choreSteps } from './chorelists.js?v=1795538620';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795538620';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795539997';
+import { choreSteps } from './chorelists.js?v=1795539997';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795539997';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -71,7 +71,13 @@ function duration(key, kid, showers, short) {
   return MIN[key];
 }
 
-function schedule(kid, dow) {
+// The night before a day with no school (Friday, Saturday, or the night before a day off): later bedtime.
+// Without a date (weekly views), Friday and Saturday nights.
+export function noSchoolTomorrow(dow, date) {
+  return date ? !isSchoolDay(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)) : dow === 4 || dow === 5;
+}
+
+function schedule(kid, dow, date) {
   const showers = SHOWER[kid].includes(dow);
   const home = HOME[dow] && HOME[dow][kid];
   let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].filter((k) => k !== 'shower' || showers);
@@ -102,7 +108,7 @@ function schedule(kid, dow) {
   // Eli charges his watch every night, right before reading.
   if (kid === 'eli') { const r = rows.findIndex(([k]) => k === 'reading'); rows.splice(r, 0, ['watch', rows[r][1]]); }
   // Show choir alarm: Monday and Thursday nights, 5 min before lights out.
-  if (kid === 'eli' && (dow === 0 || dow === 3)) rows.splice(rows.length - 1, 0, ['alarm', rows[rows.length - 1][1] - 5]);
+  if (kid === 'eli' && (dow === 0 || dow === 3) && !(date && noSchoolTomorrow(dow, date))) rows.splice(rows.length - 1, 0, ['alarm', rows[rows.length - 1][1] - 5]);
   return rows;
 }
 
@@ -126,10 +132,10 @@ function bedLabel(key, kid, dow) {
   }[key];
 }
 
-export function bedtime(kid, dow) {
-  const rows = schedule(kid, dow);
+export function bedtime(kid, dow, date) {
+  const rows = schedule(kid, dow, date);
   // Fri/Sat: 30 min later; Rhett gets another 30 on top of Isaiah's
-  const late = dow === 4 || dow === 5 ? (kid === 'rhett' ? 60 : 30) : 0;
+  const late = noSchoolTomorrow(dow, date) ? (kid === 'rhett' ? 60 : 30) : 0;
   const out = rows.map(([key, min]) => ({
     key, time: fmtTime(min + late), min: min + late, label: bedLabel(key, kid, dow),
     choices: key === 'snack' ? BED_SNACKS : null,
@@ -141,13 +147,14 @@ export function bedtime(kid, dow) {
   return out;
 }
 
-export function notes(kid, dow) {
+export function notes(kid, dow, date) {
+  const off = noSchoolTomorrow(dow, date);
   const n = [];
   if (dow === 6 || dow === 0) n.push('Family dinner tonight');
   if (dow === 2) n.push(kid === 'isaiah' ? 'Awana tonight · home about 8:15' : 'Youth group tonight · home about 8:45');
   if (dow === 3 && kid === 'rhett') n.push('Racquetball tonight · home by 8');
-  if (kid === 'eli' && (dow === 0 || dow === 3)) n.push('Show choir in the morning · alarm 6:25');
-  if (dow === 4 || dow === 5) n.push('No school tomorrow · bedtime ' + (kid === 'rhett' ? '1 hour' : '30 min') + ' later');
+  if (kid === 'eli' && (dow === 0 || dow === 3) && !off) n.push('Show choir in the morning · alarm 6:25');
+  if (off) n.push('No school tomorrow · bedtime ' + (kid === 'rhett' ? '1 hour' : '30 min') + ' later');
   return n;
 }
 
@@ -220,8 +227,8 @@ export function weekend(kid, dow) {
 }
 
 // Scheduled lights-out (minutes after midnight) for a kid on a night.
-export function lightsOut(kid, dow) {
-  const b = bedtime(kid, dow);
+export function lightsOut(kid, dow, date) {
+  const b = bedtime(kid, dow, date);
   return b[b.length - 1].min;
 }
 
@@ -233,14 +240,14 @@ export function timerResult(kid, dateObj, rec, checks) { return atDate(dateObj, 
 function timerResultOn(kid, dateObj, rec, checks) {
   if (!rec || !rec.start || !rec.end) return null;
   const dow = (dateObj.getDay() + 6) % 7;
-  const lo = lightsOut(kid, dow);
+  const lo = lightsOut(kid, dow, dateObj);
   const end = new Date(rec.end);
   // minutes after midnight of the checklist date (past midnight counts as late)
   // by the clock, so daylight-saving nights work; each day past the checklist date adds 24h
   const dayGap = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate(), 12) - new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), 12)) / 86400000);
   const endMin = dayGap * 1440 + end.getHours() * 60 + end.getMinutes();
   const day = dateObj.getFullYear() + '-' + String(dateObj.getMonth() + 1).padStart(2, '0') + '-' + String(dateObj.getDate()).padStart(2, '0');
-  const steps = bedtime(kid, dow).filter((s) => !s.afterLights && (!STARTS[s.key] || day >= STARTS[s.key]));
+  const steps = bedtime(kid, dow, dateObj).filter((s) => !s.afterLights && (!STARTS[s.key] || day >= STARTS[s.key]));
   const done = steps.filter((s) => checks && isDone(checks[s.key])).length;
   // Up to the grace minutes (Settings, 5 by default) past lights out still counts; beyond that only with a parent's OK.
   const lateBy = endMin - lo;

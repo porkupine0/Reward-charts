@@ -4,6 +4,7 @@ Work runs in scheduled sessions, one item at a time. Each item is tested, then r
 Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all (GitHub runs them on every push too).
 
 ## Decisions
+- Nov 24: the school calendar (routines.js NO_SCHOOL, isSchoolDay) decides school days. A weekday off is like a Saturday for school things: no school items (backpack, assignments, homework), Saturday mornings (Eli's Ritalin, Isaiah's Saturday list), later bedtime the night before, no show-choir alarm, School row off. Game time is still earned. Add next year's dates there; don't hardcode days off anywhere else.
 - Nov 19: the advisor sets the order of work (the parent said so). Don't ask the parent about order; the check-ins follow "Next steps" below.
 - Late chores ("Finish first") can earn back that day's game time. No change.
 - Monday and Tuesday of the week of Nov 16 count. Charts stay tied from Nov 16, and parents fill in those days on the checklists.

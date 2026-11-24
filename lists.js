@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795538620';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay } from './routines.js?v=1795538620';
-import { SETTINGS, onSettings } from './settings.js?v=1795538620';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795538620';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795538620';
-import { LESSONS } from './driving-course.js?v=1795538620';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795538620';
-import * as TESTS from './driving-tests.js?v=1795538620';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795538620';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795539997';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2 } from './routines.js?v=1795539997';
+import { SETTINGS, onSettings } from './settings.js?v=1795539997';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795539997';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795539997';
+import { LESSONS } from './driving-course.js?v=1795539997';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795539997';
+import * as TESTS from './driving-tests.js?v=1795539997';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795539997';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -89,16 +89,25 @@ export const EXTRA_CHORES = { eli: { '2026-11-23': 'Bathrooms', '2026-11-24': 'K
 // Weeks a boy earns no game time (a parent's decision): { kid: [{ from, to, why }] } (dates inclusive).
 export const GAME_OFF = { eli: [{ from: '2026-11-23', to: '2026-11-29', why: 'No game time this week (video games lost)' }] };
 export const gameOffOn = (kid, date) => (GAME_OFF[kid] || []).find((o) => ymd(date) >= o.from && ymd(date) <= o.to) || null;
+// School items: not on a weekday off (the school calendar in routines.js).
+const SCHOOL_KEYS = ['putaway', 'organize', 'due', 'missing', 'homework'];
 export function lists(ctx, kid, date) { return atDate(date, () => listsOn(ctx, kid, date)); }
 function listsOn(ctx, kid, date) {
   const dow = dowOf(date);
   // Teeth was added Nov 11, 2026; leave it off earlier mornings so past candy isn't undone.
   // Eli's Bible reading and prayer start Nov 21, 2026 (earlier days keep the lists they had).
   const bibleOk = (i) => !STARTS[i.key] || ymd(date) >= STARTS[i.key];
-  const morn = morning(kid, dow).filter((i) => (i.key !== 'mTeeth' || ymd(date) >= '2026-11-11') && bibleOk(i));
+  // A weekday off is a Saturday morning (Eli's Ritalin; Isaiah's Saturday list), and has no school items.
+  const off = dow <= 4 && !isSchoolDay(date);
+  const morn = morning(kid, off ? 5 : dow).filter((i) => (i.key !== 'mTeeth' || ymd(date) >= '2026-11-11') && bibleOk(i));
   const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow);
   const day = [];
   raw.filter(bibleOk).forEach((i) => (i.weekly === true ? day.push(...weeklyItems(ctx, kid, date)) : day.push(i)));
+  if (off) {
+    for (let n = day.length - 1; n >= 0; n--) if (SCHOOL_KEYS.includes(day[n].key)) day.splice(n, 1);
+    day.forEach((i, n) => { if (i.key === 'afterSnack') day[n] = Object.assign({}, i, { label: 'Afternoon snack' }); });
+    if (kid === 'eli' && ymd(date) >= STARTS.meds2) { const b = day.findIndex((i) => i.key === 'bibleRead'); day.splice(b >= 0 ? b : day.length, 0, Object.assign({}, MEDS2)); }
+  }
   // Isaiah's glasses follow the school calendar: school glasses on school mornings, home glasses otherwise;
   // no after-school swap on a weekday off; his clothes pile goes with the pair for the day they're for.
   if (kid === 'isaiah') {
@@ -153,7 +162,7 @@ function listsOn(ctx, kid, date) {
     if (i.key === 'activity' && kid === 'eli') i.derived = 'run';
     if (i.key === 'activity' && kid === 'isaiah') i.derived = 'touches';
   });
-  return { morning: morn, day, bed: bedtime(kid, dow).filter(bibleOk) };
+  return { morning: morn, day, bed: bedtime(kid, dow, date).filter(bibleOk) };
 }
 
 // A computer task (typing, Duolingo, checking assignments, homework) can't be ticked until every chore in the day's list is done.
@@ -288,7 +297,7 @@ export { mondayOf };
 // → after lights out. Anything left from earlier in the day is mentioned too.
 export function nowStatus(ctx, kid, now) {
   const date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const dow = dowOf(date), school = dow <= 4, min = now.getHours() * 60 + now.getMinutes();
+  const dow = dowOf(date), school = isSchoolDay(date), min = now.getHours() * 60 + now.getMinutes();
   const ls = lists(ctx, kid, date);
   const m = progress(ctx, kid, date, ls.morning), d = progress(ctx, kid, date, ls.day), b = progress(ctx, kid, date, ls.bed);
   const bedStart = ls.bed[0].min - 15, lo = ls.bed[ls.bed.length - 1];
@@ -319,7 +328,7 @@ export function readingWeek(ctx, kid, monday, upTo) {
   for (let i = 0; i < 7; i++) {
     const d = addDays(monday, i);
     if (ymd(d) > ymd(last)) break;
-    if (!atDate(d, () => bedtime(kid, dowOf(d))).some((s) => s.key === 'reading')) continue;
+    if (!atDate(d, () => bedtime(kid, dowOf(d), d)).some((s) => s.key === 'reading')) continue;
     nights++;
     const v = dayChecks(ctx, kid, d).reading;
     if (v === EXCUSED) excused++;

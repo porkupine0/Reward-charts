@@ -570,7 +570,8 @@ test("game-time minutes and bedtime grace are settings, by date", () => {
   assert.equal(L.gameMinOn(d('2026-12-01')), 20);
   // 7 minutes late: late before the grace change, inside the grace after it (Rhett, lights out 8:00 on Mon/Tue)
   const night = (k) => { const x = d(k); return { start: new Date(x.getFullYear(), x.getMonth(), x.getDate(), 19, 30).getTime(), end: new Date(x.getFullYear(), x.getMonth(), x.getDate(), 20, 7).getTime() }; };
-  assert.equal(timerResult('rhett', d('2026-11-24'), night('2026-11-24'), {}).status, 'late');
+  // (Nov 17: Nov 24 is now the night before a day off, with the later bedtime)
+  assert.equal(timerResult('rhett', d('2026-11-17'), night('2026-11-17'), {}).status, 'late');
   assert.equal(timerResult('rhett', d('2026-12-01'), night('2026-12-01'), {}).status, 'grace');
   // bad values fall back to the defaults
   applySettings({ game: 999, grace: -3 });

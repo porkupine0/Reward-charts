@@ -30,7 +30,7 @@
   check(!(await keys('#day .checklist')).includes('glassesHome') && !(await keys('#bed')).includes('glasses'), 'nothing on Nov 23');
   // bedtime: right after reading at lights out; other times unchanged (same weekday a week earlier)
   const times = (sel) => p.$$eval(sel, (els) => els.map((e) => e.dataset.key + '@' + (e.querySelector('.rtime') || {}).textContent));
-  await visit('checklist.html?kid=isaiah&date=2026-11-24', 'gl-bed');
+  await visit('checklist.html?kid=isaiah&date=2026-12-01', 'gl-bed'); // an ordinary school night (Nov 24 is now the night before a day off)
   const now = await times('#bed .ckbtn');
   await visit('checklist.html?kid=isaiah&date=2026-11-17', 'gl-bed-old');
   const old = await times('#bed .ckbtn');
