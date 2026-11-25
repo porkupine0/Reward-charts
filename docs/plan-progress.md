@@ -103,7 +103,7 @@ not done; one item can span nights. The rows above stay as a record.
 | # | Item | Eli reaches it | Status |
 |---|---|---|---|
 | 1 | Unit 2 lessons 3-4 rework + pin; real-course unit-test browser case | Dec 2 | done Nov 24 |
-| 2 | Form B fixes (tB01, tB15, tB03, tB04, length ranks, fact keys, consecutive-forms test); C8 number quota first | about Dec 4 | [ ] |
+| 2 | Form B fixes (tB01, tB15, tB03, tB04, length ranks, fact keys, consecutive-forms test); C8 number quota first | about Dec 4 | done Nov 25 (pinned) |
 | 3 | Unit 3 rework (4 lessons + pin) | Dec 7 | [ ] |
 | 4 | Unit 4 rework (4 lessons + pin) | Dec 14 | [ ] |
 | 5 | Form C | about Dec 18 | [ ] |
@@ -235,3 +235,4 @@ in a lesson; a fact the DOT test asks gets a `core` flag (once that lands). The 
 - Nov 24 (parent): nightly sessions extended through Fri Jan 15, 2027; both scheduled tasks updated to the work queue.
 - Nov 25 (nightly): the daily backup has NEVER made a backup: Nov 18-19 'successes' had no BACKUP_KEY; Nov 20-24 were 401 reading the database's top level. scripts/backup.sh now reads charts/ (falls back to each chart), tested against a local stand-in both ways. CLAUDE.md notes the driving restructure exception (unreached, unapproved, unpinned lessons).
 - Nov 25 (nightly): ran the Daily backup once by hand after the fix: success, 5,360-byte encrypted backup (artifact reward-charts-backup) read from charts/ in one request. First real backup ever.
+- Nov 25 (nightly): Form B rebuilt and pinned: tB01/tB08/tB15/tB16 replaced (Form A's explanations, which Eli can read, gave away the bus, business-speed and 300-foot answers; tB01 repeated tA01's school sign), named-sign stems for tB03/tB04, filler choices out, ranks 8/6/3/8; fresh blind check 25/25 keys, 6 explanations and 2 choices fixed, fresh recheck clean. Consecutive-forms test added; number quota 8-10 kept (Form A has 9). p.12's 'If your vehicle stalls' list includes unsafe-looking bullets ('keep trying to restart', 'wave at the engineer'): never use those ideas as wrong choices. Next: queue item 3 (unit 3 rework).

@@ -329,7 +329,7 @@ test('skill levels: every planned lesson day is beginner, intermediate or advanc
 
 // Guessing tells (see guessReport): a hard rule for units 5+ and Forms C+; units 1-4 and Form B are reported until
 // reworked (scripts print them); Form A is frozen and exempt by name.
-const REPORT_ONLY = ['unit 3', 'unit 4', 'form B'];
+const REPORT_ONLY = ['unit 3', 'unit 4'];
 test('guessing tells: no length-rank tell, stock filler or padded wrong choice in new units and forms', async () => {
   const { LESSONS } = await import('../driving-course.js?v=' + V), { FORMS } = await import('../driving-tests.js?v=' + V);
   const units = {};
@@ -405,3 +405,11 @@ test('consecutive knowledge-test forms never repeat a fact or give away the next
   });
   assert.deepEqual(bad, []);
 });
+
+// Form B (progress test 1, opens after unit 2) is final as of Nov 25, 2026: rebuilt, blind-checked, pinned.
+test('Form B (progress test 1) is unchanged', async () => {
+  const { createHash } = await import('node:crypto');
+  const { FORMS } = await import('../driving-tests.js?v=' + V);
+  assert.equal(createHash('sha256').update(JSON.stringify(FORMS.B)).digest('hex'), '06dfdc61326cd32f019ed9ab9a57b95b7c05aaeae83dc5bc7a8d3f5798e6779e');
+});
+
