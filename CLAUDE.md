@@ -1,38 +1,49 @@
 # Reward Charts: notes for every Claude session
 
 The family's checklists, reward charts and Parents page for Eli, Rhett and Isaiah. Plain HTML + ES modules on
-GitHub Pages, data in Firebase (`config.js`). Other Claude sessions (nightly and interactive) push to `main`
-too: fetch main and rebase on it before you start and again right before you push.
+GitHub Pages, data in Firebase (`config.js`). Standing rules live here; dated history and to-dos live in
+`docs/plan-progress.md` (read its **Decisions** first). Other Claude sessions work on this repo too.
 
 ## Where things are
-- `docs/plan-progress.md`: the plan, the **Decisions** list (read it first) and what's next.
-- `lists.js`: what's on each kid's list for a day, game time, carry-over, grounding. `routines.js`: the
-  item definitions, bedtimes, the school calendar. `chorelists.js`: chore step lists. `checklist.js`: the page.
+- `lists.js`: what's on a kid's list for a day, game time, carry-over, grounding. `routines.js`: item
+  definitions, bedtimes, `STARTS`, the school calendar. `chorelists.js`: chore step lists. `checklist.js`: the page.
 - Big files: grep, don't read whole (`style.css`, `tests/app.test.mjs`, `docs/iowa/drivers-manual.txt`).
+- This container can't read the live database: never assume the code's defaults are what's live.
 
 ## Rules that must hold
-- **Past days don't change.** A new or changed item gets a start date in `STARTS` (routines.js), on the
-  first day its time hasn't passed yet (Central time). Settings schedule changes go through the Settings page
-  (it snapshots history), not `DEFAULTS`.
-- **School days come from the calendar** (`NO_SCHOOL`, `isSchoolDay`, `noSchoolTomorrow` in routines.js).
-  A weekday off is like a Saturday for school things. Never hardcode a day off anywhere else; add next
-  school year's dates there (the list ends May 28, 2027).
-- **Lost game time = grounding,** set by parents on the Parents page (`routines/grounded/<kid>/<day>`).
-  Don't add `GAME_OFF` weeks in code.
-- **Chore step lists** match a chore by its exact name; step ids hash the chore name + the step text.
-  Every built-in list name must be a real chore name (a unit test checks).
-- **Cashing in game time needs the parent PIN** (`askParent`), on the chart pages and the Parents page.
-- **New database paths** need a rule in `database.rules.json` and a line in `tests/rules.test.mjs`.
-- **driving-course.js is append-only** (see docs; saved answers point at positions).
+- **Past days don't change.** New or changed items get a start date in `STARTS`: the first day its time
+  hasn't passed yet (Central time). Schedule changes go through the Settings page (it snapshots history), not
+  `DEFAULTS`. Exception: edits to chore step lists show on every day.
+- **School days come only from the calendar** (`NO_SCHOOL`, `isSchoolDay`, `noSchoolTomorrow`). A weekday off
+  is like a Saturday for school things. Add next year's dates there (the list ends May 28, 2027).
+- **Lost game time = grounding,** set by parents on the Parents page. Don't add `GAME_OFF` weeks in code.
+- **Chore lists** match a chore by exact name (a unit test checks built-in names against the chores, plus
+  Isaiah's "Laundry" and "Clean your room (30 min)"); step ids hash the chore name + step text.
+- **Every parent-only action goes through `askParent`** (PIN): cash-ins, grounding, approvals, Settings.
+- **New database paths** need a rule in `database.rules.json` and a line in `tests/rules.test.mjs`. The rules
+  aren't applied yet; once they are, the parent must republish them for a new path to save.
+- **driving-course.js is append-only:** never reorder or remove lessons; add questions only at the end of a
+  lesson's list (saved answers point at positions).
 - Tests use the Firebase stand-in; never point anything at the real database.
 
+## Adding a checklist item (the most common request)
+Settle each of these and tell the parent the answers:
+- Which days, by the school calendar (school days, days off, weekends), and the first day it shows.
+- Game time: after-school and bedtime items count toward it; morning items don't.
+- Whether it carries to the next day (`CARRY` in lists.js) and whether Isaiah's morning candy needs it.
+- Traps: chore ticks are saved by position in the day (`chore`, `chore2`), and lights out isn't always the last
+  bedtime row (after-lights items share its time); filter `afterLights` where it matters.
+
 ## Shipping a change
-1. `python3 stamp.py` (adds `?v=` so phones load the new code).
-2. `for f in *.js; do node --input-type=module --check < "$f" || echo "BAD $f"; done` (CI's check).
-3. `node --test tests/*.test.mjs` and `node tests/browser/run.mjs` (or one case by name).
-4. Look at new screens at phone width (`tests/browser/.out/*.png`); add a browser case for new behavior.
-5. If an older test breaks because of the new rule, change only what the rule explains, and say so.
+1. Fetch main (`git fetch --depth=200 origin main`) and start from it; if main moved while you worked, merge
+   it in (don't rebase other sessions' commits, never force-push).
+2. `python3 stamp.py` after merging (every `?v=` line changes, so on a `?v=` conflict take either side and stamp again).
+3. `for f in *.js; do node --input-type=module --check < "$f" || echo "BAD $f"; done` (CI's check).
+4. `node --test tests/*.test.mjs` and `node tests/browser/run.mjs` (or one case by name). Look at new screens
+   at phone width (`tests/browser/.out/*.png`) and add a browser case for new behavior. If an older test breaks
+   because of the new rule, change only what the rule explains, and say so.
+5. Pushing to `main` makes it live on the boys' phones (see Decisions for when that's allowed).
 
 ## Talking to the parent
-They read on a phone. Lead with what changed for the boys, then what they need to do (exact Settings
-lines, in order), then numbered questions with what happens now if they don't answer.
+They read on a phone. Lead with what changed for the boys, then what they need to do (exact Settings lines, in
+order), then numbered questions with what happens now if they don't answer.

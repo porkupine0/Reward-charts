@@ -4,7 +4,6 @@ Work runs in scheduled sessions, one item at a time. Each item is tested, then r
 Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all (GitHub runs them on every push too).
 
 ## Decisions
-- Nov 25 code review (driving, for the nightly sessions): (1) testScore/testDoneOn now need watched/<sitting>; a sitting fully answered before the Finish change (Nov 21, 17:03 UTC) would read as open. The baseline was taken after it, so probably fine; confirm the live data has watched/base, or count fully answered sittings from before that time as done. (2) unitTestFor can take more than BACKLOG (4) earlier-unit questions when a finished lesson has fewer than PER_LESSON questions; count the backlog questions separately.
 - Nov 24: grounding from electronics is set by parents on the Parents page (routines grounded/<kid>/<day>; today counts as day one). A grounded day earns no game time; while grounded, game time is on hold (kept, not usable). Use this for lost video-game time; don't add GAME_OFF weeks in code (Eli's Nov 23-29 week stays there and counts as grounded days).
 - Nov 24: the school calendar (routines.js NO_SCHOOL, isSchoolDay) decides school days. A weekday off is like a Saturday for school things: no school items (backpack, assignments, homework), Saturday mornings (Eli's Ritalin, Isaiah's Saturday list), later bedtime the night before, no show-choir alarm, School row off. Game time is still earned. Add next year's dates there; don't hardcode days off anywhere else.
 - Nov 19: the advisor sets the order of work (the parent said so). Don't ask the parent about order; the check-ins follow "Next steps" below.
@@ -14,6 +13,9 @@ Browser tests live in tests/browser/: `node tests/browser/run.mjs` runs them all
 
 ## Remaining order
 14, 16, 12, 13 (16 before 12: editable settings would rewrite past weeks without it).
+
+## To do from reviews
+- [ ] Nov 25 code review, driving (nightly sessions): (1) testScore/testDoneOn now need watched/<sitting>; a sitting fully answered before the Finish change (Nov 21, 17:03 UTC) would read as open. The baseline was taken after it, so probably fine; confirm the live data has watched/base, or count fully answered sittings from before that time as done. (2) unitTestFor can take more than BACKLOG (4) earlier-unit questions when a finished lesson has fewer than PER_LESSON questions; count the backlog questions separately.
 
 ## Tier 1: bugs
 - [x] 3. Light-mode highlight colours restored (they pointed at themselves).
