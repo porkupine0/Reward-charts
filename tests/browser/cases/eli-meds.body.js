@@ -15,3 +15,11 @@
   check(!(await p.$('[data-key="mMeds"]')) && !(await p.$('[data-key="meds2"]')), 'not on school days');
   await visit('checklist.html?kid=eli&date=2026-11-14', 'meds-before');
   check(!(await p.$('[data-key="mMeds"]')), 'not before Nov 21');
+  // teeth, then deodorant, every morning from Nov 25 (school day, day off, weekend); not before
+  for (const day of ['2026-11-25', '2026-11-28', '2026-11-30']) {
+    await visit('checklist.html?kid=eli&date=' + day, 'care-' + day);
+    const m = await p.$$eval('#morning .ckbtn', (els) => els.map((e) => e.dataset.key));
+    check(m.slice(-2).join() === 'mBrush,mDeo', day + ': teeth then deodorant at the end of the morning (' + m.join() + ')');
+  }
+  await visit('checklist.html?kid=eli&date=2026-11-24', 'care-before');
+  check(!(await p.$('[data-key="mBrush"]')) && !(await p.$('[data-key="mDeo"]')), 'not before Nov 25');

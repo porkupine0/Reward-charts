@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795590336';
-import { choreSteps } from './chorelists.js?v=1795590336';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795590336';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795614771';
+import { choreSteps } from './chorelists.js?v=1795614771';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795614771';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -272,7 +272,7 @@ export function rewardWhen(dow) {
 export const BIBLE_FROM = '2026-11-21';
 export const BIBLE_KEYS = ['mBible', 'bibleRead', 'pray'];
 // Items added later, with the first day they show (earlier days keep the lists they had).
-export const STARTS = { mBible: BIBLE_FROM, bibleRead: BIBLE_FROM, pray: BIBLE_FROM, mMeds: '2026-11-21', meds2: '2026-11-21',
+export const STARTS = { mBrush: '2026-11-25', mDeo: '2026-11-25', mBible: BIBLE_FROM, bibleRead: BIBLE_FROM, pray: BIBLE_FROM, mMeds: '2026-11-21', meds2: '2026-11-21',
   // Isaiah's glasses: each from the first day its time hadn't passed when it was added (Tue Nov 24, 10:30 am)
   mGlasses: '2026-11-25', glassesHome: '2026-11-24', glasses: '2026-11-24' };
 // Eli's Ritalin on Saturday and Sunday: the morning dose records its time (mMedsAt); the second dose is due 4 hours later.
@@ -286,7 +286,9 @@ const ELI_AFTERNOON = { key: 'bibleRead', label: 'Read a psalm or proverb + 1 ch
 ] };
 
 export function morning(kid, dow) {
-  if (kid === 'eli') return dow >= 5 ? [MEDS, ELI_MORNING] : [ELI_MORNING];
+  // Eli, every morning: Bible time, then teeth, then deodorant (own keys: Isaiah's teeth box is mTeeth)
+  const eliCare = [{ key: 'mBrush', label: 'Brush your teeth' }, { key: 'mDeo', label: 'Put on deodorant' }];
+  if (kid === 'eli') return dow >= 5 ? [MEDS, ELI_MORNING, ...eliCare] : [ELI_MORNING, ...eliCare];
   if (kid !== 'isaiah') return [];
   const breakfast = { key: 'mBreakfast', label: 'Eat breakfast', choices: ['Cereal', 'English muffin'] };
   const teeth = { key: 'mTeeth', label: 'Brush your teeth' };
