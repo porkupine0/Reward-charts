@@ -23,7 +23,9 @@ GitHub Pages, data in Firebase (`config.js`). Standing rules live here; dated hi
 - **New database paths** need a rule in `database.rules.json` and a line in `tests/rules.test.mjs`. The rules
   aren't applied yet; once they are, the parent must republish them for a new path to save.
 - **driving-course.js is append-only:** never reorder or remove lessons; add questions only at the end of a
-  lesson's list (saved answers point at positions).
+  lesson's list (saved answers point at positions). Exception (Nov 21, advisor): a lesson Eli hasn't reached and
+  the parent hasn't approved may be restructured before it's pinned. Once pinned (`PINNED_LESSONS` in
+  tests/driving.test.mjs) or seen, it's frozen; ids are never reused. Form A (his baseline) is pinned too.
 - Tests use the Firebase stand-in; never point anything at the real database.
 
 ## Adding a checklist item (the most common request)

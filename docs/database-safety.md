@@ -58,3 +58,5 @@ It asks for the passphrase. `backup.json` is the whole database, with everything
   - Restoring from it removes the PIN, so the next parent tap asks to set a new one.
 
 **If the backups stop:** GitHub pauses scheduled workflows in a public repo after 60 days with no activity in the repo (see GitHub's Actions documentation: *Disabling and enabling a workflow*). To turn it back on: the repo, then **Actions**, then **Daily backup**, then **Enable workflow**. A commit to the repo also resets the clock.
+
+**Nov 25, 2026:** the backup never ran before Nov 20 (no BACKUP_KEY) and was refused (401) every day since. It now reads `charts/` (everything the app saves), and if that whole node is refused it reads each chart the app uses and joins them. It never reads the database's top level. The encrypted file restores with the import step above (into the `charts` node).
