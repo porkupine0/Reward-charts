@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795614771';
-import { askParent } from './parent.js?v=1795614771';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795614771';
-import { applySettings, SETTINGS } from './settings.js?v=1795614771';
-import { weekStreak, cheerIf } from './streaks.js?v=1795614771';
-import { gameWeek } from './lists.js?v=1795614771';
-import * as L from './lists.js?v=1795614771';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795614771';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795615234';
+import { askParent } from './parent.js?v=1795615234';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795615234';
+import { applySettings, SETTINGS } from './settings.js?v=1795615234';
+import { weekStreak, cheerIf } from './streaks.js?v=1795615234';
+import { gameWeek } from './lists.js?v=1795615234';
+import * as L from './lists.js?v=1795615234';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795615234';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
