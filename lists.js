@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795561945';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795561945';
-import { SETTINGS, onSettings } from './settings.js?v=1795561945';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795561945';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795561945';
-import { LESSONS } from './driving-course.js?v=1795561945';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795561945';
-import * as TESTS from './driving-tests.js?v=1795561945';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795561945';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795568370';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795568370';
+import { SETTINGS, onSettings } from './settings.js?v=1795568370';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795568370';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795568370';
+import { LESSONS } from './driving-course.js?v=1795568370';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795568370';
+import * as TESTS from './driving-tests.js?v=1795568370';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795568370';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -203,8 +203,9 @@ export const course = () => driveCourse;
 // the next day). Any chore list with a step named "Dry" works this way.
 function screenReady(ctx, kid, date, it) {
   if (isOn(ctx, kid, date, it)) return true;
-  const dry = (it.steps || []).find((s) => /^dry$/i.test(s.label));
-  return !!dry && !!dayChecks(ctx, kid, date)[dry.key];
+  // every step up to and including Dry ticked (not just Dry)
+  const steps = it.steps || [], i = steps.findIndex((s) => /^dry$/i.test(s.label)), c = dayChecks(ctx, kid, date);
+  return i >= 0 && steps.slice(0, i + 1).every((s) => c[s.key]);
 }
 const owedForScreens = (ctx, kid, date) => choresOwed(ctx, kid, date).filter((o) => !screenReady(ctx, kid, o.date, o.item));
 export function computerLock(ctx, kid, date) {
@@ -435,9 +436,10 @@ export function gameWeek(ctx, kid, monday, now = new Date()) {
   const carriedIn = carriedInto(ctx, kid, monday), carriedOut = arrives(out), letGo = out && !out.add ? leaves(out) : 0;
   // a no-game-time week (GAME_OFF): nothing earned, and minutes carried in from before can't be used either
   const off = days.some((d) => d.off);
-  // grounded today: what's left is on hold (kept for after the grounding, not usable now)
-  const hold = !off && groundedOn(ctx, kid, now);
-  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, off, hold, left: off ? 0 : Math.max(0, minutes + carriedIn - used - leaves(out)) };
+  // On hold (kept, not usable now): grounded today, or a no-game-time week (minutes carried into it stay
+  // and can be carried out at the end of the week).
+  const hold = off || groundedOn(ctx, kid, now);
+  return { days, minutes, max: days.reduce((a, d) => a + d.worth, 0), uses, used, carriedIn, carriedOut, letGo, off, hold, left: Math.max(0, minutes + carriedIn - used - leaves(out)) };
 }
 // Parents page: boys with game time left from last week and no answer yet. [{ kid, from, minutes }]
 // Every finished week (from Nov 16, 2026) not answered yet stays on the list, oldest first, until a parent

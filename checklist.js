@@ -1,10 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795561945';
-import { MEDS_GAP_MIN, isSchoolDay, noSchoolTomorrow, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795561945';
-import { SETTINGS } from './settings.js?v=1795561945';
-import { askParent } from './parent.js?v=1795561945';
-import * as L from './lists.js?v=1795561945';
-import { chapters, parseRef, nextRef } from './bible.js?v=1795561945';
-import { dayStreak, cheerIf } from './streaks.js?v=1795561945';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795568370';
+import { MEDS_GAP_MIN, isSchoolDay, noSchoolTomorrow, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795568370';
+import { SETTINGS } from './settings.js?v=1795568370';
+import { askParent } from './parent.js?v=1795568370';
+import * as L from './lists.js?v=1795568370';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795568370';
+import { dayStreak, cheerIf } from './streaks.js?v=1795568370';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -370,7 +370,7 @@ document.addEventListener('click', (e) => {
   save(ID, base + key, next);
   // Checking a bedtime step starts the bedtime timer if nobody has (today only).
   if (next && ymd(date) === ymd(new Date()) && !(dayChecks().bedTimer || {}).start &&
-      atDate(date, () => bedtime(kid, dowOf(date), date)).some((b) => b.key === key)) {
+      atDate(date, () => bedtime(kid, dowOf(date), date)).some((b) => b.key === key && !b.afterLights)) {
     save(ID, base + 'bedTimer', { start: Date.now(), auto: true });
   }
   if (key === 'lights') save(ID, base + 'lightsAt', next ? Date.now() : null);

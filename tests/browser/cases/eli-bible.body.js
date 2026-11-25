@@ -40,5 +40,9 @@
   check(!!(await p.$('#day .ck.locked .ckbtn[data-key="typing"]')), 'typing locked before laundry');
   await tap('[data-steps="2026-11-28|chore"]');
   const st = await p.$$eval('#day .stepbtn', (els) => els.map((e) => ({ k: e.dataset.step, t: e.textContent })));
-  for (const s of st.filter((s) => /^(Collect|Wash|Dry)/.test(s.t))) await tap('[data-step="' + s.k + '"]');
-  check(!(await p.$('#day .ck.locked .ckbtn[data-key="typing"]')), 'typing opens once Dry is ticked');
+  // Dry alone isn't enough: every step up to Dry (laundry started, room done)
+  await tap('[data-step="' + st.find((s) => /^Dry/.test(s.t)).k + '"]');
+  check(!!(await p.$('#day .ck.locked .ckbtn[data-key="typing"]')), 'Dry alone doesn’t unlock');
+  const upTo = st.slice(0, st.findIndex((s) => /^Dry/.test(s.t)));
+  for (const s of upTo) await tap('[data-step="' + s.k + '"]');
+  check(!(await p.$('#day .ck.locked .ckbtn[data-key="typing"]')), 'typing opens once every step through Dry is ticked');

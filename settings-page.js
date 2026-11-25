@@ -1,10 +1,10 @@
 // Settings page: edit chores, shower nights, lights out, reward lists and prize levels.
-import { watch, save, statusPill, esc, isLive } from './store.js?v=1795561945';
-import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795561945';
-import { KIDS } from './routines.js?v=1795561945';
-import { LEVELS } from './trials.js?v=1795561945';
-import { listsToSave, norm, MAX_STEPS } from './chorelists.js?v=1795561945';
-import { askParent } from './parent.js?v=1795561945';
+import { watch, save, statusPill, esc, isLive } from './store.js?v=1795568370';
+import { SETTINGS, DEFAULTS, LIMITS, applySettings, snapshotToSave } from './settings.js?v=1795568370';
+import { KIDS } from './routines.js?v=1795568370';
+import { LEVELS } from './trials.js?v=1795568370';
+import { listsToSave, norm, MAX_STEPS } from './chorelists.js?v=1795568370';
+import { askParent } from './parent.js?v=1795568370';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -48,7 +48,7 @@ function renderLists() {
   $('steplists').innerHTML = listNames().map((n, i) => {
     const st = stepsOf(n);
     return '<details class="slist"><summary><b>' + esc(n) + '</b> <span>' + (st.length ? st.length + ' step' + (st.length > 1 ? 's' : '') : 'one box, no steps') + '</span></summary>' +
-      '<label class="field"><span class="flabel">One step per line (up to ' + MAX_STEPS + '). Words before a colon show in bold. Start a line with [every other time] or [monthly] for steps that aren’t every time. Leave it empty for a single box.</span>' +
+      '<label class="field"><span class="flabel">One step per line (up to ' + MAX_STEPS + '). Words before a colon show in bold. Start a line with [every other time] or [monthly] for steps that aren’t every time. Leave it empty for a single box. Step changes show on every day, including chores still owed from earlier this week.</span>' +
       '<textarea id="sl' + i + '" data-list="' + esc(n) + '" rows="' + Math.max(3, st.length + 1) + '">' + esc(st.join('\n')) + '</textarea></label></details>';
   }).join('');
 }

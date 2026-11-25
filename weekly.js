@@ -1,11 +1,11 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795561945';
-import { askParent } from './parent.js?v=1795561945';
-import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795561945';
-import { applySettings, SETTINGS } from './settings.js?v=1795561945';
-import { weekStreak, cheerIf } from './streaks.js?v=1795561945';
-import { gameWeek } from './lists.js?v=1795561945';
-import * as L from './lists.js?v=1795561945';
-import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795561945';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, dateParam } from './store.js?v=1795568370';
+import { askParent } from './parent.js?v=1795568370';
+import { CHARTS, weekProgress, rowsFor, TIED_FROM } from './charts.js?v=1795568370';
+import { applySettings, SETTINGS } from './settings.js?v=1795568370';
+import { weekStreak, cheerIf } from './streaks.js?v=1795568370';
+import { gameWeek } from './lists.js?v=1795568370';
+import * as L from './lists.js?v=1795568370';
+import { cellOn, derivedCell, effectiveWeek } from './lists.js?v=1795568370';
 
 const fmtMin = (m) => (m >= 60 ? Math.floor(m / 60) + ' hr' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -41,11 +41,13 @@ function monthWeeks(monday) {
 
 function renderGame() {
   // Earned on school days (minutes per day from Settings), used in pieces on the weekend
-  const g = gameWeek(ctx, kidId, week), now = new Date(), today = ymd(now);
+  // the on-hold state is about today, so only the current week shows it
+  const now = new Date(), today = ymd(now), current = ymd(mondayOf(now)) === ymd(week);
+  const g = Object.assign(gameWeek(ctx, kidId, week, now), current ? {} : { hold: false });
   const n = (L.CHECKS[kidId] || []).length;
   $('gamecard').classList.toggle('unlocked', g.minutes > 0);
   const off = (g.days.find((d) => d.off) || {}).off;
-  const ahead = g.hold ? L.groundedAhead(ctx, kidId, now) : [];
+  const ahead = g.hold && !g.off ? L.groundedAhead(ctx, kidId, now) : [];
   const holdTxt = ahead.length ? 'Grounded from electronics: ' + ahead.length + ' day' + (ahead.length > 1 ? 's' : '') + ' left (through ' + parseYmd(ahead[ahead.length - 1].day).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + '). Game time is on hold until then.' : '';
   $('gtstatus').innerHTML = holdTxt ? '<b>' + esc(holdTxt) + '</b>' : off ? '<b>' + esc(off) + '</b>' : '<span class="gt-big">' + fmtMin(g.minutes) + '</span> of ' + fmtMin(g.max) + ' earned this week';
   const t = g.days.find((d) => ymd(d.date) === today);
@@ -57,7 +59,7 @@ function renderGame() {
     (g.carriedOut ? '<p class="gt-why"><b>' + fmtMin(g.carriedOut) + ' moved</b> to the next week.</p>' : '') +
     (g.letGo ? '<p class="gt-why"><b>' + fmtMin(g.letGo) + ' let go</b> (not carried over).</p>' : '') +
     '<div class="gt-sum"><span>Earned <b>' + fmtMin(g.minutes) + '</b></span><span>Used <b>' + fmtMin(g.used) + '</b></span><span>Left <b>' + fmtMin(g.left) + '</b></span></div>' +
-    (g.hold && g.left > 0 ? '<p class="gt-why"><b>' + fmtMin(g.left) + ' on hold</b> until the grounding ends.</p>' : '') +
+    (g.hold && g.left > 0 ? '<p class="gt-why"><b>' + fmtMin(g.left) + ' on hold</b> ' + (g.off ? 'this week (no game time); it can carry to next week.' : 'until the grounding ends.') + '</p>' : '') +
     (g.left > 0 && !g.hold ? '<div class="gt-use"><span>Played:</span>' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-gtuse="' + m + '">' + fmtMin(m) + '</button>').join('') +
       '<button class="chip" data-gtuse="other">Other…</button></div>' : '') +
     (g.uses.length ? '<ul class="gt-log">' + g.uses.map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + fmtMin(u.minutes) + '</b></span><button class="linkbtn" data-gtundo="' + u.at + '">Undo</button></li>').join('') + '</ul>' : '') +

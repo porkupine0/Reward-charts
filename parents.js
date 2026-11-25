@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795561945';
-import { CHARTS, weekProgress } from './charts.js?v=1795561945';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795561945';
-import * as L from './lists.js?v=1795561945';
-import { owed, score, planned, fmt } from './trials.js?v=1795561945';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795561945';
-import { askParent, setParent, changePin } from './parent.js?v=1795561945';
-import { dayFull } from './streaks.js?v=1795561945';
-import { owedItems } from './owed.js?v=1795561945';
-import { pruneList, pruneCutoff } from './prune.js?v=1795561945';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795561945';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795561945';
-import { nowHtml } from './nowview.js?v=1795561945';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795568370';
+import { CHARTS, weekProgress } from './charts.js?v=1795568370';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795568370';
+import * as L from './lists.js?v=1795568370';
+import { owed, score, planned, fmt } from './trials.js?v=1795568370';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795568370';
+import { askParent, setParent, changePin } from './parent.js?v=1795568370';
+import { dayFull } from './streaks.js?v=1795568370';
+import { owedItems } from './owed.js?v=1795568370';
+import { pruneList, pruneCutoff } from './prune.js?v=1795568370';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795568370';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795568370';
+import { nowHtml } from './nowview.js?v=1795568370';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -82,10 +82,10 @@ function render() {
   $('bank').innerHTML = gameKids.map((id) => {
     const k = KIDS[id], g = L.gameWeek(ctx, id, mon, today);
     const waiting = carry.filter((c) => c.kid === id).reduce((a, c) => a + c.minutes, 0);
-    const head = g.off ? 'No game time this week' : g.hold ? '<b>' + g.left + ' min on hold</b> (grounded)' : '<b>' + g.left + ' min left</b>';
+    const head = g.hold ? '<b>' + g.left + ' min on hold</b> (' + (g.off ? 'no game time this week' : 'grounded') + ')' : '<b>' + g.left + ' min left</b>';
     const sub = g.minutes + ' earned this week' + (g.carriedIn ? ' + ' + g.carriedIn + ' carried over' : '') + ' · ' + g.used + ' used' + (waiting ? ' · ' + waiting + ' more waiting on your leftover answer' : '');
     const btns = g.left > 0 && !g.hold && !g.off ? '<span class="exbtns">' + [15, 30, 60].filter((m) => m <= g.left).map((m) => '<button class="chip" data-bank="' + id + '|' + m + '">' + (m === 60 ? '1 hr' : m + ' min') + '</button>').join('') + '<button class="chip" data-bank="' + id + '|other">Other…</button></span>' : '';
-    const log = g.uses.slice(-3).reverse().map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + u.minutes + ' min</b></span><button class="linkbtn" data-bankundo="' + id + '|' + u.at + '">Undo</button></li>').join('');
+    const log = g.uses.slice(-3).reverse().map((u) => '<li><span>' + esc(new Date(u.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + new Date(u.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })) + ' · <b>' + u.minutes + ' min</b></span><button class="linkbtn" data-bankundo="' + id + '|' + u.at + '|' + ymd(mon) + '">Undo</button></li>').join('');
     return row(k.name, k.accent, head, sub, btns) + (log ? '<ul class="gt-log bank-log">' + log + '</ul>' : '');
   }).join('');
   // Grounded from electronics: days left (today counts), last day, +1 day / -1 day (PIN)
@@ -211,7 +211,7 @@ document.addEventListener('click', async (e) => {
     return;
   }
   const bu = e.target.closest('[data-bankundo]');
-  if (bu) { const [kid, at] = bu.dataset.bankundo.split('|'); if (await askParent()) save('routines', 'game/' + kid + '/' + ymd(mondayOf(new Date())) + '/' + at, null); return; }
+  if (bu) { const [kid, at, wk] = bu.dataset.bankundo.split('|'); if (await askParent()) save('routines', 'game/' + kid + '/' + wk + '/' + at, null); return; }
   const gr = e.target.closest('[data-ground]');
   if (gr) {
     const [kid, a] = gr.dataset.ground.split('|');

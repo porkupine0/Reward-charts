@@ -733,7 +733,8 @@ test('Eli, Nov 23-29, 2026: an extra chore every day (bathrooms; kitchen Tue and
   // minutes carried in from the week before can't be used that week either
   const withCarry = { ...ctx, routines: { days: {}, carry: { eli: { '2026-11-16': { minutes: 45, add: true } } } } };
   const gw = L.gameWeek(withCarry, 'eli', new Date(2026, 10, 23));
-  assert.ok(gw.carriedIn === 45 && gw.left === 0 && gw.off, 'carried-in minutes: shown, not usable');
+  // carried-in minutes: shown and kept on hold (not usable that week; carried out after it, not lost)
+  assert.ok(gw.carriedIn === 45 && gw.left === 45 && gw.hold && gw.off, 'carried-in minutes: shown, on hold, not usable');
   assert.ok(L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).worth > 0 && !L.gameDay(ctx, 'eli', new Date(2026, 10, 30)).off);
   assert.ok(L.gameDay(ctx, 'rhett', new Date(2026, 10, 24)).worth > 0, 'Rhett unaffected');
 });
