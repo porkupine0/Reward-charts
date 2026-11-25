@@ -383,3 +383,25 @@ test('lessons in units 5+ have at most 7 questions (3 in the daily quiz + 4 in t
   const over = LESSONS.filter((l) => Number(l.id.match(/^w(\d+)/)[1]) >= 5 && (l.questions || []).length > 7).map((l) => l.id + ' (' + l.questions.length + ')');
   assert.deepEqual(over, []);
 });
+
+// Consecutive forms test different facts: Eli can read every explanation of a finished test ("See every answer"),
+// so a later form's answer must not be stated in the form before it (same number on the same page, or its
+// explanation saying the answer), and no two consecutive forms quote the same manual words.
+test('consecutive knowledge-test forms never repeat a fact or give away the next form’s answers', async () => {
+  const { FORMS } = await import('../driving-tests.js?v=' + V);
+  const names = Object.keys(FORMS).sort(), page = (q) => q.ref.match(/p\.\s?(\d+)/)[1];
+  const nums = (t) => (String(t).match(/\d+(?:\.\d+)?|\.\d+/g) || []).map(Number);
+  const bad = [];
+  names.slice(1).forEach((f, i) => {
+    const prev = FORMS[names[i]], cur = FORMS[f];
+    cur.forEach((q) => {
+      const ans = q.choices[q.answer], an = nums(ans);
+      prev.forEach((p) => {
+        if (an.length && page(p) === page(q) && an.some((n) => nums(p.choices[p.answer]).includes(n) || nums(p.why).includes(n))) bad.push(q.id + ' (' + ans + ') repeats ' + p.id);
+        if (p.why.toLowerCase().includes(ans.toLowerCase()) && ans.length > 12) bad.push(q.id + ': ' + p.id + '’s explanation states its answer');
+      });
+    });
+    D.quoteReport({ [names[i]]: prev, [f]: cur }, []).filter((r) => /form/.test(r.a) && /form/.test(r.b)).forEach((r) => bad.push(r.a + ' and ' + r.b + ' quote the same words'));
+  });
+  assert.deepEqual(bad, []);
+});

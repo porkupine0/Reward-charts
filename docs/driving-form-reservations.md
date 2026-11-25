@@ -101,3 +101,15 @@ in consecutive forms. Kept: they ask different numbers for different speeds (tA1
 tB16: 55 mph, 300 feet), and Form A can't change. The rule from here: "never in consecutive forms" means the same
 number for the same case; another number from the same sentence may follow.
 
+## Nov 25: changes after rebuilding Form B
+- Form B took three reserved facts (it's taken first, about Dec 4): p.20 bus 15 feet and p.42 interstate minimum
+  40 mph (were Form C items 1 and 8), p.42 50 mph unsurfaced at night (was Form E item 1). Under the consecutive-forms
+  rule they can't be in Form C; refill C from the spares when C is built (p.24 dirt 50 percent; p.37 open
+  container $200 is Alcohol, which already has its one slot, so prefer a Speed or Highways spare).
+- Number-question quota settled (C8): Form A, his baseline, has 9 number questions by hand count (tA04, tA08,
+  tA12, tA14, tA15, tA16, tA18, tA19, tA24; its `num` flags were never set). The DOT practice test has about 5 in
+  66, but every form is compared with Form A, so the 8-10 rule stays.
+- New test: consecutive forms may not repeat a number on the same page, state the next form's answer in an
+  explanation, or quote the same manual words (Eli can read every explanation after a test). It can't catch a
+  repeat in different words (the old tB08 repeated tA09's "from behind, you always stop"): the blind check must.
+
