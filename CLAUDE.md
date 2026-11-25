@@ -16,6 +16,7 @@ GitHub Pages, data in Firebase (`config.js`). Standing rules live here; dated hi
   `DEFAULTS`. Exception: edits to chore step lists show on every day.
 - **School days come only from the calendar** (`NO_SCHOOL`, `isSchoolDay`, `noSchoolTomorrow`). A weekday off
   is like a Saturday for school things. Add next year's dates there (the list ends May 28, 2027).
+  Exception (parent, Nov 25): Eli's driving lesson stays due Monday-Friday even on days off.
 - **Lost game time = grounding,** set by parents on the Parents page. Don't add `GAME_OFF` weeks in code.
 - **Chore lists** match a chore by exact name (a unit test checks built-in names against the chores, plus
   Isaiah's "Laundry" and "Clean your room (30 min)"); step ids hash the chore name + step text.
