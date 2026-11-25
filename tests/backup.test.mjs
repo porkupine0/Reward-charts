@@ -76,3 +76,17 @@ test('backup: the address comes from config.js', () => {
   const url = execFileSync('bash', ['-c', `grep -o "databaseURL: *['\\"][^'\\"]*" config.js | sed "s/.*['\\"]//"`], { cwd: new URL('..', import.meta.url).pathname, encoding: 'utf8' }).trim();
   assert.match(url, /^https:\/\/[a-z0-9-]+.*firebase/);
 });
+
+test('backup: refuses data without the daily logs (a broken or partial read), writes nothing', async () => {
+  const srv = await new Promise((resolve) => {
+    const x = createServer((req, res) => { res.writeHead(200); res.end(req.url === '/charts.json' ? '{"config":{}}' : '{}'); });
+    x.listen(0, '127.0.0.1', () => resolve(x));
+  });
+  const dir = mkdtempSync(join(tmpdir(), 'bk-')), out = join(dir, 'b.enc');
+  try {
+    const r = await run([SCRIPT, out], { ...process.env, BACKUP_KEY: 'k', DB_URL: 'http://127.0.0.1:' + srv.address().port });
+    assert.notEqual(r.status, 0);
+    assert.equal(existsSync(out), false);
+  } finally { srv.close(); }
+});
+
