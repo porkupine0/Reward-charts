@@ -42,7 +42,8 @@ Settle each of these and tell the parent the answers:
 4. `node --test tests/*.test.mjs` and `node tests/browser/run.mjs` (or one case by name). Look at new screens
    at phone width (`tests/browser/.out/*.png`) and add a browser case for new behavior. If an older test breaks
    because of the new rule, change only what the rule explains, and say so.
-5. Pushing to `main` makes it live on the boys' phones (see Decisions for when that's allowed).
+5. Push to `main`: it goes live on the boys' phones. The parent's standing OK (Decisions, Nov 25): publish
+   finished, tested changes without asking first, then tell them what changed.
 
 ## Talking to the parent
 They read on a phone. Lead with what changed for the boys, then what they need to do (exact Settings lines, in
