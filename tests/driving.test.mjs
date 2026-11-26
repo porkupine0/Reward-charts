@@ -329,7 +329,7 @@ test('skill levels: every planned lesson day is beginner, intermediate or advanc
 
 // Guessing tells (see guessReport): a hard rule for units 5+ and Forms C+; units 1-4 and Form B are reported until
 // reworked (scripts print them); Form A is frozen and exempt by name.
-const REPORT_ONLY = ['unit 3', 'unit 4'];
+const REPORT_ONLY = ['unit 4'];
 test('guessing tells: no length-rank tell, stock filler or padded wrong choice in new units and forms', async () => {
   const { LESSONS } = await import('../driving-course.js?v=' + V), { FORMS } = await import('../driving-tests.js?v=' + V);
   const units = {};
@@ -350,7 +350,7 @@ test('guessReport finds a rank tell, a filler and a padded choice', () => {
 
 // Lessons 1-2 (w1d1, w1d2) are frozen as of Nov 21, 2026; w1d3-w1d4 and w2d1-w2d2 reworked, checked and pinned Nov 22-23 (last rewords before Eli starts). Like Form A: if this
 // fails, put them back; new questions are appended in a later lesson. Pin each later lesson once it is approved.
-const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '96ad6a9e592a75dcc0b3a7ae21aedbc726bb4c4b3c8f28086382b0fd61904f9d', 'w2d1,w2d2': '613200dc19121b691c4b21185572a183f102b370979112d923320a8b98e90603', 'w2d3,w2d4': '5e1d9e00ac2a489283326f159e23cc0d905fe044d3c94203906b453555f4173a' };
+const PINNED_LESSONS = { 'w1d1,w1d2': 'f9c22886d497ccf2353a2cba75213ba351cb48e33d86d07ffb47c926c9569ad6', 'w1d3,w1d4': '96ad6a9e592a75dcc0b3a7ae21aedbc726bb4c4b3c8f28086382b0fd61904f9d', 'w2d1,w2d2': '613200dc19121b691c4b21185572a183f102b370979112d923320a8b98e90603', 'w2d3,w2d4': '5e1d9e00ac2a489283326f159e23cc0d905fe044d3c94203906b453555f4173a', 'w3d1,w3d2,w3d3,w3d4': 'fa15229b8785d0e705fea8ec77e832593b2c3b8004c17181ee37b2268ca61930' };
 test('frozen lessons are unchanged', async () => {
   const { createHash } = await import('node:crypto');
   const { LESSONS } = await import('../driving-course.js?v=' + V);

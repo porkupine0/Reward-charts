@@ -104,7 +104,7 @@ not done; one item can span nights. The rows above stay as a record.
 |---|---|---|---|
 | 1 | Unit 2 lessons 3-4 rework + pin; real-course unit-test browser case | Dec 2 | done Nov 24 |
 | 2 | Form B fixes (tB01, tB15, tB03, tB04, length ranks, fact keys, consecutive-forms test); C8 number quota first | about Dec 4 | done Nov 25 (pinned) |
-| 3 | Unit 3 rework (4 lessons + pin) | Dec 7 | [ ] |
+| 3 | Unit 3 rework (4 lessons + pin) | Dec 7 | done Nov 26 (pinned) |
 | 4 | Unit 4 rework (4 lessons + pin) | Dec 14 | [ ] |
 | 5 | Form C | about Dec 18 | [ ] |
 | 6 | Unit 5 build | Dec 21 | [ ] |
@@ -238,3 +238,4 @@ in a lesson; a fact the DOT test asks gets a `core` flag (once that lands). The 
 - Nov 25 (nightly): Form B rebuilt and pinned: tB01/tB08/tB15/tB16 replaced (Form A's explanations, which Eli can read, gave away the bus, business-speed and 300-foot answers; tB01 repeated tA01's school sign), named-sign stems for tB03/tB04, filler choices out, ranks 8/6/3/8; fresh blind check 25/25 keys, 6 explanations and 2 choices fixed, fresh recheck clean. Consecutive-forms test added; number quota 8-10 kept (Form A has 9). p.12's 'If your vehicle stalls' list includes unsafe-looking bullets ('keep trying to restart', 'wave at the engineer'): never use those ideas as wrong choices. Next: queue item 3 (unit 3 rework).
 - Correction (Nov 25): the database rules in this repo have probably NEVER been published. The repo file always allowed a top-level read, and the live database refused one. The Nov 20 note that they 'went live' was wrong; CLAUDE.md is right. Publishing them is a separate change (docs/database-safety.md), not the backup fix. Backup script now holds the data in memory, checks it is an object with routines before encrypting, and prints only the chart count.
 - Nov 25 (parent): driving lessons stay Monday-Friday regardless of the school calendar (Thanksgiving, winter break and other days off included; excuse a day with "Not able to do it?"). No database rules published since Nov 18; keep it that way (no changes to the database).
+- Nov 26 (nightly): unit 3 reworked and pinned: 7 questions per lesson (test-asked line markings first), yes/no stems recast as what/when/where, 'Only...' fillers out (the guess report missed them because one right answer starts with Only), dropped w3d1q7 (repeat of w2d3q8), w3d2q2 (repeat of w3d2q1), w3d3q8 (bike box; explanation not on its page), w3d4q8 (same p.16 sentence as w3d2q6). Fresh blind check 28/28 keys; four explanations and two lone-answer tells fixed; fresh recheck clean. Ranks 9/8/5/6. Daily backup passed on its own schedule (Nov 25, 9 charts). Next: queue item 4 (unit 4 rework, Eli reaches it Dec 14).
