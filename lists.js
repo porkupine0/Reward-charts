@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795615234';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795615234';
-import { SETTINGS, onSettings } from './settings.js?v=1795615234';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795615234';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795615234';
-import { LESSONS } from './driving-course.js?v=1795615234';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795615234';
-import * as TESTS from './driving-tests.js?v=1795615234';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795615234';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795662796';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795662796';
+import { SETTINGS, onSettings } from './settings.js?v=1795662796';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795662796';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795662796';
+import { LESSONS } from './driving-course.js?v=1795662796';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795662796';
+import * as TESTS from './driving-tests.js?v=1795662796';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795662796';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -120,7 +120,7 @@ function listsOn(ctx, kid, date) {
   // A weekday off is a Saturday morning (Eli's Ritalin; Isaiah's Saturday list), and has no school items.
   const off = dow <= 4 && !isSchoolDay(date);
   const morn = morning(kid, off ? 5 : dow).filter((i) => (i.key !== 'mTeeth' || ymd(date) >= '2026-11-11') && bibleOk(i));
-  const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null) : weekend(kid, dow);
+  const raw = dow <= 4 ? afterSchool(kid, dow, kid === 'eli' ? planFor(date) : null, off && ymd(date) >= '2026-11-26') : weekend(kid, dow);
   const day = [];
   raw.filter(bibleOk).forEach((i) => (i.weekly === true ? day.push(...weeklyItems(ctx, kid, date)) : day.push(i)));
   if (off) {

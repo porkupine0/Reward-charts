@@ -1,6 +1,6 @@
-import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795615234';
-import { choreSteps } from './chorelists.js?v=1795615234';
-import { ALL as BIBLE_ALL } from './bible.js?v=1795615234';
+import { SETTINGS, applySettings, toMin, atDate } from './settings.js?v=1795662796';
+import { choreSteps } from './chorelists.js?v=1795662796';
+import { ALL as BIBLE_ALL } from './bible.js?v=1795662796';
 // After-school + bedtime routines for each kid. dow: 0 = Mon … 6 = Sun.
 export const KIDS = {
   eli: { name: 'Eli', accent: '#C2501C', chart: 'eli' },
@@ -77,14 +77,19 @@ export function noSchoolTomorrow(dow, date) {
   return date ? !isSchoolDay(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)) : dow === 4 || dow === 5;
 }
 
+// From Nov 26, 2026 a day off has no youth group, Awana or racquetball: no 'home by' time, no Thursday shower
+// timing; it's a normal evening (the later bedtime for the night before a day off still applies).
+// Earlier days keep what they had.
+const offNight = (date) => !!date && ymd2(date) >= '2026-11-26' && !isSchoolDay(date);
+const ymd2 = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 function schedule(kid, dow, date) {
   const showers = SHOWER[kid].includes(dow);
-  const home = HOME[dow] && HOME[dow][kid];
+  const home = offNight(date) ? null : HOME[dow] && HOME[dow][kid];
   let steps = ORDER[kid === 'eli' ? 'eli' : 'young'].filter((k) => k !== 'shower' || showers);
   // Isaiah showers first, before his snack.
   if (kid === 'isaiah' && showers) steps = ['shower'].concat(steps.filter((k) => k !== 'shower'));
   const rows = [];
-  if (home == null && dow === 3 && showers && kid !== 'isaiah') {
+  if (home == null && dow === 3 && showers && kid !== 'isaiah' && !offNight(date)) {
     // Thursday: keep the old start time (old 15-min shower, snack first) and push lights out later instead.
     // (Not Isaiah: he's done by 8:00 on Thursdays like other nights, so his shower starts earlier.)
     // Lights out stays where it was (Eli 8:40); anything longer than that shower starts earlier.
@@ -151,8 +156,9 @@ export function notes(kid, dow, date) {
   const off = noSchoolTomorrow(dow, date);
   const n = [];
   if (dow === 6 || dow === 0) n.push('Family dinner tonight');
-  if (dow === 2) n.push(kid === 'isaiah' ? 'Awana tonight · home about 8:15' : 'Youth group tonight · home about 8:45');
-  if (dow === 3 && kid === 'rhett') n.push('Racquetball tonight · home by 8');
+  const night = !offNight(date);
+  if (dow === 2 && night) n.push(kid === 'isaiah' ? 'Awana tonight · home about 8:15' : 'Youth group tonight · home about 8:45');
+  if (dow === 3 && kid === 'rhett' && night) n.push('Racquetball tonight · home by 8');
   if (kid === 'eli' && (dow === 0 || dow === 3) && !off) n.push('Show choir in the morning · alarm 6:25');
   if (off) n.push('No school tomorrow · bedtime ' + (kid === 'rhett' ? '1 hour' : '30 min') + ' later');
   return n;
@@ -175,7 +181,7 @@ const TYPING = { key: 'typing', label: 'Typing practice · 10 min', computer: tr
 // Rhett's trombone practice, Fri/Sat/Sun: 20 min Friday, 30 min Saturday and Sunday (the minutes on his reward chart).
 export const trombone = (dow) => ({ key: 'trombone', label: 'Practice trombone · ' + (dow === 4 ? 20 : 30) + ' min', sub: 'Use the timer on your chart page. Tap to open it.', link: 'trombone.html' });
 
-export function afterSchool(kid, dow, runPlan) {
+export function afterSchool(kid, dow, runPlan, dayOff = false) {
   if (dow > 4) return [];
   const items = [
     kid === 'isaiah'
@@ -199,7 +205,7 @@ export function afterSchool(kid, dow, runPlan) {
       ? { key: 'activity', label: 'Swim practice', sub: 'Checks itself off when you tick it on your Training page. Tap to open it.', link: 'run.html', opt: !!runPlan.optional }
       : { key: 'activity', label: 'Running' + (runPlan ? ': ' + runPlan.title : ''), sub: (runPlan ? (runPlan.optional ? 'Optional today. ' : '') : dow === 4 ? 'Optional bonus run today. ' : '') + 'Checks itself off when today’s Training is done. Tap to open it.', link: 'run.html', opt: runPlan ? !!runPlan.optional : dow === 4 });
   } else if (kid === 'rhett') {
-    items.push(dow === 3
+    items.push(dow === 3 && !dayOff
       ? { key: 'activity', label: 'Racquetball tonight' }
       : { key: 'activity', label: 'Move your body · 20 min', sub: 'Bike, hoops, jump rope, a walk, a workout video', link: 'trombone.html' });
   } else {
