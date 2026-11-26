@@ -1,13 +1,13 @@
 // Eli's Driving page: today's lesson (video, Watched, 5 questions), past lessons' answers, and the
 // parent preview (approve or skip each lesson before Eli sees it).
-import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795662796';
-import { applyConfig } from './routines.js?v=1795662796';
-import { askParent } from './parent.js?v=1795662796';
-import * as L from './lists.js?v=1795662796';
-import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795662796';
-import { signSvg } from './signs.js?v=1795662796';
-import * as COURSE from './driving-course.js?v=1795662796';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795662796';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, esc, statusPill } from './store.js?v=1795675921';
+import { applyConfig } from './routines.js?v=1795675921';
+import { askParent } from './parent.js?v=1795675921';
+import * as L from './lists.js?v=1795675921';
+import { lessonFor, quizFor, isApproved, isSkipped, testScore, openSittings, refLabel } from './driving.js?v=1795675921';
+import { signSvg } from './signs.js?v=1795675921';
+import * as COURSE from './driving-course.js?v=1795675921';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795675921';
 
 const $ = (id) => document.getElementById(id);
 const ID = 'eli-drive';
