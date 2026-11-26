@@ -1,6 +1,6 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795675921';
-import { planFor, ZONES, LAPS, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1795675921';
-import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1795675921';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795675981';
+import { planFor, ZONES, LAPS, TERMS, ROUTINES, dayDone, trialOn } from './plan.js?v=1795675981';
+import { saveTrial, fmt as tfmt, score, nextMilestone, mphFor } from './trials.js?v=1795675981';
 
 const ID = 'eli-run';
 const $ = (id) => document.getElementById(id);
