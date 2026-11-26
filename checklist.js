@@ -1,10 +1,10 @@
-import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795676012';
-import { MEDS_GAP_MIN, isSchoolDay, noSchoolTomorrow, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795676012';
-import { SETTINGS } from './settings.js?v=1795676012';
-import { askParent } from './parent.js?v=1795676012';
-import * as L from './lists.js?v=1795676012';
-import { chapters, parseRef, nextRef } from './bible.js?v=1795676012';
-import { dayStreak, cheerIf } from './streaks.js?v=1795676012';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, esc, statusPill, dateParam } from './store.js?v=1795701872';
+import { MEDS_GAP_MIN, isSchoolDay, noSchoolTomorrow, atDate, applyConfig, KIDS, WEEKLY, afterSchool, weekend, bedtime, notes, fmtTime, timerResult, choreItems, morning, MORNING_REWARD, rewardWhen, isDone, SKIP, EXCUSED, EXCUSABLE } from './routines.js?v=1795701872';
+import { SETTINGS } from './settings.js?v=1795701872';
+import { askParent } from './parent.js?v=1795701872';
+import * as L from './lists.js?v=1795701872';
+import { chapters, parseRef, nextRef } from './bible.js?v=1795701872';
+import { dayStreak, cheerIf } from './streaks.js?v=1795701872';
 
 const ID = 'routines';
 const $ = (id) => document.getElementById(id);
@@ -461,6 +461,12 @@ document.addEventListener('click', (e) => {
   if (a === 'reset' && confirm('Clear this ' + (which === 'mornTimer' ? 'morning' : 'bedtime') + ' time for ' + KIDS[kid].name + '?')) save(ID, base, null);
 }, true);
 
+// The wake-up time field: while it's in use, the page isn't rebuilt under it (a rebuild closed the time
+// picker after each change). The page catches up when the field loses focus.
+let wokeBusy = false;
+document.addEventListener('focusin', (e) => { if (e.target.id === 'wokeAt') wokeBusy = true; });
+document.addEventListener('focusout', (e) => { if (e.target.id === 'wokeAt') { wokeBusy = false; render(); } });
+const rerender = () => { if (!wokeBusy) render(); };
 document.addEventListener('change', (e) => {
   if (e.target.id === 'wokeAt') save(ID, 'days/' + ymd(date) + '/' + kid + '/wokeAt', e.target.value || null);
 });
@@ -578,8 +584,8 @@ document.addEventListener('click', (e) => {
 }, true);
 
 render();
-watch(ID, (d) => { data = d; ctx.routines = d; render(); }, statusPill($('sync')));
-watch('config', (d) => { applyConfig(d); render(); });
-watch('eli-run', (d) => { ctx.run = d; render(); });
-watch('isaiah', (d) => { ctx.isaiah = d; render(); });
-watch('eli-drive', (d) => { ctx.drive = d; render(); });
+watch(ID, (d) => { data = d; ctx.routines = d; rerender(); }, statusPill($('sync')));
+watch('config', (d) => { applyConfig(d); rerender(); });
+watch('eli-run', (d) => { ctx.run = d; rerender(); });
+watch('isaiah', (d) => { ctx.isaiah = d; rerender(); });
+watch('eli-drive', (d) => { ctx.drive = d; rerender(); });
