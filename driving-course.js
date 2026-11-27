@@ -353,7 +353,7 @@ export const LESSONS = [
     questions: [
       q('w4d2q1', 'You’re turning left. A motorcycle is coming straight through from the other way. Who must yield?', ['The motorcycle, because it’s smaller', 'The first one into the middle', 'You, the driver turning left', 'Both may go together'], 2,
         'Drivers turning left must yield to oncoming traffic that is going straight ahead.', 19, 'Drivers turning left must yield to oncoming cars that are going straight ahead.'),
-      q('w4d2q4', 'You’re backing out of a driveway across the sidewalk. Who goes first?', ['You, since you’re in a car', 'People on the sidewalk', 'The first one to move', 'Cars parked nearby'], 1,
+      q('w4d2q4', 'You’re backing out of a driveway across the sidewalk. Who goes first?', ['You, since you’re in a car', 'People walking by', 'The first one to move', 'Cars parked nearby'], 1,
         'Drivers crossing a sidewalk or leaving a driveway, alley or parking lot must yield to people walking.', 19, 'Drivers crossing a sidewalk, entering or exiting a driveway, alley, or parking lot must yield to pedestrians.'),
       q('w4d2q5', 'When may you drive on a sidewalk?', ['To get around stopped traffic', 'When no one is walking', 'At low speed in town', 'Only to cross it'], 3,
         'Driving on a sidewalk is illegal except to cross it.', 19, 'It is illegal to drive on a sidewalk except to cross it.'),
@@ -361,7 +361,7 @@ export const LESSONS = [
         'Make sure you see the motorcycle and know its speed before you turn.', 58, 'Make sure you see the motorcycle and know its speed before you start to turn or enter an intersection.'),
       q('w4d2q2', 'Where are crashes between cars and motorcycles most likely?', ['At intersections', 'On long straight highways', 'In parking lots and garages', 'On gravel roads'], 0,
         'Intersections are where car and motorcycle crashes are most likely.', 58, 'Intersections are the most likely places for car/ motorcycle collisions to occur.'),
-      q('w4d2q7', 'Before turning at an intersection or driveway, who should you look for?', ['Parked cars', 'People walking, biking or skating', 'Traffic lights and signs', 'Trucks and buses'], 1,
+      q('w4d2q7', 'Before turning at an intersection or driveway, who should you look for?', ['Parked cars', 'People walking, biking or skating', 'Traffic lights and signs', 'Drivers waving you on'], 1,
         'Look especially for pedestrians, bicyclists, skaters and people in wheelchairs before you turn.', 58, 'Be especially careful to look for pedestrians, bicyclists, skaters, and people using wheelchairs or low-speed micromobility devices before turning at intersections and driveways.')
     ]
   },
