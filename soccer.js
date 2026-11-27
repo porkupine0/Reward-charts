@@ -1,10 +1,10 @@
-import { askParent } from './parent.js?v=1795809418';
-import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, isLive } from './store.js?v=1795809418';
-import { touchedOn } from './lists.js?v=1795809418';
+import { askParent } from './parent.js?v=1795811124';
+import { watch, save, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill, isLive } from './store.js?v=1795811124';
+import { touchedOn } from './lists.js?v=1795811124';
 
 const ID = 'isaiah';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795809418';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795811124';
 export { LEVELS };
 
 const $ = (id) => document.getElementById(id);

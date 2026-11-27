@@ -1,14 +1,14 @@
 // One place that decides what's on each kid's list for a day and whether each item is done.
 // The checklist page, the home "Today" list and the parent page all use these.
-import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795809418';
-import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795809418';
-import { SETTINGS, onSettings } from './settings.js?v=1795809418';
-import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795809418';
-import { rowsFor, TIED_FROM } from './charts.js?v=1795809418';
-import { LESSONS } from './driving-course.js?v=1795809418';
-import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795809418';
-import * as TESTS from './driving-tests.js?v=1795809418';
-import { planFor, dayDone, planEndYmd } from './plan.js?v=1795809418';
+import { ymd, addDays, mondayOf, parseYmd } from './store.js?v=1795811124';
+import { WEEKLY, afterSchool, weekend, bedtime, morning, choreItems, isDone, SKIP, EXCUSED, timerResult, atDate, STARTS, isSchoolDay, MEDS2, noSchoolTomorrow, trombone } from './routines.js?v=1795811124';
+import { SETTINGS, onSettings } from './settings.js?v=1795811124';
+import { stepShows, CADENCE_START, norm, choreSteps } from './chorelists.js?v=1795811124';
+import { rowsFor, TIED_FROM } from './charts.js?v=1795811124';
+import { LESSONS } from './driving-course.js?v=1795811124';
+import { dueOn, testDoneOn, openSittings } from './driving.js?v=1795811124';
+import * as TESTS from './driving-tests.js?v=1795811124';
+import { planFor, dayDone, planEndYmd } from './plan.js?v=1795811124';
 
 export const dowOf = (d) => (d.getDay() + 6) % 7; // Mon = 0
 // The baseline knowledge test on a day: 'open' (not finished by the end of that day), 'today' (finished that
@@ -88,6 +88,8 @@ export const EXTRA_CHORES = { eli: { '2026-11-23': 'Bathrooms', '2026-11-24': 'K
   '2026-11-27': 'Stairs, landing + upstairs hallway', '2026-11-28': 'Kitchen', '2026-11-29': 'Trash: empty every trash can in the house' },
   // Isaiah, Wed Nov 25, 2026 (the parent asked that morning)
   isaiah: { '2026-11-25': 'Restock + organize the mini fridge and downstairs fridge' } };
+// One-off afternoon boxes on a single day: { kid: { 'YYYY-MM-DD': item } }. Counts toward game time like his other after-school items.
+export const ONE_OFF = { isaiah: { '2026-11-27': { key: 'outside', label: 'Outside time · 30 min', sub: 'Get outside for 30 minutes today (parent’s request, Thanksgiving weekend)' } } };
 // Weeks a boy earns no game time (a parent's decision): { kid: [{ from, to, why }] } (dates inclusive).
 export const GAME_OFF = { eli: [{ from: '2026-11-23', to: '2026-11-29', why: 'No game time this week (video games lost)' }] };
 export const gameOffOn = (kid, date) => (GAME_OFF[kid] || []).find((o) => ymd(date) >= o.from && ymd(date) <= o.to) || null;
@@ -149,6 +151,9 @@ function listsOn(ctx, kid, date) {
     let at = -1; day.forEach((x, n) => { if (x.chore) at = n; });
     day.splice(at + 1, 0, it); // right after his usual chore(s)
   }
+  // One-off afternoon items (a single day, like an extra chore): { kid: { 'YYYY-MM-DD': item } }.
+  const once = (ONE_OFF[kid] || {})[ymd(date)];
+  if (once) { const w = day.findIndex((x) => x.weekly); day.splice(w >= 0 ? w : day.length, 0, Object.assign({}, once)); }
   // "every other time" and "monthly" chore steps: only on the days they're due
   day.forEach((it, n) => {
     if (!it.chore || !it.steps || !it.steps.some((s) => s.when)) return;
