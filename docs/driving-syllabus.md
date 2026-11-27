@@ -71,8 +71,8 @@ checks every day has a tag and that no advanced day comes before what it relies 
 
 The course climbs: units 1-3 are mostly beginner, units 4-8 mostly intermediate, units 6 and 9 mostly advanced.
 Finding: unit 4 day 4 (reduced-conflict intersections and the diverging diamond, advanced) comes before freeway
-ramps (5.2, unit 6 day 1). The lesson is already written; the Dec 3 skill-level review decides whether it needs
-a ramp primer or a later slot.
+ramps (5.2, unit 6 day 1). The lesson is written; on Nov 27 (before pinning) it got a ramp key point instead: "An interchange joins
+roads with ramps; on-ramps lead you onto the highway" (p.51). It stays in unit 4.
 
 ## Likely test questions
 Each of Iowa DOT's 68 practice questions maps to a unit: signs, signals and the sign pictures to unit 2; markings and lane changes to 3; right of way to 4; speed, stopping, turning, signaling distances and speed limits to 5; passing, freeway entrances and merging to 6; school buses (7 questions, the most of any one topic: their own day), emergency vehicles and Move Over (3) and motorcycles to 7; railroad, work zones, parking and backing to 8; headlights, rain, hydroplaning, gravel and skids to 9; phones, alcohol, implied consent and tires to 10; looking ahead, blind spots and following distance to 1.
