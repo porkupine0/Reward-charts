@@ -54,8 +54,13 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   p.on('console', m => { if (m.type() === 'error' && !/fonts|ERR_FAILED|firebase/.test(m.text())) errors.push(cur + ' CONSOLE ' + m.text()); });
   p.on('dialog', d => d.accept());
   const B = 'http://localhost:' + (process.env.PORT || 8765) + '/';
-  async function visit(u, shot, expectSync = true) {
+  async function visit(u, shot, expectSync = true, opts = {}) {
     cur = u; await p.goto(B + u); await p.waitForTimeout(450);
+    // the Parents page needs the PIN every visit: enter the test PIN (2468), or set it if there's none yet
+    if (/^parents\.html/.test(u) && !opts.noPin) {
+      const box = await p.waitForSelector('.pindlg input#pinbox', { timeout: 4000 }).catch(() => null);
+      if (box) { await box.fill('2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(400); }
+    }
     const shown = await p.evaluate(() => [...document.querySelectorAll('[hidden]')].filter((e) => e.getClientRects().length).map((e) => e.id || e.className || e.tagName));
     check(!shown.length, u + ' hidden but showing: ' + shown.join(', '));
     const ov = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -69,7 +74,7 @@ const check = (ok, msg) => { if (!ok) errors.push(msg); };
   const db = () => p.evaluate(() => JSON.parse(sessionStorage.getItem('mockdb') || '{}'));
 
   // 1. Every page, every kid, a few dates
-  for (const u of ['index.html', 'kid.html?kid=eli', 'kid.html?kid=rhett', 'kid.html?kid=isaiah', 'stats.html', 'eli.html', 'trombone.html', 'isaiah.html', 'run.html', 'run.html#history', 'trials.html', 'parents.html', 'settings.html', 'history.html?kid=rhett']) await visit(u);
+  for (const u of ['index.html', 'kid.html?kid=eli', 'kid.html?kid=rhett', 'kid.html?kid=isaiah', 'stats.html', 'eli.html', 'trombone.html', 'isaiah.html', 'run.html', 'run.html#history', 'trials.html', 'parents.html', 'settings.html', 'history.html?kid=rhett']) await visit(u, undefined, true, { noPin: true }); // (no PIN exists yet: none is created while loading)
   await visit('index.html');
   check((await p.$$('.person')).length === 4, 'home should have 4 people');
   check((await p.$eval('#n-eli', e => e.textContent)).length > 3, 'home Eli status empty');

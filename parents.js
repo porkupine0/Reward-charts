@@ -1,17 +1,17 @@
 // Parents page: what's owed, late nights, this week, Calendar reminders, backup and cleanup.
-import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795762536';
-import { CHARTS, weekProgress } from './charts.js?v=1795762536';
-import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795762536';
-import * as L from './lists.js?v=1795762536';
-import { owed, score, planned, fmt } from './trials.js?v=1795762536';
-import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795762536';
-import { askParent, setParent, changePin } from './parent.js?v=1795762536';
-import { dayFull } from './streaks.js?v=1795762536';
-import { owedItems } from './owed.js?v=1795762536';
-import { pruneList, pruneCutoff } from './prune.js?v=1795762536';
-import { testScore, testDoneOn, openSittings } from './driving.js?v=1795762536';
-import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795762536';
-import { nowHtml } from './nowview.js?v=1795762536';
+import { watch, save, isLive, ymd, parseYmd, mondayOf, addDays, shortDate, esc, statusPill } from './store.js?v=1795809418';
+import { CHARTS, weekProgress } from './charts.js?v=1795809418';
+import { KIDS, timerResult, bedtime, applyConfig, SKIP, EXCUSED, atDate } from './routines.js?v=1795809418';
+import * as L from './lists.js?v=1795809418';
+import { owed, score, planned, fmt } from './trials.js?v=1795809418';
+import { LEVELS, WEEKLY, CHAMPION } from './bm.js?v=1795809418';
+import { askParent, setParent, changePin } from './parent.js?v=1795809418';
+import { dayFull } from './streaks.js?v=1795809418';
+import { owedItems } from './owed.js?v=1795809418';
+import { pruneList, pruneCutoff } from './prune.js?v=1795809418';
+import { testScore, testDoneOn, openSittings } from './driving.js?v=1795809418';
+import { FORMS, SITTINGS, PASS } from './driving-tests.js?v=1795809418';
+import { nowHtml } from './nowview.js?v=1795809418';
 
 const $ = (id) => document.getElementById(id);
 const IDS = ['routines', 'eli-run', 'eli-drive', 'isaiah', 'eli', 'trombone', 'zay', 'eli-trials', 'config'];
@@ -287,3 +287,18 @@ $('ics').innerHTML = Object.entries(KIDS).map(([id, k]) => '<button class="pillb
 render();
 setInterval(render, 60000);
 IDS.forEach((id, i) => watch(id, (d) => { D[id] = d; if (id === 'config') applyConfig(d); render(); }, i === 0 ? statusPill($('sync')) : null));
+
+// The whole page needs the PIN every time it's opened (the parent's rule, Nov 27, 2026), even on a parent's
+// phone: it stays covered until the PIN is entered, and covers again when the page is restored from the back
+// button's cache. The PIN boxes on other pages keep their own rule (a parent's phone stays unlocked).
+let opening = false;
+async function openPage() {
+  if (opening) return;
+  if (!isLive('settings')) { setTimeout(openPage, 300); return; }
+  opening = true;
+  try { if (await askParent({ always: true })) document.body.classList.remove('locked'); } finally { opening = false; }
+}
+document.getElementById('unlockbtn').onclick = openPage;
+openPage();
+window.addEventListener('pageshow', (e) => { if (e.persisted) { document.body.classList.add('locked'); openPage(); } });
+

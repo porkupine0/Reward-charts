@@ -3,7 +3,7 @@
 // unlocks for 15 minutes. The PIN is stored as a hash, never as digits.
 // A new PIN can only be created once the saved settings have loaded and there truly isn't one,
 // so a slow connection can never replace the real PIN.
-import { watch, save, isLive } from './store.js?v=1795762536';
+import { watch, save, isLive } from './store.js?v=1795809418';
 
 let rec = {};
 watch('settings', (d) => { rec = d || {}; });
@@ -81,8 +81,10 @@ function notice(msg) {
 }
 
 // Resolves true when this phone may use parent boxes, asking for the PIN once if needed.
-export async function askParent() {
-  if (isParent()) return true;
+// { always: true } asks every time, even on a parent's phone (the Parents page itself: the parent's rule,
+// Nov 27, 2026: the whole page needs the PIN each time it's opened).
+export async function askParent(opts = {}) {
+  if (isParent() && !opts.always) return true;
   if (!isLive('settings')) { notice('Still connecting. Parent boxes unlock once this phone is online.'); return false; }
   const stored = rec.pinHash || (rec.pin ? 'legacy' : null);
   if (!stored) {
@@ -93,14 +95,14 @@ export async function askParent() {
     return true;
   }
   for (let tries = 0; tries < 3; tries++) {
-    const r = await pinDialog('Parents only', tries ? 'That PIN didn’t match. Try again.' : 'Enter the parent PIN to unlock parent boxes.', true);
+    const r = await pinDialog('Parents only', tries ? 'That PIN didn’t match. Try again.' : opts.always ? 'Enter the parent PIN to open the Parents page.' : 'Enter the parent PIN to unlock parent boxes.', !opts.always);
     if (r === null) return false;
-    const p = r.pin;
+    const p = typeof r === 'string' ? r : r.pin;
     const ok = stored === 'legacy' ? p === String(rec.pin) : (await hash(p)) === rec.pinHash;
     if (ok) {
       // Older PINs were saved as plain digits: replace with a hash.
       if (stored === 'legacy') { await save('settings', 'pinHash', await hash(p)); save('settings', 'pin', null); }
-      setParent(true, r.keep);
+      if (!opts.always || !isParent()) setParent(true, opts.always ? isParentPhone() : r.keep);
       return true;
     }
   }

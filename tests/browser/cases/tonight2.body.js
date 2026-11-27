@@ -10,21 +10,15 @@
       rhett: { bedTimer: { start: s, end: e } }, eli: { reading: '~skip' } } } } } }));
   }, [PINHASH, lateStart, lateEnd]);
   await visit('parents.html', 'tonight2');
-  // cancelled PIN saves nothing
-  await tap('[data-allgood="2026-11-18|rhett"]');
-  await p.waitForSelector('.pindlg', { timeout: 2000 });
-  await p.click('.pindlg [data-pin="cancel"]'); await p.waitForTimeout(200);
-  let st = (await db()).charts.routines.days['2026-11-18'].rhett;
-  check(st.noYell === undefined && st.firstTime === undefined && st.noLies === undefined, 'cancelled PIN saved nothing');
-  // another phone says "Not today" while the PIN box is open
-  await tap('[data-allgood="2026-11-18|rhett"]');
-  await p.waitForSelector('.pindlg input', { timeout: 2000 });
+  // the page took the PIN on the way in, so All good saves at once; it doesn't undo a "Not today" another
+  // phone set first
   await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-18/rhett/noLies', 'no'); });
-  await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(400);
-  st = (await db()).charts.routines.days['2026-11-18'].rhett;
-  notes.push('rhett after race: ' + JSON.stringify({ noYell: st.noYell, firstTime: st.firstTime, noLies: st.noLies }));
-  check(st.noLies === 'no' && st.noYell === true && st.firstTime === true, 'Not today survived; the other two saved from one prompt');
-  check((await p.$$('.pindlg')).length === 0, 'only one PIN prompt');
+  await p.waitForTimeout(150);
+  await tap('[data-allgood="2026-11-18|rhett"]'); await p.waitForTimeout(300);
+  const st = (await db()).charts.routines.days['2026-11-18'].rhett;
+  notes.push('rhett: ' + JSON.stringify({ noYell: st.noYell, firstTime: st.firstTime, noLies: st.noLies }));
+  check(st.noLies === 'no' && st.noYell === true && st.firstTime === true, 'Not today kept; the other two saved, no second PIN');
+  check((await p.$$('.pindlg')).length === 0, 'no PIN prompt inside the page');
   // late bedtime and excuse rows
   const rows = await p.$eval('#tonight', (e) => e.textContent);
   check(/min late/.test(rows), 'late bedtime row shown');

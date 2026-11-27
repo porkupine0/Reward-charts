@@ -26,8 +26,8 @@ LESSONS[0].questions[0].sign = { shape: 'octagon', color: 'red' };`;
   await visit('drive.html', 'drive-preview');
   check(!(await p.$('.dprev')), 'no answers before the PIN');
   await p.click('#previewbtn');
-  await p.waitForSelector('.pindlg input', { timeout: 2000 });
-  await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
+  // (the Parents page itself took the PIN on the way in; a second prompt only if that unlock has lapsed)
+  if (await p.waitForSelector('.pindlg input', { timeout: 800 }).catch(() => null)) { await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300); }
   check((await p.$$('.dprev')).length === 3, 'preview lists the lessons');
   await p.click('[data-approve="F1|yes"]'); await p.waitForTimeout(300);
   check((await db()).charts['eli-drive'].approved.F1 === '2026-11-18', 'F1 approved (stored as the day)');

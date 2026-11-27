@@ -1,55 +1,43 @@
-  // Parent unlock: unticked = 15 minutes, ticked "parent's phone" = stays unlocked, old flag asks again.
+  // The Parents page needs the PIN every time it's opened (the parent's rule, Nov 27, 2026), even on a parent's
+  // phone: covered until the PIN is right; Cancel or a wrong PIN keeps it covered; "Enter PIN" asks again; the
+  // back button's cache doesn't skip it. Inside the page, parent buttons don't ask a second time.
   const PINHASH = '30fb85852fe669dfbf8e52b679886067b7ac636b8478c831607e50cade42329d'; // 2468
-  const t0 = new Date(2026, 10, 18, 20, 0).getTime();
-  await p.clock.install({ time: t0 });
-  await p.clock.resume(); // let timers run; jump ahead with fastForward
+  await p.clock.install({ time: new Date(2026, 10, 18, 20, 0).getTime() });
+  await p.clock.resume();
   await p.goto(B + 'index.html');
   await p.evaluate((h) => { localStorage.clear(); sessionStorage.setItem('mockdb', JSON.stringify({ charts: { settings: { pinHash: h }, routines: { days: {} } } })); }, PINHASH);
-  const asks = async (dk = '2026-11-18') => {
-    await visit('parents.html', 'unlock');
-    await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-18/eli', null); await m.save('routines', 'days/2026-11-19/eli', null); });
-    await p.waitForTimeout(150);
-    if (!(await p.$('[data-allgood="' + dk + '|eli"]'))) {
-      errors.push('no All good button: ' + (await p.$eval('#tnhead', (e) => e.textContent)) + ' / ' + (await p.$eval('#tonight', (e) => e.textContent)).slice(0, 100) + ' / ' + (await p.$eval('#sync', (e) => e.textContent)));
-      return null;
-    }
-    await p.click('[data-allgood="' + dk + '|eli"]');
-    const shown = await p.waitForSelector('.pindlg input', { timeout: 1500 }).then(() => true).catch(() => false);
-    return shown;
-  };
-  const enter = async (keep) => { if (!(await p.$('.pindlg input'))) { errors.push('no PIN box to fill'); return; } if (keep) await p.check('#pinkeep'); await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300); };
-  // 1. unticked: unlocked now, asks again after 16 minutes
-  check(await asks(), 'first time asks');
-  await enter(false);
-  check(!(await asks()), 'unticked: no ask within 15 min');
-  await p.clock.fastForward('16:00');
-  check(await asks(), 'unticked: asks again after 16 min');
-  await enter(true); // 2. ticked: still unlocked a day later
-  await p.clock.fastForward('24:00:00'); // the evening of Nov 19
-  check(!(await asks('2026-11-19')), 'ticked: no ask a day later');
-  // 3. Lock this phone clears it
-  await visit('parents.html', 'unlock-lock');
+  const covered = () => p.evaluate(() => document.body.classList.contains('locked') && getComputedStyle(document.getElementById('tncard')).display === 'none');
+  // 1. it asks on the way in; Cancel keeps the page covered
+  await visit('parents.html', 'unlock-ask', true, { noPin: true });
+  check(!!(await p.waitForSelector('.pindlg input', { timeout: 3000 }).catch(() => null)), 'asks for the PIN on the way in');
+  check(!(await p.$('#pinkeep')), 'no "parent’s phone" box here: it asks every time');
+  await p.click('.pindlg [data-pin="cancel"]'); await p.waitForTimeout(200);
+  check(await covered(), 'Cancel: the page stays covered');
+  await p.screenshot({ path: OUT + 'unlock-covered.png' });
+  // 2. a wrong PIN keeps it covered; the right one opens it
+  await p.click('#unlockbtn');
+  await p.waitForSelector('.pindlg input', { timeout: 2000 });
+  await p.fill('.pindlg input', '1111'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
+  check(/didn’t match/.test(await p.$eval('.pindlg', (e) => e.textContent)) && await covered(), 'a wrong PIN: still covered, asks again');
+  await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
+  check(!(await covered()), 'the right PIN opens the page');
+  // 3. inside, a parent button doesn't ask again
+  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-18/eli', null); });
+  await p.waitForTimeout(150);
+  if (await p.$('[data-allgood="2026-11-18|eli"]')) {
+    await p.click('[data-allgood="2026-11-18|eli"]'); await p.waitForTimeout(300);
+    check(!(await p.$('.pindlg')), 'inside the page: no second PIN');
+  }
+  // 4. even a parent's phone (stays unlocked elsewhere) is asked again on the next visit
+  await p.evaluate(() => localStorage.setItem('rc:unlock', JSON.stringify({ always: true })));
+  await visit('parents.html', 'unlock-again', true, { noPin: true });
+  check(!!(await p.waitForSelector('.pindlg input', { timeout: 3000 }).catch(() => null)) && await covered(), 'next visit, even on a parent’s phone: asks again, covered');
+  await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(300);
+  check(!(await covered()) && await p.evaluate(() => JSON.parse(localStorage.getItem('rc:unlock') || '{}').always === true), 'opens; the phone stays a parent’s phone for the other pages');
+  // 5. Lock this phone still clears the unlock
   await p.click('#lock'); await p.waitForTimeout(100);
   check(await p.evaluate(() => localStorage.getItem('rc:unlock') === null), 'Lock this phone clears the unlock');
-  // 4. old forever flag: honoured until Mon Nov 23, Lock clears it, from Nov 23 it asks and is removed
-  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rc:parent', '1'); });
-  check(!(await asks('2026-11-19')), 'old flag: no ask before Nov 23');
-  await visit('index.html', 'unlock-home-legacy');
-  notes.push('home line: ' + (await p.$eval('#parentline', (e) => e.textContent)).slice(0, 60));
-  check(/until Monday, Nov 23/.test(await p.$eval('#parentline', (e) => e.textContent)), 'home explains the switch');
-  await visit('parents.html', 'unlock-lock2');
-  await p.click('#lock'); await p.waitForTimeout(100);
-  check(await asks('2026-11-19'), 'old flag: Lock makes it ask');
-  await p.click('.pindlg [data-pin="cancel"]');
-  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rc:parent', '1'); });
-  await p.clock.setSystemTime(new Date(2026, 10, 23, 20, 0).getTime());
-  await visit('parents.html', 'unlock-nov23');
-  await p.evaluate(async () => { const m = await import('./store.js?v=' + window.__V); await m.save('routines', 'days/2026-11-23/eli', null); });
-  await p.click('[data-allgood="2026-11-23|eli"]');
-  check(await p.waitForSelector('.pindlg input', { timeout: 1500 }).then(() => true).catch(() => false), 'old flag: asks from Nov 23');
-  check(await p.evaluate(() => localStorage.getItem('rc:parent') === null), 'old flag removed from Nov 23');
-  // the PIN box, light and dark
-  await p.screenshot({ path: OUT + 'pin-light.png' });
-  await p.emulateMedia({ colorScheme: 'dark' });
-  await p.screenshot({ path: OUT + 'pin-dark.png' });
-  await p.emulateMedia({ colorScheme: 'light' });
+  // 6. back from another page (the browser's page cache): covered and asking again
+  await p.goto(B + 'index.html'); await p.waitForTimeout(300);
+  await p.goBack(); await p.waitForTimeout(600);
+  check(await covered() || !!(await p.$('.pindlg input')), 'back button: covered again');

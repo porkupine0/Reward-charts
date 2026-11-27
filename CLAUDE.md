@@ -21,6 +21,8 @@ GitHub Pages, data in Firebase (`config.js`). Standing rules live here; dated hi
 - **Chore lists** match a chore by exact name (a unit test checks built-in names against the chores, plus
   Isaiah's "Laundry" and "Clean your room (30 min)"); step ids hash the chore name + step text.
 - **Every parent-only action goes through `askParent`** (PIN): cash-ins, grounding, approvals, Settings.
+  The Parents page as a whole needs the PIN on every visit, even on a parent's phone (parent, Nov 27):
+  `askParent({ always: true })` in parents.js; the page stays covered (`body.locked`) until it's right.
 - **New database paths** need a rule in `database.rules.json` and a line in `tests/rules.test.mjs`. The rules
   aren't applied yet; once they are, the parent must republish them for a new path to save.
 - **driving-course.js is append-only:** never reorder or remove lessons; add questions only at the end of a

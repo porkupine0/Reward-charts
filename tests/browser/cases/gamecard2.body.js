@@ -25,7 +25,7 @@
   await visit('index.html', 'link-home');
   await p.locator('#parentline').screenshot({ path: OUT + 'link-home.png' });
   await p.evaluate(() => localStorage.removeItem('rc:unlock'));
-  await p.evaluate(() => { const db = JSON.parse(sessionStorage.getItem('mockdb')); db.charts.settings = { pinHash: 'x' }; sessionStorage.setItem('mockdb', JSON.stringify(db)); });
+  await p.evaluate(() => { const db = JSON.parse(sessionStorage.getItem('mockdb')); db.charts.settings = { pinHash: '30fb85852fe669dfbf8e52b679886067b7ac636b8478c831607e50cade42329d' }; sessionStorage.setItem('mockdb', JSON.stringify(db)); });
   await visit('parents.html', 'link-pin');
   await p.click('#pin'); await p.waitForTimeout(300);
   await p.screenshot({ path: OUT + 'link-pin.png' });

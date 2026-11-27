@@ -8,8 +8,8 @@
   check(/25 min left/.test(txt) && /25 carried over/.test(txt), 'Rhett 25 min left: ' + txt.replace(/\s+/g, ' ').slice(0, 120));
   check(!!(await p.$('[data-bank="rhett|15"]')) && !(await p.$('[data-bank="rhett|30"]')), 'only amounts he has');
   await p.click('[data-bank="rhett|15"]');
-  await p.waitForSelector('.pindlg input', { timeout: 2000 });
-  await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(400);
+  // (the Parents page itself took the PIN on the way in; a second prompt only if that unlock has lapsed)
+  if (await p.waitForSelector('.pindlg input', { timeout: 800 }).catch(() => null)) { await p.fill('.pindlg input', '2468'); await p.click('.pindlg [data-pin="ok"]'); await p.waitForTimeout(400); }
   const g = (await db()).charts.routines.game.rhett['2026-11-30'];
   check(g && Object.values(g).includes(15), 'cashed in 15 min this week');
   check(/10 min left/.test(await p.$eval('#bank', (e) => e.textContent)), 'now 10 left');

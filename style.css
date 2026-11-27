@@ -759,3 +759,8 @@ input[type="time"], .field input, select { background: var(--surface); color: va
 .tbtn.deny:disabled { opacity: .45; cursor: not-allowed; }
 #bank .prow2 .exbtns { grid-column: 2 / -1; justify-content: flex-start; flex-wrap: wrap; }
 .bank-log { margin: -4px 0 8px 68px; }
+/* Parents page: covered until the PIN is entered (every visit) */
+.pagelock { display: none; text-align: center; }
+body.locked .pagelock { display: block; }
+body.locked main.wrap > :not(nav):not(.pagelock) { display: none !important; }
+
