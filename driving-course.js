@@ -332,7 +332,7 @@ export const LESSONS = [
     questions: [
       q('w4d1q3', 'No signs or signals at an intersection. You and a car on your left arrive at about the same time. Who yields?', ['The car on your left yields to you', 'You yield to the car on your left', 'The faster car goes first', 'Both stop and wait for a wave'], 0,
         'At an intersection with no signs or signals, the driver on the left yields to the driver on the right.', 19, 'The driver on the left (red car) must yield to the driver on the right (green car).'),
-      q('w4d1q6', 'Unless a sign says otherwise, when may you turn right at a red light?', ['Without stopping, if no one is coming', 'After a full stop, yielding to traffic and walkers', 'Never; wait for the green light', 'After slowing down, if it’s clear'], 1,
+      q('w4d1q6', 'Unless a sign says otherwise, when may you turn right at a red light?', ['Without stopping, if no one is coming', 'After stopping fully and yielding', 'Never; wait for the green light', 'After slowing down, if it’s clear'], 1,
         'Right turns on red are allowed unless a sign forbids them; you must still yield after stopping.', 19, 'Right turns on red are permitted unless there is a sign prohibiting them.'),
       q('w4d1q1', 'At an all-way stop, which driver goes first?', ['The one going straight', 'The bigger vehicle', 'The first to arrive', 'The one that waves others on'], 2,
         'At an all-way stop, the driver who reaches the intersection first goes first, after a complete stop.', 19, 'At an all-way stop, the driver reaching the intersection first gets to go first'),
@@ -340,7 +340,7 @@ export const LESSONS = [
         'When vehicles arrive at the same time, the vehicle to the right goes first.', 19, 'For vehicles arriving at the same time, the vehicle to the right gets to go first.'),
       q('w4d1q4', 'At an intersection with no stop sign or signal, what must every driver do?', ['Slow down and approach carefully', 'Keep their speed; nobody has to stop', 'Speed up to clear it quickly', 'Come to a full stop every single time'], 0,
         'It’s every driver’s job to slow down and approach carefully.', 19, 'it’s the responsibility of all drivers to slow down and approach carefully.'),
-      q('w4d1q8', 'At a two-way stop (cross traffic doesn’t stop), you want to turn left from the stop sign. Who goes first?', ['You, since you stopped first', 'The car nearest the middle', 'Cross traffic', 'Cars behind you in line'], 2,
+      q('w4d1q8', 'At a two-way stop, you want to turn left from the stop sign. Who goes first?', ['You, since you stopped first', 'The car nearest the middle', 'Cross traffic', 'Cars behind you in line'], 2,
         'At a stop sign, wait until crossing vehicles and the crosswalk are clear before you go.', 8, 'wait until crossing vehicles and the cross-walk are clear before proceeding.')
     ]
   },
@@ -352,8 +352,8 @@ export const LESSONS = [
     videos: [{ yt: 'ZdSCgNm4atQ', title: 'How to Turn Left at Intersections - Unprotected Left Turns', channel: 'Zutobi Drivers Ed', len: '12:05', iowa: 'Iowa’s manual: turning left, yield to oncoming traffic going straight, including motorcycles and bicycles.' }],
     questions: [
       q('w4d2q1', 'You’re turning left. A motorcycle is coming straight through from the other way. Who must yield?', ['The motorcycle, because it’s smaller', 'The first one into the middle', 'You, the driver turning left', 'Both may go together'], 2,
-        'Drivers turning left must yield to oncoming traffic going straight, motorcycles included.', 19, 'Drivers turning left must yield to oncoming cars that are going straight ahead.'),
-      q('w4d2q4', 'You’re backing out of a driveway across the sidewalk. Who goes first?', ['You, since you’re in a car', 'People on the sidewalk', 'The first one to move', 'Cars on the street'], 1,
+        'Drivers turning left must yield to oncoming traffic that is going straight ahead.', 19, 'Drivers turning left must yield to oncoming cars that are going straight ahead.'),
+      q('w4d2q4', 'You’re backing out of a driveway across the sidewalk. Who goes first?', ['You, since you’re in a car', 'People on the sidewalk', 'The first one to move', 'Cars parked nearby'], 1,
         'Drivers crossing a sidewalk or leaving a driveway, alley or parking lot must yield to people walking.', 19, 'Drivers crossing a sidewalk, entering or exiting a driveway, alley, or parking lot must yield to pedestrians.'),
       q('w4d2q5', 'When may you drive on a sidewalk?', ['To get around stopped traffic', 'When no one is walking', 'At low speed in town', 'Only to cross it'], 3,
         'Driving on a sidewalk is illegal except to cross it.', 19, 'It is illegal to drive on a sidewalk except to cross it.'),
@@ -361,7 +361,7 @@ export const LESSONS = [
         'Make sure you see the motorcycle and know its speed before you turn.', 58, 'Make sure you see the motorcycle and know its speed before you start to turn or enter an intersection.'),
       q('w4d2q2', 'Where are crashes between cars and motorcycles most likely?', ['At intersections', 'On long straight highways', 'In parking lots and garages', 'On gravel roads'], 0,
         'Intersections are where car and motorcycle crashes are most likely.', 58, 'Intersections are the most likely places for car/ motorcycle collisions to occur.'),
-      q('w4d2q7', 'Before turning at an intersection or driveway, who should you look for?', ['Oncoming cars', 'People walking, biking or skating', 'Traffic lights and signs', 'Trucks and buses'], 1,
+      q('w4d2q7', 'Before turning at an intersection or driveway, who should you look for?', ['Parked cars', 'People walking, biking or skating', 'Traffic lights and signs', 'Trucks and buses'], 1,
         'Look especially for pedestrians, bicyclists, skaters and people in wheelchairs before you turn.', 58, 'Be especially careful to look for pedestrians, bicyclists, skaters, and people using wheelchairs or low-speed micromobility devices before turning at intersections and driveways.')
     ]
   },
@@ -392,7 +392,7 @@ export const LESSONS = [
     key: [k('Reduced-conflict intersection: to go left or across, turn right, then U-turn at the median.', 52, 'will turn right onto the highway, merge into the left lane and then make a U-turn at a designated median opening.'),
       k('You only watch one direction of highway traffic at a time.', 52, 'drivers are only concerned with one direction of traffic on the highway at a time.'),
       k('A diverging diamond briefly puts you on the opposite side of the road.', 53, 'it directs drivers on the opposite side of the road briefly before diverging back into the correct direction.'),
-      k('An interchange joins roads with ramps; on-ramps lead you onto the highway.', 51, 'On-ramps are used to enter an interstate or highway')],
+      k('On-ramps are how you get onto an interstate or highway.', 51, 'On-ramps are used to enter an interstate or highway')],
     videos: [{ yt: 'xOqMwNLKKto', title: 'Reduced Conflict Intersections', channel: 'Iowa DOT Answers', len: '3:44' },
       { yt: 'bxkur5Wl4Ok', title: 'Navigating the Diverging Diamond Interchange', channel: 'Iowa DOT Answers', len: '4:30' }],
     questions: [
