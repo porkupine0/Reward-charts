@@ -41,3 +41,11 @@
   await p.goto(B + 'index.html'); await p.waitForTimeout(300);
   await p.goBack(); await p.waitForTimeout(600);
   check(await covered() || !!(await p.$('.pindlg input')), 'back button: covered again');
+  // 7. left open, then switched away from and back: covered and asking again
+  await p.fill('.pindlg input', '2468').catch(() => {}); await p.click('.pindlg [data-pin="ok"]').catch(() => {}); await p.waitForTimeout(300);
+  check(!(await covered()), 'open again after the PIN');
+  await p.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); });
+  check(await covered(), 'hidden: covered at once');
+  await p.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => false }); document.dispatchEvent(new Event('visibilitychange')); });
+  check(!!(await p.waitForSelector('.pindlg input', { timeout: 3000 }).catch(() => null)), 'shown again: asks for the PIN');
+
