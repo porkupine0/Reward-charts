@@ -1,4 +1,4 @@
-import { checkSign } from './signs.js?v=1795848677';
+import { checkSign } from './signs.js?v=1795849174';
 // Eli's driving course: the rules, with no page and no content (content lives in driving-course.js later).
 // A lesson is { id, title, review?, videos: [...], questions: [{ id, q, choices, answer, why, ref }] }.
 // Progress (stored per lesson and question, never as lists):
@@ -320,6 +320,17 @@ export function guessReport(name, qs) {
   });
   const n = ranks.reduce((x, y) => x + y, 0), worst = n ? Math.max(...ranks) / n : 0;
   if (n >= 8 && worst > 0.35) issues.unshift(name + ': the right answer is the same length rank in ' + Math.round(worst * 100) + '% (' + ranks.join('/') + ', longest to shortest; keep each at 35% or less)');
-  Object.entries(wrong).forEach(([w, ids]) => { if (ids.length >= 4 && !right[w]) issues.push(name + ': "' + w + '" opens ' + ids.length + ' wrong choices and no right one (' + ids.join(', ') + ')'); });
-  return { ranks, worst, issues };
+  // a listed filler opening 4+ wrong choices and at most a third as many right ones (one right "Only to cross
+  // it" no longer hides a dozen wrong "Only..." choices)
+  Object.entries(wrong).forEach(([w, ids]) => { const r = (right[w] || []).length; if (ids.length >= 4 && ids.length >= 3 * Math.max(1, r) + (r ? 0 : -2)) issues.push(name + ': "' + w + '" opens ' + ids.length + ' wrong choices and ' + (r ? 'only ' + r : 'no') + ' right one' + (r === 1 ? '' : 's') + ' (' + ids.join(', ') + ')'); });
+  // the right answer is the odd one out: the three wrong choices open with the same word and it doesn't
+  // (one "No" against three "Yes"), or it alone has a colon or semicolon
+  const lone = [];
+  qs.filter((q) => (q.choices || []).length === 4).forEach((q) => {
+    const first = q.choices.map((c) => (c.toLowerCase().match(/[a-z’']+/) || [''])[0]), wr = first.filter((_, i) => i !== q.answer);
+    if (wr.every((w) => w === wr[0]) && first[q.answer] !== wr[0]) lone.push(q.id + ': the right answer is the only one not opening with "' + wr[0] + '"');
+    const punct = q.choices.map((c) => /[:;]/.test(c));
+    if (punct[q.answer] && punct.filter(Boolean).length === 1) lone.push(q.id + ': the right answer is the only choice with a colon or semicolon');
+  });
+  return { ranks, worst, issues, lone };
 }

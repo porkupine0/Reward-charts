@@ -413,3 +413,16 @@ test('Form B (progress test 1) is unchanged', async () => {
   assert.equal(createHash('sha256').update(JSON.stringify(FORMS.B)).digest('hex'), '06dfdc61326cd32f019ed9ab9a57b95b7c05aaeae83dc5bc7a8d3f5798e6779e');
 });
 
+
+// Lone-answer tells (guessReport().lone): a hard rule for units 5+ and Forms C+; pinned units 1-4 and Forms A-B
+// are reported only (scripts/guess-report.mjs), since they can't change.
+test('no lone-answer tells in new units and forms', async () => {
+  const { LESSONS } = await import('../driving-course.js?v=' + V), { FORMS } = await import('../driving-tests.js?v=' + V);
+  const isNew = (g) => (/^unit (\d+)/.test(g) && Number(g.split(' ')[1]) >= 5) || (/^form [C-Z]$/.test(g));
+  const units = {};
+  LESSONS.forEach((l) => { const u = 'unit ' + l.id.match(/^w(\d+)/)[1]; (units[u] = units[u] || []).push(...(l.questions || [])); });
+  const groups = [...Object.entries(units), ...Object.entries(FORMS).map(([f, qs]) => ['form ' + f, qs])].filter(([g]) => isNew(g));
+  assert.deepEqual(groups.flatMap(([g, qs]) => D.guessReport(g, qs).lone), []);
+  const t = D.guessReport('t', [{ id: 'a', choices: ['Yes, if x', 'Yes, if y', 'No', 'Yes, always'], answer: 2 }, { id: 'b', choices: ['Go: now', 'Wait', 'Stop', 'Turn'], answer: 0 }]);
+  assert.equal(t.lone.length, 2, 'the check catches a lone "No" and a lone colon');
+});
