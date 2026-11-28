@@ -113,3 +113,23 @@ number for the same case; another number from the same sentence may follow.
   explanation, or quote the same manual words (Eli can read every explanation after a test). It can't catch a
   repeat in different words (the old tB08 repeated tA09's "from behind, you always stop"): the blind check must.
 
+## Nov 28: thin topics allocated across Forms C-F (school buses/emergency 4 per form, railroad/work zones 2)
+Already used: A: tA08 amber from the front 20 mph, tA09 four-lane meeting from the front, tA10 pull right for an
+emergency vehicle (its explanation adds "drive through an intersection first"), tA11 move over (its explanation
+lists tow/maintenance/hazard lights), tA12 15 feet from the rail, tA13 orange work-zone signs. B: tB08 15 feet
+behind the bus, tB09 500 feet behind an emergency vehicle, tB10 180-day suspension, tB11 three lanes or fewer all
+stop, tB12 45-degree angle toward the train, tB13 fines double.
+
+| Form | School buses and emergency (4) | Railroad and work zones (2) |
+|---|---|---|
+| C | p.20 stay stopped until the arm is in and the bus moves; p.19 divided by a median, the other side needn't stop; p.22 move-over violation: suspension up to one year (number); p.20 from behind, never pass while red or amber lights flash | p.14 arrow boards: a lane or shoulder is closed; p.12 passive crossing (crossbuck only): slow down, look, expect a train |
+| D | p.20 amber lights: the bus is about to stop (DOT 59); p.22 Steer It-Clear It: a crash with no injuries, move the car out of the lanes; p.20 a four-lane road from behind: stop (B's tB08 is distance, not this); p.19 emergency vehicle at an intersection: drive through first, then pull over | p.14 flaggers: follow their stop/slow paddle; p.12 never stop on the tracks |
+| E | p.20 loading sequence: amber, then red and the arm (DOT 49); p.22 move over: no speed set, it must be reasonable; p.20 two-lane with a centre turn lane, meeting: stop; p.19 emergency vehicle: don't follow closely (500 ft, A/B-free by then) | p.14 channelizing devices (cones, drums, barricades) guide you; p.12 school buses and hazmat vehicles stop 15-50 feet before crossings |
+| F | p.22 move over also for a car with hazard lights on; p.20 three lanes or fewer: everyone stops (B fact, F not consecutive); p.19 pull right for an emergency vehicle (A fact); p.20 180-day suspension (B fact) | p.14 work zones: increase following distance; p.12 trains are wider than the tracks (A's explanation; F not consecutive to A) |
+
+Form C numbers after Form B took two: 60 mph primary roads (p.42), 4-5 seconds at 40 mph (p.41), 10 feet from a
+stop sign (p.21), 50 feet from a railroad crossing (p.21), BAC .08 (p.37), 6 inches of water (p.60), $1,500 crash
+report (p.63), move-over suspension up to one year (p.22), 20 feet from a fire station entrance (p.21, from D's
+list). That's 9. Signs for C: shapes no earlier form asked or explained: a diamond (merging traffic? no: unit 2
+asks it; use a work-zone or warning diamond meaning) and the coloured rectangles (green, blue, brown).
+
